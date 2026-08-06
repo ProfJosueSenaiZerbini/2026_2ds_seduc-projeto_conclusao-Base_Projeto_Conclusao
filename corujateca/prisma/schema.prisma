@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model bibliotecario {
+  id_bibliotecario      Int                 @id @default(autoincrement())
+  nome_bibliotecario    String              @db.VarChar(255)
+  senha_bibliotecario   String              @db.VarChar(255)
+  inativo_bibliotecario Boolean             @default(false)
+  emprestimo            emprestimo[]
+  multa                 multa[]
+  tel_bibliotecario     tel_bibliotecario[]
+}
+
+model emprestimo {
+  id_emprestimo                     Int           @id @default(autoincrement())
+  dta_emprestimo                    DateTime      @db.Date
+  dta_devolucao                     DateTime      @db.Date
+  dta_devolucao_real                DateTime?     @db.Date
+  inativo_emprestimo                Boolean       @default(false)
+  fk_bibliotecario_id_bibliotecario Int
+  fk_exemplar_id_exemplar           Int
+  fk_frequentador_id_freq           Int
+  bibliotecario                     bibliotecario @relation(fields: [fk_bibliotecario_id_bibliotecario], references: [id_bibliotecario], onDelete: NoAction, onUpdate: NoAction, map: "fk_emp_bibliotecario")
+  exemplar                          exemplar      @relation(fields: [fk_exemplar_id_exemplar], references: [id_exemplar], onDelete: NoAction, onUpdate: NoAction, map: "fk_emp_exemplar")
+  frequentador                      frequentador  @relation(fields: [fk_frequentador_id_freq], references: [id_freq], onDelete: NoAction, onUpdate: NoAction, map: "fk_emp_frequentador")
+}
+
+model exemplar {
+  id_exemplar       Int                  @id @default(autoincrement())
+  inativo_exemplar  Boolean              @default(false)
+  status_exemplar   status_exemplar_enum @default(Dispon_vel)
+  fk_livro_id_livro Int
+  emprestimo        emprestimo[]
+  livro             livro                @relation(fields: [fk_livro_id_livro], references: [id_livro], onDelete: NoAction, onUpdate: NoAction, map: "fk_exp_id_livro")
+}
+
+model frequentador {
+  id_freq        Int          @id @default(autoincrement())
+  nome_freq      String       @db.VarChar(255)
+  senha_freq     String       @db.VarChar(255)
+  inativo_freq   Boolean      @default(false)
+  suspensao_freq Boolean      @default(false)
+  emprestimo     emprestimo[]
+  multa          multa[]
+  tel_freq       tel_freq[]
+}
+
+model livro {
+  id_livro          Int        @id @default(autoincrement())
+  isbn              String     @unique @db.VarChar(13)
+  titulo_livro      String     @db.VarChar(255)
+  autor_livro       String     @db.VarChar(255)
+  sinopse_livro     String?
+  editora_livro     String     @db.VarChar(255)
+  anopub_livro      Int        @db.SmallInt
+  imgcapa_livro     String     @db.VarChar(130)
+  genero_livro      String     @db.VarChar(30)
+  inativo_livro     Boolean    @default(false)
+  localizacao_livro String     @db.VarChar(130)
+  exemplar          exemplar[]
+}
+
+model multa {
+  id_multa                          Int           @id @default(autoincrement())
+  dta_inicio_multa                  DateTime      @db.Date
+  dta_termino_multa                 DateTime      @db.Date
+  inativo_multa                     Boolean       @default(false)
+  tipomulta                         String        @db.VarChar(20)
+  fk_bibliotecario_id_bibliotecario Int
+  fk_frequentador_id_frequentador   Int
+  bibliotecario                     bibliotecario @relation(fields: [fk_bibliotecario_id_bibliotecario], references: [id_bibliotecario], onDelete: NoAction, onUpdate: NoAction, map: "fk_mlt_bibliotecario")
+  frequentador                      frequentador  @relation(fields: [fk_frequentador_id_frequentador], references: [id_freq], onDelete: NoAction, onUpdate: NoAction, map: "fk_mlt_frequentador")
+}
+
+model tel_bibliotecario {
+  id_tel_bibliotecario              Int           @id @default(autoincrement())
+  numtel_bibliotecario              String        @db.VarChar(9)
+  ddd_bibliotecario                 String        @db.VarChar(2)
+  fk_bibliotecario_id_bibliotecario Int
+  bibliotecario                     bibliotecario @relation(fields: [fk_bibliotecario_id_bibliotecario], references: [id_bibliotecario], onDelete: Cascade, map: "fk_tel_bibliotecario")
+}
+
+model tel_freq {
+  id_tel_freq             Int          @id @default(autoincrement())
+  ddd_freq                String       @db.VarChar(2)
+  numtel_freq             String       @db.VarChar(9)
+  fk_frequentador_id_freq Int
+  frequentador            frequentador @relation(fields: [fk_frequentador_id_freq], references: [id_freq], onDelete: Cascade, map: "fk_tel_frequentador")
+}
+
+enum status_exemplar_enum {
+  Em_posse   @map("Em posse")
+  Dispon_vel @map("Disponível")
+  Danificado
+}
