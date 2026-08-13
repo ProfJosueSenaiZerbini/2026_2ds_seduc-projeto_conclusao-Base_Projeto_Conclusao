@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+    /* ===== Brand ===== */
+    --brand-700: #2E0C00;
+    --brand-600: #790A0F;
+    --brand-500: #9F5119;
+    --brand-400: #734F18;
+    --brand-300: #AA7C43;
+}
+
+@theme inline {
+    /* Background */
+    --color-background: #E8E8E8;
+
+    /* Text */
+    --color-text-primary: #000000;
+    --color-text-inverse: #ffffff;
+
+    /* Brand */
+    --color-brand-700: var(--brand-700);
+    --color-brand-600: var(--brand-600);
+    --color-brand-500: var(--brand-500);
+    --color-brand-400: var(--brand-400);
+    --color-brand-300: var(--brand-300);
+
+    /* Book Categories */
+    --color-romance: #ffb8de;
+    --color-religion-mythology: #f7ffb8;
+    --color-science-fiction: #c0ffb8;
+    --color-art-culture: #ffb8f8;
+    --color-fantasy: #ffd6b8;
+    --color-biographies-memoirs: #ffe3b8;
+    --color-thriller-mystery: #dcb8ff;
+    --color-comics-manga: #a2c2e8;
+    --color-horror: #e37e7e;
+    --color-children-young-adult: #ffb8cb;
+    --color-adventure: #ffe082;
+    --color-science-knowledge: #b8dbff;
+    --color-poetry-chronicles: #b8fff4;
+    --color-history: #ffc5b8;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: Arial, Helvetica, sans-serif;
+}
