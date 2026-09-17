@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+    /* ===== Brand ===== */
+    --brand-800: #4F2426;
+    --brand-700: #790A0F;
+    --brand-600: #634B2B;
+    --brand-500: #9D7746;
+    --brand-400: #C8995D;
+    --brand-300: #E1BB8C;
+    --brand-200: #DBDAD2;
+    --brand-100: #D0CBBF;
+}
+
+@theme inline {
+    /* Background */
+    --color-background: #E8E8E8;
+
+    /* Text */
+    --color-text-primary: #634B2B;
+    --color-text-inverse: #F2F0EF;
+
+    /* Button */
+    --color-button-primary: #6B7A4B;
+    --color-button-secondary: #98462B;
+
+    /* Brand */
+    --color-brand-800: var(--brand-800);
+    --color-brand-700: var(--brand-700);
+    --color-brand-600: var(--brand-600);
+    --color-brand-500: var(--brand-500);
+    --color-brand-400: var(--brand-400);
+    --color-brand-300: var(--brand-300);
+    --color-brand-200: var(--brand-200);
+    --color-brand-100: var(--brand-100);
+
+    /* Book Categories */
+    --color-romance: #ffb8de;
+    --color-religion-mythology: #f7ffb8;
+    --color-science-fiction: #c0ffb8;
+    --color-art-culture: #ffb8f8;
+    --color-fantasy: #ffd6b8;
+    --color-biographies-memoirs: #ffe3b8;
+    --color-thriller-mystery: #dcb8ff;
+    --color-comics-manga: #a2c2e8;
+    --color-horror: #e37e7e;
+    --color-children-young-adult: #ffb8cb;
+    --color-adventure: #ffe082;
+    --color-science-knowledge: #b8dbff;
+    --color-poetry-chronicles: #b8fff4;
+    --color-history: #ffc5b8;
+    --color-guide-manual-gastronomy: #ffc56f;
+    --color-politics: #6aa4d8;
+    --color-selfHelp-personal-development: #e76c98;
+    --color-economy: #9fe5bf;
+    --color-literature: #a160d4;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: Arial, Helvetica, sans-serif;
+}
