@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ibico - Login</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/login.css">
+</head>
+
+<body>
+
+    <div class="panel" id="panel">
+        <div class="brand">Ibico</div>
+        <h1>Bem-vindo de volta</h1>
+        <p class="subtitle">Escolha como deseja acessar a plataforma</p>
+
+
+        <form action="/login" method="POST">
+            <!-- Campo oculto para enviar o tipo de perfil (contratante ou trabalhador) -->
+            <input type="hidden" name="tipoPerfil" id="tipoPerfilInput" value="contratante">
+
+            <div class="toggle-row">
+                <button type="button" class="toggle-btn" id="btnWork" onclick="selectMode('work')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                    Quero Trabalhar
+                </button>
+
+
+                <button type="button" class="toggle-btn active-hire" id="btnHire" onclick="selectMode('hire')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="7" width="18" height="13" rx="2" />
+                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <path d="M3 13h18" />
+                    </svg>
+                    Quero Contratar
+                </button>
+            </div>
+
+            <div class="field-wrap">
+                <label>E-mail Corporativo ou Pessoal</label>
+                <!-- ADICIONADO: name="email" -->
+                <input type="email" name="email" placeholder="exemplo@ibico.com.br" required>
+            </div>
+
+            <div class="field-wrap">
+                <div class="field-top">
+                    <label style="margin-bottom:0;">Senha</label>
+                    <a href="#" class="forgot">Esqueceu a senha?</a>
+                </div>
+                <!-- ADICIONADO: name="senha" -->
+                <input type="password" name="senha" placeholder="••••••••" required>
+                <span class="eye">👁</span>
+            </div>
+
+            <label class="remember">
+                <input type="checkbox" name="lembrar">
+                Lembrar de mim neste dispositivo
+            </label>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Entrar na Plataforma →</button>
+
+            <p class="signup">Não tem uma conta? <a href="/cadastrar">Criar uma conta gratuitamente</a></p>
+
+            <div class="divider">Ou entre com</div>
+
+            <div class="social-row">
+                <button type="button" class="social-btn">🔵 Google</button>
+                <button type="button" class="social-btn">🔷 LinkedIn</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="side">
+        <div class="bird-layer show" id="birdHire"></div>
+        <div class="bird-layer" id="birdWork"></div>
+        <div class="side-caption" id="sideCaption">
+            <div class="name">Araponga</div>
+            <div class="latin">Procnias nudicollis</div>
+        </div>
+    </div>
+    <script src="/js/login.js"></script>
+</body>
+
+</html>

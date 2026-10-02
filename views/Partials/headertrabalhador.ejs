@@ -1,0 +1,28 @@
+<header class="navbar">
+  <div class="navbar__inner">
+    <div class="navbar__logo">Ibico</div>
+    <nav class="navbar__links">
+      <!-- A classe ativa acompanha a pagina atual. -->
+      <a href="/hometrabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/hometrabalhador' || rotaAtual === '/homeTrabalhador')) ? 'nav-link--active' : '' %>">Início</a>
+      <a href="/historico" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/historico' || rotaAtual === '/historicoTrabalhador')) ? 'nav-link--active' : '' %>">Histórico</a>
+      <a href="/carteira/trabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/carteira/trabalhador') ? 'nav-link--active' : '' %>">Carteira</a>
+    </nav>
+    
+    <div class="navbar__actions" style="display: flex; align-items: center; gap: 12px;">
+      <!-- Botão para acessar o Perfil -->
+      <a href="/perfil" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/perfil') ? 'nav-link--active' : '' %>" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+        <i class="far fa-user-circle" style="font-size: 1.2rem;"></i>
+        <span>Meu Perfil</span>
+      </a>
+
+      <button class="icon-btn" title="Notificações">
+        <i class="far fa-bell"></i>
+      </button>
+
+      <!-- Permite encerrar a sessao sem depender de JavaScript. -->
+      <form action="/logout" method="POST" style="margin: 0;">
+        <button type="submit" class="logout-btn">Sair</button>
+      </form>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Contratante — Ibico</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/perfilContratante.css">
+    <link rel="stylesheet" href="/css/modalEditarPerfil.css">
+</head>
+
+<body>
+
+    <%- include('partials/headerContratante') %>
+
+        <main class="page-container"
+            style="max-width: 900px; margin: 40px auto; padding: 0 20px; font-family: sans-serif;">
+            <div class="profile-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 1.8rem; margin: 0; color: #333;">Meu Perfil</h1>
+                    <p style="color: #666; margin-top: 4px;">Veja e mantenha seus dados sempre atualizados.</p>
+                </div>
+                <div class="actions">
+                    <button type="button" onclick="abrirModal()" class="btn-edit"
+                        style="background-color: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">Editar
+                        Perfil</button>
+                    <a href="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'contratante' ? '/homeContratante' : '/hometrabalhador' %>"
+                        class="btn-secondary" style="margin-left: 10px; text-decoration: none; color: #555;">Voltar</a>
+                </div>
+            </div>
+
+            <div class="profile-card"
+                style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+
+                <!-- Identificação / Avatar com Iniciais -->
+                <div class="profile-avatar-section"
+                    style="display: flex; align-items: center; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid #eee; margin-bottom: 24px;">
+                    <div class="avatar-circle"
+                        style="width: 80px; height: 80px; border-radius: 50%; background-color: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; color: #495057;">
+                        <%= usuario && usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'US' %>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.4rem; color: #212529;">
+                            <%= usuario ? usuario.nome : 'Contratante' %>
+                        </h2>
+                        <span class="badge-role"
+                            style="display: inline-block; background-color: #e7f5ff; color: #1c7ed6; font-size: 0.85rem; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-top: 6px;">
+                            <%= (usuario && usuario.tipo_perfil) ? usuario.tipo_perfil : 'Contratante' %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Campos do Usuário -->
+                <div class="field-group">
+                    <label>Nome completo</label>
+                    <div class="field-value">
+                        <%= usuario.nome %>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Email</label>
+                    <div class="field-value">
+                        <%= usuario.email %>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>CPF</label>
+                    <div class="field-value">
+                        <%= usuario.cpf %>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Idade</label>
+                    <div class="field-value">
+                        <%= usuario.idade %> anos
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Data de cadastro</label>
+                    <div class="field-value">
+                        <%= usuario.data_cadastro_formatada %>
+                    </div>
+                </div>
+
+                <!-- Seção de Alterar Senha -->
+                <div class="security-section"
+                    style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <label
+                            style="display: block; font-size: 0.85rem; color: #6c757d; margin-bottom: 2px;">Senha</label>
+                        <span style="font-size: 0.9rem; color: #495057;">Por segurança, sua senha nunca é
+                            exibida.</span>
+                    </div>
+                    <!-- Botão que abre o modal de senha -->
+                    <button type="button" onclick="abrirModalSenha()"
+                        style="background: none; border: none; color: #007bff; text-decoration: none; font-weight: 500; font-size: 0.9rem; cursor: pointer;">Alterar
+                        senha</button>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Estrutura do Modal de Edição -->
+        <div id="modalEditarPerfil" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Editar Perfil</h3>
+                    <button type="button" class="btn-close" onclick="fecharModal()">&times;</button>
+                </div>
+
+                <form action="/perfil/editar" method="POST">
+                    <div class="modal-group">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" name="nome" value="<%= usuario.nome %>" required>
+                    </div>
+
+                    <div class="modal-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" value="<%= usuario.email %>" required>
+                    </div>
+
+                    <div class="modal-group">
+                        <label for="idade">Idade</label>
+                        <input type="number" id="idade" name="idade" value="<%= usuario.idade || '' %>" required
+                            min="18">
+                    </div>
+
+                    <div class="modal-group">
+                        <label>CPF (não alterável)</label>
+                        <input type="text" value="<%= usuario.cpf %>" disabled class="input-disabled">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="fecharModal()" class="btn-modal-cancel">Cancelar</button>
+                        <button type="submit" class="btn-modal-save">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- MODAL DE ALTERAR SENHA -->
+        <div id="modalAlterarSenha" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Alterar Senha</h3>
+                    <button type="button" class="btn-close" onclick="fecharModalSenha()">&times;</button>
+                </div>
+
+                <form action="/perfil/alterar-senha" method="POST">
+                    <div class="modal-group">
+                        <label for="senhaAtual">Senha Actual</label>
+                        <input type="password" id="senhaAtual" name="senhaAtual" required
+                            placeholder="Digite sua senha atual">
+                    </div>
+
+                    <div class="modal-group">
+                        <label for="novaSenha">Nova Senha</label>
+                        <input type="password" id="novaSenha" name="novaSenha" required
+                            placeholder="Digite a nova senha">
+                    </div>
+
+                    <div class="modal-group">
+                        <label for="confirmarNovaSenha">Confirmar Nova Senha</label>
+                        <input type="password" id="confirmarNovaSenha" name="confirmarNovaSenha" required
+                            placeholder="Repita a nova senha">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="fecharModalSenha()" class="btn-modal-cancel">Cancelar</button>
+                        <button type="submit" class="btn-modal-save">Salvar Nova Senha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <%- include('partials/footer') %>
+
+            <!-- Script JS externo para controle do Modal -->
+           <script src="/js/perfilContratante.js"></script>
+</body>
+
+</html>

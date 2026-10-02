@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhes do Bico — Ibico</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/detalhesBico.css">
+</head>
+<body>
+
+  <!-- O cabecalho acompanha o perfil que esta visualizando a oportunidade. -->
+  <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'contratante') { %>
+    <%- include('Partials/headerContratante') %>
+  <% } else { %>
+    <%- include('Partials/headertrabalhador') %>
+  <% } %>
+
+  <!-- BANNER HERO -->
+  <div class="hero-banner">
+    <div class="banner-container">
+      <div class="banner-info">
+        <span class="badge-status"><%= bico.status %></span>
+        <h1><%= bico.titulo %></h1>
+        <div class="banner-meta">
+          <span>📍 <%= bico.bairro %></span>
+          <span>📅 <%= bico.data_servico_formatada %></span>
+        </div>
+      </div>
+      <div class="banner-price">
+        <span class="price-label">VALOR TOTAL</span>
+        <div class="price-value">R$ <%= Number(bico.valor).toFixed(2).replace('.', ',') %></div>
+        <span class="price-sub">Pagamento via PIX</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+    <div class="content-left">
+      <div class="section-block">
+        <h3>Descrição da Vaga</h3>
+        <p class="description-text">
+          <%= bico.descricao %>
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h3>Informações Rápidas</h3>
+        <div class="grid-2">
+          <div class="info-card">
+            <span class="icon">⏰</span>
+            <div>
+              <span class="card-label">Horário</span>
+              <strong><%= bico.horario %></strong>
+            </div>
+          </div>
+          <div class="info-card">
+            <span class="icon">👔</span>
+            <div>
+              <span class="card-label">Traje</span>
+              <strong>Esporte Fino / Social</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-right">
+      <div class="summary-card">
+        <h3>Candidatar-se</h3>
+        <div class="summary-item">
+          <span>Contratante</span>
+            <strong><%= bico.contratante_nome %></strong>
+          </div>
+          <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' && bico.status === 'Aberto') { %>
+            <button class="btn-accept" type="button">Quero este Bico</button>
+          <% } %>
+        <!-- O retorno acompanha o perfil que abriu os detalhes. -->
+        <a href="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'contratante' ? '/homeContratante' : '/hometrabalhador' %>" class="btn-back">Voltar</a>
+      </div>
+    </aside>
+  </main>
+
+  <!-- PARTIAL DO FOOTER -->
+  <%- include('Partials/footer') %>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Dependências do Node
+node_modules/
+
+# Arquivo de configuração local (contém senhas e dados sensíveis)
+.env
+
+# Arquivos de log de erros do npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Pastas do sistema operacional (opcional)
+.DS_Store
+Thumbs.db
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

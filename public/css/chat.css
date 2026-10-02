@@ -1,0 +1,427 @@
+/* =========================================================
+   Ibico — Tela de Chat
+   Mobile-first. Reaproveita os tokens de cor/tipografia
+   já usados em Histórico e Perfil, incluindo o tema
+   "theme-contratante" (vermelho do botão Finalizar Serviço).
+   ========================================================= */
+
+:root {
+  --color-bg: #faf8f5;
+  --color-card: #ffffff;
+  --color-border: #e7e2d9;
+  --color-text: #1f2a28;
+  --color-text-muted: #6b7570;
+
+  --color-brand-red: #e8503b;
+  --color-finalizar-red: #a83a2c;
+  --color-finalizar-red-dark: #8a2f24;
+
+  --color-teal: #12403c;
+  --color-teal-dark: #0c2f2c;
+
+  --color-online: #2fb567;
+
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Altura real da viewport em mobile (evita saltos com barra de endereço) */
+  --vh: 1vh;
+}
+
+/* Tema Contratante — mesma regra usada em perfil.css */
+body.theme-contratante {
+  --color-teal: var(--color-finalizar-red);
+  --color-teal-dark: var(--color-finalizar-red-dark);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; }
+
+/* =========================================================
+   Estrutura geral: mobile-first, tela cheia.
+   Em telas maiores vira um "cartão" de chat centralizado.
+   ========================================================= */
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: calc(var(--vh, 1vh) * 100);
+  background: var(--color-bg);
+  max-width: 720px;
+  margin: 0 auto;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+
+/* ---------- Header ---------- */
+.chat-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.chat-header__back {
+  color: var(--color-text);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.chat-header__back:hover { background: var(--color-bg); }
+
+.chat-header__avatar {
+  position: relative;
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+}
+.chat-header__avatar img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.chat-header__status {
+  position: absolute;
+  right: -1px; bottom: -1px;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--color-card);
+  background: var(--color-text-muted);
+}
+.chat-header__status--online { background: var(--color-online); }
+
+.chat-header__info {
+  flex: 1;
+  min-width: 0;
+}
+.chat-header__info h1 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-header__info p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-header__menu {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.chat-header__menu:hover { background: var(--color-bg); }
+
+/* ---------- Contexto do bico ---------- */
+.chat-context {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff8ee;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.82rem;
+}
+.chat-context__tag {
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+  background: rgba(18, 64, 60, 0.1);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+body.theme-contratante .chat-context__tag {
+  color: var(--color-finalizar-red);
+  background: rgba(168, 58, 44, 0.1);
+}
+.chat-context__titulo {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-context__valor {
+  font-weight: 700;
+  color: var(--color-finalizar-red);
+}
+
+/* ---------- Mensagens ---------- */
+.chat-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(18, 64, 60, 0.035), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(232, 80, 59, 0.035), transparent 40%);
+}
+
+.chat-divider {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0 10px;
+}
+.chat-divider span {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 84%;
+  margin-bottom: 6px;
+}
+.message__avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.message__bolha {
+  padding: 9px 13px 7px;
+  border-radius: var(--radius-lg);
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+.message__texto {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+.message__hora {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+  font-size: 0.68rem;
+  margin-top: 3px;
+  opacity: 0.75;
+}
+
+/* Mensagem recebida — bolha clara, alinhada à esquerda */
+.message--recebida {
+  align-self: flex-start;
+}
+.message--recebida .message__bolha {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 4px;
+  color: var(--color-text);
+}
+
+/* Mensagem enviada — bolha na cor de identidade, alinhada à direita */
+.message--enviada {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.message--enviada .message__bolha {
+  background: var(--color-teal);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.message--enviada .message__check { color: #9fe3c8; }
+body.theme-contratante .message--enviada .message__check { color: #f4c4bb; }
+
+/* Estado de falha no envio */
+.message--erro .message__bolha {
+  background: #f3d9d5;
+  color: var(--color-text);
+}
+.message__erro-aviso {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--color-finalizar-red);
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+/* Indicador de "digitando..." */
+.typing-indicator {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 8px;
+}
+.typing-indicator img {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.typing-indicator__dots {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+}
+.typing-indicator__dots i {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  display: inline-block;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.typing-indicator__dots i:nth-child(2) { animation-delay: 0.15s; }
+.typing-indicator__dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ---------- Campo de entrada ---------- */
+.chat-input-bar {
+  flex: 0 0 auto;
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+}
+.chat-input-bar__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.chat-input-bar__anexo {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.chat-input-bar__anexo:hover { background: var(--color-bg); }
+
+.chat-input-bar__campo {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  max-height: 120px;
+  color: var(--color-text);
+}
+.chat-input-bar__campo:focus {
+  outline: none;
+  border-color: var(--color-teal);
+  background: var(--color-card);
+}
+
+.chat-input-bar__enviar {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-teal);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.chat-input-bar__enviar:hover:not(:disabled) { background: var(--color-teal-dark); }
+.chat-input-bar__enviar:active:not(:disabled) { transform: scale(0.94); }
+.chat-input-bar__enviar:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   Responsivo
+   ========================================================= */
+
+/* Telas pequenas (mobile) — já é o padrão acima: tela cheia,
+   sem bordas laterais, balões ocupando mais largura. */
+@media (max-width: 480px) {
+  .chat-screen {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+  }
+  .message { max-width: 88%; }
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .message { max-width: 70%; }
+  .chat-messages { padding: 20px 24px; }
+  .chat-header { padding: 14px 24px; }
+  .chat-input-bar { padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); }
+}
+
+/* Desktop — chat como um cartão centralizado, com cantos e sombra,
+   como um painel de conversa dentro do restante do produto. */
+@media (min-width: 900px) {
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .chat-screen {
+    height: calc(100vh - 64px);
+    height: calc(var(--vh, 1vh) * 100 - 64px);
+    max-height: 820px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(18, 20, 20, 0.08);
+    overflow: hidden;
+  }
+  .chat-header { border-radius: 20px 20px 0 0; }
+  .message { max-width: 62%; }
+}
