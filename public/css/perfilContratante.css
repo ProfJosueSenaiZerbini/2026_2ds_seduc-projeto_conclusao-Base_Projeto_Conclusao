@@ -1,0 +1,315 @@
+/* ==========================================
+   Estilos da Página de Perfil do Contratante
+   ========================================== */
+
+:root {
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --bg-card: #ffffff;
+  --border-color: #e0e0e0;
+  --border-light: #eeeeee;
+  --badge-bg: #e7f5ff;
+  --badge-text: #1c7ed6;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.page-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header da Página */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.profile-header p {
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+}
+
+/* Botão de Editar */
+.btn-edit {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: inline-block;
+}
+
+.btn-edit:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Card Principal de Perfil */
+.profile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Seção de Avatar/Foto */
+.profile-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 24px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #495057;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-role {
+  display: inline-block;
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+/* Grid com as informações */
+.profile-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px 20px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-value {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+/* Seção de Segurança / Senha */
+.security-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.security-section label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.security-section span {
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.security-section a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.security-section a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Responsividade para Telas Menores */
+@media (max-width: 600px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .btn-edit {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-card {
+    padding: 20px;
+  }
+
+  .profile-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fundo escuro transparente */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Caixa flutuante */
+.modal-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 460px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    font-family: sans-serif;
+}
+
+/* Cabeçalho do modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333333;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #888888;
+    cursor: pointer;
+}
+
+/* Campos de entrada */
+.modal-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-group label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.modal-group input {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.modal-group input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.input-disabled {
+    background-color: #f1f3f5;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Botoes de Ação */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-modal-cancel {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-modal-cancel:hover {
+    background-color: #dee2e6;
+}
+
+.btn-modal-save {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-modal-save:hover {
+    background-color: #0056b3;
+}

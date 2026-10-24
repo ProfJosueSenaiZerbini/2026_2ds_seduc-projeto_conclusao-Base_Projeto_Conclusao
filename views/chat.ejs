@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversa | iBico</title>
+  <link rel="stylesheet" href="/css/chat.css">
+</head>
+
+<body>
+  <% const ehContratante = usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'contratante'; %>
+  <% const rotaVolta = ehContratante
+    ? `/bicos/${bico.id}/gerenciar`
+    : '/historico'; %>
+
+  <main class="chat-screen">
+    <header class="chat-header">
+      <a class="chat-header__back" href="<%= rotaVolta %>" aria-label="Voltar">←</a>
+
+      <strong>iBico 🛠️</strong>
+
+      <div class="chat-header__info">
+        <h1><%= contato.nome %></h1>
+        <p><%= ehContratante ? 'Trabalhador da candidatura aceita' : 'Contratante do bico' %></p>
+      </div>
+    </header>
+
+    <section class="chat-context" aria-label="Informações do bico">
+      <span class="chat-context__tag">Candidatura aceita</span>
+      <div class="chat-context__titulo">
+        <%= bico.titulo %>
+        <p>Data: <%= bico.data_servico_formatada %> · Horário: <%= bico.horario %></p>
+      </div>
+      <span class="chat-context__valor">
+        R$ <%= Number(bico.valor).toFixed(2).replace('.', ',') %>
+      </span>
+    </section>
+
+    <section
+      id="chat-messages"
+      class="chat-messages"
+      aria-label="Mensagens da conversa"
+    >
+      <% mensagens.forEach((mensagem) => { %>
+        <% const mensagemPropria = Number(mensagem.remetente_id) === Number(usuario.id); %>
+        <article
+          class="message <%= mensagemPropria ? 'message--enviada' : 'message--recebida' %>"
+          data-mensagem-id="<%= mensagem.id %>"
+        >
+          <div class="message__bolha">
+            <strong class="message__autor"><%= mensagem.remetente_nome %></strong>
+            <p class="message__texto"><%= mensagem.texto %></p>
+            <time class="message__hora"><%= mensagem.horario %></time>
+          </div>
+        </article>
+      <% }); %>
+    </section>
+
+    <footer class="chat-input-bar">
+      <p id="chat-feedback" class="message__erro-aviso" role="status" aria-live="polite"></p>
+      <form id="form-chat" class="chat-input-bar__form">
+        <textarea
+          id="input-mensagem"
+          class="chat-input-bar__campo"
+          aria-label="Mensagem"
+          aria-describedby="chat-feedback"
+          placeholder="Digite uma mensagem"
+        ></textarea>
+        <button
+          id="btn-enviar"
+          class="chat-input-bar__enviar"
+          type="submit"
+          disabled
+        >Enviar</button>
+      </form>
+    </footer>
+  </main>
+
+  <div
+    id="chat-config"
+    data-url-enviar="<%= `/bicos/candidaturas/${candidaturaId}/chat/mensagens` %>"
+    data-url-consultar="<%= `/bicos/candidaturas/${candidaturaId}/chat/mensagens` %>"
+    data-candidatura-id="<%= candidaturaId %>"
+    data-usuario-id="<%= usuario.id %>"
+  ></div>
+  <script>
+    const configuracaoChat = document.getElementById('chat-config');
+    window.__CHAT__ = {
+      urlEnviar: configuracaoChat.dataset.urlEnviar,
+      urlConsultar: configuracaoChat.dataset.urlConsultar,
+      candidaturaId: configuracaoChat.dataset.candidaturaId,
+      usuarioId: configuracaoChat.dataset.usuarioId
+    };
+  </script>
+  <script src="/js/chat.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,231 @@
+/* =========================================================
+   IBICO — Carteira do Contratante (carteiraContratante.css)
+   ========================================================= */
+
+:root {
+  --bg: #FAF9F6;
+  --white: #FFFFFF;
+  --ink: #14213D;
+  --ink-soft: #4B5563;
+  --muted: #6B7280;
+  --line: #E7E5E0;
+  --brand-green: #12372A;
+  --brand-green-hover: #0C2A20;
+  --brand-green-light: #E7F6EC;
+  --shadow: 0 1px 2px rgba(20, 33, 61, 0.04), 0 8px 20px rgba(20, 33, 61, 0.05);
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-full: 999px;
+}
+
+/* LAYOUT E ESTRUTURA (DESKTOP) */
+.wallet {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 32px 60px;
+}
+
+.wallet__header {
+  margin-bottom: 32px;
+}
+
+.wallet__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.wallet__subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* DASHBOARD SUPERIOR */
+.wallet__dashboard {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.wallet__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wallet__card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet__card--primary {
+  background: var(--brand-green);
+  color: var(--white);
+  border: none;
+  justify-content: space-between;
+}
+
+.wallet__card--primary .wallet__label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.wallet__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.wallet__balance {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin: 0 0 24px;
+  letter-spacing: -0.02em;
+}
+
+.wallet__stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.wallet__stat-info {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* BOTÕES DE AÇÃO */
+.wallet__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn--primary {
+  background: var(--white);
+  color: var(--brand-green);
+}
+
+.btn--primary:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.btn--outline-light {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn--outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--white);
+}
+
+/* EXTRATO E TABELA */
+.wallet__transactions {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 32px;
+}
+
+.wallet__section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 24px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.wallet__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.wallet__table th {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--line);
+}
+
+.wallet__table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.wallet__table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.wallet__value--positive {
+  color: var(--brand-green);
+  font-weight: 700;
+}
+
+.wallet__value--negative {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* BADGES DE STATUS */
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.badge--success {
+  background: var(--brand-green-light);
+  color: var(--brand-green);
+}
+
+.badge--pending {
+  background: #FFF3D6;
+  color: #B4750C;
+}
+
+/* ADAPTAÇÕES RESPONSIVAS */
+@media (max-width: 850px) {
+  .wallet__dashboard {
+    grid-template-columns: 1fr;
+  }
+}

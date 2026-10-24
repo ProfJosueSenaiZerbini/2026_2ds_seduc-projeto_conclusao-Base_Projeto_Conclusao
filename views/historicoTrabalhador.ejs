@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibico | Histórico de Bicos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/historicoTrabalhador.css">
+</head>
+
+<body>
+
+    <%- include('Partials/headertrabalhador') %>
+
+        <main class="page">
+            <h1 class="page__title">Seu Histórico de Bicos</h1>
+            <p class="page__subtitle">Acompanhe suas candidaturas e serviços confirmados em um só lugar.</p>
+
+            <!-- Botões das Abas -->
+            <div class="tabs" role="tablist">
+                <button class="tab tab--active" onclick="trocarAba(event, 'aceitos')">
+                    Bicos Aceitos (<%= aceitos.length %>)
+                </button>
+                <button class="tab" onclick="trocarAba(event, 'pendentes')">
+                    Bicos Pendentes (<%= pendentes.length %>)
+                </button>
+                <button class="tab" onclick="trocarAba(event, 'cancelados')">
+                    Cancelados (<%= cancelados.length %>)
+                </button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Conteúdo: Bicos Aceitos -->
+                <div class="tab-panel tab-panel--active" id="aceitos">
+                    <% if (aceitos.length===0) { %>
+                        <p style="color: #666; margin-top: 20px;">Você ainda não possui bicos aceitos.</p>
+                        <% } else { %>
+                            <ul class="bicos-list">
+                                <% aceitos.forEach(bico=> { %>
+                                    <li class="bico-card">
+                                        <div class="bico-card__header">
+                                            <h3>
+                                                <%= bico.titulo %>
+                                            </h3>
+                                            <span class="badge badge--success">
+                                                <%= bico.bico_status %>
+                                            </span>
+                                        </div>
+                                        <p class="bico-card__desc">
+                                            <%= bico.descricao %>
+                                        </p>
+                                        <div class="bico-card__footer">
+                                            <span><strong>Valor:</strong> R$ <%=
+                                                    Number(bico.valor).toFixed(2).replace('.', ',' ) %></span>
+                                            <span><strong>Data:</strong>
+                                                <%= bico.data_servico_formatada %>
+                                            </span>
+                                        </div>
+                                        <% if (bico.candidatura_status === 'Aceito') { %>
+                                            <a
+                                                class="btn btn--primary"
+                                                href="/bicos/candidaturas/<%= bico.candidatura_id %>/chat"
+                                            >Abrir conversa</a>
+                                        <% } %>
+                                    </li>
+                                    <% }); %>
+                            </ul>
+                            <% } %>
+                </div>
+
+                <!-- Conteúdo: Bicos Pendentes -->
+                <div class="tab-panel" id="pendentes" style="display: none;">
+                    <% if (pendentes.length===0) { %>
+                        <p style="color: #666; margin-top: 20px;">Você não tem nenhuma candidatura pendente.</p>
+                        <% } else { %>
+                            <ul class="bicos-list">
+                                <% pendentes.forEach(bico=> { %>
+                                    <li class="bico-card">
+                                        <div class="bico-card__header">
+                                            <h3>
+                                                <%= bico.titulo %>
+                                            </h3>
+                                            <span class="badge badge--warning">Pendente</span>
+                                        </div>
+                                        <p class="bico-card__desc">
+                                            <%= bico.descricao %>
+                                        </p>
+                                        <div class="bico-card__footer">
+                                            <span><strong>Valor:</strong> R$ <%=
+                                                    Number(bico.valor).toFixed(2).replace('.', ',' ) %></span>
+                                            <span><strong>Data:</strong>
+                                                <%= bico.data_servico_formatada %>
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <% }); %>
+                            </ul>
+                            <% } %>
+                </div>
+
+                <div class="tab-panel" id="cancelados" style="display: none;">
+                    <% if (cancelados.length===0) { %>
+                        <p style="color: #666; margin-top: 20px;">Voce nao possui candidaturas canceladas.</p>
+                    <% } else { %>
+                        <ul class="bicos-list">
+                            <% cancelados.forEach(cancelamento=> { %>
+                                <li class="bico-card">
+                                    <div class="bico-card__header">
+                                        <h3><%= cancelamento.titulo %></h3>
+                                        <span class="badge badge--warning"><%= cancelamento.status_novo %></span>
+                                    </div>
+                                    <p class="bico-card__desc"><%= cancelamento.descricao %></p>
+                                    <div class="bico-card__footer">
+                                        <span><strong>Valor:</strong> R$ <%= Number(cancelamento.valor).toFixed(2).replace('.', ',') %></span>
+                                        <span><strong>Data do bico:</strong> <%= cancelamento.data_servico_formatada %></span>
+                                    </div>
+                                    <p><strong>Status anterior:</strong> <%= cancelamento.status_anterior || '-' %></p>
+                                    <p><strong>Status novo:</strong> <%= cancelamento.status_novo %></p>
+                                    <p><strong>Data da alteracao:</strong> <%= cancelamento.data_alteracao_formatada %></p>
+                                    <p><strong>Observacao:</strong> <%= cancelamento.observacao || 'Sem observacao.' %></p>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            function trocarAba(event, tabId) {
+                // Esconde todos os painéis
+                document.querySelectorAll('.tab-panel').forEach(panel => panel.style.display = 'none');
+                // Remove a classe ativa dos botões
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('tab--active'));
+
+                // Mostra o painel selecionado e ativa o botão
+                document.getElementById(tabId).style.display = 'block';
+                event.currentTarget.classList.add('tab--active');
+            }
+        </script>
+
+        <%- include('Partials/footer') %>
+
+            <script src="/js/historicoTrabalhador.js"></script>
+</body>
+
+</html>

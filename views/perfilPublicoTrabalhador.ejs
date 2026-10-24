@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil público de <%= trabalhador.nome %> — iBico</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/perfilPublicoTrabalhador.css">
+</head>
+
+<body>
+    <header class="public-header">
+        <a class="public-brand" href="/">iBico</a>
+    </header>
+
+    <main class="public-profile">
+        <a class="back-link" href="/">← Voltar ao início</a>
+
+        <section class="worker-card" aria-labelledby="worker-name">
+            <div class="worker-avatar" aria-hidden="true">
+                <%= trabalhador.nome.slice(0, 2).toUpperCase() %>
+            </div>
+            <div class="worker-summary">
+                <p class="eyebrow">Perfil público do trabalhador</p>
+                <h1 id="worker-name"><%= trabalhador.nome %></h1>
+                <% if (quantidadeAvaliacoes > 0) { %>
+                    <div class="overall-rating">
+                        <span class="rating-stars" aria-label="Média de <%= mediaAvaliacoes.toFixed(1).replace('.', ',') %> de 5 estrelas">
+                            <% for (let estrela = 1; estrela <= 5; estrela++) { %>
+                                <span aria-hidden="true"><%= estrela <= Math.round(mediaAvaliacoes) ? '★' : '☆' %></span>
+                            <% } %>
+                        </span>
+                        <strong><%= mediaAvaliacoes.toFixed(1).replace('.', ',') %> de 5</strong>
+                        <span class="review-count">
+                            <%= quantidadeAvaliacoes %> <%= quantidadeAvaliacoes === 1 ? 'avaliação' : 'avaliações' %>
+                        </span>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <section class="reviews-section" aria-labelledby="reviews-title">
+            <div class="section-heading">
+                <h2 id="reviews-title">Avaliações recebidas</h2>
+                <% if (quantidadeAvaliacoes > 0) { %>
+                    <span><%= quantidadeAvaliacoes %> no total</span>
+                <% } %>
+            </div>
+
+            <% if (avaliacoes.length === 0) { %>
+                <div class="empty-reviews">
+                    <span class="empty-star" aria-hidden="true">☆</span>
+                    <p>Este trabalhador ainda não recebeu avaliações.</p>
+                    <span>As avaliações aparecerão aqui após a conclusão de um serviço.</span>
+                </div>
+            <% } else { %>
+                <div class="reviews-list">
+                    <% avaliacoes.forEach(avaliacao => { %>
+                        <article class="review-card">
+                            <div class="review-heading">
+                                <div>
+                                    <h3><%= avaliacao.contratante_nome %></h3>
+                                    <time><%= avaliacao.data_avaliacao %></time>
+                                </div>
+                                <div class="review-stars" aria-label="<%= avaliacao.nota %> de 5 estrelas">
+                                    <% for (let estrela = 1; estrela <= 5; estrela++) { %>
+                                        <span aria-hidden="true"><%= estrela <= avaliacao.nota ? '★' : '☆' %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <p class="review-comment"><%= avaliacao.comentario || 'Nenhum comentário foi informado.' %></p>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iBico - Meus Bicos Ativos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/bicosAtivos.css">
+</head>
+
+<body>
+
+  <%- include('Partials/headerContratante') %>
+
+    <main class="dashboard-container">
+      <!-- Cabeçalho -->
+      <header class="dashboard-header">
+        <div class="header-titles">
+          <span class="category-tag">PAINEL DE ATIVIDADES</span>
+          <h1>Meus Bicos Ativos</h1>
+          <p>Acompanhe o que está rolando e mantenha tudo sob controle.</p>
+        </div>
+        <a href="/bicos/novo" class="btn-new-job">+ Publicar Novo Bico</a>
+      </header>
+
+      <!-- As metricas agora sao calculadas com os bicos retornados pelo banco. -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon icon-green">✓</div>
+          <div class="metric-info">
+            <span class="metric-label">Bicos ativos</span>
+            <strong class="metric-value">
+              <%= bicos.length %>
+            </strong>
+            <span class="metric-sub text-green">Ativos agora</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon icon-yellow">🕒</div>
+          <div class="metric-info">
+            <span class="metric-label">Em andamento</span>
+            <strong class="metric-value">
+              <%= bicos.filter(bico=> bico.status === 'Em andamento').length %>
+            </strong>
+            <span class="metric-sub text-muted">Em andamento</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon icon-blue">💼</div>
+          <div class="metric-info">
+            <span class="metric-label">Investido no mês</span>
+            <strong class="metric-value">R$ <%= bicos.reduce((total, bico)=> total + Number(bico.valor || 0),
+                0).toFixed(2).replace('.', ',') %></strong>
+            <span class="metric-sub text-green">Valor dos bicos ativos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção de Listagem -->
+      <!-- Seção de Listagem -->
+      <section class="content-section">
+        <div class="section-bar">
+          <div class="section-title">
+            <h2>Seus bicos</h2>
+            <p>
+              <%= bicos.length %> oportunidades ativas
+            </p>
+          </div>
+
+          <div class="filters-bar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Buscar bico...">
+            </div>
+            <div class="filter-tabs">
+              <button class="filter-btn active">Todos <span>
+                  <%= bicos.length %>
+                </span></button>
+              <button class="filter-btn">Abertos <span>
+                  <%= bicos.filter(bico=> bico.status === 'Aberto').length %>
+                </span></button>
+              <button class="filter-btn">Em andamento <span>
+                  <%= bicos.filter(bico=> bico.status === 'Em andamento').length %>
+                </span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Os cards sao gerados dinamicamente para evitar dados ficticios na tela. -->
+        <div class="jobs-grid">
+
+          <% bicos.forEach(bico=> { %>
+            <article class="job-card">
+              <div class="job-card-header">
+                <span class="badge <%= bico.status === 'Em andamento' ? 'badge-ongoing' : 'badge-open' %>">• <%=
+                    bico.status %></span>
+                <button class="btn-more">•••</button>
+              </div>
+              <h3 class="job-title">
+                <%= bico.titulo %>
+              </h3>
+              <div class="job-meta">
+                <span>📍 <%= bico.bairro %></span>
+                <span>🕒 <%= bico.data_servico_formatada %>
+                    <%= bico.horario %></span>
+              </div>
+              <div class="job-footer">
+                <div class="user-info">
+                  <div class="avatar avatar-purple">
+                    <%= bico.nome_trabalhador ? bico.nome_trabalhador.slice(0, 2).toUpperCase() : '+' %>
+                  </div>
+                  <div>
+                    <span class="user-role">
+                      <%= bico.nome_trabalhador ? 'Profissional' : 'Propostas' %>
+                    </span>
+                    <strong class="user-name">
+                      <%= bico.nome_trabalhador || 'Aguardando profissional' %>
+                    </strong>
+                  </div>
+                </div>
+                <div class="price-info">
+                  <span class="price-label">Valor combinado</span>
+                  <strong class="price-value">R$ <%= Number(bico.valor || 0).toFixed(2).replace('.', ',' ) %></strong>
+                </div>
+              </div>
+
+              <div class="job-actions" style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                <a href="/bicos/<%= bico.id %>/gerenciar" class="btn-primary"
+                  style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; text-decoration: none;">Ver detalhes
+                </a>
+              </div>
+            </article>
+            <% }); %>
+
+        </div>
+      </section>
+    </main>
+
+    <%- include('Partials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123f3a">
+  <title>Prévia de conversa — iBico</title>
+  <link rel="stylesheet" href="./css/chat.css">
+  <style>
+    :root {
+      --preview-petrol: #123f3a;
+      --preview-petrol-dark: #0d302c;
+      --preview-mint: #e6f2ef;
+      --preview-paper: #f4f7f5;
+      --preview-ink: #20312e;
+      --preview-muted: #71807b;
+      --preview-line: #e1e9e5;
+      --preview-gold: #a66b1f;
+    }
+
+    body.preview-page {
+      min-height: 100%;
+      height: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 28px 20px;
+      background:
+        radial-gradient(ellipse at top left, rgba(18, 63, 58, 0.08), transparent 34rem),
+        var(--preview-paper);
+      color: var(--preview-ink);
+    }
+
+    .preview-page .chat-screen {
+      width: min(100%, 820px);
+      height: min(880px, calc(100dvh - 56px));
+      min-height: 560px;
+      max-width: 820px;
+      border: 1px solid var(--preview-line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(18, 63, 58, 0.13);
+    }
+
+    .preview-page .chat-header {
+      gap: 14px;
+      padding: 18px 24px;
+      border-bottom-color: var(--preview-line);
+      position: relative;
+    }
+
+    .preview-page .chat-header__back {
+      text-decoration: none;
+      font-size: 1.35rem;
+      color: var(--preview-petrol);
+      background: #f2f6f4;
+    }
+
+    .preview-page .chat-header__back:hover {
+      background: var(--preview-mint);
+    }
+
+    .preview-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 6px;
+      color: var(--preview-petrol);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+
+    .preview-brand__tool {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--preview-mint);
+      font-size: 1.1rem;
+      letter-spacing: 0;
+    }
+
+    .preview-contact {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 12px;
+      padding-left: 16px;
+      border-left: 1px solid var(--preview-line);
+    }
+
+    .preview-contact__avatar {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: #e9e4da;
+      color: #615748;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .preview-page .chat-header__info h1 {
+      color: var(--preview-ink);
+      font-family: var(--font-body);
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .preview-page .chat-header__info p {
+      color: var(--preview-muted);
+      font-size: 0.77rem;
+    }
+
+    .preview-flag {
+      margin-left: auto;
+      padding: 7px 11px;
+      border: 1px solid #d8e7e2;
+      border-radius: 999px;
+      background: #f3f8f6;
+      color: var(--preview-petrol);
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .preview-page .chat-context {
+      display: block;
+      flex: 0 0 auto;
+      margin: 18px 22px 0;
+      padding: 17px 19px;
+      border: 1px solid var(--preview-line);
+      border-radius: 16px;
+      background: #fbfcfb;
+      font-size: inherit;
+    }
+
+    .service-card__top,
+    .service-card__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .service-card__eyebrow {
+      color: var(--preview-muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .service-status {
+      padding: 6px 10px;
+      border: 1px solid #cfe7db;
+      border-radius: 999px;
+      background: #edf8f1;
+      color: #286641;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .preview-page .chat-context__titulo {
+      display: block;
+      margin-top: 10px;
+      color: var(--preview-ink);
+      font-size: 1.08rem;
+      font-weight: 750;
+      white-space: normal;
+    }
+
+    .service-card__meta {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-top: 13px;
+      color: var(--preview-muted);
+      font-size: 0.78rem;
+    }
+
+    .service-card__meta span + span {
+      padding-left: 13px;
+      border-left: 1px solid var(--preview-line);
+    }
+
+    .preview-page .chat-context__valor {
+      color: var(--preview-petrol);
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .preview-page .chat-messages {
+      min-height: 0;
+      margin-top: 4px;
+      padding: 16px 26px 24px;
+      gap: 7px;
+      background:
+        radial-gradient(circle at 18% 24%, rgba(18, 63, 58, 0.035), transparent 38%),
+        #f8faf9;
+    }
+
+    .preview-page .chat-divider {
+      margin: 14px 0 12px;
+    }
+
+    .preview-page .chat-divider span {
+      padding: 6px 12px;
+      border-color: #e2e9e5;
+      background: #fff;
+      color: var(--preview-muted);
+      font-size: 0.7rem;
+      font-weight: 650;
+    }
+
+    .preview-page .message {
+      max-width: min(76%, 520px);
+      margin-bottom: 4px;
+    }
+
+    .preview-page .message__bolha {
+      padding: 11px 14px 8px;
+      border-radius: 16px;
+      box-shadow: 0 2px 7px rgba(25, 54, 47, 0.04);
+    }
+
+    .preview-page .message--recebida .message__bolha {
+      border-color: #e1e9e5;
+      border-bottom-left-radius: 5px;
+      background: #fff;
+      color: var(--preview-ink);
+    }
+
+    .preview-page .message--enviada .message__bolha {
+      border: 1px solid #d5e8e2;
+      border-bottom-right-radius: 5px;
+      background: #e7f3ef;
+      color: #203d37;
+    }
+
+    .preview-page .message__texto {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .preview-page .message__hora {
+      margin-top: 5px;
+      color: var(--preview-muted);
+      font-size: 0.66rem;
+      opacity: 0.85;
+    }
+
+    .preview-page .chat-input-bar {
+      padding: 14px 20px 16px;
+      border-top-color: var(--preview-line);
+      background: #fff;
+    }
+
+    .preview-note {
+      margin: 0 0 10px;
+      color: var(--preview-muted);
+      font-size: 0.72rem;
+      text-align: center;
+    }
+
+    .preview-page .chat-input-bar__form {
+      align-items: center;
+      padding: 5px;
+      border: 1px solid var(--preview-line);
+      border-radius: 16px;
+      background: #f7f9f8;
+    }
+
+    .preview-page .chat-input-bar__campo {
+      min-height: 44px;
+      max-height: 90px;
+      padding: 12px 13px;
+      border: 0;
+      background: transparent;
+      color: var(--preview-muted);
+      font-size: 0.86rem;
+    }
+
+    .preview-page .chat-input-bar__campo:disabled {
+      opacity: 1;
+      cursor: not-allowed;
+    }
+
+    .preview-page .chat-input-bar__enviar {
+      width: auto;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: var(--preview-petrol);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .preview-page .chat-input-bar__enviar:disabled {
+      background: #dfe8e4;
+      color: #71807b;
+    }
+
+    @media (max-width: 620px) {
+      body.preview-page {
+        align-items: stretch;
+        padding: 0;
+      }
+
+      .preview-page .chat-screen {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        max-width: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .preview-page .chat-header {
+        gap: 10px;
+        padding: 14px 14px;
+      }
+
+      .preview-brand {
+        gap: 6px;
+        margin-right: 0;
+        font-size: 0.93rem;
+      }
+
+      .preview-brand__tool {
+        width: 30px;
+        height: 30px;
+      }
+
+      .preview-contact {
+        gap: 8px;
+        padding-left: 10px;
+      }
+
+      .preview-contact__avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.72rem;
+      }
+
+      .preview-page .chat-header__info h1 {
+        font-size: 0.86rem;
+      }
+
+      .preview-page .chat-header__info p {
+        font-size: 0.69rem;
+      }
+
+      .preview-flag {
+        display: none;
+      }
+
+      .preview-page .chat-context {
+        margin: 12px 12px 0;
+        padding: 14px;
+      }
+
+      .preview-page .chat-messages {
+        padding: 12px 14px 20px;
+      }
+
+      .preview-page .message {
+        max-width: 88%;
+      }
+
+      .preview-page .chat-input-bar {
+        padding: 11px 12px calc(11px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (max-width: 380px) {
+      .preview-page .chat-header__back {
+        width: 30px;
+        height: 30px;
+      }
+
+      .preview-brand {
+        font-size: 0.84rem;
+      }
+
+      .preview-contact__avatar {
+        display: none;
+      }
+
+      .service-card__meta {
+        gap: 8px;
+      }
+
+      .service-card__meta span + span {
+        padding-left: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body class="preview-page">
+  <main class="chat-screen">
+    <header class="chat-header">
+      <a class="chat-header__back" href="#" aria-label="Voltar">←</a>
+      <div class="preview-brand" aria-label="iBico">
+        <span class="preview-brand__tool" aria-hidden="true">🛠️</span>
+        <span>iBico</span>
+      </div>
+      <div class="preview-contact">
+        <span class="preview-contact__avatar" aria-hidden="true">MO</span>
+        <div class="chat-header__info">
+          <h1>Marina Oliveira</h1>
+          <p>Contratante · contato fictício</p>
+        </div>
+      </div>
+      <span class="preview-flag">PRÉVIA · DADOS FICTÍCIOS</span>
+    </header>
+
+    <section class="chat-context" aria-label="Informações fictícias do serviço">
+      <div class="service-card__top">
+        <span class="service-card__eyebrow">Detalhes do serviço · exemplo</span>
+        <span class="service-status">Candidatura aceita</span>
+      </div>
+      <div class="service-card__top">
+        <span class="chat-context__titulo">Organização de jardim</span>
+        <span class="chat-context__valor">R$ 180,00</span>
+      </div>
+      <div class="service-card__meta">
+        <span>Data: 18/10/2026</span>
+        <span>Horário: 09:00</span>
+      </div>
+    </section>
+
+    <section class="chat-messages" aria-label="Mensagens fictícias de exemplo">
+      <div class="chat-divider">
+        <span>18 de outubro de 2026</span>
+      </div>
+
+      <div class="message message--recebida">
+        <div class="message__bolha">
+          <p class="message__texto">Olá! Podemos combinar os detalhes para a organização do jardim?</p>
+          <span class="message__hora">09:14</span>
+        </div>
+      </div>
+
+      <div class="message message--enviada">
+        <div class="message__bolha">
+          <p class="message__texto">Olá, Marina! Claro. Vou levar as ferramentas necessárias.</p>
+          <span class="message__hora">09:16</span>
+        </div>
+      </div>
+
+      <div class="message message--recebida">
+        <div class="message__bolha">
+          <p class="message__texto">Perfeito, combinamos então. Até lá!</p>
+          <span class="message__hora">09:18</span>
+        </div>
+      </div>
+
+      <div class="chat-divider">
+        <span>Mensagens demonstrativas, não salvas</span>
+      </div>
+    </section>
+
+    <footer class="chat-input-bar">
+      <p class="preview-note">Esta é uma prévia visual com dados fictícios. O envio de mensagens não está disponível.</p>
+      <form class="chat-input-bar__form" aria-label="Envio desativado na prévia">
+        <textarea
+          class="chat-input-bar__campo"
+          aria-label="Campo de mensagem desativado"
+          placeholder="O campo de mensagem está desativado."
+          disabled
+        ></textarea>
+        <button
+          class="chat-input-bar__enviar"
+          type="button"
+          disabled
+        >Enviar</button>
+      </form>
+    </footer>
+  </main>
+</body>
+
+</html>
