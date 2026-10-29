@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhes do Bico — Ibico</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/detalhesBico.css">
+</head>
+<body>
+
+  <!-- PARTIAL DO HEADER -->
+  <%- include('partials/headerTrabalhador') %>
+
+  <!-- BANNER HERO -->
+  <div class="hero-banner">
+    <div class="banner-container">
+      <div class="banner-info">
+        <span class="badge-status">Aberto</span>
+        <h1>Garçom para Evento Corporativo</h1>
+        <div class="banner-meta">
+          <span>📍 Centro, São Paulo</span>
+          <span>📅 20/08/2026</span>
+        </div>
+      </div>
+      <div class="banner-price">
+        <span class="price-label">VALOR TOTAL</span>
+        <div class="price-value">R$ 180,00</div>
+        <span class="price-sub">Pagamento via PIX</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+    <div class="content-left">
+      <div class="section-block">
+        <h3>Descrição da Vaga</h3>
+        <p class="description-text">
+          Procuramos profissional com experiência em atendimento para evento de empresa. Responsável por servir bebidas e apoiar o buffet.
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h3>Informações Rápidas</h3>
+        <div class="grid-2">
+          <div class="info-card">
+            <span class="icon">⏰</span>
+            <div>
+              <span class="card-label">Horário</span>
+              <strong>18:00 - 23:00</strong>
+            </div>
+          </div>
+          <div class="info-card">
+            <span class="icon">👔</span>
+            <div>
+              <span class="card-label">Traje</span>
+              <strong>Esporte Fino / Social</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-right">
+      <div class="summary-card">
+        <h3>Candidatar-se</h3>
+        <div class="summary-item">
+          <span>Vagas restantes</span>
+          <strong>2 de 5</strong>
+        </div>
+        <button class="btn-accept">Quero este Bico</button>
+        <a href="/homeTrabalhador" class="btn-back">Voltar</a>
+      </div>
+    </aside>
+  </main>
+
+  <!-- PARTIAL DO FOOTER -->
+  <%- include('partials/footer') %>
+
+</body>
+</html>

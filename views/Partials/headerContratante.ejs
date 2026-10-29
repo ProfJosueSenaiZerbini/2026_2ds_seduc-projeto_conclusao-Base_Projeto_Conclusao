@@ -1,0 +1,25 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="/homeContratante" class="brand">
+      <span class="brand-dot"></span>Ibico
+    </a>
+    <nav class="topbar-nav">
+      <a href="/homeContratante" class="nav-link active">Início</a>
+      <a href="/bicos/novo" class="nav-link">Publicar Bico</a>
+      <a href="/bicos/ativos" class="nav-link">Bicos</a>
+      <a href="/carteira/Contratante" class="nav-link">Carteira</a>
+    </nav>
+  </div>
+
+  <div class="topbar-right">
+    <div class="saldo-badge">
+      <span class="icon">💳</span>
+      <strong>R$ <%= Number(usuario && usuario.saldo_simulado ? usuario.saldo_simulado : 0).toFixed(2) %></strong>
+    </div>
+
+    <div class="user-profile">
+      <span><%= usuario && usuario.nome ? usuario.nome : 'Contratante' %></span>
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Foto Perfil" class="avatar">
+    </div>
+  </div>
+</header>

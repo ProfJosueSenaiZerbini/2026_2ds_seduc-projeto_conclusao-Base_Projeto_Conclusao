@@ -1,0 +1,268 @@
+/* =========================================================
+   Variáveis Globais de Cores - Tema Araponga & Ibico
+   ========================================================= */
+:root {
+  /* Cores Principais (Araponga) */
+  --brand-50: #f0fdf4;
+  --brand-100: #dcfce7;
+  --brand-500: #16a34a; /* Verde Araponga */
+  --brand-600: #15803d;
+  --brand-700: #116530;
+
+  /* Cores de Destaque / Ação */
+  --accent-100: #e0f2fe;
+  --accent-500: #0284c7; /* Azul Araponga */
+  --accent-600: #0369a1;
+
+  /* Neutros e Superfícies */
+  --surface: #ffffff;
+  --background-visual: linear-gradient(160deg, #f0fdf4 0%, #e0f2fe 100%);
+  --ink-900: #0f172a;
+  --ink-700: #334155;
+  --ink-500: #64748b;
+  --border-color: #cbd5e1;
+
+  /* Sombras e Bordas */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================================
+   Layout Principal (Split Screen)
+   ========================================================= */
+.auth-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Painel Esquerdo - Visual */
+.auth-split-visual {
+  background: var(--background-visual);
+  padding: 60px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-split-visual h1 {
+  font-size: 32px;
+  max-width: 460px;
+  color: var(--ink-900);
+  line-height: 1.2;
+}
+
+.auth-split-visual p {
+  color: var(--ink-500);
+  max-width: 440px;
+  font-size: 16px;
+  margin-top: 12px;
+}
+
+.tag-pill {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--brand-100);
+  color: var(--brand-700);
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.visual-photo {
+  margin-top: 28px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 4px solid var(--surface);
+}
+
+.visual-photo img {
+  width: 100%;
+  display: block;
+}
+
+/* Painel Direito - Formulário */
+.auth-split-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--surface);
+}
+
+.auth-title {
+  font-size: 24px;
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
+.auth-sub {
+  color: var(--ink-500);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* =========================================================
+   Componentes do Formulário
+   ========================================================= */
+
+/* Seletor de Perfil (Role Toggle) */
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--surface);
+}
+
+.role-card:hover {
+  border-color: var(--brand-500);
+}
+
+.role-card.active {
+  border-color: var(--brand-500);
+  background: var(--brand-50);
+}
+
+.role-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.role-card span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+/* Estutura de Linhas e Campos */
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-700);
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--ink-900);
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+
+/* Input com Ícone (Botão de ver senha) */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink-500);
+}
+
+/* Checkboxes */
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-700);
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: var(--brand-500);
+  margin-top: 3px;
+}
+
+/* Botão Principal e Rodapé */
+.btn-teal {
+  background: var(--brand-500);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition:  0.2s ease;
+}
+
+.btn-teal:hover {
+  background: var(--brand-600);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.foot-note {
+  font-size: 13px;
+  color: var(--ink-500);
+  margin-top: 20px;
+  text-align: center;
+}
+
+.hint-link {
+  color: var(--brand-600);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hint-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsividade para Telas Menores */
+@media (max-width: 768px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+  .auth-split-visual {
+    display: none; /* Esconde a lateral visual em celulares */
+  }
+}

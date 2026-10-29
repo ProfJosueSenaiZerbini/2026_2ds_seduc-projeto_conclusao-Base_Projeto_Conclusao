@@ -1,0 +1,242 @@
+/* =========================================================
+   IBICO — Estilos Globais (Header e Footer Partials)
+   ========================================================= */
+
+/* VARIÁVEIS GLOBAIS DE COR */
+:root {
+  --teal: #0d9488;
+  --teal-hover: #0a7a6f;
+  --brand-green: #16a34a;
+  --ink: #0f172a;
+  --gray-bg: #f8fafc;
+  --border: #e2e8f0;
+  --text-muted: #64748b;
+}
+
+/* RESET BÁSICO */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--gray-bg);
+  color: var(--ink);
+}
+
+/* =========================================================
+   HEADER / TOPBAR
+   ========================================================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--teal);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--teal);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--teal);
+}
+
+.nav-link.active {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.saldo-badge {
+  background: #f1f5f9;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+/* =========================================================
+   HEADER / NAVBAR (PARTIAL PADRÃO)
+   ========================================================= */
+
+.navbar {
+  background: var(--bg, #FAF9F6);
+  border-bottom: 1px solid var(--line, #E7E5E0);
+  width: 100%;
+}
+
+.navbar__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--brand-red, #E8503A);
+  letter-spacing: -0.02em;
+}
+
+.navbar__links {
+  display: flex;
+  gap: 36px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--ink-soft, #4B5563);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--ink, #14213D);
+}
+
+.nav-link--active {
+  color: var(--brand-red, #E8503A);
+  font-weight: 600;
+  border-bottom-color: var(--brand-red, #E8503A);
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--ink, #14213D);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(20, 33, 61, 0.06);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.footer {
+  background: #f1f5f9;
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  margin-top: 60px;
+}
+
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer-links {
+  display: flex;
+  gap: 48px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-col h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.footer-col a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.footer-col a:hover {
+  color: var(--teal);
+}
+
+.hint-link {
+  color: var(--teal);
+  font-weight: 600;
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Login - Ibico</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel='stylesheet' type='text/css' media='screen' href='/css/login.css'>
+</head>
+
+<body>
+
+    <div class="left-panel">
+        <div class="login-container">
+            <div class="brand-title">Ibico</div>
+            <h1>Bem-Vindo de volta</h1>
+            <p class="subtitle">Escolha como deseja aceder à plataforma</p>
+
+            <form action="/login" method="POST">
+
+                <input type="hidden" name="tipoPerfil" id="tipo_perfil" value="Contratante">
+
+                <div class="profile-selector">
+                    <div class="profile-card active" id="card-contratar" onclick="selecionarPerfil('Contratante')">
+                        <i class="fas fa-briefcase"></i> Quero Contratar
+                    </div>
+                    <div class="profile-card" id="card-trabalhar" onclick="selecionarPerfil('Trabalhador')">
+                        <i class="fas fa-tools"></i>
+                        Quero Trabalhar
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">E-mail Corporativo ou Pessoal</label>
+                    <input type="email" id="email" name="email" placeholder="exemplo@ibico.com.br" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="senha">
+                        Senha
+                        <a href="#">Esqueceu a senha?</a>
+                    </label>
+                    <input type="password" id="senha" name="senha" placeholder="*********" required>
+                    <i class="fas fa-eye toggle-password" onclick="toggleSenha()"></i>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="lembrar" name="lembrar">
+                    <label for="lembrar">Lembrar de mim neste dispositivo</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Entrar na Plataforma <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <div class="signup-link">
+                    Não tem conta? <a href="/cadastrar">Criar uma conta gratuitamente</a>
+                </div>
+
+                <div class="divider">Ou entre com</div>
+
+                <div class="social-login">
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-google" style="color: #DB4437;"></i> Google
+                    </button>
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-linkedin" style="color: #0A66C2;"></i> LinkedIn
+                    </button>
+                </div>
+
+                <div class="security-badge">
+                    <i class="fas fa-lock"></i> Conexão segura AES-256 </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="right-panel"></div>
+
+    <script src="/js/login.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibico | Carteira do Contratante</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/carteiraContratante.css">
+</head>
+
+<body>
+
+  <%- include('partials/headerContratante') %>
+
+    <main class="wallet">
+      <header class="wallet__header">
+        <h1 class="wallet__title">Sua Carteira</h1>
+        <p class="wallet__subtitle">Gerencie seu saldo, depósitos e pagamentos de serviços contratados.</p>
+      </header>
+
+      <!-- DASHBOARD FINANCEIRO DINÂMICO -->
+      <section class="wallet__dashboard">
+        <div class="wallet__card wallet__card--primary">
+          <span class="wallet__label">Saldo Disponível</span>
+          <h2 class="wallet__balance">R$ <%= carteira.saldo.toFixed(2).replace('.', ',' ) %>
+          </h2>
+          <div class="wallet__actions">
+            <button class="btn btn--primary">Adicionar Saldo</button>
+            <button class="btn btn--outline-light">Sacar Saldo</button>
+          </div>
+        </div>
+
+        <div class="wallet__stats">
+          <div class="wallet__card">
+            <span class="wallet__label">Investido este mês</span>
+            <span class="wallet__stat-value">R$ <%= carteira.totalInvestido.toFixed(2).replace('.', ',' ) %></span>
+            <span class="wallet__stat-info">
+              <%= carteira.bicosFinalizados %> bicos finalizados
+            </span>
+          </div>
+          <div class="wallet__card">
+            <span class="wallet__label">Pagamentos em Aberto</span>
+            <span class="wallet__stat-value">R$ <%= carteira.totalPendente.toFixed(2).replace('.', ',' ) %></span>
+            <span class="wallet__stat-info">
+              <%= carteira.bicosPendentes %> bicos aguardando conclusão
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXTRATO DE TRANSAÇÕES DINÂMICO -->
+      <section class="wallet__transactions">
+        <div class="wallet__section-header">
+          <h3 class="wallet__section-title">Histórico de Transações</h3>
+        </div>
+
+        <div class="table-container">
+          <table class="wallet__table">
+            <thead>
+              <tr>
+                <th>Data e Hora</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th class="text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (transacoes && transacoes.length> 0) { %>
+                <% transacoes.forEach(transacao=> { %>
+                  <tr>
+                    <td>
+                      <%= transacao.dataHora %>
+                    </td>
+                    <td>
+                      <%= transacao.descricao %>
+                    </td>
+                    <td>
+                      <%= transacao.tipo %>
+                    </td>
+                    <td>
+                      <% if (transacao.status==='CONCLUIDO' ) { %>
+                        <span class="badge badge--success">Concluído</span>
+                        <% } else { %>
+                          <span class="badge badge--pending">Pendente</span>
+                          <% } %>
+                    </td>
+                    <td
+                      class="text-right <%= transacao.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
+                      <%= transacao.tipo==='Entrada' ? '+' : '-' %> R$ <%= transacao.valor.toFixed(2).replace('.', ',' )
+                          %>
+                    </td>
+                  </tr>
+                  <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="5" style="text-align: center; color: var(--muted);">
+                          Nenhuma transação encontrada.
+                        </td>
+                      </tr>
+                      <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <%- include('partials/footer') %>
+
+</body>
+
+</html>

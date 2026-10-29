@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibico | Extrato da Carteira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/carteiraTrabalhador.css">
+</head>
+
+<body>
+
+  <%- include('partials/headerTrabalhador') %>
+
+  <main class="page">
+
+    <div class="title-row">
+      <div>
+        <h1>Extrato da Carteira</h1>
+        <p>Gerencie seus ganhos e acompanhe suas transações com transparência.</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary">📄 Gerar Relatório</button>
+        <button class="btn btn-primary">💳 Sacar via Pix</button>
+      </div>
+    </div>
+
+    <div class="top-grid">
+      <div class="balance-stack">
+        <div class="card">
+          <div class="balance-label">SALDO DISPONÍVEL</div>
+          <div class="balance-value" id="saldo-disponivel">
+            R$ <%= carteira && carteira.saldoDisponivel ? carteira.saldoDisponivel.toFixed(2).replace('.', ',') : '0,00' %>
+          </div>
+          <div class="balance-delta" id="saldo-delta">
+            <%= carteira && carteira.delta ? carteira.delta : '' %>
+          </div>
+        </div>
+        <div class="card">
+          <div class="balance-label">SALDO RETIDO</div>
+          <div class="balance-value" id="saldo-retido">
+            R$ <%= carteira && carteira.saldoRetido ? carteira.saldoRetido.toFixed(2).replace('.', ',') : '0,00' %>
+          </div>
+          <div class="balance-sub" id="saldo-retido-info">
+            <%= carteira && carteira.infoRetido ? carteira.infoRetido : '' %>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="chart-header">
+          <div>
+            <h3>Crescimento Mensal</h3>
+            <p>Acompanhamento de ganhos brutos</p>
+          </div>
+          <div class="chart-select">Últimos 6 meses ⌄</div>
+        </div>
+        <!-- Gráfico fixo visual -->
+        <div class="bars">
+          <div class="bar-col"><div class="bar" style="height:60px"></div><div class="bar-label">Jan</div></div>
+          <div class="bar-col"><div class="bar" style="height:70px"></div><div class="bar-label">Fev</div></div>
+          <div class="bar-col"><div class="bar" style="height:95px"></div><div class="bar-label">Mar</div></div>
+          <div class="bar-col"><div class="bar" style="height:85px"></div><div class="bar-label">Abr</div></div>
+          <div class="bar-col"><div class="bar" style="height:100px"></div><div class="bar-label">Mai</div></div>
+          <div class="bar-col active"><div class="bar active" style="height:140px"></div><div class="bar-label">Jun</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card history-card">
+      <div class="history-header">
+        <h3>Histórico de Transações</h3>
+        <div class="search-box">
+          🔍
+          <input type="text" id="filtro-bico" placeholder="Filtrar por nome, valor ou data/horário...">
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Descrição do Bico</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody id="transacoes-body">
+          <% if (typeof transacoes !== 'undefined' && transacoes.length > 0) { %>
+            <% transacoes.slice(0, 5).forEach(t => { %>
+              <tr>
+                <td><%= t.tipo %></td>
+                <td><%= t.descricao %></td>
+                <td><%= t.dataHora %></td>
+                <td>
+                  <span class="badge <%= t.status === 'CONCLUIDO' ? 'badge--success' : 'badge--pending' %>">
+                    <%= t.status === 'CONCLUIDO' ? 'Concluído' : 'Pendente' %>
+                  </span>
+                </td>
+                <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
+                  <%= t.tipo === 'Entrada' ? '+' : '-' %> R$ <%= Number(t.valor).toFixed(2).replace('.', ',') %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <!-- As linhas poderão ser preenchidas via cliente pelo JS -->
+          <% } %>
+        </tbody>
+      </table>
+      <div class="see-all" id="abrir-historico">Ver todo o histórico</div>
+    </div>
+
+  </main>
+
+  <!-- Modal: Histórico completo -->
+  <div class="modal-overlay" id="historico-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Histórico Completo</h3>
+        <button class="modal-close" id="fechar-historico">✕</button>
+      </div>
+      <div class="modal-search">
+        <div class="search-box">
+          🔍
+          <input type="text" id="filtro-bico-modal" placeholder="Filtrar por nome, valor ou data/horário...">
+        </div>
+      </div>
+      <div class="modal-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição do Bico</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="historico-completo-body">
+            <% if (typeof transacoes !== 'undefined' && transacoes.length > 0) { %>
+              <% transacoes.forEach(t => { %>
+                <tr>
+                  <td><%= t.tipo %></td>
+                  <td><%= t.descricao %></td>
+                  <td><%= t.dataHora %></td>
+                  <td>
+                    <span class="badge <%= t.status === 'CONCLUIDO' ? 'badge--success' : 'badge--pending' %>">
+                      <%= t.status === 'CONCLUIDO' ? 'Concluído' : 'Pendente' %>
+                    </span>
+                  </td>
+                  <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
+                    <%= t.tipo === 'Entrada' ? '+' : '-' %> R$ <%= Number(t.valor).toFixed(2).replace('.', ',') %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <script src="/js/carteiraTrabalhador.js"></script>
+</body>
+
+</html>

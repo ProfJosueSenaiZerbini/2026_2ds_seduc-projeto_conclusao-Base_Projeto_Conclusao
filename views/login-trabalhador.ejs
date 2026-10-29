@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Ibico</title>
+<link rel="stylesheet" href="/css/login-trabalhador.css">
+</head>
+<body>
+  <div class="page">
+    <div class="panel-form">
+      <div class="logo">Ibico</div>
+      <h1>Bem-vindo de volta</h1>
+      <p class="subtitle">Escolha como deseja acessar a plataforma</p>
+
+      <div class="role-toggle">
+        <button type="button" class="role-btn active" id="btnContratar" onclick="setRole('contratar')">
+          <span class="icon">🏢</span>Quero Contratar
+        </button>
+        <button type="button" class="role-btn" id="btnTrabalhar" onclick="setRole('trabalhar')">
+          <span class="icon">🛠️</span>Quero Trabalhar
+        </button>
+      </div>
+
+      <form id="loginForm">
+        <div>
+          <label for="email">E-mail Corporativo ou Pessoal</label>
+          <input type="email" id="email" placeholder="exemplo@ibico.com.br" required>
+        </div>
+
+        <div>
+          <label for="senha">Senha <a href="#" class="forgot">Esqueceu a senha?</a></label>
+          <div class="input-wrap">
+            <input type="password" id="senha" placeholder="••••••••" required>
+            <button type="button" class="toggle-pass" id="toggleSenha">👁</button>
+          </div>
+        </div>
+
+        <label class="remember">
+          <input type="checkbox" id="lembrar">
+          Lembrar de mim neste dispositivo
+        </label>
+
+        <button type="submit" class="btn-primary">Entrar na Plataforma →</button>
+      </form>
+
+      <p class="signup-line">
+        Não tem uma conta? <a href="cadastro.html">Criar uma conta gratuitamente</a>
+      </p>
+
+      <div class="divider">Ou entre com</div>
+      <div class="oauth-row">
+        <button type="button" class="oauth-btn">🔵 Google</button>
+        <button type="button" class="oauth-btn">💼 LinkedIn</button>
+      </div>
+
+      <p class="footer-note">🔒 Conexão Segura AES-256</p>
+    </div>
+
+    <div class="panel-visual">
+      <div class="visual-card">
+        <h2>Conectando talentos a demandas locais com clareza e agilidade</h2>
+        <p>Acesse sua conta para acompanhar vagas, propostas e pagamentos em um só lugar.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/login-trabalhador.js"></script>
+</body>
+</html>
