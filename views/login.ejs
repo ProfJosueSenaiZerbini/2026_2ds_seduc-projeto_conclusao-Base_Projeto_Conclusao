@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ibico - Login</title>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/login.css">
+    <%- include('Partials/phosphorIcons') %>
 </head>
 
 <body>
@@ -38,22 +39,13 @@
 
                     <div class="toggle-row">
                         <button type="button" class="toggle-btn" id="btnWork">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path
-                                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                            </svg>
+                            <i class="icon ph ph-wrench" aria-hidden="true"></i>
                             Quero Trabalhar
                         </button>
 
 
                         <button type="button" class="toggle-btn active-hire" id="btnHire">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <rect x="3" y="7" width="18" height="13" rx="2" />
-                                <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                <path d="M3 13h18" />
-                            </svg>
+                            <i class="icon ph ph-briefcase" aria-hidden="true"></i>
                             Quero Contratar
                         </button>
                     </div>
@@ -72,10 +64,7 @@
                         <!-- ADICIONADO: name="senha" -->
                         <input type="password" name="senha" placeholder="••••••••" required>
                         <button type="button" class="eye" aria-label="Mostrar senha" aria-pressed="false">
-                            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                                <path
-                                    d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
-                            </svg>
+                            <i class="ph ph-eye" aria-hidden="true"></i>
                         </button>
                     </div>
 
@@ -84,15 +73,15 @@
                         Lembrar de mim neste dispositivo
                     </label>
 
-                    <button type="submit" class="submit-btn" id="submitBtn">Entrar na Plataforma →</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Entrar na Plataforma <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
 
                     <p class="signup">Não tem uma conta? <a href="/cadastrar">Criar uma conta gratuitamente</a></p>
 
                     <div class="divider">Ou entre com</div>
 
                     <div class="social-row">
-                        <button type="button" class="social-btn">🔵 Google</button>
-                        <button type="button" class="social-btn">🔷 LinkedIn</button>
+                        <button type="button" class="social-btn"><i class="ph ph-google-logo" aria-hidden="true"></i> Google</button>
+                        <button type="button" class="social-btn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i> LinkedIn</button>
                     </div>
 
                 </form>

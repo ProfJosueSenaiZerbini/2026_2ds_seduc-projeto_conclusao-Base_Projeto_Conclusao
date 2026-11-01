@@ -88,7 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(dados.erro || 'Não foi possível finalizar o serviço.');
       }
 
-      statusBico.textContent = `• ${dados.status}`;
+      const statusIcon = document.createElement('i');
+      statusIcon.className = 'ph-fill ph-circle';
+      statusIcon.setAttribute('aria-hidden', 'true');
+      statusBico.replaceChildren(statusIcon, document.createTextNode(` ${dados.status}`));
       feedback.textContent = dados.mensagem || 'Serviço finalizado com sucesso.';
       form.remove();
     } catch (erro) {

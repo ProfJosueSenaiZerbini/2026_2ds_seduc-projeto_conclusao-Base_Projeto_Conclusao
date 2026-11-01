@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Conversa | iBico</title>
   <link rel="stylesheet" href="/css/chat.css">
+  <%- include('Partials/phosphorIcons') %>
 </head>
 
 <body>
@@ -16,9 +17,9 @@
 
   <main class="chat-screen">
     <header class="chat-header">
-      <a class="chat-header__back" href="<%= rotaVolta %>" aria-label="Voltar">←</a>
+      <a class="chat-header__back" href="<%= rotaVolta %>" aria-label="Voltar"><i class="ph ph-arrow-left" aria-hidden="true"></i></a>
 
-      <strong>iBico 🛠️</strong>
+      <strong>iBico <i class="ph ph-wrench" aria-hidden="true"></i></strong>
 
       <div class="chat-header__info">
         <h1><%= contato.nome %></h1>

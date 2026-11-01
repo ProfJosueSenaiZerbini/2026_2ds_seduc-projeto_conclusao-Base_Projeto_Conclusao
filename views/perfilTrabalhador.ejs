@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <%- include('Partials/phosphorIcons') %>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/perfilTrabalhador.css">
 </head>
@@ -34,11 +35,11 @@
             </div>
             <div class="pt-acoes">
                 <button type="button" class="pt-btn pt-btn-primary" id="ptBtnEditar">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
                     Editar Perfil
                 </button>
                 <a href="/hometrabalhador" class="pt-btn pt-btn-outline">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                    <i class="ph ph-arrow-left" aria-hidden="true"></i>
                     Voltar
                 </a>
             </div>
@@ -56,7 +57,7 @@
                         <h2><%= usuario.nome %></h2>
                         <span class="pt-pill pt-pill-role"><i class="pt-dot"></i><%= usuario.tipo_perfil ? usuario.tipo_perfil.toLowerCase() : 'trabalhador' %></span>
                         <span class="pt-pill pt-pill-verificado">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.4-3.7-3.7 1.4-1.4 2.3 2.3 4.6-4.6 1.4 1.4-6 6Z"/></svg>
+                            <i class="ph-fill ph-seal-check" aria-hidden="true"></i>
                             Perfil Verificado
                         </span>
                     </div>
@@ -91,7 +92,7 @@
                 <!-- Dados cadastrais -->
                 <div class="pt-secao-titulo">
                     <h3>
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                        <i class="ph ph-user-circle" aria-hidden="true"></i>
                         Dados Cadastrais
                     </h3>
                     <span>Informações privadas e do cadastro</span>
@@ -102,7 +103,7 @@
                         <label>Nome completo</label>
                         <div class="pt-campo-linha">
                             <div class="pt-campo-valor"><%= usuario.nome %></div>
-                            <svg class="pt-campo-icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.5a7 7 0 0 1 11.6 0"/></svg>
+                            <i class="pt-campo-icone ph ph-user-circle" aria-hidden="true"></i>
                         </div>
                     </div>
 
@@ -119,7 +120,7 @@
                         <div class="pt-campo-linha">
                             <div class="pt-campo-valor pt-mono" id="ptCpfValor" data-cpf="<%= usuario.cpf %>"><%= usuario.cpf %></div>
                             <button type="button" class="pt-btn-link" id="ptBtnCpf" aria-pressed="false">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <i class="ph ph-eye" aria-hidden="true"></i>
                                 <span id="ptCpfTexto">Ocultar</span>
                             </button>
                         </div>
@@ -137,7 +138,7 @@
                         <label>Data de cadastro</label>
                         <div class="pt-campo-linha">
                             <div class="pt-campo-valor pt-mono">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                <i class="ph ph-calendar-blank" aria-hidden="true"></i>
                                 <%= usuario.data_cadastro_formatada %>
                             </div>
                             <span class="pt-tag-neutra">Membro recente</span>
@@ -149,7 +150,7 @@
                 <div class="pt-duas-colunas">
                     <div>
                         <h3 class="pt-sub-titulo">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>
+                            <i class="ph ph-toolbox" aria-hidden="true"></i>
                             Habilidades e Especialidades
                         </h3>
                         <div class="pt-chips">
@@ -162,7 +163,7 @@
 
                     <div>
                         <h3 class="pt-sub-titulo">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                            <i class="ph ph-shield-check" aria-hidden="true"></i>
                             Segurança e Verificação
                         </h3>
                         <ul class="pt-lista-seguranca">
@@ -183,7 +184,7 @@
         <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloEditar">
             <div class="pt-modal-header">
                 <h3 id="ptTituloEditar">Editar Perfil</h3>
-                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalEditar" aria-label="Fechar">&times;</button>
+                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalEditar" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
             </div>
             <form action="/perfil/editar" method="POST">
                 <div class="pt-modal-grupo">
@@ -219,7 +220,7 @@
         <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloSenha">
             <div class="pt-modal-header">
                 <h3 id="ptTituloSenha">Alterar Senha</h3>
-                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalSenha" aria-label="Fechar">&times;</button>
+                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalSenha" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
             </div>
             <form action="/perfil/alterar-senha" method="POST" id="ptFormSenha">
                 <div class="pt-modal-grupo">
@@ -248,7 +249,7 @@
         <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloHab">
             <div class="pt-modal-header">
                 <h3 id="ptTituloHab">Adicionar habilidade</h3>
-                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalHabilidade" aria-label="Fechar">&times;</button>
+                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalHabilidade" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
             </div>
             <form action="/perfil/habilidades" method="POST">
                 <div class="pt-modal-grupo">

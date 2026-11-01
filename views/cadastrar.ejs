@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criar Conta — Ibico</title>
   <link rel="stylesheet" href="/css/cadastro.css">
+  <%- include('Partials/phosphorIcons') %>
 </head>
 
 <body class="theme-contratante">
@@ -82,11 +83,11 @@
           <label class="role-label">Eu quero...</label>
           <div class="role-toggle" id="cadastroRoleToggle">
             <div class="role-card active" data-role="contratante" id="cardContratante">
-              <div class="role-icon">💼</div>
+              <div class="role-icon"><i class="ph ph-briefcase" aria-hidden="true"></i></div>
               <span>Quero Contratar</span>
             </div>
             <div class="role-card" data-role="trabalhador" id="cardTrabalhador">
-              <div class="role-icon">🛠️</div>
+              <div class="role-icon"><i class="ph ph-wrench" aria-hidden="true"></i></div>
               <span>Quero Trabalhar</span>
             </div>
           </div>
@@ -131,9 +132,7 @@
                     minlength="6" maxlength="72">
                   <button type="button" class="input-icon-btn" data-toggle-password="cSenha"
                     data-toggle-label="senha" aria-label="Mostrar senha" aria-pressed="false">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
-                    </svg>
+                    <i class="ph ph-eye" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>
@@ -145,9 +144,7 @@
                   <button type="button" class="input-icon-btn" data-toggle-password="cConfirma"
                     data-toggle-label="confirmação de senha" aria-label="Mostrar confirmação de senha"
                     aria-pressed="false">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
-                    </svg>
+                    <i class="ph ph-eye" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>

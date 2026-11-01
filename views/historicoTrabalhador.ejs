@@ -7,6 +7,7 @@
     <title>Ibico | Histórico de Bicos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <%- include('Partials/phosphorIcons') %>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/historicoTrabalhador.css">
 </head>
@@ -50,7 +51,7 @@
 
                     <div class="filters">
                         <label class="search">
-                            <span class="search__icon" aria-hidden="true">🔍</span>
+                            <span class="search__icon" aria-hidden="true"><i class="ph ph-magnifying-glass"></i></span>
                             <input type="search" id="busca" placeholder="Buscar por serviço ou cliente...">
                         </label>
                         <select id="ordenar" class="select" aria-label="Ordenar">
@@ -91,13 +92,13 @@
 
             <!-- Pop-up: Dica para Profissionais -->
             <aside class="tip-popup" id="dicaPopup" role="dialog" aria-labelledby="dicaTitulo" hidden>
-                <div class="tip-popup__icon" aria-hidden="true">💡</div>
+                <div class="tip-popup__icon" aria-hidden="true"><i class="ph ph-lightbulb"></i></div>
                 <div class="tip-popup__body">
                     <h4 id="dicaTitulo">Dica para Profissionais</h4>
                     <p>Mantenha suas conversas ativas e envie fotos no chat ao concluir para garantir a melhor avaliação
                         e liberar os repasses com antecedência.</p>
                 </div>
-                <button type="button" class="tip-popup__close" id="fecharDica" aria-label="Fechar dica">✕</button>
+                <button type="button" class="tip-popup__close" id="fecharDica" aria-label="Fechar dica"><i class="ph ph-x" aria-hidden="true"></i></button>
             </aside>
 
             <%- include('Partials/footer') %>

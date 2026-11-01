@@ -7,7 +7,7 @@
 %>
 <li class="bico-card" data-busca="<%= busca %>" data-ts="<%= dataTs %>">
     <div class="bico-card__top">
-        <div class="bico-card__icon" aria-hidden="true"><%= bico.icone || '💼' %>
+        <div class="bico-card__icon" aria-hidden="true"><% if (bico.icone) { %><%= bico.icone %><% } else { %><i class="ph ph-briefcase"></i><% } %>
     </div>
 
     <div class="bico-card__main">
@@ -37,7 +37,7 @@
 
                         <div class="bico-card__meta">
                             <div class="meta">
-                                <span class="meta__icon">📅</span>
+                                <span class="meta__icon"><i class="ph ph-calendar-blank" aria-hidden="true"></i></span>
                                 <div><span class="meta__label">Data</span>
                                     <span class="meta__value">
                                         <%= bico.data_servico_formatada %>
@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="meta">
-                                <span class="meta__icon">🕒</span>
+                                <span class="meta__icon"><i class="ph ph-clock" aria-hidden="true"></i></span>
                                 <div><span class="meta__label">Horário</span>
                                     <span class="meta__value">
                                         <%= bico.horario || '--:--' %>
@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                             <div class="meta">
-                                <span class="meta__icon">📍</span>
+                                <span class="meta__icon"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
                                 <div><span class="meta__label">Local</span>
                                     <span class="meta__value">
                                         <%= bico.local || '-' %>
@@ -63,7 +63,7 @@
                                 </div>
                             </div>
                             <div class="meta">
-                                <span class="meta__icon">👤</span>
+                                <span class="meta__icon"><i class="ph ph-user" aria-hidden="true"></i></span>
                                 <div><span class="meta__label">Cliente</span>
                                     <span class="meta__value">
                                         <%= bico.cliente_nome || '-' %>
@@ -95,7 +95,7 @@
                                         <span class="price__value">R$ <%= valorFmt %></span>
                                         <% if (tipo==='aceito' || tipo==='concluido' ) { %>
                                             <% if (pago) { %>
-                                                <span class="pill pill--paid">✔ Pago na Carteira</span>
+                                                <span class="pill pill--paid"><i class="ph ph-check-circle" aria-hidden="true"></i> Pago na Carteira</span>
                                                 <% } else { %>
                                                     <span class="pill pill--custody">Garantido sob Custódia</span>
                                                     <% } %>
@@ -115,7 +115,7 @@
                                                         bico.candidatura_id) { %>
                                                         <a class="btn btn--primary"
                                                             href="/bicos/candidaturas/<%= bico.candidatura_id %>/chat">
-                                                            <span aria-hidden="true">💬</span> Abrir conversa
+                                                            <i class="ph ph-chat-circle" aria-hidden="true"></i> Abrir conversa
                                                         </a>
                                                         <% } %>
                                     </div>

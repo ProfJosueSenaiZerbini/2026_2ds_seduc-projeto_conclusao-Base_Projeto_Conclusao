@@ -7,6 +7,7 @@
   <title>Ibico | Extrato da Carteira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <%- include('Partials/phosphorIcons') %>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/carteiraTrabalhador.css">
 </head>
@@ -23,8 +24,8 @@
         <p>Gerencie seus ganhos e acompanhe suas transações com transparência.</p>
       </div>
       <div class="actions">
-        <button class="btn btn-secondary">📄 Gerar Relatório</button>
-        <button class="btn btn-primary">💳 Sacar via Pix</button>
+        <button class="btn btn-secondary"><i class="ph ph-file-text" aria-hidden="true"></i> Gerar Relatório</button>
+        <button class="btn btn-primary"><i class="ph ph-credit-card" aria-hidden="true"></i> Sacar via Pix</button>
       </div>
     </div>
 
@@ -56,7 +57,7 @@
             <h3>Crescimento Mensal</h3>
             <p>Acompanhamento de ganhos brutos</p>
           </div>
-          <div class="chart-select">Últimos 6 meses ⌄</div>
+          <div class="chart-select">Últimos 6 meses <i class="ph ph-caret-down" aria-hidden="true"></i></div>
         </div>
         <!-- Gráfico fixo visual -->
         <div class="bars">
@@ -74,7 +75,7 @@
       <div class="history-header">
         <h3>Histórico de Transações</h3>
         <div class="search-box">
-          🔍
+          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
           <input type="text" id="filtro-bico" placeholder="Filtrar por nome, valor ou data/horário...">
         </div>
       </div>
@@ -120,11 +121,11 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3>Histórico Completo</h3>
-        <button class="modal-close" id="fechar-historico">✕</button>
+        <button class="modal-close" id="fechar-historico" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
       </div>
       <div class="modal-search">
         <div class="search-box">
-          🔍
+          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
           <input type="text" id="filtro-bico-modal" placeholder="Filtrar por nome, valor ou data/horário...">
         </div>
       </div>

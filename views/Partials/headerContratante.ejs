@@ -17,7 +17,7 @@
       aria-controls="sidebar-contratante"
       data-sidebar-collapse
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7" /></svg>
+      <i class="ph ph-caret-left" aria-hidden="true"></i>
     </button>
   </div>
 
@@ -29,7 +29,7 @@
       title="Início"
       <%- rotaAtual === '/homeContratante' ? 'aria-current="page"' : '' %>
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+      <i class="ph ph-house" aria-hidden="true"></i>
       <span class="sidebar-nav__label">Início</span>
     </a>
     <a
@@ -39,7 +39,7 @@
       title="Publicar Bico"
       <%- rotaAtual === '/bicos/novo' ? 'aria-current="page"' : '' %>
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      <i class="ph ph-plus" aria-hidden="true"></i>
       <span class="sidebar-nav__label">Publicar Bico</span>
     </a>
     <a
@@ -49,7 +49,7 @@
       title="Bicos"
       <%- rotaAtual === '/bicos/ativos' || /^\/bicos\/\d+/.test(rotaAtual) ? 'aria-current="page"' : '' %>
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2" /></svg>
+      <i class="ph ph-briefcase" aria-hidden="true"></i>
       <span class="sidebar-nav__label">Bicos</span>
     </a>
     <a
@@ -59,7 +59,7 @@
       title="Carteira"
       <%- rotaAtual === '/carteira/contratante' ? 'aria-current="page"' : '' %>
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2" /><path d="M3 9h18m-6 5h3" /></svg>
+      <i class="ph ph-credit-card" aria-hidden="true"></i>
       <span class="sidebar-nav__label">Carteira</span>
     </a>
   </nav>
@@ -89,7 +89,7 @@
     </a>
     <form action="/logout" method="POST" class="sidebar-logout-form">
       <button type="submit" class="sidebar-logout" aria-label="Sair" title="Sair">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></svg>
+        <i class="ph ph-sign-out" aria-hidden="true"></i>
         <span class="sidebar-nav__label">Sair</span>
       </button>
     </form>
@@ -104,7 +104,7 @@
   aria-controls="sidebar-contratante"
   data-sidebar-mobile-toggle
 >
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+  <i class="ph ph-list" aria-hidden="true"></i>
   <span>Menu</span>
 </button>
 <button class="sidebar-backdrop" type="button" aria-label="Fechar navegação" data-sidebar-backdrop tabindex="-1" hidden></button>

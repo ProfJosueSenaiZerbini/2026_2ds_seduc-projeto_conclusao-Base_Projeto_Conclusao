@@ -121,6 +121,8 @@
   color: var(--details-red-banner);
 }
 
+#status-bico .ph-circle { margin-right: 4px; font-size: 7px; vertical-align: middle; }
+
 .card-label {
   display: block;
   font-size: 12px;

@@ -7,7 +7,7 @@
   <title>Publicar Novo Bico — Ibico</title>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/publicarBico.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <%- include('Partials/phosphorIcons') %>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
           <p>Preencha os detalhes da demanda para encontrar os melhores parceiros locais.</p>
         </div>
         <div class="badge-verified">
-          <i class="fas fa-check-circle"></i> Anúncio Verificado Ibico
+          <i class="ph-fill ph-check-circle"></i> Anúncio Verificado Ibico
         </div>
       </div>
 
@@ -63,7 +63,7 @@
               <div class="input-group">
                 <label>Bairro</label>
                 <div class="input-with-icon">
-                  <i class="fas fa-location-dot"></i>
+                  <i class="ph-fill ph-map-pin"></i>
                   <input type="text" name="bairro" placeholder="Ex: Itaim Bibi" required>
                 </div>
               </div>
@@ -82,7 +82,7 @@
 
             <div class="balance-box">
               <div class="balance-info">
-                <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
+                <div class="wallet-icon"><i class="ph-fill ph-wallet"></i></div>
                 <div>
                   <span class="label">SEU SALDO ATUAL</span>
                   <span class="value">R$ <%= Number(usuario.saldo_simulado || 0).toFixed(2) %></span>
@@ -90,14 +90,14 @@
               </div>
               <div class="balance-check">
                 <p>Valor a Reter: <span class="highlight">R$ 0,00</span></p>
-                <p class="status-ok"><i class="fas fa-check-circle"></i> Saldo suficiente disponível</p>
+                <p class="status-ok"><i class="ph-fill ph-check-circle"></i> Saldo suficiente disponível</p>
               </div>
             </div>
 
             <div class="form-actions">
               <a href="/homeContratante" class="btn-cancel">Cancelar</a>
               <button type="submit" class="btn-submit">
-                <i class="fas fa-paper-plane"></i> Publicar Vaga
+                <i class="ph-fill ph-paper-plane-tilt"></i> Publicar Vaga
               </button>
             </div>
           </form>

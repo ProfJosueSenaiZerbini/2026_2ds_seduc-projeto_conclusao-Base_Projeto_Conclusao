@@ -487,6 +487,11 @@ body main.home {
   transition: background .2s;
 }
 
+.home .btn-details > i {
+  flex: 0 0 11px;
+  width: 11px;
+}
+
 .home .btn-details:hover {
   background: #c62836;
 }
@@ -680,6 +685,8 @@ body main.home {
 }
 
 .home .map-tip > i {
+  flex: 0 0 11px;
+  width: 11px;
   margin-top: 2px;
   color: #c68b32;
 }

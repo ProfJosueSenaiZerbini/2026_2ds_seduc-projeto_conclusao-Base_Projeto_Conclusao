@@ -15,6 +15,7 @@
 
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/bicosAtivos.css">
+  <%- include('Partials/phosphorIcons') %>
 
   <style>
     /* Barra de filtros */
@@ -162,7 +163,7 @@
       </div>
 
       <a href="/bicos/novo" class="btn-new-job">
-        + Publicar Novo Bico
+        <i class="ph ph-plus" aria-hidden="true"></i> Publicar Novo Bico
       </a>
     </header>
 
@@ -170,7 +171,7 @@
     <section class="metrics-grid">
 
       <div class="metric-card">
-        <div class="metric-icon icon-green">✓</div>
+        <div class="metric-icon icon-green"><i class="ph ph-check-circle" aria-hidden="true"></i></div>
 
         <div class="metric-info">
           <span class="metric-label">Bicos ativos</span>
@@ -184,7 +185,7 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon icon-yellow">🕒</div>
+        <div class="metric-icon icon-yellow"><i class="ph ph-clock" aria-hidden="true"></i></div>
 
         <div class="metric-info">
           <span class="metric-label">Em andamento</span>
@@ -198,7 +199,7 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon icon-blue">💼</div>
+        <div class="metric-icon icon-blue"><i class="ph ph-briefcase" aria-hidden="true"></i></div>
 
         <div class="metric-info">
           <span class="metric-label">Investido no mês</span>
@@ -235,7 +236,7 @@
         <div class="filters-bar">
 
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><i class="ph ph-magnifying-glass" aria-hidden="true"></i></span>
 
             <input
               type="text"
@@ -306,7 +307,7 @@
             <div class="job-card-header">
 
               <span class="badge <%= bico.status === 'Em andamento' ? 'badge-ongoing' : 'badge-open' %>">
-                • <%= bico.status %>
+                <i class="ph-fill ph-circle" aria-hidden="true"></i> <%= bico.status %>
               </span>
 
               <button
@@ -314,7 +315,7 @@
                 class="btn-more"
                 aria-label="Mais opções para <%= bico.titulo %>"
               >
-                •••
+                <i class="ph ph-dots-three" aria-hidden="true"></i>
               </button>
 
             </div>
@@ -326,11 +327,11 @@
             <div class="job-meta">
 
               <span>
-                📍 <%= bico.bairro %>
+                <i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %>
               </span>
 
               <span>
-                🕒 <%= bico.data_servico_formatada %>
+                <i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= bico.data_servico_formatada %>
                 <%= bico.horario %>
               </span>
 

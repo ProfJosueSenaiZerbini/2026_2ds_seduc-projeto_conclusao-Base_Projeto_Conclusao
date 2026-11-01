@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (noResults) noResults.hidden = filteredCards.length !== 0;
         if (loadMoreBtn) {
             loadMoreBtn.hidden = filteredCards.length <= visibleLimit;
-            loadMoreBtn.innerHTML = 'Carregar mais oportunidades <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>';
+            loadMoreBtn.innerHTML = 'Carregar mais oportunidades <i class="ph-fill ph-caret-down" aria-hidden="true"></i>';
         }
     }
 

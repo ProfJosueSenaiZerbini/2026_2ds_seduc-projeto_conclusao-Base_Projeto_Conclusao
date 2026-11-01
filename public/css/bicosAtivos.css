@@ -224,6 +224,8 @@ body {
   border-radius: 20px;
 }
 
+.job-card .badge .ph-circle { margin-right: 4px; font-size: 7px; vertical-align: middle; }
+
 .badge-ongoing {
   background-color: #fef3c7;
   color: #b45309;

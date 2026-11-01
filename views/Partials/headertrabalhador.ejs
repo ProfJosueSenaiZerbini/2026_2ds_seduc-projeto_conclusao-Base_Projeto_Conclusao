@@ -11,12 +11,12 @@
     <div class="navbar__actions" style="display: flex; align-items: center; gap: 12px;">
       <!-- Botão para acessar o Perfil -->
       <a href="/perfil" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/perfil') ? 'nav-link--active' : '' %>" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
-        <i class="far fa-user-circle" style="font-size: 1.2rem;"></i>
+        <i class="ph ph-user-circle" aria-hidden="true" style="font-size: 1.2rem;"></i>
         <span>Meu Perfil</span>
       </a>
 
       <button class="icon-btn" title="Notificações">
-        <i class="far fa-bell"></i>
+        <i class="ph ph-bell" aria-hidden="true"></i>
       </button>
 
       <!-- Permite encerrar a sessao sem depender de JavaScript. -->

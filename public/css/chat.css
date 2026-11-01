@@ -276,6 +276,7 @@ body.theme-contratante .chat-context__tag {
   color: #fff;
   border-bottom-right-radius: 4px;
 }
+.message__check { font-size: 15px; }
 .message--enviada .message__check { color: #9fe3c8; }
 body.theme-contratante .message--enviada .message__check { color: #f4c4bb; }
 

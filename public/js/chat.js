@@ -135,17 +135,9 @@
         hora.textContent = horario;
 
         if (autor === "eu") {
-            var check = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            check.setAttribute("class", "message__check");
-            check.setAttribute("width", "15");
-            check.setAttribute("height", "15");
-            check.setAttribute("viewBox", "0 0 24 24");
-            check.setAttribute("fill", "none");
-            check.setAttribute("stroke", "currentColor");
-            check.setAttribute("stroke-width", "2.2");
-            check.setAttribute("stroke-linecap", "round");
-            check.setAttribute("stroke-linejoin", "round");
-            check.innerHTML = '<path d="M2 12l5 5L22 4"/>';
+            var check = document.createElement("i");
+            check.className = "message__check ph ph-check";
+            check.setAttribute("aria-hidden", "true");
             hora.appendChild(check);
         }
 
