@@ -1,6 +1,7 @@
 # Dependências do Node
 node_modules/
-
+artifacts/
+test-results/
 # Arquivo de configuração local (contém senhas e dados sensíveis)
 .env
 
