@@ -27,6 +27,23 @@
         </div>
       </div>
 
+      <section class="mascot-assistant" aria-label="Dica para publicar um bico">
+        <button class="mascot-assistant__toggle" type="button" aria-label="Abrir dica para publicar um bico"
+          aria-expanded="false" aria-controls="mascot-tip">
+          <img src="/img/passarinho_transparente.png" alt="">
+          <span aria-hidden="true">?</span>
+        </button>
+        <aside class="mascot-assistant__bubble" id="mascot-tip" aria-labelledby="mascot-tip-title"
+          aria-describedby="mascot-tip-message" role="region" hidden>
+          <div class="mascot-assistant__bubble-content">
+            <button class="mascot-assistant__close" type="button" aria-label="Fechar dica"><i class="ph ph-x" aria-hidden="true"></i></button>
+            <h2 id="mascot-tip-title">Precisa de uma dica?</h2>
+            <p id="mascot-tip-message">Seja claro ao descrever o serviço que você precisa. Informe os detalhes importantes,
+              o local e as condições para facilitar a compreensão dos interessados.</p>
+          </div>
+        </aside>
+      </section>
+
       <% if (erro) { %>
         <div class="erro-passarinho">
           <img src="/img/passarinho_transparente.png" alt="Passarinho">
@@ -40,16 +57,19 @@
         </div>
         <% } %>
 
-          <form action="/bicos/novo" method="POST" class="main-card">
+          <div class="form-layout">
+          <form action="/bicos/novo" method="POST" class="main-card" id="publicar-form">
             <div class="input-group">
               <label>Título do Bico</label>
               <input type="text" name="titulo" placeholder="Ex: Montagem de móveis de escritório" required>
+              <small class="field-hint">Use um título direto que explique o serviço.</small>
             </div>
 
             <div class="input-group">
               <label>Descrição detalhada</label>
               <textarea name="descricao" rows="5"
                 placeholder="Descreva as tarefas, ferramentas necessárias e expectativas..." required></textarea>
+              <small class="field-hint">Inclua tarefas, materiais necessários e qualquer condição importante.</small>
             </div>
 
             <div class="row">
@@ -59,6 +79,7 @@
                   <span>R$</span>
                   <input type="number" name="valor" min="0.01" step="0.01" placeholder="250" required>
                 </div>
+                <small class="field-hint">Informe o valor da diária oferecida.</small>
               </div>
               <div class="input-group">
                 <label>Bairro</label>
@@ -66,6 +87,7 @@
                   <i class="ph-fill ph-map-pin"></i>
                   <input type="text" name="bairro" placeholder="Ex: Itaim Bibi" required>
                 </div>
+                <small class="field-hint">Indique o bairro onde o serviço será realizado.</small>
               </div>
             </div>
 
@@ -100,25 +122,42 @@
                 <i class="ph-fill ph-paper-plane-tilt"></i> Publicar Vaga
               </button>
             </div>
+            <div class="publish-note">
+              <i class="ph-fill ph-info" aria-hidden="true"></i>
+              <p>Depois de publicado, seu bico ficará aberto para receber candidaturas.</p>
+            </div>
           </form>
+
+          <aside class="listing-summary" aria-labelledby="listing-summary-title">
+            <span class="summary-eyebrow"><i class="ph ph-eye" aria-hidden="true"></i> PRÉVIA</span>
+            <h2 id="listing-summary-title">Resumo do anúncio</h2>
+            <dl>
+              <div><dt>Título</dt><dd data-summary="titulo">Seu título aparecerá aqui</dd></div>
+              <div><dt>Local</dt><dd data-summary="bairro">Bairro do serviço</dd></div>
+              <div><dt>Data e horário</dt><dd data-summary="agenda">A definir</dd></div>
+              <div><dt>Diária</dt><dd data-summary="valor">A definir</dd></div>
+            </dl>
+            <p class="summary-footnote">Os detalhes podem ser ajustados antes de publicar.</p>
+          </aside>
+          </div>
 
           <div class="info-grid">
             <div class="info-card">
-              <i class="far fa-lightbulb"></i>
+              <i class="ph ph-lightbulb"></i>
               <div>
                 <h4>Dica de Título</h4>
                 <p>Seja claro e específico.</p>
               </div>
             </div>
             <div class="info-card">
-              <i class="fas fa-shield-halved"></i>
+              <i class="ph-fill ph-shield"></i>
               <div>
                 <h4>Segurança Ibico</h4>
                 <p>Pagamento garantido.</p>
               </div>
             </div>
             <div class="info-card">
-              <i class="fas fa-users-line"></i>
+              <i class="ph-fill ph-users-three"></i>
               <div>
                 <h4>Alcance Local</h4>
                 <p>Média de 5 propostas/hora.</p>
@@ -129,6 +168,7 @@
 
     <%- include('Partials/footer') %>
 
+    <script src="/js/publicarBico.js" defer></script>
 </body>
 
 </html>
