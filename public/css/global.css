@@ -4,13 +4,18 @@
 
 /* VARIÁVEIS GLOBAIS DE COR */
 :root {
-  --teal: #0d9488;
-  --teal-hover: #0a7a6f;
-  --brand-green: #16a34a;
-  --ink: #0f172a;
-  --gray-bg: #f8fafc;
-  --border: #e2e8f0;
-  --text-muted: #64748b;
+  --global-ibico-brand: #0d9488;
+  --global-ibico-brand-hover: #0a7a6f;
+  --global-ibico-green: #16a34a;
+  --global-ibico-ink: #0f172a;
+  --global-ibico-page-bg: #f8fafc;
+  --global-ibico-border: #e2e8f0;
+  --global-ibico-text-muted: #64748b;
+  --worker-header-bg: #faf9f6;
+  --worker-header-border: #e7e5e0;
+  --worker-header-ink: #14213d;
+  --worker-header-muted: #4b5563;
+  --worker-header-accent: #e8503a;
 }
 
 /* RESET BÁSICO */
@@ -21,8 +26,8 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--gray-bg);
-  color: var(--ink);
+  background-color: var(--global-ibico-page-bg);
+  color: var(--global-ibico-ink);
 }
 
 /* Identidade compartilhada pela marca, pelo footer e pelo header do trabalhador. */
@@ -30,9 +35,11 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--teal);
+  color: var(--global-ibico-brand);
   font-size: 20px;
   font-weight: 800;
+  font-family: inherit;
+  line-height: 1.2;
   text-decoration: none;
 }
 
@@ -41,7 +48,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--teal);
+  background-color: var(--global-ibico-brand);
 }
 
 .avatar {
@@ -87,19 +94,22 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
   background: var(--contractor-sidebar-primary);
   box-shadow: 8px 0 28px rgba(16, 37, 31, 0.16);
   color: var(--contractor-sidebar-white);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
   transition: width 0.28s ease, transform 0.28s ease;
 }
 .contractor-sidebar__top { display: flex; align-items: center; justify-content: space-between; min-height: 48px; gap: 12px; }
-.sidebar-brand { display: inline-flex; align-items: center; min-width: 0; gap: 11px; color: var(--contractor-sidebar-white); font-size: 21px; font-weight: 800; letter-spacing: -0.04em; text-decoration: none; white-space: nowrap; }
+.sidebar-brand { display: inline-flex; align-items: center; min-width: 0; gap: 11px; color: var(--contractor-sidebar-white); font-family: inherit; font-size: 21px; font-weight: 800; line-height: 1.2; letter-spacing: -0.04em; text-decoration: none; white-space: nowrap; }
 .sidebar-brand__mark { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border-radius: 14px 14px 14px 5px; background: var(--contractor-sidebar-accent); color: var(--contractor-sidebar-primary); font-size: 25px; line-height: 1; }
 .sidebar-collapse-toggle, .sidebar-mobile-toggle { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--contractor-sidebar-accent); border-radius: 13px; background: var(--contractor-sidebar-secondary); color: var(--contractor-sidebar-white); cursor: pointer; transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease; }
 .sidebar-collapse-toggle:hover, .sidebar-mobile-toggle:hover { border-color: var(--contractor-sidebar-white); background: var(--contractor-sidebar-accent); color: var(--contractor-sidebar-primary); }
 .sidebar-collapse-toggle:focus-visible, .sidebar-mobile-toggle:focus-visible, .sidebar-nav__link:focus-visible, .sidebar-account__profile:focus-visible, .sidebar-logout:focus-visible { outline: 3px solid var(--contractor-sidebar-accent); outline-offset: 3px; }
 .sidebar-collapse-toggle svg, .sidebar-mobile-toggle svg, .sidebar-nav__link svg, .sidebar-logout svg { width: 21px; height: 21px; flex: 0 0 21px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.sidebar-nav__link, .sidebar-logout { position: relative; display: flex; align-items: center; min-width: 0; min-height: 48px; gap: 14px; padding: 0 13px; border: 0; border-radius: 13px; background: transparent; color: var(--contractor-sidebar-white); font: inherit; font-size: 14px; font-weight: 600; text-align: left; text-decoration: none; cursor: pointer; transition: background-color 0.18s ease, color 0.18s ease; }
-.sidebar-nav__link:hover, .sidebar-logout:hover, .sidebar-account__profile:hover { background: var(--contractor-sidebar-secondary); color: var(--contractor-sidebar-accent); }
-.sidebar-nav__link.active, .sidebar-account__profile.active { background: var(--contractor-sidebar-secondary); color: var(--contractor-sidebar-white); font-weight: 750; }
+.sidebar-nav__link, .sidebar-logout { position: relative; display: flex; align-items: center; min-width: 0; min-height: 48px; gap: 13px; padding: 0 13px; border: 0; border-radius: 13px; background: transparent; color: var(--contractor-sidebar-white); font: inherit; font-size: 14px; font-weight: 600; line-height: 1.3; text-align: left; text-decoration: none; cursor: pointer; transition: background-color 0.18s ease, color 0.18s ease; }
+.sidebar-nav__link:hover, .sidebar-logout:hover, .sidebar-account__profile:hover { background: #263C32; color: var(--contractor-sidebar-accent); }
+.sidebar-nav__link.active, .sidebar-account__profile.active { background: rgba(168, 197, 180, 0.15); box-shadow: inset 0 0 0 1px rgba(168, 197, 180, 0.14); color: var(--contractor-sidebar-white); font-weight: 750; }
 .sidebar-nav__link.active::before { position: absolute; inset: 9px auto 9px 0; width: 3px; border-radius: 0 3px 3px 0; background: var(--contractor-sidebar-accent); content: ''; }
 .sidebar-nav__label { overflow: hidden; opacity: 1; white-space: nowrap; transition: max-width 0.22s ease, opacity 0.18s ease; }
 .sidebar-balance { display: flex; align-items: center; min-height: 68px; gap: 12px; padding: 11px 12px; border: 1px solid var(--contractor-sidebar-accent); border-radius: 15px; background: var(--contractor-sidebar-secondary); }
@@ -108,12 +118,12 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 .sidebar-balance__label { color: var(--contractor-sidebar-accent); font-size: 11px; }
 .sidebar-balance strong { overflow: hidden; color: var(--contractor-sidebar-white); font-size: 15px; text-overflow: ellipsis; }
 .sidebar-account { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--contractor-sidebar-secondary); }
-.sidebar-account__profile { display: flex; align-items: center; min-width: 0; min-height: 48px; gap: 11px; padding: 5px 8px; border-radius: 13px; color: var(--contractor-sidebar-white); font-size: 13px; font-weight: 650; text-decoration: none; }
+.sidebar-account__profile { display: flex; align-items: center; min-width: 0; min-height: 48px; gap: 11px; padding: 5px 8px; border-radius: 13px; color: var(--contractor-sidebar-white); font-size: 13px; font-weight: 650; line-height: 1.35; text-decoration: none; }
 .sidebar-account__avatar { flex: 0 0 36px; width: 36px; height: 36px; border: 2px solid var(--contractor-sidebar-white); border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--contractor-sidebar-accent); }
 .sidebar-account__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: max-width 0.22s ease, opacity 0.18s ease; }
 .sidebar-logout-form { margin: 0; }
 .sidebar-logout { width: 100%; color: var(--contractor-sidebar-white); }
-.sidebar-logout:hover { background: var(--contractor-sidebar-secondary); color: var(--contractor-sidebar-accent); }
+.sidebar-logout:hover { background: #263C32; color: var(--contractor-sidebar-accent); }
 .contractor-sidebar.is-collapsed { width: var(--contractor-sidebar-collapsed-width); align-items: center; padding-inline: 10px; }
 .contractor-sidebar.is-collapsed .contractor-sidebar__top { flex-direction: column; }
 .contractor-sidebar.is-collapsed .sidebar-brand__text, .contractor-sidebar.is-collapsed .sidebar-nav__label, .contractor-sidebar.is-collapsed .sidebar-balance__details, .contractor-sidebar.is-collapsed .sidebar-account__name { max-width: 0; opacity: 0; }
@@ -160,16 +170,20 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 }
 
 /* Botao compartilhado pelo header do trabalhador. */
-.logout-btn { border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; background: #ffffff; color: var(--text-muted); font-size: 14px; cursor: pointer; }
-.logout-btn:hover { color: var(--teal); border-color: var(--teal); }
+.logout-btn { border: 1px solid var(--global-ibico-border); border-radius: 6px; padding: 7px 12px; background: #ffffff; color: var(--global-ibico-text-muted); font-family: inherit; font-size: 14px; line-height: 1.25; cursor: pointer; }
+.logout-btn:hover { color: var(--global-ibico-brand); border-color: var(--global-ibico-brand); }
 /* =========================================================
    HEADER / NAVBAR (PARTIAL PADRÃO)
    ========================================================= */
 
 .navbar {
-  background: var(--bg, #FAF9F6);
-  border-bottom: 1px solid var(--line, #E7E5E0);
+  background: var(--worker-header-bg);
+  border-bottom: 1px solid var(--worker-header-border);
   width: 100%;
+  color: var(--worker-header-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .navbar__inner {
@@ -184,7 +198,8 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 .navbar__logo {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--brand-red, #E8503A);
+  line-height: 1.2;
+  color: var(--worker-header-accent);
   letter-spacing: -0.02em;
 }
 
@@ -195,22 +210,23 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 
 .nav-link {
   text-decoration: none;
-  color: var(--ink-soft, #4B5563);
+  color: var(--worker-header-muted);
   font-weight: 500;
   font-size: 0.95rem;
+  line-height: 1.4;
   padding-bottom: 6px;
   border-bottom: 2px solid transparent;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-link:hover {
-  color: var(--ink, #14213D);
+  color: var(--worker-header-ink);
 }
 
 .nav-link--active {
-  color: var(--brand-red, #E8503A);
+  color: var(--worker-header-accent);
   font-weight: 600;
-  border-bottom-color: var(--brand-red, #E8503A);
+  border-bottom-color: var(--worker-header-accent);
 }
 
 .navbar__actions {
@@ -222,7 +238,9 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 .icon-btn {
   background: none;
   border: none;
-  color: var(--ink, #14213D);
+  color: var(--worker-header-ink);
+  font-family: inherit;
+  line-height: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -242,9 +260,13 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
    ========================================================= */
 .footer {
   background: #f1f5f9;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--global-ibico-border);
   padding: 32px 0;
   margin-top: 60px;
+  color: var(--global-ibico-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .footer-container {
@@ -269,23 +291,57 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 .footer-col h4 {
   margin: 0 0 4px 0;
   font-size: 14px;
-  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--global-ibico-ink);
 }
 
 .footer-col a {
   text-decoration: none;
-  color: var(--text-muted);
+  color: var(--global-ibico-text-muted);
+  font-family: inherit;
   font-size: 13px;
+  line-height: 1.4;
   transition: color 0.15s ease;
 }
 
 .footer-col a:hover {
-  color: var(--teal);
+  color: var(--global-ibico-brand);
 }
 
 .hint-link {
-  color: var(--teal);
+  color: var(--global-ibico-brand);
   font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .navbar__inner {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    padding: 12px 16px;
+  }
+
+  .navbar__logo {
+    order: 1;
+  }
+
+  .navbar__actions {
+    order: 2;
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  .navbar__links {
+    order: 3;
+    flex: 0 0 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .navbar__links .nav-link {
+    white-space: nowrap;
+  }
 }
 
 /* Empilha as colunas para manter o footer legivel em telas pequenas. */

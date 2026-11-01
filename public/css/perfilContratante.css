@@ -1,18 +1,18 @@
 :root {
-  --verde-escuro: #0f3b2a;
-  --verde-banner: #17402f;
-  --verde: #12a56b;
-  --verde-claro: #e6f6ee;
-  --texto: #0f2a22;
-  --texto-suave: #6b7a84;
-  --borda: #e4e9ee;
-  --fundo: #f5f7f9;
+  --contractor-profile-green-dark: #0f3b2a;
+  --contractor-profile-green-banner: #17402f;
+  --contractor-profile-green: #12a56b;
+  --contractor-profile-green-light: #e6f6ee;
+  --contractor-profile-text: #0f2a22;
+  --contractor-profile-text-muted: #6b7a84;
+  --contractor-profile-border: #e4e9ee;
+  --contractor-profile-bg: #f5f7f9;
 }
 
 body {
-  background: var(--fundo);
+  background: var(--contractor-profile-bg);
   font-family: 'Inter', system-ui, sans-serif;
-  color: var(--texto);
+  color: var(--contractor-profile-text);
 }
 
 .perfil-page {
@@ -40,7 +40,7 @@ body {
 
 .perfil-topo p {
   margin: 6px 0 0;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   font-size: 1.05rem;
 }
 
@@ -62,7 +62,7 @@ body {
 }
 
 .btn-primary {
-  background: var(--verde-escuro);
+  background: var(--contractor-profile-green-dark);
   color: #fff;
   border: none;
   box-shadow: 0 6px 16px rgba(15, 59, 42, .25);
@@ -75,8 +75,8 @@ body {
 
 .btn-outline {
   background: #fff;
-  color: var(--texto);
-  border: 1px solid var(--borda);
+  color: var(--contractor-profile-text);
+  border: 1px solid var(--contractor-profile-border);
 }
 
 .btn-outline:hover {
@@ -189,13 +189,13 @@ body {
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-bottom: 1px solid var(--borda);
+  border-bottom: 1px solid var(--contractor-profile-border);
   background: #fafbfc;
 }
 
 .stat {
   padding: 26px 32px;
-  border-right: 1px solid var(--borda);
+  border-right: 1px solid var(--contractor-profile-border);
 }
 
 .stat:last-child {
@@ -208,7 +208,7 @@ body {
   letter-spacing: .04em;
   font-size: .85rem;
   font-weight: 600;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   margin-bottom: 8px;
 }
 
@@ -220,12 +220,12 @@ body {
 .stat-valor small {
   font-size: .95rem;
   font-weight: 400;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   margin-left: 4px;
 }
 
 .stat-valor.verde {
-  color: var(--verde);
+  color: var(--contractor-profile-green);
 }
 
 .estrela {
@@ -235,7 +235,7 @@ body {
 
 .badge-ativo {
   display: inline-block;
-  background: var(--verde-claro);
+  background: var(--contractor-profile-green-light);
   color: #0b7d4f;
   font-weight: 600;
   padding: 8px 16px;
@@ -253,7 +253,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--borda);
+  border-bottom: 1px solid var(--contractor-profile-border);
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 8px;
@@ -269,7 +269,7 @@ body {
 }
 
 .secao-titulo span {
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   font-size: .95rem;
 }
 
@@ -281,7 +281,7 @@ body {
 
 .campo {
   background: #f8f9fb;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--contractor-profile-border);
   border-radius: 16px;
   padding: 22px 28px;
 }
@@ -296,7 +296,7 @@ body {
   letter-spacing: .04em;
   font-size: .85rem;
   font-weight: 600;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   margin-bottom: 8px;
 }
 
@@ -328,13 +328,13 @@ body {
 }
 
 .campo-nota {
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   font-size: .95rem;
   white-space: nowrap;
 }
 
 .tag-verde {
-  background: var(--verde-claro);
+  background: var(--contractor-profile-green-light);
   color: #0b7d4f;
   font-size: .95rem;
   padding: 4px 12px;
@@ -344,8 +344,8 @@ body {
 
 .tag-neutra {
   background: #fff;
-  border: 1px solid var(--borda);
-  color: var(--texto-suave);
+  border: 1px solid var(--contractor-profile-border);
+  color: var(--contractor-profile-text-muted);
   font-size: .95rem;
   padding: 6px 14px;
   border-radius: 8px;
@@ -358,7 +358,7 @@ body {
   gap: 8px;
   background: none;
   border: none;
-  color: var(--texto);
+  color: var(--contractor-profile-text);
   font: 500 1rem 'Inter', sans-serif;
   cursor: pointer;
   padding: 4px 0;
@@ -366,12 +366,12 @@ body {
 }
 
 .btn-link:hover {
-  color: var(--verde);
+  color: var(--contractor-profile-green);
 }
 
 .btn-senha {
   margin-top: 14px;
-  color: var(--verde-escuro);
+  color: var(--contractor-profile-green-dark);
   text-decoration: underline;
 }
 
@@ -382,7 +382,7 @@ body {
   gap: 48px;
   margin-top: 40px;
   padding-top: 32px;
-  border-top: 1px solid var(--borda);
+  border-top: 1px solid var(--contractor-profile-border);
 }
 
 .sub-titulo {
@@ -401,9 +401,9 @@ body {
 }
 
 .chip {
-  background: var(--verde-claro);
+  background: var(--contractor-profile-green-light);
   border: 1px solid #cfe3d8;
-  color: var(--texto);
+  color: var(--contractor-profile-text);
   padding: 8px 18px;
   border-radius: 10px;
   font-size: 1rem;
@@ -412,14 +412,14 @@ body {
 .chip-add {
   background: #f4f6f8;
   border: 1.5px dashed #c3ccd3;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
   cursor: pointer;
   font-family: 'Inter', sans-serif;
 }
 
 .chip-add:hover {
-  border-color: var(--verde);
-  color: var(--verde);
+  border-color: var(--contractor-profile-green);
+  color: var(--contractor-profile-green);
 }
 
 .lista-seguranca {
@@ -505,7 +505,7 @@ body {
   font-size: 1.8rem;
   line-height: 1;
   cursor: pointer;
-  color: var(--texto-suave);
+  color: var(--contractor-profile-text-muted);
 }
 
 .modal-group {
@@ -530,7 +530,7 @@ body {
 
 .modal-group input:focus {
   outline: none;
-  border-color: var(--verde);
+  border-color: var(--contractor-profile-green);
   box-shadow: 0 0 0 3px rgba(18, 165, 107, .15);
 }
 
@@ -554,7 +554,7 @@ body {
 
 .btn-modal-cancel {
   background: #fff;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--contractor-profile-border);
   padding: 10px 18px;
   border-radius: 10px;
   font: 600 .95rem 'Inter', sans-serif;
@@ -562,7 +562,7 @@ body {
 }
 
 .btn-modal-save {
-  background: var(--verde-escuro);
+  background: var(--contractor-profile-green-dark);
   color: #fff;
   border: none;
   padding: 10px 18px;
@@ -586,7 +586,7 @@ body {
   }
 
   .stat {
-    border-bottom: 1px solid var(--borda);
+    border-bottom: 1px solid var(--contractor-profile-border);
   }
 
   .grid-dados,

@@ -1,17 +1,17 @@
 :root {
-  --primary-green: #0b5c37;
-  --primary-green-hover: #08472a;
-  --bg-page: #f3f7f4;
-  --card-bg: #ffffff;
-  --text-dark: #0f172a;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
+  --active-primary-green: #0b5c37;
+  --active-primary-green-hover: #08472a;
+  --active-page-bg: #f3f7f4;
+  --active-card-bg: #ffffff;
+  --active-text-dark: #0f172a;
+  --active-muted: #64748b;
+  --active-border-color: #e2e8f0;
 }
 
 body {
-  background-color: var(--bg-page);
+  background-color: var(--active-page-bg);
   font-family: 'Inter', sans-serif;
-  color: var(--text-dark);
+  color: var(--active-text-dark);
   margin: 0;
 }
 
@@ -32,7 +32,7 @@ body {
 .category-tag {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary-green);
+  color: var(--active-primary-green);
   letter-spacing: 0.05em;
 }
 
@@ -44,13 +44,13 @@ body {
 }
 
 .dashboard-header p {
-  color: var(--text-muted);
+  color: var(--active-muted);
   margin: 0;
   font-size: 0.95rem;
 }
 
 .btn-new-job {
-  background-color: var(--primary-green);
+  background-color: var(--active-primary-green);
   color: #ffffff;
   font-weight: 600;
   padding: 0.8rem 1.4rem;
@@ -61,7 +61,7 @@ body {
 }
 
 .btn-new-job:hover {
-  background-color: var(--primary-green-hover);
+  background-color: var(--active-primary-green-hover);
 }
 
 /* Metrics Cards */
@@ -73,7 +73,7 @@ body {
 }
 
 .metric-card {
-  background: var(--card-bg);
+  background: var(--active-card-bg);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -93,7 +93,7 @@ body {
   font-size: 1.1rem;
 }
 
-.icon-green { background-color: #e6f4ed; color: var(--primary-green); }
+.icon-green { background-color: #e6f4ed; color: var(--active-primary-green); }
 .icon-yellow { background-color: #fef3c7; color: #b45309; }
 .icon-blue { background-color: #e0f2fe; color: #0369a1; }
 
@@ -104,13 +104,13 @@ body {
 
 .metric-label {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
 }
 
 .metric-value {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-dark);
+  color: var(--active-text-dark);
   line-height: 1.2;
 }
 
@@ -120,7 +120,7 @@ body {
 }
 
 .text-green { color: #16a34a; }
-.text-muted { color: var(--text-muted); }
+.text-muted { color: var(--active-muted); }
 
 /* Content Section & Filters */
 .section-bar {
@@ -139,7 +139,7 @@ body {
 .section-title p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
 }
 
 .filters-bar {
@@ -149,8 +149,8 @@ body {
 }
 
 .search-box {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background: var(--active-card-bg);
+  border: 1px solid var(--active-border-color);
   border-radius: 10px;
   padding: 0.5rem 0.8rem;
   display: flex;
@@ -173,7 +173,7 @@ body {
   background: transparent;
   border: none;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
   cursor: pointer;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
@@ -182,7 +182,7 @@ body {
 
 .filter-btn.active {
   background: #ffffff;
-  color: var(--text-dark);
+  color: var(--active-text-dark);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
@@ -200,7 +200,7 @@ body {
 }
 
 .job-card {
-  background: var(--card-bg);
+  background: var(--active-card-bg);
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid #eef2f0;
@@ -237,7 +237,7 @@ body {
 .btn-more {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--active-muted);
   cursor: pointer;
   letter-spacing: 1px;
 }
@@ -252,7 +252,7 @@ body {
   display: flex;
   gap: 1rem;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -289,7 +289,7 @@ body {
 .user-role {
   display: block;
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
 }
 
 .user-name {
@@ -304,7 +304,7 @@ body {
 .price-label {
   display: block;
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: var(--active-muted);
 }
 
 .price-value {
@@ -317,7 +317,7 @@ body {
   justify-content: space-between;
   align-items: center;
   text-decoration: none;
-  color: var(--primary-green);
+  color: var(--active-primary-green);
   font-weight: 700;
   font-size: 0.85rem;
 }

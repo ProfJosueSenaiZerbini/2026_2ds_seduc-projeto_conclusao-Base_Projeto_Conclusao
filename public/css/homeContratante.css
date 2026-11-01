@@ -374,40 +374,6 @@ body.home-contratante-page {
 .support-card p { margin: 3px 0 0; color: var(--home-muted); font-size: 12px; line-height: 1.45; }
 .support-link { margin-left: auto; white-space: nowrap; }
 
-/* Home-only polish for the shared contractor sidebar. */
-.home-contratante-page .contractor-sidebar .sidebar-nav__link,
-.home-contratante-page .contractor-sidebar .sidebar-logout {
-  gap: 13px;
-}
-
-.home-contratante-page .contractor-sidebar .sidebar-nav__link svg,
-.home-contratante-page .contractor-sidebar .sidebar-logout svg {
-  width: 22px;
-  height: 22px;
-  flex-basis: 22px;
-}
-
-.home-contratante-page .contractor-sidebar .sidebar-nav__link.active {
-  background: rgba(168, 197, 180, 0.15);
-  box-shadow: inset 0 0 0 1px rgba(168, 197, 180, 0.14);
-}
-
-.home-contratante-page .contractor-sidebar .sidebar-nav__link.active::before {
-  width: 4px;
-  background: var(--contractor-sidebar-accent);
-}
-
-.home-contratante-page .contractor-sidebar .sidebar-nav__link:hover,
-.home-contratante-page .contractor-sidebar .sidebar-logout:hover {
-  background: #263C32;
-}
-
-.home-contratante-page .contractor-sidebar .sidebar-nav__link:focus-visible,
-.home-contratante-page .contractor-sidebar .sidebar-logout:focus-visible {
-  outline-color: var(--contractor-sidebar-accent);
-  outline-offset: 2px;
-}
-
 @media (max-width: 760px) {
   .home-dashboard { padding: 30px 22px 48px; }
   .welcome-header { align-items: flex-start; }

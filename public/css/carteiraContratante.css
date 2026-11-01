@@ -3,19 +3,19 @@
    ========================================================= */
 
 :root {
-  --bg: #FAF9F6;
-  --white: #FFFFFF;
-  --ink: #14213D;
-  --ink-soft: #4B5563;
-  --muted: #6B7280;
-  --line: #E7E5E0;
-  --brand-green: #12372A;
-  --brand-green-hover: #0C2A20;
-  --brand-green-light: #E7F6EC;
-  --shadow: 0 1px 2px rgba(20, 33, 61, 0.04), 0 8px 20px rgba(20, 33, 61, 0.05);
-  --radius-lg: 16px;
-  --radius-md: 10px;
-  --radius-full: 999px;
+  --contractor-wallet-bg: #FAF9F6;
+  --contractor-wallet-white: #FFFFFF;
+  --contractor-wallet-ink: #14213D;
+  --contractor-wallet-ink-soft: #4B5563;
+  --contractor-wallet-muted: #6B7280;
+  --contractor-wallet-line: #E7E5E0;
+  --contractor-wallet-brand-green: #12372A;
+  --contractor-wallet-brand-green-hover: #0C2A20;
+  --contractor-wallet-brand-green-light: #E7F6EC;
+  --contractor-wallet-shadow: 0 1px 2px rgba(20, 33, 61, 0.04), 0 8px 20px rgba(20, 33, 61, 0.05);
+  --contractor-wallet-radius-lg: 16px;
+  --contractor-wallet-radius-md: 10px;
+  --contractor-wallet-radius-full: 999px;
 }
 
 /* LAYOUT E ESTRUTURA (DESKTOP) */
@@ -32,13 +32,13 @@
 .wallet__title {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--ink);
+  color: var(--contractor-wallet-ink);
   margin: 0 0 8px;
   letter-spacing: -0.01em;
 }
 
 .wallet__subtitle {
-  color: var(--muted);
+  color: var(--contractor-wallet-muted);
   font-size: 1rem;
   margin: 0;
 }
@@ -58,18 +58,18 @@
 }
 
 .wallet__card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  background: var(--contractor-wallet-white);
+  border: 1px solid var(--contractor-wallet-line);
+  border-radius: var(--contractor-wallet-radius-lg);
   padding: 28px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--contractor-wallet-shadow);
   display: flex;
   flex-direction: column;
 }
 
 .wallet__card--primary {
-  background: var(--brand-green);
-  color: var(--white);
+  background: var(--contractor-wallet-brand-green);
+  color: var(--contractor-wallet-white);
   border: none;
   justify-content: space-between;
 }
@@ -83,7 +83,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: var(--contractor-wallet-muted);
   margin-bottom: 8px;
 }
 
@@ -97,13 +97,13 @@
 .wallet__stat-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--contractor-wallet-ink);
   margin-bottom: 4px;
 }
 
 .wallet__stat-info {
   font-size: 0.88rem;
-  color: var(--muted);
+  color: var(--contractor-wallet-muted);
 }
 
 /* BOTÕES DE AÇÃO */
@@ -116,7 +116,7 @@
   font-family: inherit;
   font-size: 0.92rem;
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--contractor-wallet-radius-md);
   padding: 12px 20px;
   cursor: pointer;
   border: none;
@@ -124,8 +124,8 @@
 }
 
 .btn--primary {
-  background: var(--white);
-  color: var(--brand-green);
+  background: var(--contractor-wallet-white);
+  color: var(--contractor-wallet-brand-green);
 }
 
 .btn--primary:hover {
@@ -135,28 +135,28 @@
 
 .btn--outline-light {
   background: transparent;
-  color: var(--white);
+  color: var(--contractor-wallet-white);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn--outline-light:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: var(--white);
+  border-color: var(--contractor-wallet-white);
 }
 
 /* EXTRATO E TABELA */
 .wallet__transactions {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  background: var(--contractor-wallet-white);
+  border: 1px solid var(--contractor-wallet-line);
+  border-radius: var(--contractor-wallet-radius-lg);
+  box-shadow: var(--contractor-wallet-shadow);
   padding: 32px;
 }
 
 .wallet__section-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--contractor-wallet-ink);
   margin: 0 0 24px;
 }
 
@@ -174,16 +174,16 @@
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--contractor-wallet-muted);
   padding: 12px 16px;
-  border-bottom: 2px solid var(--line);
+  border-bottom: 2px solid var(--contractor-wallet-line);
 }
 
 .wallet__table td {
   padding: 18px 16px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--contractor-wallet-line);
   font-size: 0.95rem;
-  color: var(--ink);
+  color: var(--contractor-wallet-ink);
 }
 
 .wallet__table tr:last-child td {
@@ -195,12 +195,12 @@
 }
 
 .wallet__value--positive {
-  color: var(--brand-green);
+  color: var(--contractor-wallet-brand-green);
   font-weight: 700;
 }
 
 .wallet__value--negative {
-  color: var(--ink);
+  color: var(--contractor-wallet-ink);
   font-weight: 600;
 }
 
@@ -210,12 +210,12 @@
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 12px;
-  border-radius: var(--radius-full);
+  border-radius: var(--contractor-wallet-radius-full);
 }
 
 .badge--success {
-  background: var(--brand-green-light);
-  color: var(--brand-green);
+  background: var(--contractor-wallet-brand-green-light);
+  color: var(--contractor-wallet-brand-green);
 }
 
 .badge--pending {

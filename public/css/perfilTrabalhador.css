@@ -10,6 +10,12 @@
   font-family: 'Inter', system-ui, sans-serif;
 }
 
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .pt-page {
   background: #f5f7f9;
   max-width: none;
