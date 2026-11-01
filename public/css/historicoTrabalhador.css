@@ -545,7 +545,24 @@ body {
   }
 
   .bico-card__top {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    gap: 16px;
+  }
+
+  .bico-card__icon {
+    grid-row: 1 / span 2;
+  }
+
+  .bico-card__main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .bico-card__top > .badge {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
   }
 
   .search input {
@@ -559,5 +576,47 @@ body {
   .tip-popup {
     right: 16px;
     bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bico-card__top {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .bico-card__icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 56px;
+    height: 56px;
+  }
+
+  .bico-card__main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .bico-card__top > .badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .bico-card__actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+    width: 100%;
+  }
+
+  .bico-card__actions .btn {
+    min-width: 0;
+    justify-content: center;
+    padding: 12px 14px;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
