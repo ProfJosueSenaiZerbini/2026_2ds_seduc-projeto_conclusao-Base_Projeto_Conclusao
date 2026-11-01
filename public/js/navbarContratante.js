@@ -8,6 +8,36 @@ document.querySelectorAll('[data-contractor-sidebar]').forEach((sidebar) => {
 
   if (!collapseToggle || !mobileToggle || !backdrop || !nav) return;
 
+  const navLinks = Array.from(nav.querySelectorAll('.sidebar-nav__link'));
+  const activeLink = nav.querySelector('.sidebar-nav__link.active');
+  const previousIndex = sessionStorage.getItem('contractor-sidebar-previous-link');
+  const previousLink = previousIndex === null ? null : navLinks[Number(previousIndex)];
+  const indicator = nav.querySelector('.sidebar-nav__indicator');
+
+  nav.addEventListener('click', (event) => {
+    const link = event.target.closest('.sidebar-nav__link');
+    if (!link) return;
+    sessionStorage.setItem('contractor-sidebar-previous-link', String(navLinks.indexOf(link)));
+  });
+
+  if (activeLink && indicator) {
+    const navTop = nav.getBoundingClientRect().top;
+    const targetTop = activeLink.getBoundingClientRect().top - navTop + 9;
+    indicator.style.top = `${targetTop}px`;
+
+    if (previousLink && previousLink !== activeLink && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const previousTop = previousLink.getBoundingClientRect().top - navTop + 9;
+      indicator.animate(
+        [
+          { transform: `translateY(${previousTop - targetTop}px)` },
+          { transform: 'translateY(0)' },
+        ],
+        { duration: 2000, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      );
+    }
+  }
+  sessionStorage.removeItem('contractor-sidebar-previous-link');
+
   const setCollapsed = (collapsed) => {
     sidebar.classList.toggle('is-collapsed', collapsed);
     collapseToggle.setAttribute('aria-expanded', String(!collapsed));
