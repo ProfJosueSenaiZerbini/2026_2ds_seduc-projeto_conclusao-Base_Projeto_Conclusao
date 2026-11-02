@@ -175,6 +175,7 @@ Por que vira transação: `Conta.saldo` é a soma das transações. Se o saldo b
 - **Excluir a meta não devolve o dinheiro** à conta: as transações "Meta: ..." continuam no histórico. A tela avisa antes de excluir.
 - **Dinheiro guardado não é gasto.** A transação "Metas" é despesa (para o saldo bater), mas fica de fora de toda soma de GASTOS nas telas: card "Despesas" e "Gastos por categoria" do dashboard e as médias de `/meu-perfil`. Use `ehGasto(t)` / `ehDinheiroGuardado(t)` de `auth.js` em vez de `t.categoria.tipo === 'despesa'` quando o assunto for "quanto a pessoa gastou". Sem isso, quanto mais ela guarda, maiores ficam as reservas sugeridas e menor o "quanto tempo o dinheiro dura".
 - A categoria entra pelo seed (bancos novos) e pela migration `categoria_metas` (bancos que já existiam). Nos dois casos fica com o id 13.
+- **Quanto guardar por mês não é gravado.** `calcularPlanoMeta` (`public/js/meta-calculos.js`) divide o que falta pelos meses **completos** até a data, arredondando para cima, e calcula de novo a cada abertura da tela. O valor por ano só aparece em metas de 12 meses ou mais. Ao mudar a conta, rode `node Docs/Testes/teste-calculos-meta.js`.
 
 ## Regra: categorias personalizadas
 
@@ -198,6 +199,19 @@ Por que vira transação: `Conta.saldo` é a soma das transações. Se o saldo b
 - Só categorias de **despesa**, e nunca "Metas" (dinheiro guardado não é gasto).
 - Telas: seção "Limites de gasto" e modo "Gastar menos" no painel da tela de Metas; barras com limite e botão "Definir limite" (`/metas?limite=ID`) no bloco "Gastos por categoria" do dashboard.
 - **Pop-up ANTES de registrar** (`confirmarLimite` em `transacoes.js`): se o gasto deixa a categoria em 70% ou mais do limite do mês, a tela pergunta "Registrar mesmo assim?" (`confirmar({ tom: 'alerta' })` do `modal.js`). Cancelar mantém o painel aberto com o que foi digitado. É só aviso: o servidor **não** recusa gasto acima do limite. O 70% está repetido em `PERCENTUAL_ATENCAO` no `limiteController.js` e no `transacoes.js` — mudar nos dois.
+
+---
+
+## Regra: notificações do sininho
+
+O sininho aparece ao lado do avatar em todas as telas internas (`public/js/notificacoes.js`, que cria o botão sozinho). As regras ficam em `src/notificacoes.js`.
+
+- **Nenhum aviso é gravado no banco.** `GET /api/usuario/:id/notificacao` calcula a lista na hora. Pagou a conta, o aviso some sozinho.
+- **Avisos:** conta não paga que vence em até 3 dias ou está atrasada; meta em andamento que termina em até 30 dias ou já venceu; saldo de hoje negativo; limite em `atencao` ou `estourado`. Os prazos estão em `DIAS_AVISO_CONTA` e `DIAS_AVISO_META`. Ao mudar uma regra, rode `node Docs/Testes/teste-notificacoes.js`.
+- **O limite usa `limitesComSituacao`** (`limiteController.js`), a mesma função da rota de limites.
+- **Só no navegador (`localStorage`):** os tipos de aviso escolhidos em Configurações (`notif_contas`, `notif_metas`, `notif_saldo`, `notif_limites`) e os avisos já vistos (`notificacoes_vistas_<id>`). Por isso, valem só naquele navegador.
+- **A `chave` de cada aviso muda quando ele piora** (a conta que atrasa, o limite que estoura, o mês que vira), para o número do sininho contar de novo.
+- **E-mail ainda não existe.** A opção `notif_resumo` de Configurações continua sem efeito. O e-mail vai precisar de preferências no banco, porque o servidor não lê o `localStorage`, de uma verificação diária e de um registro do que já foi enviado.
 
 ---
 
@@ -394,6 +408,7 @@ As imagens da pasta são grandes (centenas de KB). Se em algum momento elas fore
 | GET | `/api/conexao-bancaria` | Listar conexões (sem o token de acesso) |
 | POST | `/api/conexao-bancaria/:id/sincronizar` | Importar o que for novo |
 | DELETE | `/api/conexao-bancaria/:id` | Desconectar (apaga as contas importadas) |
+| GET | `/api/usuario/:id/notificacao` | Listar os avisos do sininho, calculados na hora |
 
 Rotas do banco simulado, fora do `/api` porque não fazem parte do Verdanz: `POST /banco-simulado/consents`, `GET /banco-simulado/consents/:id`, `POST /banco-simulado/consents/authorize`, `POST /banco-simulado/consents/reject`, `POST /banco-simulado/token`, `GET /banco-simulado/accounts`, `GET /banco-simulado/accounts/:id/balances`, `GET /banco-simulado/accounts/:id/transactions` e a tela `GET /banco-simulado/autorizar`.
 

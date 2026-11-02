@@ -154,6 +154,13 @@
                 <div class="px-5 pb-5 pt-1 border-t border-gray-100 divide-y divide-gray-100">
                     <label class="flex items-center justify-between gap-4 py-4 cursor-pointer">
                         <span>
+                            <span class="block text-sm font-medium text-gray-800">Contas a pagar</span>
+                            <span class="block text-xs text-gray-500">Avisar quando um gasto não pago estiver vencendo ou atrasado</span>
+                        </span>
+                        <input type="checkbox" data-preferencia="notif_contas" class="w-5 h-5 accent-blue-600">
+                    </label>
+                    <label class="flex items-center justify-between gap-4 py-4 cursor-pointer">
+                        <span>
                             <span class="block text-sm font-medium text-gray-800">Metas perto do prazo</span>
                             <span class="block text-xs text-gray-500">Avisar quando uma meta estiver chegando na data limite</span>
                         </span>
@@ -165,6 +172,13 @@
                             <span class="block text-xs text-gray-500">Avisar quando o saldo de uma conta ficar negativo</span>
                         </span>
                         <input type="checkbox" data-preferencia="notif_saldo" class="w-5 h-5 accent-blue-600">
+                    </label>
+                    <label class="flex items-center justify-between gap-4 py-4 cursor-pointer">
+                        <span>
+                            <span class="block text-sm font-medium text-gray-800">Limites de gasto</span>
+                            <span class="block text-xs text-gray-500">Avisar quando uma categoria chegar a 70% do limite do mês</span>
+                        </span>
+                        <input type="checkbox" data-preferencia="notif_limites" class="w-5 h-5 accent-blue-600">
                     </label>
                     <label class="flex items-center justify-between gap-4 py-4 cursor-pointer">
                         <span>
@@ -428,6 +442,7 @@
 
     <script src="/js/auth.js"></script>
     <script src="/js/layout.js"></script>
+    <script src="/js/notificacoes.js"></script>
     <!-- modal.js: confirmação antes de excluir uma categoria -->
     <script src="/js/modal.js"></script>
     <script src="/js/configuracoes.js"></script>

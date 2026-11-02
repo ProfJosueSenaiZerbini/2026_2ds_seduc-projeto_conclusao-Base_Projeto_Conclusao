@@ -71,9 +71,73 @@ function avisarSaldoInsuficiente(conta, valor) {
   });
 }
 
+// ---- QUANTO GUARDAR ATÉ A DATA ----
+//
+// O bloco aparece em dois lugares: no painel, enquanto a pessoa preenche,
+// e no cartão da meta. A conta está em meta-calculos.js.
+
+function blocoInfo(texto) {
+  return `<p class="text-sm text-gray-500">${texto}</p>`;
+}
+
+// A cor sozinha já chama atenção: sem caixa nem ícone, para a tela ficar limpa.
+function blocoAlerta(texto) {
+  return `<p class="text-sm text-amber-700">${texto}</p>`;
+}
+
+// Devolve o HTML do bloco, ou '' quando não falta nada para guardar.
+function blocoPlano(valorAlvo, valorAtual, dataLimite) {
+  const plano = calcularPlanoMeta(valorAlvo, valorAtual, dataLimite, hojeTexto());
+  const dias = diasAte(dataLimite);
+  const falta = formatarMoeda(plano.falta);
+
+  if (plano.falta === 0) return '';
+  if (dias < 0) return blocoAlerta(`Prazo vencido · faltam ${falta}`);
+  if (dias === 0) return blocoAlerta(`Prazo termina hoje · faltam ${falta}`);
+
+  // Menos de 1 mês: não há o que dividir, é preciso guardar tudo.
+  if (plano.porMes === null) {
+    return blocoAlerta(`Faltam ${falta} em ${dias === 1 ? '1 dia' : dias + ' dias'}`);
+  }
+
+  const duracao = plano.meses === 1 ? '1 mês' : plano.meses + ' meses';
+  const porAno = plano.porAno === null ? '' : ` · ${formatarMoeda(plano.porAno)}/ano`;
+
+  return blocoInfo(
+    `<span class="font-semibold text-gray-700">${formatarMoeda(plano.porMes)}/mês</span>${porAno} · ${duracao}`
+  );
+}
+
+const planoMeta = document.getElementById('planoMeta');
+
+// Atualiza a cada tecla. O valor inicial entra na conta porque já vai
+// direto para a meta, e aí falta menos para guardar.
+function mostrarPlanoNoPainel() {
+  const valor = Number(document.getElementById('valorMeta').value);
+  const prazo = document.getElementById('prazoMeta').value;
+  const valorInicial = Number(campoValorInicial.value) || 0;
+
+  if (!(valor > 0) || !prazo) {
+    planoMeta.innerHTML = '';
+  } else if (diasAte(prazo) <= 0) {
+    // O servidor recusa criar a meta com essa data.
+    planoMeta.innerHTML = blocoAlerta('Escolha uma data no futuro');
+  } else {
+    planoMeta.innerHTML = blocoPlano(valor, valorInicial, prazo);
+  }
+}
+
+formMeta.addEventListener('input', mostrarPlanoNoPainel);
+
 function cartaoMeta(meta) {
   const pct = Math.round(meta.progresso);
   const concluida = pct >= 100;
+
+  // Meta cancelada ou alcançada não tem mais o que guardar.
+  const plano =
+    !concluida && meta.status === 'em_progresso'
+      ? blocoPlano(meta.valor_alvo, meta.valor_atual, meta.data_limite)
+      : '';
 
   return `
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -100,6 +164,8 @@ function cartaoMeta(meta) {
         <div class="${concluida ? 'bg-green-500' : 'bg-blue-600'} h-2 rounded-full transition-all"
              style="width: ${Math.min(100, pct)}%"></div>
       </div>
+
+      ${plano ? `<div class="-mt-2 mb-4">${plano}</div>` : ''}
 
       ${
         concluida
@@ -155,6 +221,7 @@ async function carregarMetas() {
 function abrirNova(modo = 'meta', idCategoria = null) {
   formMeta.reset();
   document.getElementById('idMeta').value = '';
+  mostrarPlanoNoPainel(); // o reset limpa os campos, mas não este bloco
   escolherModo(modo);
   if (modo === 'limite') prepararCamposLimite(idCategoria);
   painel.abrir();

@@ -105,23 +105,25 @@ async function responderLimite(res, status, limite, id_usuario) {
   res.status(status).json(comSituacao(limite, gastos.get(limite.id_categoria)));
 }
 
+// Todos os limites do usuário, com o gasto do mês e a situação. Também é
+// usada pelas notificações, para a regra do limite existir num lugar só.
+async function limitesComSituacao(id_usuario) {
+  const limites = await prisma.limiteCategoria.findMany({
+    where: { id_usuario },
+    include: { categoria: true },
+  });
+
+  const gastos = await gastosDoMes(id_usuario, limites.map((l) => l.id_categoria));
+  const lista = limites.map((l) => comSituacao(l, gastos.get(l.id_categoria)));
+
+  // Os que mais pedem atenção primeiro.
+  return lista.sort((a, b) => b.percentual - a.percentual);
+}
+
 // GET /api/usuario/:id/limite
 async function listarLimites(req, res) {
   try {
-    const id_usuario = req.usuario.id_usuario;
-
-    const limites = await prisma.limiteCategoria.findMany({
-      where: { id_usuario },
-      include: { categoria: true },
-    });
-
-    const gastos = await gastosDoMes(id_usuario, limites.map((l) => l.id_categoria));
-    const lista = limites.map((l) => comSituacao(l, gastos.get(l.id_categoria)));
-
-    // Os que mais pedem atenção primeiro.
-    lista.sort((a, b) => b.percentual - a.percentual);
-
-    res.json(lista);
+    res.json(await limitesComSituacao(req.usuario.id_usuario));
   } catch (erro) {
     console.error(erro);
     res.status(500).json({ erro: 'Erro ao listar limites' });
@@ -234,4 +236,4 @@ async function deletarLimite(req, res) {
   }
 }
 
-module.exports = { listarLimites, criarLimite, atualizarLimite, deletarLimite };
+module.exports = { limitesComSituacao, listarLimites, criarLimite, atualizarLimite, deletarLimite };

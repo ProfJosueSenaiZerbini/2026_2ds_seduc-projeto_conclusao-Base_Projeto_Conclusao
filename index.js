@@ -12,6 +12,7 @@ const transacaoRoutes = require('./src/routes/transacaoRoutes');
 const metaRoutes = require('./src/routes/metaRoutes');
 const limiteRoutes = require('./src/routes/limiteRoutes');
 const conexaoRoutes = require('./src/routes/conexaoRoutes');
+const notificacaoRoutes = require('./src/routes/notificacaoRoutes');
 const bancoSimuladoRoutes = require('./src/bancoSimulado/bancoRoutes');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api', transacaoRoutes);
 app.use('/api', metaRoutes);
 app.use('/api', limiteRoutes);
 app.use('/api', conexaoRoutes);
+app.use('/api', notificacaoRoutes);
 
 // Banco simulado: finge ser um banco externo para a importação de
 // contas. Fica fora do /api de propósito, porque não faz parte do Verdanz.
