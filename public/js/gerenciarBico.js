@@ -59,13 +59,73 @@ document.addEventListener('DOMContentLoaded', () => {
   const botao = document.getElementById('btn-finalizar-bico');
   const feedback = document.getElementById('feedback-finalizar-bico');
   const statusBico = document.getElementById('status-bico');
+  const modalConfirmacao = document.getElementById('confirm-finalize-modal');
+  const botaoConfirmar = document.getElementById('confirm-finalize-button');
+  const botaoCancelar = document.getElementById('cancel-finalize-button');
 
-  if (!form || !botao || !feedback || !statusBico) return;
+  if (!form || !botao || !feedback || !statusBico || !modalConfirmacao || !botaoConfirmar || !botaoCancelar) return;
+
+  const confirmarFinalizacao = () => new Promise((resolve) => {
+    const elementoAnterior = document.activeElement;
+    let finalizado = false;
+    let confirmado = false;
+    let timeoutFechamento;
+
+    const concluirFechamento = (evento) => {
+      if (evento && evento.animationName !== 'finalize-modal-exit') return;
+      modalConfirmacao.removeEventListener('animationend', concluirFechamento);
+      window.clearTimeout(timeoutFechamento);
+      botaoConfirmar.removeEventListener('click', aoConfirmar);
+      botaoCancelar.removeEventListener('click', aoCancelar);
+      modalConfirmacao.removeEventListener('cancel', aoCancelarPorEvento);
+      modalConfirmacao.removeEventListener('keydown', aoCancelarPorTeclado);
+      modalConfirmacao.removeEventListener('click', aoCancelarPorFundo);
+      if (modalConfirmacao.open) modalConfirmacao.close();
+      modalConfirmacao.classList.remove('is-closing');
+      if (elementoAnterior instanceof HTMLElement && elementoAnterior.isConnected) {
+        elementoAnterior.focus();
+      }
+      resolve(confirmado);
+    };
+
+    const fecharModal = (resultado) => {
+      if (finalizado) return;
+      finalizado = true;
+      confirmado = resultado;
+      modalConfirmacao.classList.add('is-closing');
+      modalConfirmacao.addEventListener('animationend', concluirFechamento);
+      timeoutFechamento = window.setTimeout(() => concluirFechamento(), 220);
+    };
+
+    const aoConfirmar = () => fecharModal(true);
+    const aoCancelar = () => fecharModal(false);
+    const aoCancelarPorEvento = (evento) => {
+      evento.preventDefault();
+      fecharModal(false);
+    };
+    const aoCancelarPorTeclado = (evento) => {
+      if (evento.key !== 'Escape') return;
+      evento.preventDefault();
+      fecharModal(false);
+    };
+    const aoCancelarPorFundo = (evento) => {
+      if (evento.target === modalConfirmacao) fecharModal(false);
+    };
+
+    botaoConfirmar.addEventListener('click', aoConfirmar);
+    botaoCancelar.addEventListener('click', aoCancelar);
+    modalConfirmacao.addEventListener('cancel', aoCancelarPorEvento);
+    modalConfirmacao.addEventListener('keydown', aoCancelarPorTeclado);
+    modalConfirmacao.addEventListener('click', aoCancelarPorFundo);
+
+    modalConfirmacao.showModal();
+    botaoCancelar.focus();
+  });
 
   form.addEventListener('submit', async (evento) => {
     evento.preventDefault();
 
-    if (!window.confirm('Deseja realmente finalizar este serviço?')) return;
+    if (botao.disabled || !await confirmarFinalizacao()) return;
 
     botao.disabled = true;
     feedback.textContent = '';
