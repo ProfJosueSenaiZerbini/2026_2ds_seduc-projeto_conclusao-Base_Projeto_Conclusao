@@ -48,7 +48,7 @@ export const exibirCarteiraContratante = async (req, res) => {
       bicosPendentes: estatisticas[0]?.bicosPendentes || 0
     };
 
-    res.render('carteiraContratante', { carteira, transacoes });
+    res.render('contratante/carteiraContratante', { carteira, transacoes });
   } catch (error) {
     console.error('Erro ao carregar carteira do contratante:', error);
     res.status(500).send('Erro ao carregar dados da carteira');
@@ -96,7 +96,7 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
       infoRetido: 'Aguardando conclusão do serviço'
     };
 
-    res.render('carteiraTrabalhador', { carteira, transacoes });
+    res.render('trabalhador/carteiraTrabalhador', { carteira, transacoes });
   } catch (error) {
     console.error('Erro ao carregar carteira do trabalhador:', error);
     res.status(500).send('Erro ao carregar dados da carteira');

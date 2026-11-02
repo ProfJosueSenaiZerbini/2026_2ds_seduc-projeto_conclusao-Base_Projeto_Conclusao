@@ -228,7 +228,7 @@ export const homeContratante = async (req, res) => {
             bico => bico.status === 'Em andamento'
         ).length;
 
-        return res.render('homeContratante', {
+        return res.render('contratante/homeContratante', {
             usuario,
             bicos,
             bicosAtivos,
@@ -305,7 +305,7 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
         const bicosPendentes = await pool.query(queryPendentes, [trabalhador_id]);
         const bicosCancelados = await pool.query(queryCancelados, [trabalhador_id]);
 
-        return res.render('historicoTrabalhador', {
+        return res.render('trabalhador/historicoTrabalhador', {
             aceitos: bicosAceitos,
             pendentes: bicosPendentes,
             cancelados: bicosCancelados,

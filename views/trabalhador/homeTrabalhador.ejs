@@ -7,10 +7,10 @@
     <title>Ibico | Oportunidades de trabalho</title>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/homeTrabalhador.css">
-    <%- include('Partials/phosphorIcons') %>
+    <%- include('../Partials/phosphorIcons') %>
 </head>
 <body>
-    <%- include('Partials/headertrabalhador') %>
+    <%- include('../Partials/headertrabalhador') %>
     <%
         const listaVagas = Array.isArray(vagas) ? vagas : [];
         const formatarValor = (valor) => Number(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -115,7 +115,7 @@
             </div>
         </section>
     </main>
-    <%- include('Partials/footer') %>
+    <%- include('../Partials/footer') %>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="/js/homeTrabalhador.js" defer></script>
 </body>

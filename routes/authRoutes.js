@@ -21,7 +21,7 @@ const renderHomeTrabalhador = async (req, res) => {
     try {
         const vagas = await pool.query("SELECT * FROM bicos WHERE status = 'Aberto'");
 
-        return res.render('homeTrabalhador', {
+        return res.render('trabalhador/homeTrabalhador', {
             usuario: req.session.usuario,
             vagas
         });

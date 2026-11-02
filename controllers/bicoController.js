@@ -6,7 +6,7 @@ export const exibirFormularioPublicar = (req, res) => {
         return res.redirect('/login');
     }
 
-    return res.render('publicarBico', {
+    return res.render('contratante/publicarBico', {
         usuario: req.session.usuario,
         erro: null
     });
@@ -21,35 +21,35 @@ export const cadastrarBico = async (req, res) => {
     }
 
     if (!validarTituloBico(titulo)) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'O título deve ter entre 3 e 100 caracteres.'
         });
     }
 
     if (!validarDescricaoBico(descricao)) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'A descrição deve ter entre 10 e 500 caracteres.'
         });
     }
 
     if (!validarBairroBico(bairro)) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'O bairro deve ter entre 2 e 100 caracteres.'
         });
     }
 
     if (!validarDataServico(data_servico)) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'Informe a data do serviço.'
         });
     }
 
     if (!validarHorarioServico(horario)) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'Informe o horário do serviço.'
 
@@ -64,7 +64,7 @@ export const cadastrarBico = async (req, res) => {
         !Number.isFinite(valorNumerico) ||
         valorNumerico <= 0
     ) {
-        return res.status(400).render('publicarBico', {
+        return res.status(400).render('contratante/publicarBico', {
             usuario: req.session.usuario,
             erro: 'Informe um valor maior que zero, com até duas casas decimais.'
         });
@@ -173,7 +173,7 @@ export const exibirBicosAtivosContratante = async (req, res) => {
             [usuarioId]
         );
 
-        res.render('bicosAtivos', { bicos: bicosAtivos });
+        res.render('contratante/bicosAtivos', { bicos: bicosAtivos });
     } catch (error) {
         console.error('🚫 Erro ao buscar bicos ativos:', error);
         res.status(500).send('Erro ao carregar os bicos ativos.');
@@ -736,7 +736,7 @@ export const exibirGerenciamentoBico = async (req, res) => {
         const resCandidatos = await db.query(queryCandidatos, [bicoIdNum]);
         const candidatos = Array.isArray(resCandidatos?.[0]) ? resCandidatos[0] : resCandidatos;
 
-        return res.render('gerenciarBico', {
+        return res.render('contratante/gerenciarBico', {
             bico: bicoEncontrado,
             candidatos: Array.isArray(candidatos) ? candidatos : [],
             usuario: req.session.usuario

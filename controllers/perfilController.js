@@ -11,10 +11,10 @@ export const exibirPerfil = async (req, res) => {
         if (!usuario) return res.redirect('/login');
         const tipoPerfil = usuario.tipo_perfil?.trim().toLowerCase();
         if (tipoPerfil === 'trabalhador') {
-            return res.render('perfilTrabalhador', { usuario });
+            return res.render('trabalhador/perfilTrabalhador', { usuario });
         }
         if (tipoPerfil === 'contratante') {
-            return res.render('perfilContratante', { usuario });
+            return res.render('contratante/perfilContratante', { usuario });
         }
         return res.status(403).send('Acesso negado para o perfil desta conta.');
     } catch (erro) {
@@ -117,7 +117,7 @@ export const exibirPerfilPublicoTrabalhador = async (req, res) => {
             [trabalhadorId]
         );
 
-        return res.render('perfilPublicoTrabalhador', {
+        return res.render('trabalhador/perfilPublicoTrabalhador', {
             trabalhador,
             mediaAvaliacoes: resumo.media === null ? 0 : Number(resumo.media),
             quantidadeAvaliacoes: Number(resumo.quantidade || 0),

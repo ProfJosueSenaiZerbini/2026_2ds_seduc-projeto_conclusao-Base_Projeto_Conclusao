@@ -7,14 +7,14 @@
     <title>Ibico | Histórico de Bicos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <%- include('Partials/phosphorIcons') %>
+    <%- include('../Partials/phosphorIcons') %>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/historicoTrabalhador.css">
 </head>
 
 <body>
 
-    <%- include('Partials/headertrabalhador') %>
+    <%- include('../Partials/headertrabalhador') %>
 
         <% const listaConcluidos=(typeof concluidos !=='undefined' ) ? concluidos : []; const listaCancelados=(typeof cancelados !=='undefined' ) ? cancelados : []; const abas=[ { id: 'aceitos' ,
             titulo: 'Bicos Aceitos' , lista: aceitos, tipo: 'aceito' , vazio: 'Você ainda não possui bicos aceitos.' },
@@ -74,7 +74,7 @@
                                 <% } else { %>
                                     <ul class="bicos-list">
                                         <% aba.lista.forEach(bico=> { %>
-                                            <%- include('Partials/cardBico', { bico: bico, tipo: aba.tipo }) %>
+                                            <%- include('../Partials/cardBico', { bico: bico, tipo: aba.tipo }) %>
                                                 <% }); %>
                                     </ul>
                                     <p class="empty empty--filtro" hidden>Nenhum serviço encontrado para a busca.</p>
@@ -101,7 +101,7 @@
                 <button type="button" class="tip-popup__close" id="fecharDica" aria-label="Fechar dica"><i class="ph ph-x" aria-hidden="true"></i></button>
             </aside>
 
-            <%- include('Partials/footer') %>
+            <%- include('../Partials/footer') %>
 
                 <script src="/js/historicoTrabalhador.js"></script>
 </body>

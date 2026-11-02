@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/perfilContratante.css">
-    <%- include('Partials/phosphorIcons') %>
+    <%- include('../Partials/phosphorIcons') %>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
         const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'CT';
     %>
 
-    <%- include('Partials/headerContratante') %>
+    <%- include('../Partials/headerContratante') %>
 
     <main class="perfil-page">
         <header class="perfil-topo">
@@ -131,7 +131,7 @@
         </section>
     </main>
 
-    <%- include('Partials/footer') %>
+    <%- include('../Partials/footer') %>
 
     <div id="modalEditarPerfil" class="modal-overlay" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="tituloEditarPerfil">
