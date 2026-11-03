@@ -174,7 +174,7 @@
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 15px;
   box-sizing: border-box;
 }
 
@@ -338,4 +338,478 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* Identidade e ajustes exclusivos para a visualização do trabalhador. */
+body.worker-details {
+  --details-red-banner: #8b1728;
+  --details-red-dark: #68101e;
+  --details-bg-main: #f5f2eb;
+  --details-text-dark: #191919;
+  --details-text-muted: #625e57;
+  --details-border: #e5ded3;
+  min-height: 100vh;
+  background: var(--details-bg-main);
+  color: var(--details-text-dark);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+body.worker-details .hero-banner {
+  padding: 42px 0;
+  background: linear-gradient(118deg, #191919 0%, #191919 48%, #8b1728 100%);
+}
+
+body.worker-details .banner-container {
+  width: min(1180px, 100%);
+  gap: 36px;
+}
+
+body.worker-details .banner-info {
+  min-width: 0;
+  flex: 1;
+}
+
+body.worker-details .badge-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  background: #8b1728;
+  letter-spacing: 0.06em;
+}
+
+body.worker-details .banner-info h1 {
+  max-width: 760px;
+  margin: 16px 0;
+  font-size: clamp(30px, 3.2vw, 42px);
+  line-height: 1.14;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .banner-meta {
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  line-height: 1.5;
+}
+
+body.worker-details .banner-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 7px 11px;
+  border: 1px solid rgba(245, 242, 235, 0.2);
+  border-radius: 999px;
+  background: rgba(245, 242, 235, 0.06);
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .banner-meta i {
+  flex: 0 0 auto;
+  color: #f5f2eb;
+}
+
+body.worker-details .banner-price {
+  flex: 0 0 auto;
+  min-width: 250px;
+  padding: 22px 26px;
+  border: 1px solid rgba(245, 242, 235, 0.18);
+  background: rgba(25, 25, 25, 0.28);
+  text-align: left;
+}
+
+body.worker-details .price-label {
+  font-weight: 600;
+}
+
+body.worker-details .price-value {
+  font-size: clamp(30px, 3vw, 38px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .main-container {
+  width: min(1180px, 100%);
+  max-width: none;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.9fr);
+  align-items: start;
+  gap: 28px;
+  margin: 32px auto 48px;
+  padding: 0 24px;
+}
+
+body.worker-details .content-left {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+body.worker-details .section-block {
+  margin: 0;
+  padding: 26px 28px;
+  border-color: var(--details-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(25, 25, 25, 0.045);
+}
+
+body.worker-details .section-block h3,
+body.worker-details .summary-card h3 {
+  margin: 0 0 14px;
+  color: var(--details-text-dark);
+  font-size: 19px;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+body.worker-details .description-text {
+  color: #494640;
+  font-size: 15px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.worker-details .info-card {
+  min-width: 0;
+  min-height: 84px;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid var(--details-border);
+  background: #f8f6f1;
+}
+
+body.worker-details .info-card > div {
+  min-width: 0;
+}
+
+body.worker-details .info-card .icon {
+  flex: 0 0 auto;
+  color: var(--details-red-banner);
+}
+
+body.worker-details .card-label {
+  margin-bottom: 5px;
+  color: var(--details-text-muted);
+  font-weight: 600;
+}
+
+body.worker-details .info-card strong {
+  display: block;
+  color: var(--details-text-dark);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .sidebar-right {
+  min-width: 0;
+}
+
+body.worker-details .summary-card {
+  padding: 25px;
+  border: 1px solid var(--details-border);
+  border-top: 4px solid var(--details-red-banner);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(25, 25, 25, 0.06);
+}
+
+body.worker-details .summary-card h3 {
+  margin-bottom: 16px;
+}
+
+body.worker-details .summary-item {
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom-color: var(--details-border);
+  color: var(--details-text-muted);
+}
+
+body.worker-details .summary-item strong {
+  min-width: 0;
+  color: var(--details-text-dark);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+body.worker-details .btn-accept {
+  min-height: 50px;
+  padding: 13px 18px;
+  border: 1px solid var(--details-red-banner);
+  border-radius: 10px;
+  background: var(--details-red-banner);
+  box-shadow: 0 5px 12px rgba(139, 23, 40, 0.18);
+  font-family: inherit;
+  line-height: 1.35;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+body.worker-details .btn-accept:hover {
+  background: var(--details-red-dark);
+  box-shadow: 0 7px 16px rgba(104, 16, 30, 0.24);
+  transform: translateY(-1px);
+}
+
+body.worker-details .btn-accept--cancel {
+  border-color: var(--details-border);
+  background: #f5f2eb;
+  box-shadow: none;
+  color: var(--details-red-banner);
+}
+
+body.worker-details .btn-accept--cancel:hover {
+  border-color: var(--details-red-banner);
+  background: #f0e5e2;
+  box-shadow: none;
+}
+
+body.worker-details .btn-back {
+  border: 1px solid var(--details-border);
+  border-radius: 10px;
+  background: #f5f2eb;
+  color: var(--details-text-dark);
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+body.worker-details .btn-back:hover {
+  border-color: var(--details-red-banner);
+  background: #f0e5e2;
+  color: var(--details-red-banner);
+}
+
+body.worker-details :is(a, button, textarea):focus-visible {
+  outline: 3px solid #8b1728;
+  outline-offset: 3px;
+}
+
+body.worker-details .navbar :is(a, button):focus-visible {
+  outline-color: #f5f2eb;
+}
+
+body.worker-details .candidatura-status {
+  display: grid;
+  gap: 5px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--details-border);
+  border-radius: 10px;
+  background: #f8f6f1;
+  text-align: center;
+}
+
+body.worker-details .candidatura-status--pendente {
+  border-color: #d7b87d;
+  background: #fbf5e8;
+}
+
+body.worker-details .candidatura-status--pendente .candidatura-status__value {
+  color: #78520a;
+}
+
+body.worker-details .candidatura-status--enviada {
+  border-color: #c99ca3;
+  background: #f8eff0;
+}
+
+body.worker-details .candidatura-status__label,
+body.worker-details .candidatura-status__date {
+  color: var(--details-text-muted);
+  font-size: 13px;
+}
+
+body.worker-details .candidatura-status__value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--details-red-banner);
+  font-size: 17px;
+}
+
+body.worker-details .candidatura-form {
+  width: 100%;
+  margin-top: 16px;
+}
+
+body.worker-details .candidatura-form--cancelar {
+  margin-top: 14px;
+}
+
+body.worker-details .candidatura-form__field {
+  margin-bottom: 13px;
+  text-align: left;
+}
+
+body.worker-details .candidatura-form__label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--details-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+body.worker-details .candidatura-form__textarea {
+  display: block;
+  width: 100%;
+  min-height: 92px;
+  padding: 11px 12px;
+  border: 1px solid #cfc8bd;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--details-text-dark);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+body.worker-details .candidatura-form__textarea::placeholder {
+  color: #777168;
+}
+
+body.worker-details .candidatura-form__textarea:focus-visible {
+  border-color: var(--details-red-banner);
+}
+
+body.worker-details .candidatura-indisponivel {
+  margin: 16px 0 0;
+  padding: 12px;
+  border: 1px solid var(--details-border);
+  border-radius: 10px;
+  background: #f8f6f1;
+  color: var(--details-text-muted);
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  body.worker-details .main-container {
+    grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr);
+    gap: 20px;
+    padding-inline: 20px;
+  }
+
+  body.worker-details .banner-container {
+    gap: 24px;
+  }
+
+  body.worker-details .banner-price {
+    min-width: 230px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.worker-details .hero-banner {
+    padding: 32px 0;
+  }
+
+  body.worker-details .banner-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+  }
+
+  body.worker-details .banner-price {
+    width: 100%;
+    min-width: 0;
+    padding: 18px 20px;
+    text-align: left;
+  }
+
+  body.worker-details .main-container {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    margin: 24px auto 36px;
+  }
+
+  body.worker-details .grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  body.worker-details .hero-banner {
+    padding: 26px 0;
+  }
+
+  body.worker-details .banner-container {
+    padding-inline: 18px;
+    gap: 18px;
+  }
+
+  body.worker-details .banner-info h1 {
+    margin: 13px 0;
+    font-size: clamp(25px, 7.2vw, 30px);
+    line-height: 1.18;
+  }
+
+  body.worker-details .banner-meta {
+    flex-direction: column;
+    gap: 7px;
+    font-size: 13px;
+  }
+
+  body.worker-details .banner-price {
+    padding: 16px 18px;
+  }
+
+  body.worker-details .price-value {
+    font-size: 30px;
+  }
+
+  body.worker-details .main-container {
+    margin-top: 18px;
+    padding-inline: 16px;
+  }
+
+  body.worker-details .section-block,
+  body.worker-details .summary-card {
+    padding: 20px;
+    border-radius: 13px;
+  }
+
+  body.worker-details .section-block h3,
+  body.worker-details .summary-card h3 {
+    font-size: 18px;
+  }
+
+  body.worker-details .grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.worker-details .info-card {
+    min-height: 72px;
+  }
+
+  body.worker-details .summary-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  body.worker-details .summary-item strong {
+    text-align: left;
+  }
+}
+
+@media (max-width: 360px) {
+  body.worker-details .banner-container {
+    padding-inline: 16px;
+  }
+
+  body.worker-details .main-container {
+    padding-inline: 12px;
+  }
+
+  body.worker-details .section-block,
+  body.worker-details .summary-card {
+    padding: 17px;
+  }
+
+  body.worker-details .price-value {
+    font-size: 27px;
+  }
 }

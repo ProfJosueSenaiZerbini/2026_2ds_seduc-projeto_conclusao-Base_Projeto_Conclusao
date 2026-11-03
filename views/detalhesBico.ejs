@@ -3,13 +3,18 @@
 
 <head>
   <meta charset="UTF-8">
+  <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador') { %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% } %>
   <title>Detalhes do Bico — Ibico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <%- include('Partials/phosphorIcons') %>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/detalhesBico.css">
 </head>
 
-<body>
+<body class="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' ? 'worker-details' : '' %>">
 
   <!-- O cabecalho acompanha o perfil que esta visualizando a oportunidade. -->
   <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase()==='contratante' ) { %>
@@ -92,28 +97,26 @@
 
                     <% if (minhaCandidatura) { %>
                       <!-- O trabalhador já se candidatou -->
-                      <div
-                        style="margin-top: 15px; padding: 12px; border-radius: 8px; background-color: #e3f2fd; border: 1px solid #90caf9; text-align: center;">
-                        <span style="font-size: 0.85rem; color: #1976d2; display: block;">
+                      <div class="candidatura-status <%= minhaCandidatura.status === 'Pendente' ? 'candidatura-status--pendente' : 'candidatura-status--enviada' %>">
+                        <span class="candidatura-status__label">
                           Sua Candidatura:
                         </span>
 
-                        <strong style="font-size: 1.1rem; color: #0d47a1;">
-                          <i class="ph ph-check-circle" aria-hidden="true"></i> <%= minhaCandidatura.status %>
+                        <strong class="candidatura-status__value">
+                          <i class="ph <%= minhaCandidatura.status === 'Pendente' ? 'ph-hourglass' : 'ph-check-circle' %>" aria-hidden="true"></i> <%= minhaCandidatura.status %>
                         </strong>
 
-                        <small style="display: block; margin-top: 4px; color: #555;">
+                        <small class="candidatura-status__date">
                           Inscrito em <%= minhaCandidatura.data_candidatura %>
                         </small>
                       </div>
 
                       <% if (minhaCandidatura.status==='Pendente' ) { %>
                         <!-- Cancelar candidatura -->
-                        <form action="/bicos/candidaturas/cancelar" method="POST"
-                          style="width: 100%; margin-top: 15px;">
+                        <form class="candidatura-form candidatura-form--cancelar" action="/bicos/candidaturas/cancelar" method="POST">
                           <input type="hidden" name="bico_id" value="<%= bico.id %>">
 
-                          <button class="btn-accept" type="submit" style="width: 100%;">
+                          <button class="btn-accept btn-accept--cancel" type="submit">
                             Cancelar Candidatura
                           </button>
                         </form>
@@ -121,36 +124,34 @@
 
                           <% } else if (bico.status==='Aberto' ) { %>
                             <!-- Ainda não se candidatou e o bico está aberto -->
-                            <form action="/bicos/candidatar" method="POST" style="width: 100%; margin-top: 15px;">
+                            <form class="candidatura-form" action="/bicos/candidatar" method="POST">
 
                               <input type="hidden" name="bico_id" value="<%= bico.id %>">
 
-                              <div style="margin-bottom: 12px; text-align: left;">
-                                <label for="mensagem"
-                                  style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">
+                              <div class="candidatura-form__field">
+                                <label for="mensagem" class="candidatura-form__label">
                                   Mensagem (opcional):
                                 </label>
 
                                 <textarea name="mensagem" id="mensagem" rows="3"
                                   placeholder="Apresente-se brevemente ou tire dúvidas..."
-                                  style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; resize: vertical;"></textarea>
+                                  class="candidatura-form__textarea"></textarea>
                               </div>
 
-                              <button class="btn-accept" type="submit" style="width: 100%;">
+                              <button class="btn-accept" type="submit">
                                 Quero este Bico
                               </button>
                             </form>
 
                             <% } else { %>
-                              <p style="margin-top: 15px; text-align: center; color: #666;">
+                              <p class="candidatura-indisponivel">
                                 Este bico não está mais disponível.
                               </p>
                               <% } %>
 
                                 <% } %>
 
-                                  <a href="/hometrabalhador" class="btn-back"
-                                    style="display: block; text-align: center; margin-top: 15px; text-decoration: none;">
+                                  <a href="/hometrabalhador" class="btn-back">
                                     Voltar
                                   </a>
                 </div>
