@@ -1,0 +1,228 @@
+// prisma/schema.prisma
+//
+// Escopo atual: as 5 entidades do núcleo (Usuario, Conta, Categoria,
+// Transacao, Meta), mais TokenUsuario (links por e-mail),
+// ConexaoBancaria (importação do banco simulado) e LimiteCategoria
+// (meta de gastar menos numa categoria).
+// O modelo está na 3ª Forma Normal — ver comentários em Transacao.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// USUARIO
+// ================================
+model Usuario {
+  id_usuario     Int      @id @default(autoincrement())
+  nome_usuario   String   @db.VarChar(100)
+  cpf_cnpj       String   @unique @db.VarChar(20)
+  email          String   @unique @db.VarChar(100)
+  senha          String   @db.VarChar(255)
+  data_cadastro  DateTime @default(now())
+
+  contas      Conta[]
+  metas       Meta[]
+  tokens      TokenUsuario[]
+  conexoes    ConexaoBancaria[]
+  categorias  Categoria[]
+  limites     LimiteCategoria[]
+
+  @@map("usuario")
+}
+
+// ================================
+// TOKEN_USUARIO — links enviados por e-mail
+// ================================
+// Cada linha é um link de uso único mandado para o e-mail do usuário.
+// Hoje só existe o tipo 'redefinir_senha'; a confirmação de cadastro
+// vai usar esta mesma tabela com o tipo 'verificar_email'.
+//
+// O banco guarda o HASH do token, nunca o token em si — pelo mesmo
+// motivo da senha: se alguém copiar o banco, não consegue usar os links.
+model TokenUsuario {
+  id_token      Int       @id @default(autoincrement())
+  token_hash    String    @unique @db.Char(64) // SHA-256 em hexadecimal
+  tipo          String    @db.VarChar(30)      // 'redefinir_senha' | 'trocar_email'
+  // Só é preenchido quando tipo = 'trocar_email'. Guarda o endereço novo
+  // enquanto a troca está pendente: ela só vale depois do clique no link,
+  // então o e-mail não pode ir direto para a tabela usuario.
+  email_novo    String?   @db.VarChar(100)
+  expira_em     DateTime
+  usado_em      DateTime?                      // preenchido quando o link é usado
+  data_criacao  DateTime  @default(now())
+  id_usuario    Int
+
+  usuario  Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+
+  @@index([id_usuario, tipo])
+  @@map("token_usuario")
+}
+
+// ================================
+// CONTA — a Carteira do usuário
+// ================================
+model Conta {
+  id_conta    Int     @id @default(autoincrement())
+  nome        String  @db.VarChar(100)
+  saldo       Decimal @default(0.00) @db.Decimal(12, 2)
+  id_usuario  Int
+
+  // Preenchidos só nas contas importadas de um banco. Nas contas
+  // criadas à mão (como a Carteira), os dois ficam vazios.
+  // id_externo é o código que o BANCO deu para a conta: é por ele que a
+  // sincronização reconhece "esta conta eu já importei".
+  id_conexao  Int?
+  id_externo  String? @db.VarChar(50)
+
+  usuario     Usuario          @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  conexao     ConexaoBancaria? @relation(fields: [id_conexao], references: [id_conexao], onDelete: Cascade)
+  transacoes  Transacao[]
+
+  @@unique([id_conexao, id_externo])
+  @@map("conta")
+}
+
+// ================================
+// CONEXAO_BANCARIA — um banco que o usuário autorizou
+// ================================
+// Guarda a autorização (consentimento) que o usuário deu no site do
+// banco. É uma tabela própria porque a conexão tem dados que não são
+// nem do usuário nem de uma conta: o token de acesso, até quando ele
+// vale e quando foi a última sincronização. Um usuário pode conectar
+// mais de um banco, mas o mesmo banco só uma vez.
+//
+// Desconectar apaga a conexão E as contas importadas por ela (Cascade
+// em Conta.conexao). Nada muda no banco: ele só deixa de ser consultado.
+model ConexaoBancaria {
+  id_conexao            Int       @id @default(autoincrement())
+  banco                 String    @db.VarChar(100)
+  token_acesso          String    @db.Text
+  acesso_expira_em      DateTime
+  data_conexao          DateTime  @default(now())
+  ultima_sincronizacao  DateTime?
+  id_usuario            Int
+
+  usuario  Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  contas   Conta[]
+
+  @@unique([id_usuario, banco])
+  @@map("conexao_bancaria")
+}
+
+// ================================
+// CATEGORIA — as 13 do sistema + as personalizadas
+// ================================
+// id_usuario vazio = categoria do SISTEMA (do seed, igual para todos).
+// id_usuario preenchido = categoria PERSONALIZADA, criada por um usuário
+// e visível só para ele. Ver src/categorias.js.
+//
+// Continua na 3FN: o tipo segue morando na categoria, e a transação não
+// ganhou campo nenhum.
+model Categoria {
+  id_categoria    Int    @id @default(autoincrement())
+  nome_categoria  String @db.VarChar(100)
+  tipo            String @db.VarChar(20) // 'receita' ou 'despesa'
+  id_usuario      Int?
+
+  usuario     Usuario?          @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  transacoes  Transacao[]
+  limites     LimiteCategoria[]
+
+  // O mesmo usuário não repete nome. Atenção: no MySQL um índice único
+  // aceita vários nulos, então ele NÃO impede repetir o nome de uma
+  // categoria do sistema — isso é conferido no categoriaController.
+  @@unique([id_usuario, nome_categoria])
+  @@map("categoria")
+}
+
+// ================================
+// TRANSACAO — um ganho ou um gasto
+// ================================
+// Dois campos foram removidos de propósito, por serem dependências
+// transitivas (3FN). NÃO reintroduzir:
+//
+// - id_usuario: a conta já pertence a um usuário. Para listar as
+//   transações de alguém, passe pela conta:
+//   where: { conta: { id_usuario } }
+//
+// - tipo_transacao: a categoria já tem seu próprio tipo. Para saber
+//   se é receita ou despesa, olhe transacao.categoria.tipo
+//
+model Transacao {
+  id_transacao     Int      @id @default(autoincrement())
+  valor_transacao  Decimal  @db.Decimal(12, 2) // sempre positivo
+  data_transacao   DateTime @db.Date
+  descricao        String?  @db.VarChar(150)
+  id_categoria     Int
+  id_conta         Int
+
+  // Código que o banco deu para a transação. Só existe nas importadas.
+  // O @@unique abaixo é a trava contra duplicatas: sincronizar duas
+  // vezes não consegue gravar a mesma transação do banco duas vezes.
+  id_externo       String?  @db.VarChar(50)
+
+  // Dia em que o GASTO foi pago. Vazio = ainda não pago.
+  // Um campo só responde "foi pago?" (está preenchido?) e "quando?".
+  // Não quebra a 3FN: "pago" é um fato que só a pessoa informa, não dá
+  // para deduzir de nenhum outro campo. (Já "pendente" e "atrasado" SÃO
+  // deduzidos — da data_transacao e do dia de hoje — e por isso não
+  // são gravados.) Em ganhos fica sempre vazio: ganho não tem "pago".
+  data_pagamento   DateTime? @db.Date
+
+  categoria  Categoria @relation(fields: [id_categoria], references: [id_categoria])
+  conta      Conta     @relation(fields: [id_conta], references: [id_conta], onDelete: Cascade)
+
+  @@unique([id_conta, id_externo])
+  @@index([id_conta, data_transacao])
+  @@map("transacao")
+}
+
+// ================================
+// META — objetivo financeiro
+// ================================
+model Meta {
+  id_meta      Int      @id @default(autoincrement())
+  titulo       String   @db.VarChar(100)
+  valor_alvo   Decimal  @db.Decimal(12, 2)
+  valor_atual  Decimal  @default(0.00) @db.Decimal(12, 2)
+  data_limite  DateTime @db.Date
+  status       String   @default("em_progresso") @db.VarChar(20)
+  id_usuario   Int
+
+  usuario  Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+
+  @@index([id_usuario, status])
+  @@map("meta")
+}
+
+// ================================
+// LIMITE_CATEGORIA — meta de gastar menos numa categoria
+// ================================
+// Ex.: "no máximo R$ 500 por mês em Lazer". Vale para o mês atual e
+// renova sozinho no dia 1.
+//
+// Não é uma Meta: a meta é cumprida quando o valor CHEGA ao alvo, e o
+// limite quando o gasto fica ABAIXO dele. Na tabela Meta, um limite
+// estourado viraria "concluída".
+//
+// O quanto já foi gasto no mês NÃO é gravado: é a soma das transações da
+// categoria, calculada na leitura (ver limiteController.js). Guardar um
+// valor que se deduz das transações permitiria os dois se contradizerem.
+model LimiteCategoria {
+  id_limite     Int     @id @default(autoincrement())
+  valor_limite  Decimal @db.Decimal(12, 2)
+  id_usuario    Int
+  id_categoria  Int
+
+  usuario    Usuario   @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  categoria  Categoria @relation(fields: [id_categoria], references: [id_categoria], onDelete: Cascade)
+
+  @@unique([id_usuario, id_categoria]) // um limite por categoria
+  @@map("limite_categoria")
+}
