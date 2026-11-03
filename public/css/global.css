@@ -11,11 +11,11 @@
   --global-ibico-page-bg: #f8fafc;
   --global-ibico-border: #e2e8f0;
   --global-ibico-text-muted: #64748b;
-  --worker-header-bg: #faf9f6;
-  --worker-header-border: #e7e5e0;
-  --worker-header-ink: #14213d;
-  --worker-header-muted: #4b5563;
-  --worker-header-accent: #e8503a;
+  --worker-header-bg: #191919;
+  --worker-header-border: #34312e;
+  --worker-header-ink: #f5f2eb;
+  --worker-header-muted: #d1cec7;
+  --worker-header-accent: #8b1728;
 }
 
 /* RESET BÁSICO */
@@ -172,8 +172,31 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 }
 
 /* Botao compartilhado pelo header do trabalhador. */
-.logout-btn { border: 1px solid var(--global-ibico-border); border-radius: 6px; padding: 7px 12px; background: #ffffff; color: var(--global-ibico-text-muted); font-family: inherit; font-size: 14px; line-height: 1.25; cursor: pointer; }
-.logout-btn:hover { color: var(--global-ibico-brand); border-color: var(--global-ibico-brand); }
+.logout-btn {
+  border: 1px solid var(--worker-header-border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--worker-header-ink);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.logout-btn:hover {
+  border-color: var(--worker-header-accent);
+  background: var(--worker-header-accent);
+  color: #fff;
+}
+
+.logout-btn:focus-visible,
+.icon-btn:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid var(--worker-header-ink);
+  outline-offset: 3px;
+}
 /* =========================================================
    HEADER / NAVBAR (PARTIAL PADRÃO)
    ========================================================= */
@@ -183,7 +206,7 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
   border-bottom: 1px solid var(--worker-header-border);
   width: 100%;
   color: var(--worker-header-ink);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
 }
@@ -201,7 +224,7 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
   font-size: 1.4rem;
   font-weight: 800;
   line-height: 1.2;
-  color: var(--worker-header-accent);
+  color: var(--worker-header-ink);
   letter-spacing: -0.02em;
 }
 
@@ -226,7 +249,7 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 }
 
 .nav-link--active {
-  color: var(--worker-header-accent);
+  color: var(--worker-header-ink);
   font-weight: 600;
   border-bottom-color: var(--worker-header-accent);
 }
@@ -254,7 +277,8 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 }
 
 .icon-btn:hover {
-  background: rgba(20, 33, 61, 0.06);
+  background: var(--worker-header-accent);
+  color: #fff;
 }
 
 /* =========================================================
@@ -290,6 +314,19 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
   gap: 8px;
 }
 
+.footer__description {
+  margin: 8px 0 0;
+  color: var(--global-ibico-text-muted);
+  font-size: 13px;
+}
+
+.footer__copyright {
+  display: block;
+  margin-top: 12px;
+  color: var(--global-ibico-text-muted);
+  font-size: 12px;
+}
+
 .footer-col h4 {
   margin: 0 0 4px 0;
   font-size: 14px;
@@ -315,6 +352,42 @@ body:has(.contractor-sidebar.is-collapsed) { padding-left: var(--contractor-side
 .hint-link {
   color: var(--global-ibico-brand);
   font-weight: 600;
+}
+
+.footer--worker {
+  border-top-color: #e5ded3;
+  background: #f5f2eb;
+  color: #191919;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.footer--worker .footer-col a.brand,
+.footer--worker .footer-col a.hint-link {
+  color: #8b1728;
+}
+
+.footer--worker .brand-dot {
+  background-color: #8b1728;
+}
+
+.footer--worker .footer__description,
+.footer--worker .footer__copyright,
+.footer--worker .footer-col a {
+  color: #625e58;
+}
+
+.footer--worker .footer-col h4 {
+  color: #191919;
+}
+
+.footer--worker .footer-col a:hover {
+  color: #8b1728;
+}
+
+.footer--worker a:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid #8b1728;
+  outline-offset: 3px;
 }
 
 @media (max-width: 600px) {
