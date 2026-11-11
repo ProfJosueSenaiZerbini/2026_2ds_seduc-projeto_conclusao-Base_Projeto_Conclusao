@@ -70,10 +70,26 @@ app.use('/bicos', bicoRoutes);
 app.use('/carteira', carteiraRoutes);
 app.use('/perfil', perfilRoutes);
 
-// Se o usuário acessar a raiz (/), nós mandamos ele para a URL /login
+
+// Página inicial do iBico
 app.get('/', (req, res) => {
-    res.redirect('/login');
+    if (req.session?.usuario) {
+        const tipoPerfil = req.session.usuario.tipo_perfil
+            ?.trim()
+            .toLowerCase();
+
+        if (tipoPerfil === 'contratante') {
+            return res.redirect('/homeContratante');
+        }
+
+        if (tipoPerfil === 'trabalhador') {
+            return res.redirect('/hometrabalhador');
+        }
+    }
+
+    return res.render('landing');
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

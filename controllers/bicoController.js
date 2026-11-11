@@ -281,6 +281,7 @@ const obterPrimeiraLinha = (resultado) => {
 };
 
 // Factory para manter a operação testável com uma conexão isolada.
+
 export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => {
     const { candidatura_id, novo_status, observacao } = req.body || {};
     const usuario_id = req.session?.usuario?.id || req.session?.usuario?.id_usuario;
@@ -294,6 +295,7 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
         : typeof candidatura_id === 'string' && candidatura_id.trim() !== ''
             ? Number(candidatura_id)
             : NaN;
+
     const usuarioIdNum = Number(usuario_id);
 
     if (!Number.isInteger(candidaturaIdNum) || candidaturaIdNum <= 0) {
@@ -304,7 +306,10 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
         return res.status(400).send('Identificador de usuário inválido.');
     }
 
-    if (observacao != null && (typeof observacao !== 'string' || [...observacao].length > 255)) {
+    if (
+        observacao != null &&
+        (typeof observacao !== 'string' || [...observacao].length > 255)
+    ) {
         return res.status(400).send('A observação deve ter no máximo 255 caracteres.');
     }
 
@@ -326,11 +331,12 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
         await connection.beginTransaction();
         transacaoAtiva = true;
 
-        // Localiza o bico sem bloquear candidaturas, para respeitar a ordem de locks.
+        // 1. Localiza o bico relacionado à candidatura.
         const resultadoInicial = await connection.query(
             'SELECT bico_id FROM candidaturas WHERE id = ?',
             [candidaturaIdNum]
         );
+
         const candidaturaInicial = obterPrimeiraLinha(resultadoInicial);
 
         if (!candidaturaInicial) {
@@ -339,11 +345,15 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
 
         const bicoId = candidaturaInicial.bico_id;
 
-        // As decisões do mesmo bico sempre bloqueiam primeiro esta linha.
+        // 2. Bloqueia o bico para evitar decisões simultâneas.
         const resultadoBico = await connection.query(
-            'SELECT id, contratante_id, status FROM bicos WHERE id = ? FOR UPDATE',
+            `SELECT id, contratante_id, status, valor
+             FROM bicos
+             WHERE id = ?
+             FOR UPDATE`,
             [bicoId]
         );
+
         const bico = obterPrimeiraLinha(resultadoBico);
 
         if (!bico) {
@@ -351,14 +361,18 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
         }
 
         if (Number(bico.contratante_id) !== usuarioIdNum) {
-            return await responderComRollback(403, 'Você não tem autorização para alterar esta candidatura.');
+            return await responderComRollback(
+                403,
+                'Você não tem autorização para alterar esta candidatura.'
+            );
         }
 
-        // O bico permanece bloqueado até o commit; depois bloqueamos a candidatura.
+        // 3. Bloqueia a candidatura.
         const resultadoCandidatura = await connection.query(
             'SELECT * FROM candidaturas WHERE id = ? AND bico_id = ? FOR UPDATE',
             [candidaturaIdNum, bicoId]
         );
+
         const candidatura = obterPrimeiraLinha(resultadoCandidatura);
 
         if (!candidatura) {
@@ -373,48 +387,151 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
             return await responderComRollback(400, 'Este bico não está mais aberto.');
         }
 
-        await connection.query(
-            "UPDATE candidaturas SET status = ? WHERE id = ? AND status = 'Pendente'",
+        // 4. Se aceitar, verifica e reserva o saldo do contratante.
+        if (novo_status === 'Aceito') {
+            const resultadoUsuario = await connection.query(
+                'SELECT saldo_simulado FROM usuarios WHERE id = ? FOR UPDATE',
+                [usuarioIdNum]
+            );
+
+            const contratante = obterPrimeiraLinha(resultadoUsuario);
+
+            if (!contratante) {
+                return await responderComRollback(404, 'Contratante não encontrado.');
+            }
+
+            const valorBico = Number(bico.valor);
+            const saldoDisponivel = Number(contratante.saldo_simulado);
+
+            if (
+                !Number.isFinite(valorBico) ||
+                valorBico <= 0 ||
+                !Number.isFinite(saldoDisponivel)
+            ) {
+                return await responderComRollback(
+                    400,
+                    'Não foi possível validar os valores da carteira.'
+                );
+            }
+
+            if (saldoDisponivel < valorBico) {
+                return await responderComRollback(
+                    400,
+                    'Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.'
+                );
+            }
+
+            // Desconta o valor da carteira.
+            const resultadoDebito = await connection.query(
+                `UPDATE usuarios
+                 SET saldo_simulado = saldo_simulado - ?
+                 WHERE id = ? AND saldo_simulado >= ?`,
+                [valorBico, usuarioIdNum, valorBico]
+            );
+
+            if (resultadoDebito.affectedRows !== 1) {
+                return await responderComRollback(
+                    400,
+                    'Não foi possível reservar o valor. Verifique seu saldo.'
+                );
+            }
+
+            // Registra a reserva no extrato.
+            await connection.query(
+                `INSERT INTO movimentacoes_carteira
+                    (usuario_id, bico_id, tipo_movimentacao, valor, descricao)
+                 VALUES (?, ?, 'RESERVA', ?, ?)`,
+                [
+                    usuarioIdNum,
+                    bicoId,
+                    valorBico,
+                    `Reserva do bico: ${bicoId}`
+                ]
+            );
+        }
+
+        // 5. Atualiza o status da candidatura.
+        const resultadoAtualizacaoCandidatura = await connection.query(
+            `UPDATE candidaturas
+             SET status = ?
+             WHERE id = ? AND status = 'Pendente'`,
             [novo_status, candidaturaIdNum]
         );
 
+        if (resultadoAtualizacaoCandidatura.affectedRows !== 1) {
+            return await responderComRollback(
+                409,
+                'A candidatura foi alterada. Atualize a página e tente novamente.'
+            );
+        }
+
+        // 6. Registra o histórico da candidatura.
         await connection.query(
-            `INSERT INTO historico_candidaturas (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
+            `INSERT INTO historico_candidaturas
+                (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
              VALUES (?, ?, ?, ?, ?)`,
-            [candidaturaIdNum, candidatura.status, novo_status, usuarioIdNum, observacao || null]
+            [
+                candidaturaIdNum,
+                candidatura.status,
+                novo_status,
+                usuarioIdNum,
+                observacao || null
+            ]
         );
 
+        // 7. Se aceitou, vincula o trabalhador ao bico.
         if (novo_status === 'Aceito') {
             await connection.query(
-                "UPDATE bicos SET trabalhador_id = ?, status = 'Em andamento' WHERE id = ?",
+                `UPDATE bicos
+                 SET trabalhador_id = ?, status = 'Em andamento'
+                 WHERE id = ? AND status = 'Aberto'`,
                 [candidatura.trabalhador_id, bicoId]
             );
 
+            // Recusa automaticamente as outras candidaturas pendentes.
             const resultadoPendentes = await connection.query(
-                `SELECT id FROM candidaturas
-                 WHERE bico_id = ? AND id <> ? AND status = 'Pendente'
-                 ORDER BY id FOR UPDATE`,
+                `SELECT id
+                 FROM candidaturas
+                 WHERE bico_id = ?
+                   AND id <> ?
+                   AND status = 'Pendente'
+                 ORDER BY id
+                 FOR UPDATE`,
                 [bicoId, candidaturaIdNum]
             );
+
             const candidaturasPendentes = obterLinhas(resultadoPendentes) || [];
-            const observacaoAutomatica = 'Recusada automaticamente após a aceitação de outra candidatura.';
+
+            const observacaoAutomatica =
+                'Recusada automaticamente após a aceitação de outra candidatura.';
 
             for (const pendente of candidaturasPendentes) {
                 await connection.query(
-                    "UPDATE candidaturas SET status = 'Recusado' WHERE id = ? AND status = 'Pendente'",
+                    `UPDATE candidaturas
+                     SET status = 'Recusado'
+                     WHERE id = ? AND status = 'Pendente'`,
                     [pendente.id]
                 );
+
                 await connection.query(
-                    `INSERT INTO historico_candidaturas (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
+                    `INSERT INTO historico_candidaturas
+                        (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
                      VALUES (?, 'Pendente', 'Recusado', ?, ?)`,
-                    [pendente.id, usuarioIdNum, observacaoAutomatica]
+                    [
+                        pendente.id,
+                        usuarioIdNum,
+                        observacaoAutomatica
+                    ]
                 );
             }
         }
 
+        // 8. Confirma todas as operações.
         await connection.commit();
         transacaoAtiva = false;
+
         return res.redirect(`/bicos/${bicoId}/gerenciar`);
+
     } catch (erro) {
         if (connection && transacaoAtiva) {
             try {
@@ -425,26 +542,39 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
         }
 
         console.error('ERRO AO ATUALIZAR STATUS DA CANDIDATURA:', erro);
+
         return res.status(500).send('Erro interno ao atualizar candidatura.');
+
     } finally {
         connection?.release();
     }
 };
 
+
 export const atualizarStatusCandidatura = criarAtualizadorStatusCandidatura(db);
+
 
 export const finalizarBico = async (req, res) => {
     const bicoIdNum = typeof req.params?.id === 'string' && req.params.id.trim() !== ''
         ? Number(req.params.id)
         : NaN;
-    const usuarioIdNum = Number(req.session?.usuario?.id || req.session?.usuario?.id_usuario);
+
+    const usuarioIdNum = Number(
+        req.session?.usuario?.id || req.session?.usuario?.id_usuario
+    );
 
     if (!Number.isInteger(bicoIdNum) || bicoIdNum <= 0) {
-        return res.status(400).json({ sucesso: false, erro: 'Identificador de bico inválido.' });
+        return res.status(400).json({
+            sucesso: false,
+            erro: 'Identificador de bico inválido.'
+        });
     }
 
     if (!Number.isInteger(usuarioIdNum) || usuarioIdNum <= 0) {
-        return res.status(401).json({ sucesso: false, erro: 'Autenticação necessária.' });
+        return res.status(401).json({
+            sucesso: false,
+            erro: 'Autenticação necessária.'
+        });
     }
 
     let connection;
@@ -455,41 +585,198 @@ export const finalizarBico = async (req, res) => {
         await connection.beginTransaction();
         transacaoAtiva = true;
 
+        // 1. Busca e bloqueia o bico.
         const resultadoBico = await connection.query(
-            'SELECT id, contratante_id, status FROM bicos WHERE id = ? FOR UPDATE',
+            `SELECT id, contratante_id, trabalhador_id, valor, status
+             FROM bicos
+             WHERE id = ?
+             FOR UPDATE`,
             [bicoIdNum]
         );
+
         const bico = obterPrimeiraLinha(resultadoBico);
 
         if (!bico) {
             await connection.rollback();
             transacaoAtiva = false;
-            return res.status(404).json({ sucesso: false, erro: 'Bico não encontrado.' });
+
+            return res.status(404).json({
+                sucesso: false,
+                erro: 'Bico não encontrado.'
+            });
         }
 
+        // 2. Verifica se o contratante é o proprietário.
         if (Number(bico.contratante_id) !== usuarioIdNum) {
             await connection.rollback();
             transacaoAtiva = false;
-            return res.status(403).json({ sucesso: false, erro: 'Você não tem autorização para finalizar este bico.' });
+
+            return res.status(403).json({
+                sucesso: false,
+                erro: 'Você não tem autorização para finalizar este bico.'
+            });
         }
 
+        // 3. Verifica se o bico está em andamento.
         if (bico.status !== 'Em andamento') {
             await connection.rollback();
             transacaoAtiva = false;
-            return res.status(409).json({ sucesso: false, erro: 'Somente bicos em andamento podem ser finalizados.' });
+
+            return res.status(409).json({
+                sucesso: false,
+                erro: 'Somente bicos em andamento podem ser finalizados.'
+            });
         }
 
+        // 4. Valida os dados financeiros.
+        if (!bico.trabalhador_id) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Este bico não possui um trabalhador vinculado.'
+            });
+        }
+
+        const trabalhadorId = Number(bico.trabalhador_id);
+        const valorBico = Number(bico.valor);
+
+        if (
+            !Number.isInteger(trabalhadorId) ||
+            trabalhadorId <= 0 ||
+            !Number.isFinite(valorBico) ||
+            valorBico <= 0
+        ) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Não foi possível validar os dados financeiros do bico.'
+            });
+        }
+
+        // 5. Confirma que existe uma reserva válida para este bico.
+        const resultadoReserva = await connection.query(
+            `SELECT usuario_id, valor
+             FROM movimentacoes_carteira
+             WHERE bico_id = ?
+               AND tipo_movimentacao = 'RESERVA'
+             FOR UPDATE`,
+            [bicoIdNum]
+        );
+
+        const reserva = obterPrimeiraLinha(resultadoReserva);
+
+        if (!reserva) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Não existe uma reserva financeira para este bico.'
+            });
+        }
+
+        const valorReservado = Number(reserva.valor);
+
+        if (
+            Number(reserva.usuario_id) !== usuarioIdNum ||
+            !Number.isFinite(valorReservado) ||
+            Math.round(valorReservado * 100) !== Math.round(valorBico * 100)
+        ) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'A reserva financeira não corresponde aos dados deste bico.'
+            });
+        }
+
+        // 6. Verifica se já existe um crédito para este bico.
+        const resultadoCreditoExistente = await connection.query(
+            `SELECT id
+             FROM movimentacoes_carteira
+             WHERE bico_id = ?
+               AND tipo_movimentacao = 'CREDITO'
+             FOR UPDATE`,
+            [bicoIdNum]
+        );
+
+        if (obterPrimeiraLinha(resultadoCreditoExistente)) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(409).json({
+                sucesso: false,
+                erro: 'Este bico já possui um crédito registrado.'
+            });
+        }
+
+        // 7. Bloqueia a carteira do trabalhador.
+        const resultadoTrabalhador = await connection.query(
+            'SELECT id FROM usuarios WHERE id = ? FOR UPDATE',
+            [trabalhadorId]
+        );
+
+        if (!obterPrimeiraLinha(resultadoTrabalhador)) {
+            await connection.rollback();
+            transacaoAtiva = false;
+
+            return res.status(404).json({
+                sucesso: false,
+                erro: 'Trabalhador não encontrado.'
+            });
+        }
+
+        // 8. Atualiza o status do bico.
         const resultadoAtualizacao = await connection.query(
-            "UPDATE bicos SET status = 'Finalizado' WHERE id = ? AND contratante_id = ? AND status = 'Em andamento'",
+            `UPDATE bicos
+             SET status = 'Finalizado'
+             WHERE id = ?
+               AND contratante_id = ?
+               AND status = 'Em andamento'`,
             [bicoIdNum, usuarioIdNum]
         );
 
         if (resultadoAtualizacao.affectedRows !== 1) {
             await connection.rollback();
             transacaoAtiva = false;
-            return res.status(409).json({ sucesso: false, erro: 'O status do bico mudou. Atualize a página e tente novamente.' });
+
+            return res.status(409).json({
+                sucesso: false,
+                erro: 'O status do bico mudou. Atualize a página e tente novamente.'
+            });
         }
 
+        // 9. Credita o valor reservado ao trabalhador.
+        const resultadoPagamento = await connection.query(
+            `UPDATE usuarios
+             SET saldo_simulado = saldo_simulado + ?
+             WHERE id = ?`,
+            [valorReservado, trabalhadorId]
+        );
+
+        if (resultadoPagamento.affectedRows !== 1) {
+            throw new Error('Não foi possível atualizar o saldo do trabalhador.');
+        }
+
+        // 10. Registra o crédito na carteira.
+        await connection.query(
+            `INSERT INTO movimentacoes_carteira
+                (usuario_id, bico_id, tipo_movimentacao, valor, descricao)
+             VALUES (?, ?, 'CREDITO', ?, ?)`,
+            [
+                trabalhadorId,
+                bicoIdNum,
+                valorReservado,
+                `Pagamento recebido pelo bico: ${bicoIdNum}`
+            ]
+        );
+
+        // 11. Registra o evento no histórico do bico.
         await connection.query(
             `INSERT INTO historico_eventos_bicos
                 (bico_id, usuario_id, tipo_evento, status_anterior, status_novo)
@@ -497,24 +784,40 @@ export const finalizarBico = async (req, res) => {
             [bicoIdNum, usuarioIdNum, bico.status]
         );
 
+        // 12. Confirma todas as operações.
         await connection.commit();
         transacaoAtiva = false;
-        return res.json({ sucesso: true, mensagem: 'Serviço finalizado com sucesso.', status: 'Finalizado' });
+
+        return res.json({
+            sucesso: true,
+            mensagem: 'Serviço finalizado e pagamento simulado realizado com sucesso.',
+            status: 'Finalizado'
+        });
+
     } catch (erro) {
         if (connection && transacaoAtiva) {
             try {
                 await connection.rollback();
             } catch (erroRollback) {
-                console.error('Erro ao reverter transação de finalização do bico:', erroRollback);
+                console.error(
+                    'Erro ao reverter transação de finalização do bico:',
+                    erroRollback
+                );
             }
         }
 
         console.error('ERRO AO FINALIZAR BICO:', erro);
-        return res.status(500).json({ sucesso: false, erro: 'Erro interno ao finalizar o bico.' });
+
+        return res.status(500).json({
+            sucesso: false,
+            erro: 'Erro interno ao finalizar o bico.'
+        });
+
     } finally {
         connection?.release();
     }
 };
+
 
 export const salvarAvaliacaoBico = async (req, res) => {
     const bicoIdNum = typeof req.params?.id === 'string' && req.params.id.trim() !== ''

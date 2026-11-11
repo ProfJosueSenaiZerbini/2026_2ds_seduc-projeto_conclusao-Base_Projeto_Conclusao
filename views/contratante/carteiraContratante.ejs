@@ -29,14 +29,20 @@
           <h2 class="wallet__balance">R$ <%= carteira.saldo.toFixed(2).replace('.', ',' ) %>
           </h2>
           <div class="wallet__actions">
-            <button class="btn btn--primary">Adicionar Saldo</button>
-            <button class="btn btn--outline-light">Sacar Saldo</button>
+            <form action="/carteira/contratante/adicionar-saldo" method="POST">
+              <input type="number" name="valor" min="0.01" max="99999999.99" step="0.01"
+                placeholder="Valor para adicionar" required>
+
+              <button type="submit" class="btn btn--primary">
+                Adicionar Saldo
+              </button>
+            </form>
           </div>
         </div>
 
         <div class="wallet__stats">
           <div class="wallet__card">
-            <span class="wallet__label">Investido este mês</span>
+            <span class="wallet__label">Total investido</span>
             <span class="wallet__stat-value">R$ <%= carteira.totalInvestido.toFixed(2).replace('.', ',' ) %></span>
             <span class="wallet__stat-info">
               <%= carteira.bicosFinalizados %> bicos finalizados
@@ -83,17 +89,17 @@
                       <%= transacao.tipo %>
                     </td>
                     <td>
-                      <% if (transacao.status==='CONCLUIDO' ) { %>
-                        <span class="badge badge--success">Concluído</span>
-                        <% } else { %>
-                          <span class="badge badge--pending">Pendente</span>
+                      <% if (transacao.status==='ADICAO' ) { %>
+                        <span class="badge badge--success">Saldo adicionado</span>
+                        <% } else if (transacao.status==='RESERVA' ) { %>
+                          <span class="badge badge--pending">Valor reservado</span>
                           <% } %>
                     </td>
                     <td
                       class="text-right <%= transacao.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
                       <!-- DECIMAL do MariaDB pode ser string, por isso a conversao ocorre antes do toFixed. -->
-                      <%= transacao.tipo==='Entrada' ? '+' : '-' %> R$ <%= Number(transacao.valor || 0).toFixed(2).replace('.', ',' )
-                          %>
+                      <%= transacao.tipo==='Entrada' ? '+' : '-' %> R$ <%= Number(transacao.valor ||
+                          0).toFixed(2).replace('.', ',' ) %>
                     </td>
                   </tr>
                   <% }) %>

@@ -1,7 +1,7 @@
+
 import db from '../config/database.js';
 
 export const exibirCarteiraContratante = async (req, res) => {
-  // A carteira so pode consultar dados depois que o usuario estiver autenticado.
   if (!req.session?.usuario) {
     return res.redirect('/login');
   }
@@ -9,54 +9,57 @@ export const exibirCarteiraContratante = async (req, res) => {
   try {
     const usuarioId = req.session.usuario.id;
 
-    // O driver MariaDB retorna diretamente um array de linhas, sem o array extra do mysql2.
     const usuarios = await db.query(
       'SELECT saldo_simulado FROM usuarios WHERE id = ?',
       [usuarioId]
     );
 
     const estatisticas = await db.query(
-      `SELECT 
+      `SELECT
         COALESCE(SUM(CASE WHEN status = 'Finalizado' THEN valor ELSE 0 END), 0) AS totalInvestido,
-        COALESCE(COUNT(CASE WHEN status = 'Finalizado' THEN 1 END), 0) AS bicosFinalizados,
-        COALESCE(SUM(CASE WHEN status IN ('Aberto', 'Em andamento') THEN valor ELSE 0 END), 0) AS totalPendente,
-        COALESCE(COUNT(CASE WHEN status IN ('Aberto', 'Em andamento') THEN 1 END), 0) AS bicosPendentes
-       FROM bicos 
+        COUNT(CASE WHEN status = 'Finalizado' THEN 1 END) AS bicosFinalizados,
+        COALESCE(SUM(CASE WHEN status = 'Em andamento' THEN valor ELSE 0 END), 0) AS totalPendente,
+        COUNT(CASE WHEN status = 'Em andamento' THEN 1 END) AS bicosPendentes
+       FROM bicos
        WHERE contratante_id = ?`,
       [usuarioId]
     );
 
     const transacoes = await db.query(
-      `SELECT 
-        titulo AS descricao,
-        valor,
-        DATE_FORMAT(data_servico, '%d/%m/%Y') AS dataHora,
-        status,
-        'Saída' AS tipo
-       FROM bicos 
-       WHERE contratante_id = ? 
-       ORDER BY data_servico DESC`,
+      `SELECT
+        m.descricao,
+        m.valor,
+        DATE_FORMAT(m.criado_em, '%d/%m/%Y %H:%i') AS dataHora,
+        m.tipo_movimentacao AS status,
+        CASE
+          WHEN m.tipo_movimentacao = 'ADICAO' THEN 'Entrada'
+          WHEN m.tipo_movimentacao = 'RESERVA' THEN 'Saída'
+        END AS tipo
+       FROM movimentacoes_carteira m
+       WHERE m.usuario_id = ?
+       ORDER BY m.criado_em DESC, m.id DESC`,
       [usuarioId]
     );
 
-    // DECIMAL pode chegar como string; Number padroniza os valores para a view.
     const carteira = {
       saldo: Number(usuarios[0]?.saldo_simulado || 0),
       totalInvestido: Number(estatisticas[0]?.totalInvestido || 0),
-      bicosFinalizados: estatisticas[0]?.bicosFinalizados || 0,
+      bicosFinalizados: Number(estatisticas[0]?.bicosFinalizados || 0),
       totalPendente: Number(estatisticas[0]?.totalPendente || 0),
-      bicosPendentes: estatisticas[0]?.bicosPendentes || 0
+      bicosPendentes: Number(estatisticas[0]?.bicosPendentes || 0)
     };
 
-    res.render('contratante/carteiraContratante', { carteira, transacoes });
+    return res.render('contratante/carteiraContratante', {
+      carteira,
+      transacoes
+    });
   } catch (error) {
     console.error('Erro ao carregar carteira do contratante:', error);
-    res.status(500).send('Erro ao carregar dados da carteira');
+    return res.status(500).send('Erro ao carregar dados da carteira.');
   }
 };
 
 export const exibirCarteiraTrabalhador = async (req, res) => {
-  // Evita consultar a carteira de um usuario padrao ou de uma conta diferente.
   if (!req.session?.usuario) {
     return res.redirect('/login');
   }
@@ -70,22 +73,24 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
     );
 
     const retido = await db.query(
-      `SELECT COALESCE(SUM(valor), 0) AS saldoRetido 
-       FROM bicos 
-       WHERE trabalhador_id = ? AND status = 'Em andamento'`,
+      `SELECT COALESCE(SUM(valor), 0) AS saldoRetido
+       FROM bicos
+       WHERE trabalhador_id = ?
+         AND status = 'Em andamento'`,
       [usuarioId]
     );
 
     const transacoes = await db.query(
-      `SELECT 
-        titulo AS descricao,
-        valor,
-        DATE_FORMAT(data_servico, '%d/%m/%Y') AS dataHora,
-        CASE WHEN status = 'Finalizado' THEN 'CONCLUIDO' ELSE 'PENDENTE' END AS status,
+      `SELECT
+        m.descricao,
+        m.valor,
+        DATE_FORMAT(m.criado_em, '%d/%m/%Y %H:%i') AS dataHora,
+        m.tipo_movimentacao AS status,
         'Entrada' AS tipo
-       FROM bicos 
-       WHERE trabalhador_id = ? 
-       ORDER BY data_servico DESC`,
+       FROM movimentacoes_carteira m
+       WHERE m.usuario_id = ?
+         AND m.tipo_movimentacao = 'CREDITO'
+       ORDER BY m.criado_em DESC, m.id DESC`,
       [usuarioId]
     );
 
@@ -96,9 +101,85 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
       infoRetido: 'Aguardando conclusão do serviço'
     };
 
-    res.render('trabalhador/carteiraTrabalhador', { carteira, transacoes });
+    return res.render('trabalhador/carteiraTrabalhador', {
+      carteira,
+      transacoes
+    });
   } catch (error) {
     console.error('Erro ao carregar carteira do trabalhador:', error);
-    res.status(500).send('Erro ao carregar dados da carteira');
+    return res.status(500).send('Erro ao carregar dados da carteira.');
+  }
+};
+
+// Adiciona saldo fictício à carteira do contratante.
+export const adicionarSaldoSimulado = async (req, res) => {
+  const usuarioId = Number(req.session?.usuario?.id);
+  const valorRecebido = req.body?.valor;
+
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+    return res.redirect('/login');
+  }
+
+  if (
+    typeof valorRecebido !== 'string' ||
+    !/^\d{1,8}(?:\.\d{1,2})?$/.test(valorRecebido)
+  ) {
+    return res.status(400).send('Informe um valor válido para adicionar.');
+  }
+
+  const valor = Number(valorRecebido);
+
+  if (!Number.isFinite(valor) || valor <= 0) {
+    return res.status(400).send('O valor deve ser maior que zero.');
+  }
+
+  let connection;
+  let transacaoAtiva = false;
+
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+    transacaoAtiva = true;
+
+    const usuarios = await connection.query(
+      'SELECT id FROM usuarios WHERE id = ? FOR UPDATE',
+      [usuarioId]
+    );
+
+    if (!usuarios.length) {
+      await connection.rollback();
+      transacaoAtiva = false;
+      return res.status(404).send('Usuário não encontrado.');
+    }
+
+    await connection.query(
+      'UPDATE usuarios SET saldo_simulado = saldo_simulado + ? WHERE id = ?',
+      [valor, usuarioId]
+    );
+
+    await connection.query(
+      `INSERT INTO movimentacoes_carteira
+        (usuario_id, bico_id, tipo_movimentacao, valor, descricao)
+       VALUES (?, NULL, 'ADICAO', ?, ?)`,
+      [usuarioId, valor, 'Adição de saldo simulado']
+    );
+
+    await connection.commit();
+    transacaoAtiva = false;
+
+    return res.redirect('/carteira/contratante');
+  } catch (error) {
+    if (connection && transacaoAtiva) {
+      try {
+        await connection.rollback();
+      } catch (erroRollback) {
+        console.error('Erro ao reverter adição de saldo:', erroRollback);
+      }
+    }
+
+    console.error('Erro ao adicionar saldo simulado:', error);
+    return res.status(500).send('Não foi possível adicionar o saldo simulado.');
+  } finally {
+    connection?.release();
   }
 };
