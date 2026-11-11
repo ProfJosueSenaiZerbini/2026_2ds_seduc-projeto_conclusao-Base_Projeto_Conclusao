@@ -19,6 +19,8 @@ import PerfilUsuario from './pages/PerfilUsuario';
 import PostPage from './pages/PostPage';
 import CreatePostPage from './pages/CreatePostPage';
 import CategoryPage from './pages/CategoryPage';
+import HobbiesPage from './pages/HobbiesPage';
+import ChatPage from './pages/ChatPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -45,6 +47,8 @@ function App() {
               <Route path="/perfil" element={<PerfilUsuario />} />
               <Route path="/post/:id" element={<PostPage />} />
               <Route path="/novoPost" element={<CreatePostPage />} />
+              <Route path="/hobbies" element={<HobbiesPage />} />
+              <Route path="/chat" element={<ChatPage />} />
               
               {/* Categorias */}
               <Route path="/teatro" element={<CategoryPage categoryName="TEATRO" />} />

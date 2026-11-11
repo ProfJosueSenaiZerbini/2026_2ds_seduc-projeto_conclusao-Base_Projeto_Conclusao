@@ -5,6 +5,7 @@ const {
     listarPublicos, 
     buscarPublicos, 
     criar,
+    excluirPost,
     alternarCurtida,
     statusCurtida,
     listarComentarios,
@@ -18,6 +19,7 @@ const { authOpcional } = require("../middleware/authMiddleware");
 router.get("/", listarPublicos);
 router.get("/:id", buscarPublicos);
 router.post("/criar", authMiddleware, criar);
+router.delete("/:id", authMiddleware, excluirPost);
 
 // ✦ REDE SOCIAL: Rotas de curtidas
 router.post("/:id/curtir", authMiddleware, alternarCurtida);

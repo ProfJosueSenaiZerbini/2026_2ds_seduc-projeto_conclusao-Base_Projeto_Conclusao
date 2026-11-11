@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, BookOpen, Home as HomeIcon, PlusCircle } from 'lucide-react';
+import { User, LogOut, BookOpen, Home as HomeIcon, PlusCircle, Compass, MessageSquare } from 'lucide-react';
 
 const Navbar = () => {
   const [userId, setUserId] = useState('1');
@@ -120,7 +120,19 @@ const Navbar = () => {
                 <span className="hidden xs:inline">Resenhas</span>
               </NavLink>
 
-              {/* 3. Botão Perfil */}
+              {/* 3. Botão Hobbies (Em Casa & Fora de Casa) */}
+              <NavLink to="/hobbies" className={getNavLinkClass}>
+                <Compass size={14} />
+                <span className="hidden xs:inline">Hobbies</span>
+              </NavLink>
+
+              {/* 4. Botão Chat & Comunidade (Público, Privado e IA) */}
+              <NavLink to="/chat" className={getNavLinkClass}>
+                <MessageSquare size={14} />
+                <span className="hidden xs:inline">Chat</span>
+              </NavLink>
+
+              {/* 5. Botão Perfil */}
               <NavLink to={`/perfil/${userId}`} className={getNavLinkClass}>
                 <User size={14} />
                 <span className="hidden xs:inline">Meu Perfil</span>

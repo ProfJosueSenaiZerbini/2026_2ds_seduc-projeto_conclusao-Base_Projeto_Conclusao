@@ -60,6 +60,14 @@ export const getUserProfile = (userId) => {
   return api.get(`/users/${userId}`);
 };
 
+export const getUserPosts = (userId) => {
+  return api.get(`/users/${userId}/posts`);
+};
+
+export const deletePost = (postId) => {
+  return api.delete(`/posts/${postId}`);
+};
+
 export const updateUserProfile = (userId, data) => {
   return api.put(`/users/${userId}`, data);
 };
@@ -79,6 +87,27 @@ export const getComments = (postId) => {
 
 export const addComment = (postId, texto) => {
   return api.post(`/posts/${postId}/comentarios`, { texto });
+};
+
+// ✦ COMUNIDADE & CHAT: Público, Privado e IA
+export const getPublicMessages = () => {
+  return api.get('/chat/publico');
+};
+
+export const sendPublicMessage = (data) => {
+  return api.post('/chat/publico', data);
+};
+
+export const getPrivateMessages = (outroId, meuId) => {
+  return api.get(`/chat/privado/${outroId}?meuId=${meuId || ''}`);
+};
+
+export const sendPrivateMessage = (outroId, data) => {
+  return api.post(`/chat/privado/${outroId}`, data);
+};
+
+export const chatWithAI = (data) => {
+  return api.post('/chat/ia', data);
 };
 
 export default api;

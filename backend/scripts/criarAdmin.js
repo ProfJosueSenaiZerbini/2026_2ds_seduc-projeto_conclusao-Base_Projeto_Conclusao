@@ -1,3 +1,4 @@
+const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const database = require("../SRC/DATABASE/connection");
 require("dotenv").config();
@@ -8,7 +9,13 @@ async function criarAdmin() {
         const email = process.env.ADMIN_EMAIL;
         const senha = process.env.ADMIN_SENHA;
 
-        senhaHash = await bcrypt.hash(senha, 10);
+        if (!nome || !email || !senha) {
+            throw new Error(
+                "Preencha ADMIN_NOME, ADMIN_EMAIL e ADMIN_SENHA no arquivo .env"
+            );
+        }
+
+ const senhaHash = await bcrypt.hash(senha, 10);
 
         await database.query(
             `INSERT INTO
@@ -26,7 +33,7 @@ async function criarAdmin() {
         if(e.code==="ER_DUP_ENTRY"){
             console.error("adiministrador ja cadastradoooo");
     }else{
-        console.error(e);
+        console.error("Erro ao criar administrador:", e.message);
     
     }
     }finally{

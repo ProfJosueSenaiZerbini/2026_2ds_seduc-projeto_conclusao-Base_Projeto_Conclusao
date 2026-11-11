@@ -144,13 +144,24 @@ const ResenhasPage = ({ initialCategory }) => {
     allPosts = MOCK_CARDS;
   }
 
+  const normalizarCat = (str = '') =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
   // Filtragem por Categoria e Busca
   const filteredPosts = allPosts.filter(p => {
-    const matchCategory = selectedCategory === 'TODAS' || 
-      p.categoria.includes(selectedCategory) || 
-      selectedCategory.includes(p.categoria);
+    const cat = normalizarCat(p.categoria || '');
+    const sel = normalizarCat(selectedCategory || 'TODAS');
 
-    const matchSearch = searchTerm.trim() === '' || 
+    const matchCategory = sel === 'TODAS' ||
+      cat === sel || cat.includes(sel) || sel.includes(cat) ||
+      ((sel.includes('CINEMA') || sel.includes('FILME')) && (cat.includes('CINEMA') || cat.includes('FILME'))) ||
+      ((sel.includes('LIVRO') || sel.includes('LITERATURA')) && (cat.includes('LIVRO') || cat.includes('LITERATURA'))) ||
+      ((sel.includes('MODA') || sel.includes('ESTILO')) && (cat.includes('MODA') || cat.includes('ESTILO'))) ||
+      (sel.includes('MUSICA') && cat.includes('MUSICA')) ||
+      (sel.includes('TEATRO') && cat.includes('TEATRO')) ||
+      ((sel.includes('BEM-ESTAR') || sel.includes('COTIDIANO')) && (cat.includes('BEM-ESTAR') || cat.includes('COTIDIANO')));
+
+    const matchSearch = searchTerm.trim() === '' ||
       p.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.resumo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.autor.toLowerCase().includes(searchTerm.toLowerCase());
@@ -161,10 +172,10 @@ const ResenhasPage = ({ initialCategory }) => {
   return (
     <div className="w-full bg-[#F9F6F0] min-h-screen py-10 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* TOPO EDITORIAL */}
         <header className="mb-10 sm:mb-12">
-          
+
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="bg-red-editorial text-white text-[10px] sm:text-[11px] font-mono font-bold tracking-widest px-3 py-1 rounded-full uppercase shadow-sm flex items-center gap-1.5">
               <Sparkles size={12} /> ARQUIVO COMPLETO
@@ -196,11 +207,11 @@ const ResenhasPage = ({ initialCategory }) => {
 
         {/* BARRA DE BUSCA E SELEÇÃO DE CATEGORIAS */}
         <section className="mb-10 space-y-6">
-          
+
           {/* Campo de Busca Rápida */}
           <div className="relative max-w-xl">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
+            <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -208,8 +219,8 @@ const ResenhasPage = ({ initialCategory }) => {
               className="w-full bg-white border-2 border-graphite pl-10 pr-4 py-2.5 text-xs sm:text-sm font-sans text-graphite focus:outline-none focus:border-red-editorial shadow-[3px_3px_0_0_#1A1A1A]"
             />
             {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')} 
+              <button
+                onClick={() => setSearchTerm('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-400 hover:text-graphite font-bold"
               >
                 LIMPAR
@@ -254,7 +265,7 @@ const ResenhasPage = ({ initialCategory }) => {
             Exibindo <strong>{filteredPosts.length}</strong> resenha(s) em <strong>{selectedCategory}</strong>
           </span>
           {selectedCategory !== 'TODAS' && (
-            <button 
+            <button
               onClick={() => handleSelectCategory('TODAS')}
               className="text-red-editorial font-bold hover:underline"
             >
@@ -291,9 +302,9 @@ const ResenhasPage = ({ initialCategory }) => {
                 >
                   {/* Imagem de Capa com Fita Adesiva e Badge */}
                   <div className="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 border-b-2 border-graphite">
-                    
+
                     {/* Fita Adesiva */}
-                    <div 
+                    <div
                       className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/50 border border-white/60 shadow-sm backdrop-blur-[1px] rotate-1 z-20 pointer-events-none"
                     />
 
@@ -321,7 +332,7 @@ const ResenhasPage = ({ initialCategory }) => {
 
                   {/* Conteúdo do Card */}
                   <div className="p-5 sm:p-6 flex flex-col flex-1">
-                    
+
                     {/* Metadados: Autor e Tempo de Leitura */}
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-3 font-sans">
                       <div className="flex items-center gap-1.5 text-red-editorial font-bold font-sans truncate">

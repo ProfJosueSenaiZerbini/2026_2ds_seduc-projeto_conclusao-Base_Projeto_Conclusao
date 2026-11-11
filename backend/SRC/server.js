@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes.routes");
 const postRoutes = require("./routes/posts.Routes");
 const adminRoutes = require("./routes/admin.Routes");
 const userRoutes = require("./routes/user.Routes");
+const chatRoutes = require("./routes/chat.Routes");
 const app = express();
 
 app.use(cors({
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/admin/posts", adminRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 const PORT = process.env.PORT || 3000;
 

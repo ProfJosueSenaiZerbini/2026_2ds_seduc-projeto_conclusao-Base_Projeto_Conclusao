@@ -54,6 +54,39 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// Obter publicações feitas por um usuário específico
+router.get("/:id/posts", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [posts] = await database.query(`
+ SELECT
+ p.id,
+p.usuario_id,
+p.titulo,
+p.resumo,
+p.conteudo,
+p.imagem,
+p.categoria,
+p.criando_em,
+p.publicado,
+u.nome AS autor,
+u.foto AS autor_foto,
+(SELECT COUNT(*) FROM curtidas WHERE post_id = p.id) AS likes,
+(SELECT COUNT(*) FROM comentarios WHERE post_id = p.id) AS total_comentarios
+FROM posts p
+LEFT JOIN usuario u ON u.id = p.usuario_id
+WHERE p.usuario_id = ?
+ORDER BY p.criando_em DESC
+        `, [id]);
+
+        return res.json(posts);
+    } catch (err) {
+        console.error("Erro ao buscar publicações do usuário:", err);
+        return res.status(500).json({ mensagem: "Erro ao carregar publicações do usuário." });
+    }
+});
+
 // Atualizar perfil do usuário autenticado
 router.put("/:id", authMiddleware, async (req, res) => {
     try {
@@ -76,7 +109,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
         } = req.body;
 
         await database.query(
-            `UPDATE usuario SET 
+            `UPDATE usuario SET
                 nome = COALESCE(?, nome),
                 headline = COALESCE(?, headline),
                 bio = COALESCE(?, bio),
@@ -94,8 +127,8 @@ router.put("/:id", authMiddleware, async (req, res) => {
                 foto !== undefined ? foto : null,
                 capa !== undefined ? capa : null,
                 status_tag !== undefined && status_tag !== null ? status_tag.trim() : null,
-                interesses !== undefined && interesses !== null 
-                    ? (typeof interesses === 'object' ? JSON.stringify(interesses) : interesses) 
+                interesses !== undefined && interesses !== null
+                    ? (typeof interesses === 'object' ? JSON.stringify(interesses) : interesses)
                     : null,
                 id
             ]

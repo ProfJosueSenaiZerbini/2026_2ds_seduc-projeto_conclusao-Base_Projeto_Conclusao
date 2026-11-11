@@ -138,9 +138,22 @@ const CreatePostPage = () => {
     };
 
     try {
-      await createPost(payload);
+      const res = await createPost(payload);
+
+      // Salva a publicação em cache local garantindo presença no perfil e feed de categorias
+      const novoPostObj = {
+        id: res?.id || 'post-' + Date.now(),
+        ...payload,
+        autor: user?.nome || 'Você',
+        criando_em: new Date().toISOString(),
+        likes: 0,
+        total_comentarios: 0
+      };
+      const postsSalvos = JSON.parse(localStorage.getItem('plural_user_posts') || '[]');
+      localStorage.setItem('plural_user_posts', JSON.stringify([novoPostObj, ...postsSalvos]));
+
       setSuccess(true);
-      setTimeout(() => navigate('/home'), 2000);
+      setTimeout(() => navigate('/home'), 1500);
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.mensagem || 'Erro ao publicar resenha.');
     } finally {
@@ -160,7 +173,7 @@ const CreatePostPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      
+
       <div className="mb-10 border-b border-gray-300/40 pb-6">
         <Badge variant="outline" className="mb-3">NOVA PUBLICAÇÃO</Badge>
         <h1 className="font-serif font-black text-4xl sm:text-5xl text-graphite tracking-tight">
@@ -175,17 +188,17 @@ const CreatePostPage = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8 bg-cream-light p-6 sm:p-10 border border-graphite shadow-[4px_4px_0_0_#1A1A1A]">
-        
+
         {/* Título */}
         <div>
           <label className="block font-mono text-xs font-bold uppercase tracking-widest text-graphite mb-2">Título da Obra / Resenha</label>
-          <input 
-            type="text" 
-            value={formData.title} 
-            onChange={e => setFormData({...formData, title: e.target.value})} 
-            className="w-full bg-cream border border-graphite px-4 py-3 text-graphite font-serif text-xl focus:outline-none focus:border-red-editorial transition-colors" 
-            placeholder="Ex: Memórias Póstumas de Brás Cubas" 
-            disabled={loading} 
+          <input
+            type="text"
+            value={formData.title}
+            onChange={e => setFormData({...formData, title: e.target.value})}
+            className="w-full bg-cream border border-graphite px-4 py-3 text-graphite font-serif text-xl focus:outline-none focus:border-red-editorial transition-colors"
+            placeholder="Ex: Memórias Póstumas de Brás Cubas"
+            disabled={loading}
           />
         </div>
 
@@ -237,13 +250,13 @@ const CreatePostPage = () => {
           {/* Opção 1: Link URL */}
           {imageSourceType === 'url' && (
             <div>
-              <input 
-                type="text" 
-                value={formData.image} 
-                onChange={handleUrlChange} 
-                className="w-full bg-cream border border-graphite px-4 py-3 text-graphite font-sans text-sm focus:outline-none focus:border-red-editorial transition-colors" 
-                placeholder="Ex: https://images.unsplash.com/... (ou deixe em branco se não quiser foto)" 
-                disabled={loading} 
+              <input
+                type="text"
+                value={formData.image}
+                onChange={handleUrlChange}
+                className="w-full bg-cream border border-graphite px-4 py-3 text-graphite font-sans text-sm focus:outline-none focus:border-red-editorial transition-colors"
+                placeholder="Ex: https://images.unsplash.com/... (ou deixe em branco se não quiser foto)"
+                disabled={loading}
               />
               <p className="text-[11px] text-gray-500 font-sans mt-1.5">
                 ✦ Dica: Você pode colar o link direto de qualquer imagem na internet ou deixar vazio.
@@ -262,12 +275,12 @@ const CreatePostPage = () => {
                 <span className="text-[11px] text-gray-500 font-sans mt-1">
                   Formatos aceitos: PNG, JPG, JPEG ou WEBP (opcional)
                 </span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleFileChange} 
-                  className="hidden" 
-                  disabled={loading} 
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  disabled={loading}
                 />
               </label>
             </div>
@@ -277,10 +290,10 @@ const CreatePostPage = () => {
           {imagePreview && (
             <div className="pt-2 flex flex-col sm:flex-row items-center gap-4 bg-cream p-3 border border-gray-300">
               <div className="w-20 h-20 flex-shrink-0 bg-gray-200 border border-graphite overflow-hidden">
-                <img 
-                  src={imagePreview} 
-                  alt="Prévia da foto" 
-                  className="w-full h-full object-cover" 
+                <img
+                  src={imagePreview}
+                  alt="Prévia da foto"
+                  className="w-full h-full object-cover"
                   onError={() => setImagePreview('')}
                 />
               </div>
@@ -292,9 +305,9 @@ const CreatePostPage = () => {
                   Essa foto será exibida no estilo polaroid na sua publicação.
                 </p>
               </div>
-              <button 
-                type="button" 
-                onClick={handleRemoveImage} 
+              <button
+                type="button"
+                onClick={handleRemoveImage}
                 className="px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider text-red-editorial hover:bg-red-50 border border-red-editorial/40 flex items-center gap-1 transition-colors"
               >
                 <X size={14} /> Remover foto
@@ -307,9 +320,9 @@ const CreatePostPage = () => {
           {/* Categoria */}
           <div>
             <label className="block font-mono text-xs font-bold uppercase tracking-widest text-graphite mb-2">Categoria</label>
-            <select 
-              value={formData.category} 
-              onChange={e => setFormData({...formData, category: e.target.value})} 
+            <select
+              value={formData.category}
+              onChange={e => setFormData({...formData, category: e.target.value})}
               className="w-full bg-cream border border-graphite px-4 py-3 text-graphite font-sans text-sm focus:outline-none focus:border-red-editorial transition-colors appearance-none rounded-none"
               disabled={loading}
             >
@@ -378,21 +391,21 @@ const CreatePostPage = () => {
         {/* Conteúdo */}
         <div>
           <label className="block font-mono text-xs font-bold uppercase tracking-widest text-graphite mb-2">Texto da Resenha</label>
-          <textarea 
-            value={formData.content} 
-            onChange={e => setFormData({...formData, content: e.target.value})} 
+          <textarea
+            value={formData.content}
+            onChange={e => setFormData({...formData, content: e.target.value})}
             rows="10"
-            className="w-full bg-cream border border-graphite px-4 py-4 text-graphite font-sans text-base leading-relaxed focus:outline-none focus:border-red-editorial transition-colors resize-y" 
-            placeholder="Escreva sua análise crítica..." 
-            disabled={loading} 
+            className="w-full bg-cream border border-graphite px-4 py-4 text-graphite font-sans text-base leading-relaxed focus:outline-none focus:border-red-editorial transition-colors resize-y"
+            placeholder="Escreva sua análise crítica..."
+            disabled={loading}
           ></textarea>
         </div>
 
         {/* Submit */}
         <div className="pt-4 border-t border-gray-300/40 flex justify-end">
-          <button 
-            type="submit" 
-            disabled={loading} 
+          <button
+            type="submit"
+            disabled={loading}
             className="w-full sm:w-auto bg-graphite text-white font-bold uppercase tracking-widest text-sm py-4 px-10 border border-transparent hover:bg-black hover:shadow-[4px_4px_0px_0px_rgba(200,56,43,1)] transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
           >
             {loading ? <><Loader2 size={18} className="animate-spin" /> PUBLICANDO...</> : <>PUBLICAR RESENHA</>}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Clock, User, ArrowRight, MessageCircle, Sparkles } from 'lucide-react';
 import Tape from '../components/ui/Tape';
 import Badge from '../components/ui/Badge';
+import CommentsModal from '../components/comments/CommentsModal';
 import { usePosts } from '../hooks/usePosts';
 import { toggleLike } from '../services/api';
 
@@ -87,6 +88,8 @@ const Home = () => {
   const { posts: dbPosts } = usePosts();
   const [postsList, setPostsList] = useState(POSTS_INICIAIS);
   const [postsCurtidos, setPostsCurtidos] = useState({});
+  const [modalComentariosAberto, setModalComentariosAberto] = useState(false);
+  const [postParaComentar, setPostParaComentar] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -142,25 +145,25 @@ const Home = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      
+
       {/* ✦ CABEÇALHO DO FEED PRINCIPAL ✦ */}
       <div className="border-b-2 border-graphite pb-8 mb-12 relative">
         <Tape variant="yellow" className="-top-3 right-4 w-28 h-6 rotate-2 pointer-events-none" />
-        
+
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="filled">COMUNIDADE & BLOG EDITORIAL</Badge>
           <span className="font-mono text-xs uppercase tracking-widest text-red-editorial font-bold">
             ✧ FEED COLETIVO · ARTIGOS & RESENHAS ✧
           </span>
         </div>
-        
+
         <h1 className="font-serif font-black text-4xl sm:text-6xl text-graphite tracking-tight leading-none mb-4">
           Conexão, Estilo & <br />
           <span className="italic text-red-editorial">Perspectivas Plurais</span>.
         </h1>
-        
+
         <p className="font-sans text-base text-gray-editorial max-w-2xl leading-relaxed">
-          Navegue pelas últimas publicações da nossa rede: artigos, resenhas de cinema, leituras, reflexões 
+          Navegue pelas últimas publicações da nossa rede: artigos, resenhas de cinema, leituras, reflexões
           e discussões criadas pela nossa comunidade.
         </p>
       </div>
@@ -226,7 +229,7 @@ const Home = () => {
 
               {/* Rodapé do Card: Ações (Curtir, Comentários & Ler Mais) */}
               <div className="p-6 pt-0 border-t border-gray-200 mt-2 flex items-center justify-between">
-                
+
                 <div className="flex items-center gap-2">
                   {/* Botão de Curtir com contador e estado reativo */}
                   <button
@@ -249,14 +252,21 @@ const Home = () => {
                     <span>{post.curtidas || post.likes || 0}</span>
                   </button>
 
-                  {/* Badge de Comentários */}
-                  <span 
-                    className="flex items-center gap-1 text-xs font-mono font-bold text-gray-600 bg-white border border-gray-300 px-2 py-1.5 shadow-xs"
-                    title="Total de recados"
+                  {/* Botão de Comentários Interativo (Estilo Instagram) */}
+
+             <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPostParaComentar(post);
+                      setModalComentariosAberto(true);
+                    }}
+                    className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-700 hover:text-red-editorial bg-white hover:bg-red-50 border border-gray-300 hover:border-red-editorial px-2.5 py-1.5 shadow-xs transition-all cursor-pointer group"
+                    title="Abrir comentários (estilo Instagram) ✧"
                   >
-                    <MessageCircle size={13} className="text-gray-500" />
+                    <MessageCircle size={13} className="text-gray-500 group-hover:text-red-editorial transition-colors" />
                     <span>{post.total_comentarios || 0}</span>
-                  </span>
+                  </button>
                 </div>
 
                 {/* Botão de Ler Mais */}
@@ -274,6 +284,25 @@ const Home = () => {
           );
         })}
       </div>
+
+      {/* ✦ MODAL DE COMENTÁRIOS ESTILO INSTAGRAM ✦ */}
+      <CommentsModal
+        isOpen={modalComentariosAberto}
+        onClose={() => {
+          setModalComentariosAberto(false);
+          setPostParaComentar(null);
+        }}
+        post={postParaComentar}
+        onCommentAdded={(novoTotal) => {
+          if (postParaComentar) {
+            setPostsList((prev) =>
+              prev.map((p) =>
+                p.id === postParaComentar.id ? { ...p, total_comentarios: novoTotal } : p
+              )
+            );
+          }
+        }}
+      />
 
     </div>
   );

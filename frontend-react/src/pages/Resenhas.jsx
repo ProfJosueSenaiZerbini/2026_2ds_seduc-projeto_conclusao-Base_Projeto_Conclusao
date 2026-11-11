@@ -5,6 +5,7 @@ import { Heart, Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
 import Tape from '../components/ui/Tape';
 import Badge from '../components/ui/Badge';
 import Sparkle from '../components/ui/Sparkle';
+import CommentsModal from '../components/comments/CommentsModal';
 import { toggleLike } from '../services/api';
 
 const CATEGORIES = ['TODAS', 'MODA & ESTILO', 'CINEMA & TV', 'LITERATURA', 'MÚSICA', 'BEM-ESTAR'];
@@ -83,6 +84,9 @@ const Resenhas = () => {
   const { posts, loading, error } = usePosts();
   const [selectedCategory, setSelectedCategory] = useState('TODAS');
   const [postsCurtidos, setPostsCurtidos] = useState({});
+  const [modalComentariosAberto, setModalComentariosAberto] = useState(false);
+  const [postParaComentar, setPostParaComentar] = useState(null);
+  const [comentariosExtras, setComentariosExtras] = useState({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -116,16 +120,28 @@ const Resenhas = () => {
       }))
     : POSTS_PADRAO;
 
-  // Filtro por categoria
+  // Normalizador e filtro por categoria resiliente e bidirecional
+  const normalizar = (str = '') =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
   const filteredPosts = allPosts.filter(post => {
     if (selectedCategory === 'TODAS') return true;
-    const cat = (post.categoria || '').toUpperCase();
-    return cat.includes(selectedCategory);
+    const cat = normalizar(post.categoria || '');
+    const sel = normalizar(selectedCategory);
+
+    if (cat === sel || cat.includes(sel) || sel.includes(cat)) return true;
+    if ((sel.includes('CINEMA') || sel.includes('FILME')) && (cat.includes('CINEMA') || cat.includes('FILME'))) return true;
+    if ((sel.includes('LIVRO') || sel.includes('LITERATURA')) && (cat.includes('LIVRO') || cat.includes('LITERATURA'))) return true;
+    if ((sel.includes('MODA') || sel.includes('ESTILO')) && (cat.includes('MODA') || cat.includes('ESTILO'))) return true;
+    if (sel.includes('MUSICA') && cat.includes('MUSICA')) return true;
+    if (sel.includes('TEATRO') && cat.includes('TEATRO')) return true;
+    if ((sel.includes('BEM-ESTAR') || sel.includes('COTIDIANO')) && (cat.includes('BEM-ESTAR') || cat.includes('COTIDIANO'))) return true;
+    return false;
   });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      
+
       {/* Cabeçalho da Seção de Resenhas */}
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-graphite pb-6 mb-10 gap-6 relative">
         <Tape variant="yellow" className="-top-3 right-6 w-24 h-6 rotate-1 pointer-events-none" />
@@ -247,7 +263,7 @@ const Resenhas = () => {
 
                   {/* Rodapé do Card: Ações (Curtir, Comentários & Ler Mais) */}
                   <div className="p-6 pt-0 border-t border-gray-200 mt-2 flex items-center justify-between">
-                    
+
                     <div className="flex items-center gap-2">
                       {/* Botão de Curtir com contador e estado reativo */}
                       <button
@@ -270,14 +286,20 @@ const Resenhas = () => {
                         <span>{totalCurtidas}</span>
                       </button>
 
-                      {/* Badge de Comentários */}
-                      <span 
-                        className="flex items-center gap-1 text-xs font-mono font-bold text-gray-600 bg-white border border-gray-300 px-2 py-1.5 shadow-xs"
-                        title="Total de recados"
+                      {/* Botão de Comentários Interativo (Estilo Instagram) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPostParaComentar(post);
+                          setModalComentariosAberto(true);
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-700 hover:text-red-editorial bg-white hover:bg-red-50 border border-gray-300 hover:border-red-editorial px-2.5 py-1.5 shadow-xs transition-all cursor-pointer group"
+                        title="Abrir comentários (estilo Instagram) ✧"
                       >
-                        <MessageCircle size={13} className="text-gray-500" />
-                        <span>{post.total_comentarios || 0}</span>
-                      </span>
+                        <MessageCircle size={13} className="text-gray-500 group-hover:text-red-editorial transition-colors" />
+                        <span>{comentariosExtras[post.id] !== undefined ? comentariosExtras[post.id] : (post.total_comentarios || 0)}</span>
+                      </button>
                     </div>
 
                     {/* Botão de Ler Mais */}
@@ -303,6 +325,24 @@ const Resenhas = () => {
           )}
         </div>
       )}
+
+      {/* ✦ MODAL DE COMENTÁRIOS ESTILO INSTAGRAM ✦ */}
+      <CommentsModal
+        isOpen={modalComentariosAberto}
+        onClose={() => {
+          setModalComentariosAberto(false);
+          setPostParaComentar(null);
+        }}
+        post={postParaComentar}
+        onCommentAdded={(novoTotal) => {
+          if (postParaComentar) {
+            setComentariosExtras((prev) => ({
+              ...prev,
+              [postParaComentar.id]: novoTotal
+            }));
+          }
+        }}
+      />
 
     </div>
   );
