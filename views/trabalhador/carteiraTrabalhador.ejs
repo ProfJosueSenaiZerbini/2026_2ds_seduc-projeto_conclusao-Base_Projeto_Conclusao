@@ -180,8 +180,8 @@
                       <%= t.dataHora %>
                     </td>
                     <td>
-                      <span class="badge <%= t.status === 'CONCLUIDO' ? 'badge--success' : 'badge--pending' %>">
-                        <%= t.status==='CONCLUIDO' ? 'Concluído' : 'Pendente' %>
+                      <span class="badge <%= t.status === 'CREDITO' ? 'badge--success' : 'badge--pending' %>">
+                        <%= t.status==='CREDITO' ? 'Creditado' : 'Pendente' %>
                       </span>
                     </td>
                     <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">

@@ -112,6 +112,42 @@
   gap: 12px;
 }
 
+.wallet__card--primary .wallet__actions form {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-width: 0;
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--contractor-wallet-radius-md);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--contractor-wallet-white);
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"]::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"]:focus {
+  border-color: var(--contractor-wallet-white);
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.wallet__card--primary .wallet__actions .btn {
+  min-height: 48px;
+}
+
 .btn {
   font-family: inherit;
   font-size: 0.92rem;
@@ -227,5 +263,15 @@
 @media (max-width: 850px) {
   .wallet__dashboard {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet__card--primary .wallet__actions form {
+    flex-direction: column;
+  }
+
+  .wallet__card--primary .wallet__actions .btn {
+    width: 100%;
   }
 }
