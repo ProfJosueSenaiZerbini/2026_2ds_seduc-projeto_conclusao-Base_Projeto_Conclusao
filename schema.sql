@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     idade INT NOT NULL,
     senha VARCHAR(255) NOT NULL,
     tipo_perfil VARCHAR(50) NOT NULL,
-    saldo_simulado DECIMAL(10, 2) DEFAULT 0.00,
+    saldo_simulado DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- Tabela de Bicos (Vagas)
@@ -113,3 +113,27 @@ CREATE TABLE IF NOT EXISTS historico_candidaturas (
     CONSTRAINT fk_historico_alterado_por FOREIGN KEY (alterado_por) 
 	REFERENCES usuarios(id)
 );
+
+
+-- Tabela de Movimentações da Carteira
+CREATE TABLE IF NOT EXISTS movimentacoes_carteira (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    bico_id INT DEFAULT NULL,
+    tipo_movimentacao ENUM('ADICAO', 'RESERVA', 'CREDITO') NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    descricao VARCHAR(255) DEFAULT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_movimentacoes_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+
+    CONSTRAINT fk_movimentacoes_bico
+        FOREIGN KEY (bico_id) REFERENCES bicos(id),
+
+    CONSTRAINT uk_movimentacao_bico_tipo
+        UNIQUE (bico_id, tipo_movimentacao),
+
+    CONSTRAINT chk_movimentacao_valor
+        CHECK (valor > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

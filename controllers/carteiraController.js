@@ -142,7 +142,7 @@ export const adicionarSaldoSimulado = async (req, res) => {
     transacaoAtiva = true;
 
     const usuarios = await connection.query(
-      'SELECT id FROM usuarios WHERE id = ? FOR UPDATE',
+      'SELECT id, saldo_simulado FROM usuarios WHERE id = ? FOR UPDATE',
       [usuarioId]
     );
 
@@ -152,10 +152,18 @@ export const adicionarSaldoSimulado = async (req, res) => {
       return res.status(404).send('Usuário não encontrado.');
     }
 
-    await connection.query(
+    if (usuarios[0].saldo_simulado === null) {
+      throw new Error('Saldo simulado do usuário está nulo.');
+    }
+
+    const resultadoAtualizacao = await connection.query(
       'UPDATE usuarios SET saldo_simulado = saldo_simulado + ? WHERE id = ?',
       [valor, usuarioId]
     );
+
+    if (resultadoAtualizacao.affectedRows !== 1) {
+      throw new Error('Não foi possível atualizar o saldo simulado.');
+    }
 
     await connection.query(
       `INSERT INTO movimentacoes_carteira
