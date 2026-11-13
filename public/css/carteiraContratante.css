@@ -1,0 +1,277 @@
+/* =========================================================
+   IBICO — Carteira do Contratante (carteiraContratante.css)
+   ========================================================= */
+
+:root {
+  --contractor-wallet-bg: #FAF9F6;
+  --contractor-wallet-white: #FFFFFF;
+  --contractor-wallet-ink: #14213D;
+  --contractor-wallet-ink-soft: #4B5563;
+  --contractor-wallet-muted: #6B7280;
+  --contractor-wallet-line: #E7E5E0;
+  --contractor-wallet-brand-green: #12372A;
+  --contractor-wallet-brand-green-hover: #0C2A20;
+  --contractor-wallet-brand-green-light: #E7F6EC;
+  --contractor-wallet-shadow: 0 1px 2px rgba(20, 33, 61, 0.04), 0 8px 20px rgba(20, 33, 61, 0.05);
+  --contractor-wallet-radius-lg: 16px;
+  --contractor-wallet-radius-md: 10px;
+  --contractor-wallet-radius-full: 999px;
+}
+
+/* LAYOUT E ESTRUTURA (DESKTOP) */
+.wallet {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 32px 60px;
+}
+
+.wallet__header {
+  margin-bottom: 32px;
+}
+
+.wallet__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--contractor-wallet-ink);
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.wallet__subtitle {
+  color: var(--contractor-wallet-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* DASHBOARD SUPERIOR */
+.wallet__dashboard {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.wallet__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wallet__card {
+  background: var(--contractor-wallet-white);
+  border: 1px solid var(--contractor-wallet-line);
+  border-radius: var(--contractor-wallet-radius-lg);
+  padding: 28px;
+  box-shadow: var(--contractor-wallet-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet__card--primary {
+  background: var(--contractor-wallet-brand-green);
+  color: var(--contractor-wallet-white);
+  border: none;
+  justify-content: space-between;
+}
+
+.wallet__card--primary .wallet__label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.wallet__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--contractor-wallet-muted);
+  margin-bottom: 8px;
+}
+
+.wallet__balance {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin: 0 0 24px;
+  letter-spacing: -0.02em;
+}
+
+.wallet__stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--contractor-wallet-ink);
+  margin-bottom: 4px;
+}
+
+.wallet__stat-info {
+  font-size: 0.88rem;
+  color: var(--contractor-wallet-muted);
+}
+
+/* BOTÕES DE AÇÃO */
+.wallet__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.wallet__card--primary .wallet__actions form {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-width: 0;
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--contractor-wallet-radius-md);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--contractor-wallet-white);
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"]::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wallet__card--primary .wallet__actions input[name="valor"]:focus {
+  border-color: var(--contractor-wallet-white);
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.wallet__card--primary .wallet__actions .btn {
+  min-height: 48px;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--contractor-wallet-radius-md);
+  padding: 12px 20px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn--primary {
+  background: var(--contractor-wallet-white);
+  color: var(--contractor-wallet-brand-green);
+}
+
+.btn--primary:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.btn--outline-light {
+  background: transparent;
+  color: var(--contractor-wallet-white);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn--outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--contractor-wallet-white);
+}
+
+/* EXTRATO E TABELA */
+.wallet__transactions {
+  background: var(--contractor-wallet-white);
+  border: 1px solid var(--contractor-wallet-line);
+  border-radius: var(--contractor-wallet-radius-lg);
+  box-shadow: var(--contractor-wallet-shadow);
+  padding: 32px;
+}
+
+.wallet__section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--contractor-wallet-ink);
+  margin: 0 0 24px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.wallet__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.wallet__table th {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--contractor-wallet-muted);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--contractor-wallet-line);
+}
+
+.wallet__table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--contractor-wallet-line);
+  font-size: 0.95rem;
+  color: var(--contractor-wallet-ink);
+}
+
+.wallet__table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.wallet__value--positive {
+  color: var(--contractor-wallet-brand-green);
+  font-weight: 700;
+}
+
+.wallet__value--negative {
+  color: var(--contractor-wallet-ink);
+  font-weight: 600;
+}
+
+/* BADGES DE STATUS */
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--contractor-wallet-radius-full);
+}
+
+.badge--success {
+  background: var(--contractor-wallet-brand-green-light);
+  color: var(--contractor-wallet-brand-green);
+}
+
+.badge--pending {
+  background: #FFF3D6;
+  color: #B4750C;
+}
+
+/* ADAPTAÇÕES RESPONSIVAS */
+@media (max-width: 850px) {
+  .wallet__dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet__card--primary .wallet__actions form {
+    flex-direction: column;
+  }
+
+  .wallet__card--primary .wallet__actions .btn {
+    width: 100%;
+  }
+}

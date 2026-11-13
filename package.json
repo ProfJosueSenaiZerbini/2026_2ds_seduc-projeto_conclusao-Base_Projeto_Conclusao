@@ -1,0 +1,27 @@
+{
+  "name": "gigfasts",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mariadb": "^3.5.3",
+    "morgan": "^1.11.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil — Ibico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/perfilContratante.css">
+    <%- include('../Partials/phosphorIcons') %>
+</head>
+
+<body>
+    <%
+        const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'CT';
+    %>
+
+    <%- include('../Partials/headerContratante') %>
+
+    <main class="perfil-page">
+        <header class="perfil-topo">
+            <div>
+                <h1>Meu Perfil</h1>
+                <p>Gerencie seus dados e acompanhe sua conta de contratante.</p>
+            </div>
+            <div class="perfil-acoes">
+                <button type="button" class="btn btn-primary" id="btnEditarPerfil">Editar Perfil</button>
+                <a href="/homeContratante" class="btn btn-outline">Voltar</a>
+            </div>
+        </header>
+
+        <section class="perfil-card">
+            <div class="perfil-banner">
+                <div class="avatar">
+                    <span><%= iniciais %></span>
+                    <i class="avatar-status" title="Conta ativa"></i>
+                </div>
+                <div class="banner-info">
+                    <div class="banner-linha">
+                        <h2><%= usuario.nome %></h2>
+                        <span class="pill pill-role"><i class="dot"></i>Contratante</span>
+                        <span class="pill pill-verificado">Conta Ibico</span>
+                    </div>
+                    <p class="banner-bio">Encontre profissionais e acompanhe seus bicos publicados.</p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Tipo de conta</span>
+                    <strong class="stat-valor">Contratante</strong>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Saldo disponível</span>
+                    <strong class="stat-valor verde"><%= formatarMoedaBRL(usuario.saldo_simulado) %></strong>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Acesso à plataforma</span>
+                    <span class="badge-ativo">Ativo</span>
+                </div>
+            </div>
+
+            <div class="perfil-corpo">
+                <div class="secao-titulo">
+                    <h3>Dados da conta</h3>
+                    <span>Informações cadastradas no Ibico</span>
+                </div>
+
+                <div class="grid-dados">
+                    <div class="campo">
+                        <label>Nome completo</label>
+                        <div class="campo-linha">
+                            <span class="campo-valor"><%= usuario.nome %></span>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>E-mail</label>
+                        <div class="campo-linha">
+                            <span class="campo-valor mono"><%= usuario.email %></span>
+                            <span class="tag-verde">Cadastrado</span>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>CPF</label>
+                        <div class="campo-linha">
+                            <span class="campo-valor mono" id="cpfValor" data-cpf="<%= usuario.cpf %>"><%= usuario.cpf %></span>
+                            <button type="button" class="btn-link" id="btnToggleCpf" aria-pressed="false">
+                                <span id="cpfToggleTexto">Ocultar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>Idade</label>
+                        <div class="campo-linha">
+                            <span class="campo-valor"><%= usuario.idade %> anos</span>
+                        </div>
+                    </div>
+
+                    <div class="campo campo-largo">
+                        <label>Data de cadastro</label>
+                        <div class="campo-linha">
+                            <span class="campo-valor mono"><%= usuario.data_cadastro_formatada %></span>
+                            <span class="tag-neutra">Membro desde o cadastro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="duas-colunas">
+                    <section>
+                        <h3 class="sub-titulo">Conta e segurança</h3>
+                        <ul class="lista-seguranca">
+                            <li>
+                                <span><i class="dot"></i>Dados pessoais cadastrados</span>
+                                <b>Ativo</b>
+                            </li>
+                            <li>
+                                <span><i class="dot"></i>Perfil de contratante</span>
+                                <b>Ativo</b>
+                            </li>
+                        </ul>
+                        <button type="button" class="btn-link btn-senha" id="btnAlterarSenha">Alterar senha</button>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../Partials/footer') %>
+
+    <div id="modalEditarPerfil" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="tituloEditarPerfil">
+            <div class="modal-header">
+                <h3 id="tituloEditarPerfil">Editar Perfil</h3>
+                <button type="button" class="btn-close" data-fechar="modalEditarPerfil" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </div>
+            <form action="/perfil/editar" method="POST">
+                <div class="modal-group">
+                    <label for="nome">Nome completo</label>
+                    <input type="text" id="nome" name="nome" value="<%= usuario.nome %>" required minlength="1" maxlength="100">
+                </div>
+                <div class="modal-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" value="<%= usuario.email %>" required maxlength="100">
+                </div>
+                <div class="modal-group">
+                    <label for="idade">Idade</label>
+                    <input type="number" id="idade" name="idade" value="<%= usuario.idade || '' %>" required min="18">
+                </div>
+                <div class="modal-group">
+                    <label>CPF (não alterável)</label>
+                    <input type="text" value="<%= usuario.cpf %>" disabled class="input-disabled">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" data-fechar="modalEditarPerfil">Cancelar</button>
+                    <button type="submit" class="btn-modal-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalAlterarSenha" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="tituloAlterarSenha">
+            <div class="modal-header">
+                <h3 id="tituloAlterarSenha">Alterar Senha</h3>
+                <button type="button" class="btn-close" data-fechar="modalAlterarSenha" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </div>
+            <form action="/perfil/alterar-senha" method="POST" id="formSenha">
+                <div class="modal-group">
+                    <label for="senhaAtual">Senha atual</label>
+                    <input type="password" id="senhaAtual" name="senhaAtual" required maxlength="72" placeholder="Digite sua senha atual">
+                </div>
+                <div class="modal-group">
+                    <label for="novaSenha">Nova senha</label>
+                    <input type="password" id="novaSenha" name="novaSenha" required minlength="6" maxlength="72" placeholder="Digite a nova senha">
+                </div>
+                <div class="modal-group">
+                    <label for="confirmarNovaSenha">Confirmar nova senha</label>
+                    <input type="password" id="confirmarNovaSenha" name="confirmarNovaSenha" required minlength="6" maxlength="72" placeholder="Repita a nova senha">
+                    <small class="erro-form" id="erroSenha" hidden>As senhas não coincidem.</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" data-fechar="modalAlterarSenha">Cancelar</button>
+                    <button type="submit" class="btn-modal-save">Salvar Nova Senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/perfilContratante.js"></script>
+</body>
+
+</html>

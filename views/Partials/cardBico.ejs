@@ -1,0 +1,123 @@
+<% // Variáveis recebidas: bico, tipo ('aceito' | 'concluido' | 'pendente' | 'cancelado' ) const
+    statusTxt=String(bico.bico_status || bico.status_novo || '' ).toLowerCase(); const finalizado=tipo==='concluido' ||
+    statusTxt.includes('conclu') || statusTxt.includes('finaliz'); const valorFmt=Number(bico.valor ||
+    0).toFixed(2).replace('.', ',' ); const pago=String(bico.pagamento_status || '' ).toLowerCase()==='pago' ; const
+    codigo=bico.codigo || ('BC-' + (bico.bico_id || bico.id || '' )); const dataTs=bico.data_servico ? new
+    Date(bico.data_servico).getTime() : 0; const busca=[bico.titulo, bico.cliente_nome, bico.descricao].join(' ').toLowerCase();
+%>
+<li class="bico-card" data-busca="<%= busca %>" data-ts="<%= dataTs %>">
+    <div class="bico-card__top">
+        <div class="bico-card__icon" aria-hidden="true"><% if (bico.icone) { %><%= bico.icone %><% } else { %><i class="ph ph-briefcase"></i><% } %>
+    </div>
+
+    <div class="bico-card__main">
+        <div class="bico-card__title-row">
+            <h3 class="bico-card__title">
+                <%= bico.titulo %>
+            </h3>
+            <span class="bico-card__code">• #<%= codigo %></span>
+        </div>
+        <p class="bico-card__desc">
+            <%= bico.descricao %>
+        </p>
+    </div>
+
+    <% if (tipo==='pendente' ) { %>
+        <span class="badge badge--warning">Pendente</span>
+        <% } else if (tipo==='cancelado' ) { %>
+            <span class="badge badge--danger">
+                <%= bico.status_novo || 'Cancelado' %>
+            </span>
+            <% } else if (finalizado) { %>
+                <span class="badge badge--success"><span class="badge__dot"></span>Finalizado</span>
+                <% } else { %>
+                    <span class="badge badge--info">Em andamento</span>
+                    <% } %>
+                        </div>
+
+                        <div class="bico-card__meta">
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-calendar-blank" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Data</span>
+                                    <span class="meta__value">
+                                        <%= bico.data_servico_formatada %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-clock" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Horário</span>
+                                    <span class="meta__value">
+                                        <%= bico.horario || '--:--' %>
+                                            <% if (bico.duracao) { %> • ~<%= bico.duracao %>
+                                                    <% } %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Local</span>
+                                    <span class="meta__value">
+                                        <%= bico.local || '-' %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-user" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Cliente</span>
+                                    <span class="meta__value">
+                                        <%= bico.cliente_nome || '-' %>
+                                            <% if (bico.cliente_nota) { %><span class="meta__star">★ <%=
+                                                        Number(bico.cliente_nota).toFixed(1) %></span>
+                                                <% } %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if (tipo==='cancelado' ) { %>
+                            <div class="bico-card__cancel">
+                                <p><strong>Status anterior:</strong>
+                                    <%= bico.status_anterior || '-' %>
+                                </p>
+                                <p><strong>Data da alteração:</strong>
+                                    <%= bico.data_alteracao_formatada %>
+                                </p>
+                                <p><strong>Observação:</strong>
+                                    <%= bico.observacao || 'Sem observação.' %>
+                                </p>
+                            </div>
+                            <% } %>
+
+                                <div class="bico-card__footer">
+                                    <div class="bico-card__price">
+                                        <span class="price__label">Valor:</span>
+                                        <span class="price__value">R$ <%= valorFmt %></span>
+                                        <% if (tipo==='aceito' || tipo==='concluido' ) { %>
+                                            <% if (pago) { %>
+                                                <span class="pill pill--paid"><i class="ph ph-check-circle" aria-hidden="true"></i> Pago na Carteira</span>
+                                                <% } else { %>
+                                                    <span class="pill pill--custody">Garantido sob Custódia</span>
+                                                    <% } %>
+                                                        <% } %>
+                                    </div>
+
+                                    <div class="bico-card__actions">
+                                        <% if (tipo==='aceito' && !finalizado) { %>
+                                            <a class="btn btn--secondary"
+                                                href="/bicos/<%= bico.bico_id || bico.id %>/status">Atualizar status</a>
+                                            <% } else { %>
+                                                <a class="btn btn--secondary"
+                                                    href="/bicos/<%= bico.bico_id || bico.id %>">Ver detalhes</a>
+                                                <% } %>
+
+                                                    <% if ((tipo==='aceito' || tipo==='concluido' ) &&
+                                                        bico.candidatura_id) { %>
+                                                        <a class="btn btn--primary"
+                                                            href="/bicos/candidaturas/<%= bico.candidatura_id %>/chat">
+                                                            <i class="ph ph-chat-circle" aria-hidden="true"></i> Abrir conversa
+                                                        </a>
+                                                        <% } %>
+                                    </div>
+                                </div>
+                                </li>

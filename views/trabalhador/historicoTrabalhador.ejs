@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibico | Histórico de Bicos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <%- include('../Partials/phosphorIcons') %>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/historicoTrabalhador.css">
+</head>
+
+<body>
+
+    <%- include('../Partials/headertrabalhador') %>
+
+        <% const listaConcluidos=(typeof concluidos !=='undefined' ) ? concluidos : []; const listaCancelados=(typeof cancelados !=='undefined' ) ? cancelados : []; const abas=[ { id: 'aceitos' ,
+            titulo: 'Bicos Aceitos' , lista: aceitos, tipo: 'aceito' , vazio: 'Você ainda não possui bicos aceitos.' },
+            { id: 'pendentes' , titulo: 'Bicos Pendentes' , lista: pendentes, tipo: 'pendente' ,
+            vazio: 'Você não tem nenhuma candidatura pendente.' }, { id: 'concluidos' , titulo: 'Concluídos' , lista:
+            listaConcluidos, tipo: 'concluido' , vazio: 'Você ainda não concluiu nenhum bico.' }, { id: 'cancelados' ,
+            titulo: 'Cancelados' , lista: listaCancelados, tipo: 'cancelado' ,
+            vazio: 'Você não possui candidaturas canceladas.' } ]; %>
+
+            <main class="page">
+                <header class="page__header">
+                    <div>
+                        <p class="page__eyebrow">Painel do Profissional</p>
+                        <h1 class="page__title">Seu Histórico de Bicos</h1>
+                        <p class="page__subtitle">Acompanhe suas candidaturas, serviços em andamento e trabalhos
+                            concluídos em um só lugar com transparência instantânea.</p>
+                    </div>
+                    <span class="status-chip"><span class="status-chip__dot"></span>Disponível para novos
+                        chamados</span>
+                </header>
+
+                <!-- Abas + busca + ordenação -->
+                <div class="toolbar">
+                    <div class="tabs" role="tablist">
+                        <% abas.forEach((aba, i)=> { %>
+                            <button class="tab <%= i === 0 ? 'tab--active' : '' %>" role="tab" data-tab="<%= aba.id %>">
+                                <%= aba.titulo %>
+                                    <span class="tab__count">
+                                        <%= aba.lista.length %>
+                                    </span>
+                            </button>
+                            <% }); %>
+                    </div>
+
+                    <div class="filters">
+                        <label class="search">
+                            <span class="search__icon" aria-hidden="true"><i class="ph ph-magnifying-glass"></i></span>
+                            <input type="search" id="busca" placeholder="Buscar por serviço ou cliente...">
+                        </label>
+                        <select id="ordenar" class="select" aria-label="Ordenar">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="antigos">Mais antigos</option>
+                            <option value="maior">Maior valor</option>
+                            <option value="menor">Menor valor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Painéis -->
+                <div class="tab-content">
+                    <% abas.forEach((aba, i)=> { %>
+                        <section class="tab-panel <%= i === 0 ? 'tab-panel--active' : '' %>" id="<%= aba.id %>">
+                            <% if (aba.lista.length===0) { %>
+                                <p class="empty">
+                                    <%= aba.vazio %>
+                                </p>
+                                <% } else { %>
+                                    <ul class="bicos-list">
+                                        <% aba.lista.forEach(bico=> { %>
+                                            <%- include('../Partials/cardBico', { bico: bico, tipo: aba.tipo }) %>
+                                                <% }); %>
+                                    </ul>
+                                    <p class="empty empty--filtro" hidden>Nenhum serviço encontrado para a busca.</p>
+                                    <% } %>
+                        </section>
+                        <% }); %>
+
+                            <!-- Rodapé da lista: contador + paginação -->
+                            <div class="list-footer">
+                                <p class="list-footer__info" id="infoPaginacao"></p>
+                                <nav class="pagination" id="paginacao" aria-label="Paginação"></nav>
+                            </div>
+                </div>
+            </main>
+
+            <!-- Pop-up: Dica para Profissionais -->
+            <aside class="tip-popup" id="dicaPopup" role="dialog" aria-labelledby="dicaTitulo" hidden>
+                <div class="tip-popup__icon" aria-hidden="true"><i class="ph ph-lightbulb"></i></div>
+                <div class="tip-popup__body">
+                    <h4 id="dicaTitulo">Dica para Profissionais</h4>
+                    <p>Mantenha suas conversas ativas e envie fotos no chat ao concluir para garantir a melhor avaliação
+                        e liberar os repasses com antecedência.</p>
+                </div>
+                <button type="button" class="tip-popup__close" id="fecharDica" aria-label="Fechar dica"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </aside>
+
+            <%- include('../Partials/footer') %>
+
+                <script src="/js/historicoTrabalhador.js"></script>
+</body>
+
+</html>

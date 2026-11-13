@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador') { %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% } %>
+  <title>Detalhes do Bico — Ibico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <%- include('Partials/phosphorIcons') %>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/detalhesBico.css">
+</head>
+
+<body class="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' ? 'worker-details' : '' %>">
+
+  <!-- O cabecalho acompanha o perfil que esta visualizando a oportunidade. -->
+  <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase()==='contratante' ) { %>
+    <%- include('Partials/headerContratante') %>
+      <% } else { %>
+        <%- include('Partials/headertrabalhador') %>
+          <% } %>
+
+            <!-- BANNER HERO -->
+            <div class="hero-banner">
+              <div class="banner-container">
+                <div class="banner-info">
+                  <span class="badge-status">
+                    <%= bico.status %>
+                  </span>
+                  <h1>
+                    <%= bico.titulo %>
+                  </h1>
+                  <div class="banner-meta">
+                    <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+                    <span><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= bico.data_servico_formatada %></span>
+                  </div>
+                </div>
+                <div class="banner-price">
+                  <span class="price-label">VALOR TOTAL</span>
+                  <div class="price-value">R$ <%= Number(bico.valor).toFixed(2).replace('.', ',' ) %>
+                  </div>
+                  <span class="price-sub">Pagamento via PIX</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- MAIN CONTAINER -->
+            <main class="main-container">
+              <div class="content-left">
+                <div class="section-block">
+                  <h3>Descrição da Vaga</h3>
+                  <p class="description-text">
+                    <%= bico.descricao %>
+                  </p>
+                </div>
+
+                <div class="section-block">
+                  <h3>Informações Rápidas</h3>
+                  <div class="grid-2">
+                    <div class="info-card">
+                      <span class="icon"><i class="ph ph-clock" aria-hidden="true"></i></span>
+                      <div>
+                        <span class="card-label">Horário</span>
+                        <strong>
+                          <%= bico.horario %>
+                        </strong>
+                      </div>
+                    </div>
+                    <div class="info-card">
+                      <span class="icon"><i class="ph ph-t-shirt" aria-hidden="true"></i></span>
+                      <div>
+                        <span class="card-label">Traje</span>
+                        <strong>Esporte Fino / Social</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- SIDEBAR -->
+              <aside class="sidebar-right">
+                <div class="summary-card">
+                  <h3>Candidatar-se</h3>
+
+                  <div class="summary-item">
+                    <span>Contratante</span>
+                    <strong>
+                      <%= bico.contratante_nome %>
+                    </strong>
+                  </div>
+
+                  <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase()==='trabalhador' ) { %>
+
+                    <% if (minhaCandidatura) { %>
+                      <!-- O trabalhador já se candidatou -->
+                      <div class="candidatura-status <%= minhaCandidatura.status === 'Pendente' ? 'candidatura-status--pendente' : 'candidatura-status--enviada' %>">
+                        <span class="candidatura-status__label">
+                          Sua Candidatura:
+                        </span>
+
+                        <strong class="candidatura-status__value">
+                          <i class="ph <%= minhaCandidatura.status === 'Pendente' ? 'ph-hourglass' : 'ph-check-circle' %>" aria-hidden="true"></i> <%= minhaCandidatura.status %>
+                        </strong>
+
+                        <small class="candidatura-status__date">
+                          Inscrito em <%= minhaCandidatura.data_candidatura %>
+                        </small>
+                      </div>
+
+                      <% if (minhaCandidatura.status==='Pendente' ) { %>
+                        <!-- Cancelar candidatura -->
+                        <form class="candidatura-form candidatura-form--cancelar" action="/bicos/candidaturas/cancelar" method="POST">
+                          <input type="hidden" name="bico_id" value="<%= bico.id %>">
+
+                          <button class="btn-accept btn-accept--cancel" type="submit">
+                            Cancelar Candidatura
+                          </button>
+                        </form>
+                        <% } %>
+
+                          <% } else if (bico.status==='Aberto' ) { %>
+                            <!-- Ainda não se candidatou e o bico está aberto -->
+                            <form class="candidatura-form" action="/bicos/candidatar" method="POST">
+
+                              <input type="hidden" name="bico_id" value="<%= bico.id %>">
+
+                              <div class="candidatura-form__field">
+                                <label for="mensagem" class="candidatura-form__label">
+                                  Mensagem (opcional):
+                                </label>
+
+                                <textarea name="mensagem" id="mensagem" rows="3"
+                                  placeholder="Apresente-se brevemente ou tire dúvidas..."
+                                  class="candidatura-form__textarea"></textarea>
+                              </div>
+
+                              <button class="btn-accept" type="submit">
+                                Quero este Bico
+                              </button>
+                            </form>
+
+                            <% } else { %>
+                              <p class="candidatura-indisponivel">
+                                Este bico não está mais disponível.
+                              </p>
+                              <% } %>
+
+                                <% } %>
+
+                                  <a href="/hometrabalhador" class="btn-back">
+                                    Voltar
+                                  </a>
+                </div>
+              </aside>
+            </main>
+
+            <!-- PARTIAL DO FOOTER -->
+            <%- include('Partials/footer') %>
+
+</body>
+
+</html>
