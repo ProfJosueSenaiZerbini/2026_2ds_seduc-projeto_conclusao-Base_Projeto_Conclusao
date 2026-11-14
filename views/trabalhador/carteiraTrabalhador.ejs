@@ -24,15 +24,16 @@
           <p>Gerencie seus ganhos e acompanhe suas transações com transparência.</p>
         </div>
         <div class="actions">
-          <button class="btn btn-secondary"><i class="ph ph-file-text" aria-hidden="true"></i> Gerar Relatório</button>
-          <button class="btn btn-primary"><i class="ph ph-credit-card" aria-hidden="true"></i> Sacar via Pix</button>
+          <button type="button" class="btn btn-secondary" id="gerar-relatorio"><i class="ph ph-file-text"
+              aria-hidden="true"></i> Gerar Relatório</button>
+          <p class="actions-feedback" id="relatorio-aviso" role="status" aria-live="polite" hidden></p>
         </div>
       </div>
 
       <div class="top-grid">
         <div class="balance-stack">
           <div class="card">
-            <div class="balance-label">SALDO DISPONÍVEL</div>
+            <div class="balance-label">SALDO SIMULADO</div>
             <div class="balance-value" id="saldo-disponivel">
               R$ <%= carteira && carteira.saldoDisponivel ? carteira.saldoDisponivel.toFixed(2).replace('.', ',' )
                 : '0,00' %>
@@ -40,6 +41,7 @@
             <div class="balance-delta" id="saldo-delta">
               <%= carteira && carteira.delta ? carteira.delta : '' %>
             </div>
+            <p class="balance-note">Valor simulado, apenas para demonstração. Não há saque nem transferência real.</p>
           </div>
           <div class="card">
             <div class="balance-label">SALDO RETIDO</div>
@@ -52,41 +54,40 @@
           </div>
         </div>
 
+        <%
+          // Créditos simulados por mês (últimos 12), calculados no controller; meses sem crédito valem 0.
+          const dadosGrafico = (typeof grafico !== 'undefined' && grafico && Array.isArray(grafico.meses)) ? grafico : { meses: [], total6: 0, total12: 0 };
+          const mesesGrafico = dadosGrafico.meses;
+          const reais = (valor) => 'R$ ' + Number(valor || 0).toFixed(2).replace('.', ',');
+          const faixaMeses = (lista) => lista.length
+            ? lista[0].rotulo.toLowerCase() + '/' + lista[0].ano + ' a ' + lista[lista.length - 1].rotulo.toLowerCase() + '/' + lista[lista.length - 1].ano
+            : '';
+          const ultimosSeis = mesesGrafico.slice(-6);
+        %>
         <div class="card">
           <div class="chart-header">
             <div>
               <h3>Crescimento Mensal</h3>
               <p>Acompanhamento de ganhos brutos</p>
             </div>
-            <div class="chart-select">Últimos 6 meses <i class="ph ph-caret-down" aria-hidden="true"></i></div>
+            <select class="chart-select" id="grafico-periodo" aria-label="Período do gráfico">
+              <option value="6" selected>Últimos 6 meses</option>
+              <option value="12">Últimos 12 meses</option>
+            </select>
           </div>
-          <!-- Gráfico fixo visual -->
-          <div class="bars">
-            <div class="bar-col">
-              <div class="bar" style="height:60px"></div>
-              <div class="bar-label">Jan</div>
-            </div>
-            <div class="bar-col">
-              <div class="bar" style="height:70px"></div>
-              <div class="bar-label">Fev</div>
-            </div>
-            <div class="bar-col">
-              <div class="bar" style="height:95px"></div>
-              <div class="bar-label">Mar</div>
-            </div>
-            <div class="bar-col">
-              <div class="bar" style="height:85px"></div>
-              <div class="bar-label">Abr</div>
-            </div>
-            <div class="bar-col">
-              <div class="bar" style="height:100px"></div>
-              <div class="bar-label">Mai</div>
-            </div>
-            <div class="bar-col active">
-              <div class="bar active" style="height:140px"></div>
-              <div class="bar-label">Jun</div>
-            </div>
+          <p class="chart-note" id="grafico-nota">Créditos simulados recebidos por mês<%= ultimosSeis.length ? ', de ' + faixaMeses(ultimosSeis) : '' %>. Meses sem movimentação aparecem como zero.</p>
+          <div class="bars chart--6" id="grafico-barras" role="img"
+            aria-label="Créditos simulados por mês: <%= ultimosSeis.map(m => m.rotulo + '/' + m.ano + ' ' + reais(m.total)).join('; ') %>">
+            <% mesesGrafico.forEach((m, i) => { const atual = i === mesesGrafico.length - 1; %>
+              <div class="bar-col<%= atual ? ' active' : '' %>" data-rotulo="<%= m.rotulo %>" data-ano="<%= m.ano %>"
+                data-total="<%= m.total %>" style="--p6: <%= m.p6 %>; --p12: <%= m.p12 %>;"
+                title="<%= m.rotulo %>/<%= m.ano %>: <%= reais(m.total) %>">
+                <div class="bar<%= atual ? ' active' : '' %>"></div>
+                <div class="bar-label"><%= m.rotulo %></div>
+              </div>
+            <% }) %>
           </div>
+          <p class="chart-empty" id="grafico-vazio" role="status" <%= dadosGrafico.total6 > 0 ? 'hidden' : '' %>>Nenhum crédito simulado no período.</p>
         </div>
       </div>
 
@@ -95,7 +96,8 @@
           <h3>Histórico de Transações</h3>
           <div class="search-box">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="text" id="filtro-bico" placeholder="Filtrar por nome, valor ou data/horário...">
+            <input type="text" id="filtro-bico" placeholder="Filtrar por nome, valor ou data/horário..."
+              aria-label="Filtrar transações por nome, valor ou data/horário">
           </div>
         </div>
         <table>
@@ -122,8 +124,8 @@
                     <%= t.dataHora %>
                   </td>
                   <td>
-                    <span class="badge badge--success">
-                      Ganho recebido
+                    <span class="badge <%= t.status === 'CREDITO' ? 'badge--success' : 'badge--pending' %>">
+                      <%= t.status==='CREDITO' ? 'Creditado' : 'Pendente' %>
                     </span>
                   </td>
                   <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
@@ -131,28 +133,32 @@
                   </td>
                 </tr>
                 <% }) %>
-                  <% } else { %>
-                    <!-- As linhas poderão ser preenchidas via cliente pelo JS -->
-                    <% } %>
+                  <% } %>
           </tbody>
         </table>
-        <div class="see-all" id="abrir-historico">Ver todo o histórico</div>
+        <% if (typeof transacoes === 'undefined' || transacoes.length === 0) { %>
+          <div class="see-all" id="sem-movimentacoes" role="status">Nenhuma movimentação registrada ainda.</div>
+        <% } %>
+        <div class="see-all" id="sem-resultados" role="status" hidden>Nenhuma movimentação encontrada para a busca.</div>
+        <div class="see-all" id="abrir-historico" role="button" tabindex="0" aria-haspopup="dialog"
+          aria-controls="historico-modal">Ver todo o histórico</div>
       </div>
 
     </main>
 
     <!-- Modal: Histórico completo -->
     <div class="modal-overlay" id="historico-modal">
-      <div class="modal-box">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="historico-titulo">
         <div class="modal-header">
-          <h3>Histórico Completo</h3>
+          <h3 id="historico-titulo">Histórico Completo</h3>
           <button class="modal-close" id="fechar-historico" aria-label="Fechar"><i class="ph ph-x"
               aria-hidden="true"></i></button>
         </div>
         <div class="modal-search">
           <div class="search-box">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="text" id="filtro-bico-modal" placeholder="Filtrar por nome, valor ou data/horário...">
+            <input type="text" id="filtro-bico-modal" placeholder="Filtrar por nome, valor ou data/horário..."
+              aria-label="Filtrar histórico completo por nome, valor ou data/horário">
           </div>
         </div>
         <div class="modal-scroll">
@@ -192,11 +198,17 @@
                     <% } %>
             </tbody>
           </table>
+          <% if (typeof transacoes === 'undefined' || transacoes.length === 0) { %>
+            <div class="see-all" role="status">Nenhuma movimentação registrada ainda.</div>
+          <% } %>
+          <div class="see-all" id="sem-resultados-modal" role="status" hidden>Nenhuma movimentação encontrada para a busca.</div>
         </div>
       </div>
     </div>
 
     <%- include('../Partials/footer') %>
+
+    <script src="/js/carteiraTrabalhador.js" defer></script>
 
 </body>
 

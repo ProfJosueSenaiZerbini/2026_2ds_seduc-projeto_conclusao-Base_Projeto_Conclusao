@@ -59,6 +59,51 @@ export const exibirCarteiraContratante = async (req, res) => {
   }
 };
 
+const ROTULOS_MES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+const arredondar2 = (valor) => Math.round(valor * 100) / 100;
+
+// Monta os últimos 12 meses (do mais antigo ao mês atual) a partir dos créditos já somados por mês.
+// Meses sem crédito valem 0. `p6` e `p12` são a proporção de cada mês em relação ao maior valor
+// da janela de 6 e de 12 meses (usadas só para a altura das barras).
+export const montarGraficoMensal = (linhas, mesAtual) => {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(String(mesAtual))) {
+    throw new Error('Mês atual inválido para o gráfico da carteira.');
+  }
+
+  const [anoAtual, numeroMesAtual] = String(mesAtual).split('-').map(Number);
+  const totais = new Map((linhas || []).map((linha) => [String(linha.mes), Number(linha.total) || 0]));
+  const meses = [];
+
+  for (let atras = 11; atras >= 0; atras -= 1) {
+    const indice = anoAtual * 12 + (numeroMesAtual - 1) - atras;
+    const ano = Math.floor(indice / 12);
+    const numeroMes = (indice % 12) + 1;
+    const chave = `${ano}-${String(numeroMes).padStart(2, '0')}`;
+
+    meses.push({
+      chave,
+      ano,
+      rotulo: ROTULOS_MES[numeroMes - 1],
+      total: arredondar2(totais.get(chave) || 0)
+    });
+  }
+
+  const proporcao = (valor, maior) => (maior > 0 ? Math.round((valor / maior) * 10000) / 10000 : 0);
+  const maior12 = Math.max(...meses.map((mes) => mes.total));
+  const maior6 = Math.max(...meses.slice(-6).map((mes) => mes.total));
+
+  return {
+    meses: meses.map((mes, indice) => ({
+      ...mes,
+      p12: proporcao(mes.total, maior12),
+      p6: indice >= 6 ? proporcao(mes.total, maior6) : 0
+    })),
+    total6: arredondar2(meses.slice(-6).reduce((soma, mes) => soma + mes.total, 0)),
+    total12: arredondar2(meses.reduce((soma, mes) => soma + mes.total, 0))
+  };
+};
+
 export const exibirCarteiraTrabalhador = async (req, res) => {
   if (!req.session?.usuario) {
     return res.redirect('/login');
@@ -94,6 +139,21 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
       [usuarioId]
     );
 
+    // Gráfico "Crescimento Mensal": soma só os CREDITO (nunca ADICAO ou RESERVA) dos últimos 12 meses.
+    const creditosPorMes = await db.query(
+      `SELECT DATE_FORMAT(criado_em, '%Y-%m') AS mes, SUM(valor) AS total
+       FROM movimentacoes_carteira
+       WHERE usuario_id = ?
+         AND tipo_movimentacao = 'CREDITO'
+         AND criado_em >= DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 11 MONTH)
+       GROUP BY mes
+       ORDER BY mes`,
+      [usuarioId]
+    );
+
+    // O mês atual vem do banco para o gráfico usar o mesmo calendário dos registros.
+    const mesAtual = await db.query(`SELECT DATE_FORMAT(CURDATE(), '%Y-%m') AS mes`);
+
     const carteira = {
       saldoDisponivel: Number(usuarios[0]?.saldo_simulado || 0),
       saldoRetido: Number(retido[0]?.saldoRetido || 0),
@@ -103,7 +163,8 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
 
     return res.render('trabalhador/carteiraTrabalhador', {
       carteira,
-      transacoes
+      transacoes,
+      grafico: montarGraficoMensal(creditosPorMes, mesAtual[0]?.mes)
     });
   } catch (error) {
     console.error('Erro ao carregar carteira do trabalhador:', error);

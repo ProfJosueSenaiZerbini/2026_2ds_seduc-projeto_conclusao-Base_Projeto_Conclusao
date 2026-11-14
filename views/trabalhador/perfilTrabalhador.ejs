@@ -15,7 +15,6 @@
 
 <body>
     <%
-        const habilidades = Array.isArray(usuario.habilidades) ? usuario.habilidades : ['Pequenos Reparos', 'Montagem de Móveis', 'Jardinagem', 'Pintura Básica'];
         const bicosConcluidos = usuario.bicos_concluidos != null ? usuario.bicos_concluidos : 0;
         const avaliacao = usuario.avaliacao_media != null ? Number(usuario.avaliacao_media).toFixed(1) : '—';
         const totalAvaliacoes = usuario.total_avaliacoes != null ? usuario.total_avaliacoes : 0;
@@ -146,21 +145,8 @@
                     </div>
                 </div>
 
-                <!-- Habilidades e Segurança -->
+                <!-- Segurança -->
                 <div class="pt-duas-colunas">
-                    <div>
-                        <h3 class="pt-sub-titulo">
-                            <i class="ph ph-toolbox" aria-hidden="true"></i>
-                            Habilidades e Especialidades
-                        </h3>
-                        <div class="pt-chips">
-                            <% habilidades.forEach(function (h) { %>
-                                <span class="pt-chip"><%= h %></span>
-                            <% }) %>
-                            <button type="button" class="pt-chip pt-chip-add" id="ptBtnHabilidade">+ Adicionar mais</button>
-                        </div>
-                    </div>
-
                     <div>
                         <h3 class="pt-sub-titulo">
                             <i class="ph ph-shield-check" aria-hidden="true"></i>
@@ -239,26 +225,6 @@
                 <div class="pt-modal-acoes">
                     <button type="button" class="pt-modal-cancelar" data-pt-fechar="ptModalSenha">Cancelar</button>
                     <button type="submit" class="pt-modal-salvar">Salvar Nova Senha</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: Adicionar habilidade -->
-    <div id="ptModalHabilidade" class="pt-modal-overlay" aria-hidden="true">
-        <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloHab">
-            <div class="pt-modal-header">
-                <h3 id="ptTituloHab">Adicionar habilidade</h3>
-                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalHabilidade" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
-            </div>
-            <form action="/perfil/habilidades" method="POST">
-                <div class="pt-modal-grupo">
-                    <label for="ptHabilidade">Habilidade ou especialidade</label>
-                    <input type="text" id="ptHabilidade" name="habilidade" required minlength="2" maxlength="40" placeholder="Ex.: Instalação elétrica">
-                </div>
-                <div class="pt-modal-acoes">
-                    <button type="button" class="pt-modal-cancelar" data-pt-fechar="ptModalHabilidade">Cancelar</button>
-                    <button type="submit" class="pt-modal-salvar">Adicionar</button>
                 </div>
             </form>
         </div>

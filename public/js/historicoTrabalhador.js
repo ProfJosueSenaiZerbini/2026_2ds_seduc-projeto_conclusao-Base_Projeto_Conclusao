@@ -9,9 +9,39 @@
   let abaAtual = 'aceitos';
   let paginaAtual = 1;
 
+  // Remove acentos e ignora maiúsculas/minúsculas ("pintár" = "pintar", "João" = "joao").
+  function normalizar(texto) {
+    return String(texto || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  }
+
+  // O texto do card é "serviço cliente descrição local". A busca aceita a frase como trecho contínuo
+  // (ex.: "gleba b") ou várias palavras em qualquer ordem (ex.: "teste01 gleba", "conserta teste01"),
+  // cada palavra digitada devendo ser o início de uma palavra do card.
+  function combinaComBusca(textoNormalizado, termo) {
+    if (textoNormalizado.includes(termo)) return true;
+    const partes = termo.split(/\s+/).filter(Boolean);
+    if (partes.length < 2) return false;
+    const palavras = textoNormalizado.split(/\s+/);
+    return partes.every(p => palavras.some(w => w.startsWith(p)));
+  }
+
   function valorDoCard(card) {
     const txt = card.querySelector('.price__value').textContent;
     return parseFloat(txt.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
+  }
+
+  // Ex.: "Exibindo 1–3 de 4 serviços", "Exibindo 1 de 1 serviço" ou, com busca,
+  // "Exibindo 1 de 1 serviço encontrado (4 na aba)".
+  function textoInfo(inicio, exibidos, encontrados, naAba, comBusca) {
+    const rotuloServico = (n) => (n === 1 ? 'serviço' : 'serviços');
+    if (encontrados === 0) {
+      return comBusca ? 'Nenhum serviço encontrado (' + naAba + ' na aba)' : 'Nenhum serviço';
+    }
+    const faixa = exibidos === 1 ? String(inicio + 1) : (inicio + 1) + '–' + (inicio + exibidos);
+    let txt = 'Exibindo <strong>' + faixa + '</strong> de <strong>' + encontrados + '</strong> ' +
+      rotuloServico(encontrados) + (comBusca ? ' encontrado' + (encontrados === 1 ? '' : 's') : '');
+    if (comBusca) txt += ' (' + naAba + ' na aba)';
+    return txt;
   }
 
   function renderizar() {
@@ -24,7 +54,7 @@
       return;
     }
 
-    const termo = buscaEl.value.trim().toLowerCase();
+    const termo = normalizar(buscaEl.value.trim());
     let cards = Array.from(lista.children);
 
     // Ordenação
@@ -38,7 +68,7 @@
     cards.forEach(c => lista.appendChild(c));
 
     // Filtro + paginação
-    const visiveis = cards.filter(c => c.dataset.busca.includes(termo));
+    const visiveis = cards.filter(c => combinaComBusca(normalizar(c.dataset.busca), termo));
     const totalPaginas = Math.max(1, Math.ceil(visiveis.length / POR_PAGINA));
     if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
     const inicio = (paginaAtual - 1) * POR_PAGINA;
@@ -47,8 +77,7 @@
     cards.forEach(c => { c.style.display = daPagina.includes(c) ? '' : 'none'; });
     if (msgFiltro) msgFiltro.hidden = visiveis.length > 0;
 
-    infoEl.innerHTML = 'Mostrando <strong>' + daPagina.length + '</strong> de <strong>' +
-      visiveis.length + '</strong> serviços';
+    infoEl.innerHTML = textoInfo(inicio, daPagina.length, visiveis.length, cards.length, termo !== '');
 
     // Botões de paginação
     pagEl.innerHTML = '';
@@ -76,6 +105,7 @@
       document.getElementById(abaAtual).classList.add('tab-panel--active');
       tab.classList.add('tab--active');
       paginaAtual = 1;
+      buscaEl.value = ''; // a busca vale só para a aba em que foi digitada
       renderizar();
     });
   });

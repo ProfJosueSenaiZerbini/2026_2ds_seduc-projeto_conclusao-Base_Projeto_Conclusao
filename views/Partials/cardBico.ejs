@@ -1,9 +1,11 @@
-<% // Variáveis recebidas: bico, tipo ('aceito' | 'concluido' | 'pendente' | 'cancelado' ) const
+<% // Variáveis recebidas: bico, tipo ('aceito' | 'concluido' | 'pendente' | 'cancelado' ), rotulo (opcional: texto do badge em 'cancelado')
+    const rotuloBadge = (typeof rotulo !== 'undefined') ? rotulo : '';
+    const
     statusTxt=String(bico.bico_status || bico.status_novo || '' ).toLowerCase(); const finalizado=tipo==='concluido' ||
     statusTxt.includes('conclu') || statusTxt.includes('finaliz'); const valorFmt=Number(bico.valor ||
-    0).toFixed(2).replace('.', ',' ); const pago=String(bico.pagamento_status || '' ).toLowerCase()==='pago' ; const
-    codigo=bico.codigo || ('BC-' + (bico.bico_id || bico.id || '' )); const dataTs=bico.data_servico ? new
-    Date(bico.data_servico).getTime() : 0; const busca=[bico.titulo, bico.cliente_nome, bico.descricao].join(' ').toLowerCase();
+    0).toFixed(2).replace('.', ',' ); const
+    codigo=bico.codigo || ('BC-' + (bico.bico_id || bico.id || '' )); const dataTs=bico.data_servico_iso ? new
+    Date(bico.data_servico_iso).getTime() : (bico.data_servico ? new Date(bico.data_servico).getTime() : 0); const busca=[bico.titulo, bico.cliente_nome, bico.descricao, bico.local].join(' ').toLowerCase();
 %>
 <li class="bico-card" data-busca="<%= busca %>" data-ts="<%= dataTs %>">
     <div class="bico-card__top">
@@ -26,7 +28,7 @@
         <span class="badge badge--warning">Pendente</span>
         <% } else if (tipo==='cancelado' ) { %>
             <span class="badge badge--danger">
-                <%= bico.status_novo || 'Cancelado' %>
+                <%= rotuloBadge || bico.status_novo || 'Cancelado' %>
             </span>
             <% } else if (finalizado) { %>
                 <span class="badge badge--success"><span class="badge__dot"></span>Finalizado</span>
@@ -81,7 +83,7 @@
                                     <%= bico.status_anterior || '-' %>
                                 </p>
                                 <p><strong>Data da alteração:</strong>
-                                    <%= bico.data_alteracao_formatada %>
+                                    <%= bico.data_alteracao_formatada || 'Não registrada' %>
                                 </p>
                                 <p><strong>Observação:</strong>
                                     <%= bico.observacao || 'Sem observação.' %>
@@ -93,23 +95,11 @@
                                     <div class="bico-card__price">
                                         <span class="price__label">Valor:</span>
                                         <span class="price__value">R$ <%= valorFmt %></span>
-                                        <% if (tipo==='aceito' || tipo==='concluido' ) { %>
-                                            <% if (pago) { %>
-                                                <span class="pill pill--paid"><i class="ph ph-check-circle" aria-hidden="true"></i> Pago na Carteira</span>
-                                                <% } else { %>
-                                                    <span class="pill pill--custody">Garantido sob Custódia</span>
-                                                    <% } %>
-                                                        <% } %>
                                     </div>
 
                                     <div class="bico-card__actions">
-                                        <% if (tipo==='aceito' && !finalizado) { %>
-                                            <a class="btn btn--secondary"
-                                                href="/bicos/<%= bico.bico_id || bico.id %>/status">Atualizar status</a>
-                                            <% } else { %>
-                                                <a class="btn btn--secondary"
-                                                    href="/bicos/<%= bico.bico_id || bico.id %>">Ver detalhes</a>
-                                                <% } %>
+                                        <a class="btn btn--secondary"
+                                            href="/bicos/<%= bico.bico_id || bico.id %>">Ver detalhes</a>
 
                                                     <% if ((tipo==='aceito' || tipo==='concluido' ) &&
                                                         bico.candidatura_id) { %>

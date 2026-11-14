@@ -249,37 +249,74 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
     }
 
     try {
+        // Todas as consultas trazem horário, bairro e nome do contratante (cliente) para o card.
+        // data_servico_iso (AAAA-MM-DD) alimenta a ordenação por data real do serviço.
         const queryAceitos = `
-            SELECT 
+            SELECT
                 c.id AS candidatura_id,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
                 b.valor,
                 b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS candidatura_status
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
-            WHERE c.trabalhador_id = ? AND c.status = 'Aceito'
+            JOIN usuarios u ON u.id = b.contratante_id
+            WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status <> 'Finalizado'
             ORDER BY b.data_servico DESC
         `;
 
-        const queryPendentes = `
-            SELECT 
+        // Candidatura continua 'Aceito' após a finalização; o que muda é o status do bico.
+        const queryConcluidos = `
+            SELECT
+                c.id AS candidatura_id,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
                 b.valor,
                 b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS candidatura_status
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
+            JOIN usuarios u ON u.id = b.contratante_id
+            WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status = 'Finalizado'
+            ORDER BY b.data_servico DESC
+        `;
+
+        const queryPendentes = `
+            SELECT
+                c.id AS candidatura_id,
+                b.id AS bico_id,
+                b.titulo,
+                b.descricao,
+                b.valor,
+                b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
+                DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
+                c.status AS candidatura_status
+            FROM candidaturas c
+            JOIN bicos b ON c.bico_id = b.id
+            JOIN usuarios u ON u.id = b.contratante_id
             WHERE c.trabalhador_id = ? AND c.status = 'Pendente'
             ORDER BY c.criado_em DESC
         `;
 
+        // Nas consultas abaixo, o histórico usa apenas o registro mais recente do status
+        // (subconsulta com LIMIT 1), evitando cards duplicados se houver vários registros.
         const queryCancelados = `
             SELECT
                 c.id AS candidatura_id,
@@ -288,26 +325,69 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.descricao,
                 b.valor,
                 b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 h.status_anterior,
                 h.status_novo,
                 DATE_FORMAT(h.data_alteracao, '%d/%m/%Y %H:%i') AS data_alteracao_formatada,
                 h.observacao
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
-            LEFT JOIN historico_candidaturas h
-                ON h.candidatura_id = c.id AND h.status_novo = 'Cancelado'
+            JOIN usuarios u ON u.id = b.contratante_id
+            LEFT JOIN historico_candidaturas h ON h.id = (
+                SELECT h2.id FROM historico_candidaturas h2
+                WHERE h2.candidatura_id = c.id AND h2.status_novo = 'Cancelado'
+                ORDER BY h2.data_alteracao DESC, h2.id DESC LIMIT 1
+            )
             WHERE c.trabalhador_id = ? AND c.status = 'Cancelado'
             ORDER BY h.data_alteracao DESC
         `;
 
+        // Recusadas pelo contratante (inclui a recusa automática após aceitar outro candidato).
+        // Mantém os mesmos campos do card de cancelados para reaproveitar a exibição.
+        const queryRecusados = `
+            SELECT
+                c.id AS candidatura_id,
+                b.id AS bico_id,
+                b.titulo,
+                b.descricao,
+                b.valor,
+                b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
+                DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
+                h.status_anterior,
+                h.status_novo,
+                DATE_FORMAT(h.data_alteracao, '%d/%m/%Y %H:%i') AS data_alteracao_formatada,
+                h.observacao
+            FROM candidaturas c
+            JOIN bicos b ON c.bico_id = b.id
+            JOIN usuarios u ON u.id = b.contratante_id
+            LEFT JOIN historico_candidaturas h ON h.id = (
+                SELECT h2.id FROM historico_candidaturas h2
+                WHERE h2.candidatura_id = c.id AND h2.status_novo = 'Recusado'
+                ORDER BY h2.data_alteracao DESC, h2.id DESC LIMIT 1
+            )
+            WHERE c.trabalhador_id = ? AND c.status = 'Recusado'
+            ORDER BY h.data_alteracao DESC
+        `;
+
         const bicosAceitos = await pool.query(queryAceitos, [trabalhador_id]);
+        const bicosConcluidos = await pool.query(queryConcluidos, [trabalhador_id]);
         const bicosPendentes = await pool.query(queryPendentes, [trabalhador_id]);
+        const bicosRecusados = await pool.query(queryRecusados, [trabalhador_id]);
         const bicosCancelados = await pool.query(queryCancelados, [trabalhador_id]);
 
         return res.render('trabalhador/historicoTrabalhador', {
             aceitos: bicosAceitos,
+            concluidos: bicosConcluidos,
             pendentes: bicosPendentes,
+            recusados: bicosRecusados,
             cancelados: bicosCancelados,
             usuario: req.session.usuario
         });
