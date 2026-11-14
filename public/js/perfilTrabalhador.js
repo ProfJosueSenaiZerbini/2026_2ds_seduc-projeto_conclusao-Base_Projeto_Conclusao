@@ -21,8 +21,7 @@
     // Botões que abrem modais
     var aberturas = {
         ptBtnEditar: 'ptModalEditar',
-        ptBtnSenha: 'ptModalSenha',
-        ptBtnHabilidade: 'ptModalHabilidade'
+        ptBtnSenha: 'ptModalSenha'
     };
     Object.keys(aberturas).forEach(function (btnId) {
         var btn = document.getElementById(btnId);
