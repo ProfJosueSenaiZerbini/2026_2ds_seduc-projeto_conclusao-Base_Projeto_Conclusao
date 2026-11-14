@@ -3,15 +3,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const sortSelect = document.getElementById('sortSelect');
     const cardsGrid = document.getElementById('cardsGrid');
     const resultsCount = document.getElementById('resultsCount');
+    const feedProgress = document.getElementById('feedProgress');
     const noResults = document.getElementById('noResults');
-    const clearFilters = document.getElementById('clearFilters');
+    const clearButtons = Array.from(document.querySelectorAll('#clearFilters, #clearFiltersEmpty'));
+    const areaChips = Array.from(document.querySelectorAll('.area-chip'));
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     const toast = document.getElementById('toast');
 
     if (!cardsGrid) return;
 
+    const PAGE_SIZE = 6;
     const cards = Array.from(cardsGrid.querySelectorAll('.job-card'));
-    let visibleLimit = 6;
+    let visibleLimit = PAGE_SIZE;
     let toastTimer;
 
     function showToast(message) {
@@ -54,9 +57,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Destaca o atalho de bairro cujo texto é exatamente o que está na pesquisa.
+    function syncAreaChips() {
+        const query = normalizeText(searchInput ? searchInput.value : '');
+        areaChips.forEach(chip => {
+            const active = query !== '' && query === normalizeText(chip.dataset.area);
+            chip.setAttribute('aria-pressed', String(active));
+            chip.classList.toggle('is-active', active);
+        });
+    }
+
     function renderCards() {
         const filteredCards = getFilteredCards();
         const sortedCards = sortCards(filteredCards);
+        const total = filteredCards.length;
+        const shown = Math.min(visibleLimit, total);
 
         sortedCards.forEach(card => cardsGrid.appendChild(card));
         sortedCards.forEach((card, index) => {
@@ -71,18 +86,36 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (resultsCount) {
-            const total = filteredCards.length;
-            resultsCount.textContent = total + (total === 1 ? ' vaga' : ' vagas');
+            const filtered = total !== cards.length;
+            // "1 vaga" ou "3 de 19 vagas": o plural segue o último número exibido.
+            resultsCount.textContent = filtered ? total + ' de ' + cards.length + (cards.length === 1 ? ' vaga' : ' vagas')
+                : total + (total === 1 ? ' vaga' : ' vagas');
         }
-        if (noResults) noResults.hidden = filteredCards.length !== 0;
+        if (feedProgress) {
+            feedProgress.textContent = total === 0 ? '' :
+                'Mostrando ' + shown + ' de ' + total + (total === 1 ? ' oportunidade' : ' oportunidades');
+        }
+        if (noResults) noResults.hidden = total !== 0;
         if (loadMoreBtn) {
-            loadMoreBtn.hidden = filteredCards.length <= visibleLimit;
-            loadMoreBtn.innerHTML = 'Carregar mais oportunidades <i class="ph-fill ph-caret-down" aria-hidden="true"></i>';
+            const remaining = total - visibleLimit;
+            loadMoreBtn.hidden = remaining <= 0;
+            loadMoreBtn.innerHTML = 'Carregar mais oportunidades' +
+                (remaining > 0 ? ' <span class="load-more__rest">(' + remaining + (remaining === 1 ? ' restante' : ' restantes') + ')</span>' : '') +
+                ' <i class="ph-fill ph-caret-down" aria-hidden="true"></i>';
         }
+        syncAreaChips();
+    }
+
+    function resetFilters() {
+        if (searchInput) searchInput.value = '';
+        if (sortSelect) sortSelect.value = 'recent';
+        visibleLimit = PAGE_SIZE;
+        renderCards();
+        showToast('Filtros limpos');
     }
 
     if (searchInput) searchInput.addEventListener('input', () => {
-        visibleLimit = 6;
+        visibleLimit = PAGE_SIZE;
         renderCards();
     });
 
@@ -92,16 +125,19 @@ document.addEventListener('DOMContentLoaded', function () {
         showToast('Ordenação: ' + (labels[sortSelect.value] || 'atualizada'));
     });
 
-    if (clearFilters) clearFilters.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        if (sortSelect) sortSelect.value = 'recent';
-        visibleLimit = 6;
+    clearButtons.forEach(button => button.addEventListener('click', resetFilters));
+
+    // Atalho de bairro: usa a própria pesquisa por local; clicar de novo no mesmo bairro remove o filtro.
+    areaChips.forEach(chip => chip.addEventListener('click', () => {
+        if (!searchInput) return;
+        const alreadyActive = chip.getAttribute('aria-pressed') === 'true';
+        searchInput.value = alreadyActive ? '' : chip.dataset.area;
+        visibleLimit = PAGE_SIZE;
         renderCards();
-        showToast('Filtros limpos');
-    });
+    }));
 
     if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => {
-        visibleLimit += 6;
+        visibleLimit += PAGE_SIZE;
         renderCards();
         showToast('Mais oportunidades exibidas');
     });
