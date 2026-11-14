@@ -19,7 +19,18 @@ const renderHomeTrabalhador = async (req, res) => {
     }
 
     try {
-        const vagas = await pool.query("SELECT * FROM bicos WHERE status = 'Aberto'");
+        // Vagas abertas, exceto as que o contratante já recusou para este trabalhador.
+        const vagas = await pool.query(
+            `SELECT * FROM bicos b
+             WHERE b.status = 'Aberto'
+               AND NOT EXISTS (
+                   SELECT 1 FROM candidaturas c
+                   WHERE c.bico_id = b.id
+                     AND c.trabalhador_id = ?
+                     AND c.status = 'Recusado'
+               )`,
+            [req.session.usuario.id]
+        );
 
         return res.render('trabalhador/homeTrabalhador', {
             usuario: req.session.usuario,
