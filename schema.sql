@@ -1,4 +1,8 @@
-CREATE DATABASE IF NOT EXISTS db_bico;
+-- iBico - schema do banco (MariaDB 10.11+). Todos os valores financeiros são simulados.
+-- Importar somente em um banco novo e vazio (CREATE TABLE IF NOT EXISTS não altera tabelas já existentes).
+CREATE DATABASE IF NOT EXISTS db_bico
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_general_ci;
 USE db_bico;
 
 -- Tabela de Usuários
@@ -11,8 +15,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha VARCHAR(255) NOT NULL,
     tipo_perfil VARCHAR(50) NOT NULL,
     saldo_simulado DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_usuarios_saldo CHECK (saldo_simulado >= 0),
+    CONSTRAINT chk_usuarios_idade CHECK (idade BETWEEN 18 AND 90)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Tabela de Bicos (Vagas)
 CREATE TABLE IF NOT EXISTS bicos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,9 +32,11 @@ CREATE TABLE IF NOT EXISTS bicos (
     horario VARCHAR(20) NOT NULL,
     bairro VARCHAR(100) NOT NULL,
     status ENUM('Aberto', 'Em andamento', 'Finalizado', 'Cancelado') DEFAULT 'Aberto',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data/hora em que o bico foi publicado
     CONSTRAINT fk_bicos_contratante FOREIGN KEY (contratante_id) REFERENCES usuarios(id),
-    CONSTRAINT fk_bicos_trabalhador FOREIGN KEY (trabalhador_id) REFERENCES usuarios(id)
-);
+    CONSTRAINT fk_bicos_trabalhador FOREIGN KEY (trabalhador_id) REFERENCES usuarios(id),
+    CONSTRAINT chk_bicos_valor CHECK (valor > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Tabela de Avaliações
 CREATE TABLE IF NOT EXISTS avaliacoes (
@@ -49,7 +58,7 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
         FOREIGN KEY (avaliador_id) REFERENCES usuarios(id),
     CONSTRAINT fk_avaliacoes_avaliado
         FOREIGN KEY (avaliado_id) REFERENCES usuarios(id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Eventos de status e outras ações relacionadas aos bicos
 CREATE TABLE IF NOT EXISTS historico_eventos_bicos (
@@ -65,7 +74,7 @@ CREATE TABLE IF NOT EXISTS historico_eventos_bicos (
         REFERENCES bicos(id) ON DELETE RESTRICT,
     CONSTRAINT fk_eventos_usuario FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Tabela de Candidaturas
 -- Relaciona o trabalhador ao bico e armazena o status atual da candidatura
@@ -84,7 +93,7 @@ CREATE TABLE IF NOT EXISTS candidaturas (
 	REFERENCES usuarios(id) ON DELETE CASCADE,
     CONSTRAINT uk_bico_trabalhador UNIQUE (bico_id, trabalhador_id)
       -- Impede que o mesmo trabalhador se candidate mais de uma vez ao mesmo bico
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Mensagens vinculadas à candidatura aceita que representa a conversa
 CREATE TABLE IF NOT EXISTS mensagens_chat (
@@ -97,7 +106,7 @@ CREATE TABLE IF NOT EXISTS mensagens_chat (
         REFERENCES candidaturas(id) ON DELETE CASCADE,
     CONSTRAINT fk_mensagens_chat_remetente FOREIGN KEY (remetente_id)
         REFERENCES usuarios(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Tabela de Histórico de Status da Candidatura
 CREATE TABLE IF NOT EXISTS historico_candidaturas (
@@ -112,7 +121,7 @@ CREATE TABLE IF NOT EXISTS historico_candidaturas (
 	REFERENCES candidaturas(id) ON DELETE CASCADE,
     CONSTRAINT fk_historico_alterado_por FOREIGN KEY (alterado_por) 
 	REFERENCES usuarios(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- Tabela de Movimentações da Carteira
@@ -136,4 +145,4 @@ CREATE TABLE IF NOT EXISTS movimentacoes_carteira (
 
     CONSTRAINT chk_movimentacao_valor
         CHECK (valor > 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

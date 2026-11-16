@@ -30,7 +30,7 @@ export const criarAtualizadorPerfil = (banco) => async (req, res) => {
     const nome = typeof body.nome === 'string' ? body.nome.trim() : '';
     const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
     if (!validarNome(nome) || !validarEmail(email) || !validarIdade(body.idade)) {
-        return res.status(400).send('Preencha nome, e-mail e uma idade válida (18 anos ou mais).');
+        return res.status(400).send('Preencha nome, e-mail e uma idade válida (entre 18 e 90 anos).');
     }
     const idade = Number(body.idade);
     try {

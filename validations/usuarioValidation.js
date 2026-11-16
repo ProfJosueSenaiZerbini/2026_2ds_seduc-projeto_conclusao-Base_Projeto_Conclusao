@@ -70,11 +70,20 @@ export const validarConfirmacaoSenha = (senha, confirmarSenha) => (
     senha === confirmarSenha
 );
 
+// Mesmo intervalo do CHECK chk_usuarios_idade do schema.sql (BETWEEN 18 AND 90).
+export const IDADE_MINIMA = 18;
+export const IDADE_MAXIMA = 90;
+
 export const validarIdade = (idade) => {
-    if (typeof idade !== 'string' && typeof idade !== 'number') {
+    if (typeof idade === 'string') {
+        // Aceita somente dígitos (ex.: "25"); recusa "", "2e1", "0x14", "25.5" e textos.
+        if (!/^\d{1,3}$/.test(idade.trim())) {
+            return false;
+        }
+    } else if (typeof idade !== 'number') {
         return false;
     }
 
     const idadeNumerica = Number(idade);
-    return Number.isInteger(idadeNumerica) && idadeNumerica >= 18 && idadeNumerica <= 2147483647;
+    return Number.isInteger(idadeNumerica) && idadeNumerica >= IDADE_MINIMA && idadeNumerica <= IDADE_MAXIMA;
 };

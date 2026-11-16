@@ -615,6 +615,32 @@ body.worker-details .candidatura-status--enviada {
   background: #f8eff0;
 }
 
+/* Cancelado pelo próprio trabalhador: neutro/grafite (sem aparência de sucesso) */
+body.worker-details .candidatura-status--cancelada {
+  border-color: #cfc8bb;
+  background: #efece6;
+}
+
+body.worker-details .candidatura-status--cancelada .candidatura-status__value {
+  color: #2f2c29;
+}
+
+/* Recusado pelo contratante: alerta em vinho */
+body.worker-details .candidatura-status--recusada {
+  border-color: #d9a9ae;
+  background: #fbe9eb;
+}
+
+body.worker-details .candidatura-status--recusada .candidatura-status__value {
+  color: var(--details-red-banner);
+}
+
+body.worker-details .candidatura-status__nota {
+  color: var(--details-text-dark);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 body.worker-details .candidatura-status__label,
 body.worker-details .candidatura-status__date {
   color: var(--details-text-muted);
@@ -812,4 +838,257 @@ body.worker-details .candidatura-indisponivel {
   body.worker-details .price-value {
     font-size: 27px;
   }
+}
+
+/* Ficha do serviço (trabalhador): Local, Data e Horário em uma linha no desktop.
+   Restrito a body.worker-details; a tela do contratante não usa estas regras. */
+body.worker-details .grid-2.ficha-servico {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.worker-details .ficha-servico .info-card__sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--details-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Colunas estreitas (até 1024px): ícone acima do texto para o texto ganhar largura. */
+@media (max-width: 1024px) {
+  body.worker-details .ficha-servico .info-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px;
+  }
+}
+
+/* Celular: Local na largura toda; Data e Horário lado a lado. */
+@media (max-width: 640px) {
+  body.worker-details .grid-2.ficha-servico {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  body.worker-details .ficha-servico .info-card--local {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 13px;
+  }
+}
+
+/* Modal de confirmação do cancelamento de candidatura (trabalhador).
+   Sem JavaScript abre por :target; com JavaScript a classe .is-open controla a exibição. */
+/* flow-root evita que a margem do botão colapse com a do contêiner (mantém o espaçamento do botão anterior). */
+body.worker-details .candidatura-form--cancelar {
+  display: flow-root;
+}
+
+body.worker-details a.btn-accept {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+}
+
+body.worker-details.modal-aberto {
+  overflow: hidden;
+}
+
+body.worker-details .modal-cancelar {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+body.worker-details .modal-cancelar.is-open,
+body.worker-details .modal-cancelar:target {
+  display: flex;
+}
+
+body.worker-details .modal-cancelar__fundo {
+  position: absolute;
+  inset: 0;
+  background: rgba(25, 25, 25, 0.66);
+  cursor: default;
+}
+
+body.worker-details .modal-cancelar__caixa {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 32px);
+  padding: 28px 28px 24px;
+  overflow-y: auto;
+  border-top: 4px solid var(--details-red-banner);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(25, 25, 25, 0.4);
+  animation: modal-cancelar-entrada 0.18s ease-out;
+}
+
+@keyframes modal-cancelar-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+body.worker-details .modal-cancelar__fechar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--details-text-muted);
+  font-size: 20px;
+  text-decoration: none;
+}
+
+body.worker-details .modal-cancelar__fechar:hover {
+  background: #f5f2eb;
+  color: var(--details-text-dark);
+}
+
+body.worker-details .modal-cancelar__caixa h3 {
+  margin: 0 44px 14px 0;
+  color: var(--details-text-dark);
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+body.worker-details .modal-cancelar__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 11px 13px;
+  border-left: 4px solid var(--details-red-banner);
+  border-radius: 0 8px 8px 0;
+  background: #f2e5e3;
+  color: var(--details-red-dark);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+body.worker-details .modal-cancelar__aviso i {
+  flex: 0 0 auto;
+  color: var(--details-red-banner);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+body.worker-details .modal-cancelar__texto {
+  margin: 0 0 24px;
+  color: var(--details-text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+body.worker-details .modal-cancelar__form {
+  margin: 0;
+}
+
+body.worker-details .modal-cancelar__acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+body.worker-details .modal-cancelar__voltar,
+body.worker-details .modal-cancelar__confirmar {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+body.worker-details .modal-cancelar__voltar {
+  border: 1px solid var(--details-border);
+  background: #f5f2eb;
+  color: var(--details-text-dark);
+  font-weight: 600;
+}
+
+body.worker-details .modal-cancelar__voltar:hover {
+  border-color: var(--details-red-banner);
+  color: var(--details-red-banner);
+}
+
+body.worker-details .modal-cancelar__confirmar {
+  border: 1px solid var(--details-red-banner);
+  background: var(--details-red-banner);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+body.worker-details .modal-cancelar__confirmar:hover {
+  border-color: var(--details-red-dark);
+  background: var(--details-red-dark);
+}
+
+@media (max-width: 480px) {
+  body.worker-details .modal-cancelar__caixa {
+    padding: 24px 20px 20px;
+  }
+
+  body.worker-details .modal-cancelar__acoes {
+    flex-direction: column-reverse;
+  }
+
+  body.worker-details .modal-cancelar__voltar,
+  body.worker-details .modal-cancelar__confirmar {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.worker-details .modal-cancelar__caixa {
+    animation: none;
+  }
+}
+
+/* Estado de envio do modal de cancelamento (botão desabilitado e fechamento bloqueado). */
+body.worker-details .modal-cancelar__caixa:focus {
+  outline: none;
+}
+
+body.worker-details .modal-cancelar__confirmar:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+body.worker-details .modal-cancelar.is-enviando .modal-cancelar__voltar,
+body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
+  opacity: 0.45;
+  pointer-events: none;
 }

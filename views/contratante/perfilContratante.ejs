@@ -150,7 +150,7 @@
                 </div>
                 <div class="modal-group">
                     <label for="idade">Idade</label>
-                    <input type="number" id="idade" name="idade" value="<%= usuario.idade || '' %>" required min="18">
+                    <input type="number" id="idade" name="idade" value="<%= usuario.idade || '' %>" required min="18" max="90" step="1">
                 </div>
                 <div class="modal-group">
                     <label>CPF (não alterável)</label>

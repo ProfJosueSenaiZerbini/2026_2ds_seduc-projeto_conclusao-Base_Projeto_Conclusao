@@ -177,6 +177,7 @@ body {
 .search:focus-within,
 .select:focus-visible,
 .tab:focus-visible,
+.tab-panel:focus-visible,
 .pagination__btn:focus-visible,
 .tip-popup__close:focus-visible,
 .btn:focus-visible {
@@ -333,6 +334,55 @@ body {
   color: var(--history-brand);
 }
 
+/* Cancelado pelo próprio trabalhador: neutro/grafite (diferente do vermelho de Recusado) */
+.badge--cancelado {
+  border-color: #cfc8bb;
+  background: #e9e5dd;
+  color: #2f2c29;
+}
+
+.badge--muted {
+  border-color: #ddd7cb;
+  background: #f1eee7;
+  color: #514d48;
+}
+
+/* Estado da candidatura (e, quando aceita, o estado do serviço) */
+.bico-card__status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Quando a candidatura foi enviada / atualizada (não confundir com a data do serviço) */
+.bico-card__candidatura {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 12px 0 0 4px;
+  color: var(--history-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.bico-card__candidatura > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bico-card__candidatura i {
+  flex: 0 0 auto;
+  color: var(--history-brand);
+  font-size: 14px;
+}
+
+.bico-card__candidatura strong {
+  color: var(--history-text);
+  font-weight: 600;
+}
+
 .bico-card__meta {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -399,6 +449,33 @@ body {
 
 .bico-card__cancel strong {
   color: var(--history-text);
+}
+
+.bico-card__cancel .bico-card__cancel-titulo {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 6px;
+  color: var(--history-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.bico-card__cancel-titulo i {
+  flex: 0 0 auto;
+  color: var(--history-brand);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.bico-card__cancel--cancelado {
+  border-left-color: #3b3836;
+  background: #efece6;
+  color: #3f3b38;
+}
+
+.bico-card__cancel--cancelado .bico-card__cancel-titulo i {
+  color: #3b3836;
 }
 
 .bico-card__footer {
@@ -570,6 +647,7 @@ body {
 }
 
 .tip-popup__body h4 {
+  padding-right: 18px; /* o título não passa por baixo do botão de fechar (área de 44px) */
   margin: 2px 0 5px;
   color: var(--history-text);
   font-size: 16px;
@@ -585,14 +663,14 @@ body {
 
 .tip-popup__close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 3px;
+  right: 3px;
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 0;
-  border-radius: 7px;
+  border-radius: 10px;
   background: transparent;
   color: var(--history-muted);
   cursor: pointer;
@@ -642,6 +720,16 @@ body {
 
   .bico-card__meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Alvos de toque de pelo menos 44px (botões do card e paginação) */
+  .bico-card__actions .btn {
+    min-height: 44px;
+  }
+
+  .pagination__btn {
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -732,12 +820,23 @@ body {
     font-size: 12px;
   }
 
-  .bico-card__top > .badge {
+  .bico-card__top > .bico-card__status {
     grid-column: 2;
     grid-row: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
     justify-self: start;
     max-width: 100%;
+    gap: 6px;
+  }
+
+  .bico-card__status .badge {
     white-space: normal;
+  }
+
+  .bico-card__candidatura {
+    margin-left: 0;
   }
 
   .bico-card__meta {
@@ -828,6 +927,34 @@ body {
 
   .meta__value {
     font-size: 12px;
+  }
+}
+
+/* Dica compacta em telas pequenas: sem ícone, menos espaço, mesmo texto */
+@media (max-width: 480px) {
+  .tip-popup {
+    gap: 0;
+    padding: 10px 12px 12px;
+  }
+
+  .tip-popup__icon {
+    display: none;
+  }
+
+  .tip-popup__body {
+    padding-right: 0;
+  }
+
+  .tip-popup__body h4 {
+    min-height: 30px; /* reserva a linha do botão de fechar */
+    margin: 0 0 2px;
+    padding-right: 36px;
+    font-size: 14px;
+    line-height: 30px;
+  }
+
+  .tip-popup__body p {
+    line-height: 1.4;
   }
 }
 
