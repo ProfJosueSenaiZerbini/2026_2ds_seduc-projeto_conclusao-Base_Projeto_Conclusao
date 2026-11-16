@@ -97,16 +97,37 @@
   }
 
   // Troca de abas
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-panel--active'));
-      tabs.forEach(t => t.classList.remove('tab--active'));
-      abaAtual = tab.dataset.tab;
-      document.getElementById(abaAtual).classList.add('tab-panel--active');
-      tab.classList.add('tab--active');
-      paginaAtual = 1;
-      buscaEl.value = ''; // a busca vale só para a aba em que foi digitada
-      renderizar();
+  // Ativa uma aba: classe visual, ARIA (aria-selected) e tabindex móvel (só a aba ativa entra na sequência do Tab).
+  function ativarAba(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-panel--active'));
+    tabs.forEach(t => {
+      const ativa = t === tab;
+      t.classList.toggle('tab--active', ativa);
+      t.setAttribute('aria-selected', ativa ? 'true' : 'false');
+      t.setAttribute('tabindex', ativa ? '0' : '-1');
+    });
+    abaAtual = tab.dataset.tab;
+    document.getElementById(abaAtual).classList.add('tab-panel--active');
+    paginaAtual = 1;
+    buscaEl.value = ''; // a busca vale só para a aba em que foi digitada
+    renderizar();
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => ativarAba(tab));
+    // Setas (circular), Home e End: movem o foco e ativam a aba na hora. Enter/Espaço seguem nativos (botão).
+    tab.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return; // atalhos do navegador/sistema (ex.: Alt+←, Ctrl+Home) seguem nativos
+      const ultimo = tabs.length - 1;
+      let alvo = -1;
+      if (e.key === 'ArrowRight') alvo = i === ultimo ? 0 : i + 1;
+      else if (e.key === 'ArrowLeft') alvo = i === 0 ? ultimo : i - 1;
+      else if (e.key === 'Home') alvo = 0;
+      else if (e.key === 'End') alvo = ultimo;
+      if (alvo < 0) return;
+      e.preventDefault();
+      ativarAba(tabs[alvo]);
+      tabs[alvo].focus();
     });
   });
 
@@ -121,11 +142,36 @@
   let dispensada = false;
   try { dispensada = sessionStorage.getItem('dicaProfissionaisFechada') === '1'; } catch (e) { }
 
+  // A dica aparece sem tirar o foco de onde o usuário estava. Guardamos o último foco FORA dela
+  // para devolvê-lo se o usuário fechar a dica pelo teclado estando no botão de fechar.
+  let ultimoFocoFora = null;
+  document.addEventListener('focusin', (e) => { if (!dica.contains(e.target)) ultimoFocoFora = e.target; });
+
   if (!dispensada) {
     setTimeout(() => { dica.hidden = false; }, 800);
   }
-  fechar.addEventListener('click', () => {
+
+  // devolverFoco: só quando o foco estava dentro da dica (fechamento por teclado). Foco fora da dica nunca é movido.
+  function fecharDica(devolverFoco) {
     dica.hidden = true;
     try { sessionStorage.setItem('dicaProfissionaisFechada', '1'); } catch (e) { }
+    if (!devolverFoco) return;
+    const visivel = (el) => el && el.isConnected && el.getClientRects().length > 0;
+    const destino = visivel(ultimoFocoFora) ? ultimoFocoFora : document.querySelector('.tab[aria-selected="true"]');
+    if (destino) destino.focus();
+  }
+
+  fechar.addEventListener('click', (e) => {
+    // e.detail === 0: clique gerado por teclado (Enter/Espaço). Com mouse/toque não movemos o foco
+    // (evita abrir o teclado virtual ao devolver o foco a um campo de texto).
+    fecharDica(e.detail === 0 && dica.contains(document.activeElement));
+  });
+
+  // Esc fecha a dica visível. Não interfere em campos que usam Esc (ex.: limpar a busca, fechar a lista do select).
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || e.defaultPrevented || dica.hidden) return;
+    const alvo = e.target;
+    if (alvo && alvo !== dica && !dica.contains(alvo) && /^(INPUT|SELECT|TEXTAREA)$/.test(alvo.tagName)) return;
+    fecharDica(dica.contains(document.activeElement));
   });
 })();

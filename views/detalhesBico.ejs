@@ -23,6 +23,17 @@
         <%- include('Partials/headertrabalhador') %>
           <% } %>
 
+            <%
+              // Ficha do serviço (só trabalhador): o dia da semana é calculado a partir da data real do bico.
+              const ehTrabalhador = !!(usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador');
+              const dataServicoObj = bico.data_servico ? new Date(bico.data_servico) : null;
+              const dataValida = !!dataServicoObj && !Number.isNaN(dataServicoObj.getTime());
+              const diaSemana = dataValida
+                ? dataServicoObj.toLocaleDateString('pt-BR', { weekday: 'long', timeZone: 'UTC' }).replace(/^./, (letra) => letra.toUpperCase())
+                : '';
+              const horarioTexto = String(bico.horario || '').trim();
+            %>
+
             <!-- BANNER HERO -->
             <div class="hero-banner">
               <div class="banner-container">
@@ -33,16 +44,19 @@
                   <h1>
                     <%= bico.titulo %>
                   </h1>
+                  <% if (!ehTrabalhador) { %>
                   <div class="banner-meta">
                     <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
                     <span><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= bico.data_servico_formatada %></span>
                   </div>
+                  <% } %>
                 </div>
                 <div class="banner-price">
                   <span class="price-label">VALOR TOTAL</span>
-                  <div class="price-value">R$ <%= Number(bico.valor).toFixed(2).replace('.', ',' ) %>
+                  <% const valorNumerico = Number(bico.valor); %>
+                  <div class="price-value">R$ <%= (Number.isFinite(valorNumerico) ? valorNumerico : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                   </div>
-                  <span class="price-sub">Pagamento via PIX</span>
+                  <span class="price-sub">Valor simulado, sem pagamento real</span>
                 </div>
               </div>
             </div>
@@ -59,21 +73,31 @@
 
                 <div class="section-block">
                   <h3>Informações Rápidas</h3>
-                  <div class="grid-2">
+                  <div class="grid-2<%= ehTrabalhador ? ' ficha-servico' : '' %>">
+                    <% if (ehTrabalhador) { %>
+                    <div class="info-card info-card--local">
+                      <span class="icon"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
+                      <div>
+                        <span class="card-label">Local</span>
+                        <strong><%= String(bico.bairro || '').trim() || 'Bairro a confirmar' %></strong>
+                      </div>
+                    </div>
+                    <div class="info-card info-card--data">
+                      <span class="icon"><i class="ph ph-calendar-blank" aria-hidden="true"></i></span>
+                      <div>
+                        <span class="card-label">Data</span>
+                        <strong><%= bico.data_servico_formatada || 'Data a combinar' %></strong>
+                        <% if (diaSemana) { %><small class="info-card__sub"><%= diaSemana %></small><% } %>
+                      </div>
+                    </div>
+                    <% } %>
                     <div class="info-card">
                       <span class="icon"><i class="ph ph-clock" aria-hidden="true"></i></span>
                       <div>
                         <span class="card-label">Horário</span>
                         <strong>
-                          <%= bico.horario %>
+                          <%= ehTrabalhador ? (horarioTexto || 'Horário a combinar') : bico.horario %>
                         </strong>
-                      </div>
-                    </div>
-                    <div class="info-card">
-                      <span class="icon"><i class="ph ph-t-shirt" aria-hidden="true"></i></span>
-                      <div>
-                        <span class="card-label">Traje</span>
-                        <strong>Esporte Fino / Social</strong>
                       </div>
                     </div>
                   </div>
@@ -97,14 +121,25 @@
 
                     <% if (minhaCandidatura) { %>
                       <!-- O trabalhador já se candidatou -->
-                      <div class="candidatura-status <%= minhaCandidatura.status === 'Pendente' ? 'candidatura-status--pendente' : 'candidatura-status--enviada' %>">
+                      <%
+                        // Apresentação por estado: Pendente (ampulheta), Cancelado (neutro), Recusado (alerta); demais (ex.: Aceito) como antes.
+                        const estadoCandidatura = minhaCandidatura.status;
+                        const estadoClasse = estadoCandidatura === 'Pendente' ? 'pendente' : (estadoCandidatura === 'Cancelado' ? 'cancelada' : (estadoCandidatura === 'Recusado' ? 'recusada' : 'enviada'));
+                        const estadoIcone = { pendente: 'ph-hourglass', cancelada: 'ph-prohibit', recusada: 'ph-x-circle' }[estadoClasse] || 'ph-check-circle';
+                        const estadoNota = { cancelada: 'Você cancelou esta candidatura. Não é possível se candidatar novamente.', recusada: 'O contratante não selecionou sua candidatura.' }[estadoClasse] || '';
+                      %>
+                      <div class="candidatura-status candidatura-status--<%= estadoClasse %>">
                         <span class="candidatura-status__label">
                           Sua Candidatura:
                         </span>
 
                         <strong class="candidatura-status__value">
-                          <i class="ph <%= minhaCandidatura.status === 'Pendente' ? 'ph-hourglass' : 'ph-check-circle' %>" aria-hidden="true"></i> <%= minhaCandidatura.status %>
+                          <i class="ph <%= estadoIcone %>" aria-hidden="true"></i> <%= minhaCandidatura.status %>
                         </strong>
+
+                        <% if (estadoNota) { %>
+                        <small class="candidatura-status__nota"><%= estadoNota %></small>
+                        <% } %>
 
                         <small class="candidatura-status__date">
                           Inscrito em <%= minhaCandidatura.data_candidatura %>
@@ -112,14 +147,123 @@
                       </div>
 
                       <% if (minhaCandidatura.status==='Pendente' ) { %>
-                        <!-- Cancelar candidatura -->
-                        <form class="candidatura-form candidatura-form--cancelar" action="/bicos/candidaturas/cancelar" method="POST">
-                          <input type="hidden" name="bico_id" value="<%= bico.id %>">
-
-                          <button class="btn-accept btn-accept--cancel" type="submit">
+                        <!-- Cancelar candidatura: o botão abre um modal de confirmação.
+                             Sem JavaScript o modal abre por :target e continua exigindo a confirmação explícita. -->
+                        <div id="cancelar-candidatura" class="candidatura-form candidatura-form--cancelar">
+                          <a href="#modal-cancelar" id="abrir-modal-cancelar" class="btn-accept btn-accept--cancel"
+                            aria-haspopup="dialog" aria-controls="modal-cancelar">
                             Cancelar Candidatura
-                          </button>
-                        </form>
+                          </a>
+                        </div>
+
+                        <div id="modal-cancelar" class="modal-cancelar" role="dialog" aria-modal="true"
+                          aria-labelledby="modal-cancelar-titulo" aria-describedby="modal-cancelar-descricao">
+                          <a href="#cancelar-candidatura" class="modal-cancelar__fundo" tabindex="-1" aria-hidden="true"></a>
+                          <div class="modal-cancelar__caixa" tabindex="-1">
+                            <a href="#cancelar-candidatura" class="modal-cancelar__fechar" aria-label="Fechar">
+                              <i class="ph ph-x" aria-hidden="true"></i>
+                            </a>
+                            <h3 id="modal-cancelar-titulo">Cancelar candidatura?</h3>
+                            <p class="modal-cancelar__aviso">
+                              <i class="ph-fill ph-warning-circle" aria-hidden="true"></i>
+                              <span>Esta ação é definitiva.</span>
+                            </p>
+                            <p id="modal-cancelar-descricao" class="modal-cancelar__texto">
+                              Depois de cancelar, você não poderá se candidatar novamente a este serviço.
+                            </p>
+                            <form class="modal-cancelar__form" action="/bicos/candidaturas/cancelar" method="POST">
+                              <input type="hidden" name="bico_id" value="<%= bico.id %>">
+                              <div class="modal-cancelar__acoes">
+                                <a href="#cancelar-candidatura" class="modal-cancelar__voltar" data-fechar>Voltar</a>
+                                <button type="submit" class="modal-cancelar__confirmar">Confirmar cancelamento</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <script>
+                          // Melhoria progressiva: foco, Escape, Tab preso no modal e retorno do foco ao botão que abriu.
+                          (function () {
+                            var modal = document.getElementById('modal-cancelar');
+                            var abrir = document.getElementById('abrir-modal-cancelar');
+                            if (!modal || !abrir) return;
+                            var voltar = modal.querySelector('[data-fechar]');
+                            var caixa = modal.querySelector('.modal-cancelar__caixa');
+                            var form = modal.querySelector('form');
+                            var confirmar = modal.querySelector('.modal-cancelar__confirmar');
+                            var textoConfirmar = confirmar.textContent;
+                            var enviando = false;
+                            abrir.setAttribute('role', 'button');
+                            abrir.setAttribute('aria-expanded', 'false');
+
+                            function estaAberto() { return modal.classList.contains('is-open'); }
+
+                            function abrirModal() {
+                              if (estaAberto()) return; // nunca mais de um modal aberto
+                              modal.classList.add('is-open');
+                              document.body.classList.add('modal-aberto');
+                              abrir.setAttribute('aria-expanded', 'true');
+                              voltar.focus(); // foco inicial na opção segura
+                            }
+
+                            function fecharModal() {
+                              if (!estaAberto() || enviando) return; // enviando: o pedido já saiu, não faz sentido fechar
+                              modal.classList.remove('is-open');
+                              document.body.classList.remove('modal-aberto');
+                              abrir.setAttribute('aria-expanded', 'false');
+                              if (location.hash === '#modal-cancelar') {
+                                location.replace('#cancelar-candidatura'); // tira o modal do :target (sem criar entrada no histórico)
+                              }
+                              abrir.focus();
+                            }
+
+                            // Proteção contra envio duplicado: só o primeiro "submit" passa; os demais (clique duplo, Enter, Espaço) são bloqueados.
+                            function restaurarEnvio() {
+                              enviando = false;
+                              confirmar.disabled = false;
+                              confirmar.textContent = textoConfirmar;
+                              modal.classList.remove('is-enviando');
+                              form.removeAttribute('aria-busy');
+                            }
+
+                            form.addEventListener('submit', function (e) {
+                              if (enviando) { e.preventDefault(); return; }
+                              enviando = true;
+                              confirmar.disabled = true;
+                              confirmar.textContent = 'Cancelando...';
+                              modal.classList.add('is-enviando');
+                              form.setAttribute('aria-busy', 'true');
+                              caixa.focus(); // o botão desabilitado perde o foco: mantém o foco dentro do modal
+                              // Se algum outro script impedir o envio, o botão não pode ficar desabilitado para sempre.
+                              setTimeout(function () { if (e.defaultPrevented) restaurarEnvio(); }, 0);
+                            });
+
+                            // Voltar para esta página pelo histórico (cache de navegação): libera o botão de novo.
+                            window.addEventListener('pageshow', function (e) { if (e.persisted) restaurarEnvio(); });
+
+                            abrir.addEventListener('click', function (e) { e.preventDefault(); abrirModal(); });
+                            abrir.addEventListener('keydown', function (e) {
+                              if (e.key === ' ') { e.preventDefault(); abrirModal(); } // Espaço também ativa o botão
+                            });
+                            modal.querySelectorAll('.modal-cancelar__fundo, .modal-cancelar__fechar, [data-fechar]').forEach(function (el) {
+                              el.addEventListener('click', function (e) { e.preventDefault(); fecharModal(); }); // fechar nunca envia o formulário
+                            });
+                            document.addEventListener('keydown', function (e) {
+                              if (!estaAberto()) return;
+                              if (e.key === 'Escape') { e.preventDefault(); fecharModal(); return; }
+                              if (e.key !== 'Tab') return;
+                              var itens = modal.querySelectorAll('.modal-cancelar__fechar, .modal-cancelar__voltar, .modal-cancelar__confirmar');
+                              var primeiro = itens[0];
+                              var ultimo = itens[itens.length - 1];
+                              if (!modal.contains(document.activeElement)) { e.preventDefault(); voltar.focus(); }
+                              else if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus(); }
+                              else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
+                            });
+                            if (location.hash === '#modal-cancelar') {
+                              // Abertura por link direto: o navegador tira o foco ao processar o fragmento, então foca depois do load.
+                              window.addEventListener('load', function () { setTimeout(abrirModal, 0); });
+                            }
+                          })();
+                        </script>
                         <% } %>
 
                           <% } else if (bico.status==='Aberto' ) { %>

@@ -110,10 +110,17 @@
                 </div>
               </div>
 
-              <div class="field cpf-field">
-                <label for="cpf">CPF</label>
-                <input class="input" type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
-                  value="<%= dados?.cpf || '' %>" required>
+              <div class="input-row">
+                <div class="field">
+                  <label for="cpf">CPF</label>
+                  <input class="input" type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
+                    value="<%= dados?.cpf || '' %>" required>
+                </div>
+                <div class="field">
+                  <label for="cIdade">Idade</label>
+                  <input class="input" type="number" id="cIdade" name="idade" placeholder="Ex: 25" inputmode="numeric"
+                    min="18" max="90" step="1" value="<%= dados?.idade || '' %>" required>
+                </div>
               </div>
             </div>
 

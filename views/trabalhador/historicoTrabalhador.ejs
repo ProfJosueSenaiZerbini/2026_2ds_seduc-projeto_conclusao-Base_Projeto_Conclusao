@@ -38,9 +38,12 @@
 
                 <!-- Abas + busca + ordenação -->
                 <div class="toolbar">
-                    <div class="tabs" role="tablist">
+                    <div class="tabs" role="tablist" aria-label="Status das candidaturas">
                         <% abas.forEach((aba, i)=> { %>
-                            <button class="tab <%= i === 0 ? 'tab--active' : '' %>" role="tab" data-tab="<%= aba.id %>">
+                            <button type="button" class="tab <%= i === 0 ? 'tab--active' : '' %>" role="tab" data-tab="<%= aba.id %>"
+                                id="tab-<%= aba.id %>" aria-controls="<%= aba.id %>"
+                                aria-selected="<%= i === 0 ? 'true' : 'false' %>" tabindex="<%= i === 0 ? '0' : '-1' %>"
+                                aria-label="<%= String(aba.titulo).trim() %>, <%= aba.lista.length %> <%= aba.lista.length === 1 ? 'serviço' : 'serviços' %>">
                                 <%= aba.titulo %>
                                     <span class="tab__count">
                                         <%= aba.lista.length %>
@@ -66,7 +69,8 @@
                 <!-- Painéis -->
                 <div class="tab-content">
                     <% abas.forEach((aba, i)=> { %>
-                        <section class="tab-panel <%= i === 0 ? 'tab-panel--active' : '' %>" id="<%= aba.id %>">
+                        <section class="tab-panel <%= i === 0 ? 'tab-panel--active' : '' %>" id="<%= aba.id %>" role="tabpanel"
+                            aria-labelledby="tab-<%= aba.id %>"<%- aba.lista.length === 0 ? ' tabindex="0"' : '' %>>
                             <% if (aba.lista.length===0) { %>
                                 <p class="empty">
                                     <%= aba.vazio %>
@@ -91,12 +95,12 @@
             </main>
 
             <!-- Pop-up: Dica para Profissionais -->
-            <aside class="tip-popup" id="dicaPopup" role="dialog" aria-labelledby="dicaTitulo" hidden>
+            <aside class="tip-popup" id="dicaPopup" role="region" aria-labelledby="dicaTitulo" hidden>
                 <div class="tip-popup__icon" aria-hidden="true"><i class="ph ph-lightbulb"></i></div>
                 <div class="tip-popup__body">
                     <h4 id="dicaTitulo">Dica para Profissionais</h4>
-                    <p>Mantenha suas conversas ativas e envie fotos no chat ao concluir para garantir a melhor avaliação
-                        e liberar os repasses com antecedência.</p>
+                    <p>Use o chat para combinar horário e local com o contratante. Ao finalizar o serviço, o valor simulado
+                        vai para sua carteira simulada, sem pagamento real.</p>
                 </div>
                 <button type="button" class="tip-popup__close" id="fecharDica" aria-label="Fechar dica"><i class="ph ph-x" aria-hidden="true"></i></button>
             </aside>

@@ -4,6 +4,7 @@ import {
     normalizarCPF,
     validarConfirmacaoSenha,
     validarEmail,
+    validarIdade,
     validarNome,
     validarSenha
 } from '../validations/usuarioValidation.js';
@@ -18,6 +19,7 @@ export const criarCadastradorUsuario = (banco, hasher = bcrypt) => async (req, r
                 nome,
                 email,
                 cpf: cpfInformado,
+                idade: idadeInformada,
                 tipoPerfil: tipoPerfilRecebido
             }
         });
@@ -26,6 +28,7 @@ export const criarCadastradorUsuario = (banco, hasher = bcrypt) => async (req, r
     const nome = typeof body.nome === 'string' ? body.nome.trim() : '';
     const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
     const cpfInformado = typeof body.cpf === 'string' ? body.cpf.trim() : '';
+    const idadeInformada = typeof body.idade === 'string' ? body.idade.trim() : '';
     const tipoPerfilRecebido = typeof body.tipoPerfil === 'string' ? body.tipoPerfil.trim().toLowerCase() : '';
     const tipoPerfil = ['contratante', 'trabalhador'].includes(tipoPerfilRecebido) ? tipoPerfilRecebido : null;
 
@@ -59,6 +62,10 @@ export const criarCadastradorUsuario = (banco, hasher = bcrypt) => async (req, r
 
     if (!validarNome(nome, 3)) {
         return mostrarErro('O nome deve ter entre 3 e 100 caracteres.');
+    }
+
+    if (!validarIdade(idadeInformada)) {
+        return mostrarErro('Informe uma idade válida, entre 18 e 90 anos.');
     }
 
     if (!validarSenha(body.senha)) {
@@ -101,7 +108,7 @@ export const criarCadastradorUsuario = (banco, hasher = bcrypt) => async (req, r
         await banco.query(
             `INSERT INTO usuarios (nome, email, cpf, idade, senha, tipo_perfil)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [nome, email, cpf, 18, senhaCriptografada, tipoPerfil]
+            [nome, email, cpf, Number(idadeInformada), senhaCriptografada, tipoPerfil]
         );
 
         return res.redirect('/login');
@@ -250,10 +257,14 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
 
     try {
         // Todas as consultas trazem horário, bairro e nome do contratante (cliente) para o card.
-        // data_servico_iso (AAAA-MM-DD) alimenta a ordenação por data real do serviço.
+        // data_servico_iso (AAAA-MM-DD) é a data do serviço; a ordenação do histórico vem de candidatura_ordem_ts
+        // (evento da candidatura) e a data do serviço só serve de alternativa no card quando esse campo não existe.
         const queryAceitos = `
             SELECT
                 c.id AS candidatura_id,
+                UNIX_TIMESTAMP(COALESCE((SELECT MAX(hx.data_alteracao) FROM historico_candidaturas hx WHERE hx.candidatura_id = c.id AND hx.status_novo = 'Aceito'), c.atualizado_em)) AS candidatura_ordem_ts,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
@@ -269,13 +280,19 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
             JOIN bicos b ON c.bico_id = b.id
             JOIN usuarios u ON u.id = b.contratante_id
             WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status <> 'Finalizado'
-            ORDER BY b.data_servico DESC
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
         // Candidatura continua 'Aceito' após a finalização; o que muda é o status do bico.
+        // Ordenação dos concluídos: data/hora do evento real de finalização (historico_eventos_bicos); sem evento, cai na
+        // data de aceitação (critério anterior). A subconsulta traz só o evento mais recente, sem duplicar candidaturas.
         const queryConcluidos = `
             SELECT
                 c.id AS candidatura_id,
+                UNIX_TIMESTAMP(COALESCE(ef.data_evento, COALESCE((SELECT MAX(hx.data_alteracao) FROM historico_candidaturas hx WHERE hx.candidatura_id = c.id AND hx.status_novo = 'Aceito'), c.atualizado_em))) AS candidatura_ordem_ts,
+                DATE_FORMAT(ef.data_evento, '%d/%m/%Y %H:%i') AS finalizacao_formatada,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
@@ -290,13 +307,21 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
             JOIN usuarios u ON u.id = b.contratante_id
+            LEFT JOIN historico_eventos_bicos ef ON ef.id = (
+                SELECT e2.id FROM historico_eventos_bicos e2
+                WHERE e2.bico_id = b.id AND e2.tipo_evento = 'Finalizacao' AND e2.status_novo = 'Finalizado'
+                ORDER BY e2.data_evento DESC, e2.id DESC LIMIT 1
+            )
             WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status = 'Finalizado'
-            ORDER BY b.data_servico DESC
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
         const queryPendentes = `
             SELECT
                 c.id AS candidatura_id,
+                UNIX_TIMESTAMP(c.criado_em) AS candidatura_ordem_ts,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
@@ -312,7 +337,7 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
             JOIN bicos b ON c.bico_id = b.id
             JOIN usuarios u ON u.id = b.contratante_id
             WHERE c.trabalhador_id = ? AND c.status = 'Pendente'
-            ORDER BY c.criado_em DESC
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
         // Nas consultas abaixo, o histórico usa apenas o registro mais recente do status
@@ -320,6 +345,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
         const queryCancelados = `
             SELECT
                 c.id AS candidatura_id,
+                UNIX_TIMESTAMP(COALESCE(h.data_alteracao, c.atualizado_em)) AS candidatura_ordem_ts,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
@@ -343,7 +371,7 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 ORDER BY h2.data_alteracao DESC, h2.id DESC LIMIT 1
             )
             WHERE c.trabalhador_id = ? AND c.status = 'Cancelado'
-            ORDER BY h.data_alteracao DESC
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
         // Recusadas pelo contratante (inclui a recusa automática após aceitar outro candidato).
@@ -351,6 +379,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
         const queryRecusados = `
             SELECT
                 c.id AS candidatura_id,
+                UNIX_TIMESTAMP(COALESCE(h.data_alteracao, c.atualizado_em)) AS candidatura_ordem_ts,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
                 b.id AS bico_id,
                 b.titulo,
                 b.descricao,
@@ -374,7 +405,7 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 ORDER BY h2.data_alteracao DESC, h2.id DESC LIMIT 1
             )
             WHERE c.trabalhador_id = ? AND c.status = 'Recusado'
-            ORDER BY h.data_alteracao DESC
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
         const bicosAceitos = await pool.query(queryAceitos, [trabalhador_id]);

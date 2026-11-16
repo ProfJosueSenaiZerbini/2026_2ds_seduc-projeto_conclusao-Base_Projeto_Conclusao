@@ -19,7 +19,8 @@ const renderHomeTrabalhador = async (req, res) => {
     }
 
     try {
-        // Vagas abertas, exceto as que o contratante já recusou para este trabalhador.
+        // Vagas abertas, exceto as que o contratante já recusou para este trabalhador
+        // e as que o próprio trabalhador cancelou (não pode se candidatar de novo).
         const vagas = await pool.query(
             `SELECT * FROM bicos b
              WHERE b.status = 'Aberto'
@@ -27,7 +28,7 @@ const renderHomeTrabalhador = async (req, res) => {
                    SELECT 1 FROM candidaturas c
                    WHERE c.bico_id = b.id
                      AND c.trabalhador_id = ?
-                     AND c.status = 'Recusado'
+                     AND c.status IN ('Recusado', 'Cancelado')
                )`,
             [req.session.usuario.id]
         );
