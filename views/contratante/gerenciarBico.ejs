@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iBico - Gerenciar Bico</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/gerenciarBico.css">
+  <%- include('../Partials/phosphorIcons') %>
+</head>
+
+<body>
+
+  <%- include('../Partials/headerContratante') %>
+
+    <main class="main-container manage-job">
+
+      <!-- Cabeçalho do Bico -->
+      <section class="section-block manage-job__card job-summary">
+        <span id="status-bico" class="badge job-status"><i
+            class="ph-fill ph-circle" aria-hidden="true"></i>
+          <%= bico.status %>
+        </span>
+        <h1 class="job-title">
+          <%= bico.titulo %>
+        </h1>
+        <p class="job-value">R$ <%=
+            Number(bico.valor).toFixed(2).replace('.', ',' ) %>
+        </p>
+
+        <div class="job-meta">
+          <span class="job-meta__item"><i class="ph ph-calendar-blank" aria-hidden="true"></i> <strong>Data:</strong>
+            <%= bico.data_servico_formatada %>
+          </span>
+          <span class="job-meta__item"><i class="ph ph-clock" aria-hidden="true"></i> <strong>Horário:</strong>
+            <%= bico.horario %>
+          </span>
+          <span class="job-meta__item"><i class="ph ph-map-pin" aria-hidden="true"></i> <strong>Bairro:</strong>
+            <%= bico.bairro %>
+          </span>
+        </div>
+
+        <p class="job-description">
+          <%= bico.descricao %>
+        </p>
+        <% if (Number(usuario.id || usuario.id_usuario)===Number(bico.contratante_id) && bico.status==='Em andamento' )
+          { %>
+          <form id="form-finalizar-bico" class="job-summary__action" action="/bicos/<%= bico.id %>/finalizar" method="POST">
+            <button id="btn-finalizar-bico" class="manage-job__button manage-job__button--primary" type="submit">
+              Finalizar Serviço
+            </button>
+          </form>
+          <% } %>
+            <p id="feedback-finalizar-bico" class="job-feedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <% if (usuario && Number(usuario.id || usuario.id_usuario)===Number(bico.contratante_id) &&
+        bico.status==='Finalizado' && Number(bico.trabalhador_id)> 0) { %>
+        <section class="section-block manage-job__card evaluation-section" aria-labelledby="titulo-avaliacao-bico">
+          <h2 id="titulo-avaliacao-bico">Avaliar trabalhador</h2>
+          <a class="manage-job__link" href="/perfil/publico/<%= bico.trabalhador_id %>">Ver perfil e avaliações</a>
+          <form id="form-avaliacao-bico" action="/bicos/<%= bico.id %>/avaliacao" method="POST">
+            <fieldset class="evaluation-rating">
+              <legend>Nota <span aria-hidden="true">*</span></legend>
+              <div class="evaluation-stars">
+                <% [5, 4, 3, 2, 1].forEach(nota=> { %>
+                  <input class="evaluation-star-input" type="radio" id="nota-<%= nota %>" name="nota"
+                    value="<%= nota %>" required>
+                  <label class="evaluation-star" for="nota-<%= nota %>"
+                    aria-label="<%= nota %> estrela<%= nota > 1 ? 's' : '' %>">★</label>
+                  <% }); %>
+              </div>
+            </fieldset>
+
+            <label class="evaluation-comment-label" for="comentario-avaliacao">Comentário (opcional)</label>
+            <textarea id="comentario-avaliacao" name="comentario" maxlength="500" rows="4"
+              placeholder="Conte como foi o serviço (até 500 caracteres)."></textarea>
+
+            <button id="btn-salvar-avaliacao" class="evaluation-submit" type="submit">
+              Salvar avaliação
+            </button>
+            <p id="feedback-avaliacao-bico" class="evaluation-feedback" role="status" aria-live="polite"></p>
+          </form>
+          <p class="evaluation-note">
+            Avaliações existentes não são carregadas neste formulário. Para editá-las com os dados atuais,
+            será necessário futuramente consultar a avaliação salva e preencher os campos.
+          </p>
+        </section>
+        <% } %>
+
+          <!-- Lista de Candidatos Inscritos -->
+          <section class="section-block manage-job__card candidate-section">
+            <h2 class="manage-job__section-title">Candidatos Inscritos (<%= candidatos.length %>)</h2>
+
+            <% if (candidatos.length===0) { %>
+              <p class="candidate-empty">Nenhum trabalhador se candidatou a esta vaga até o momento.</p>
+              <% } else { %>
+                <div class="candidates-list">
+                  <% candidatos.forEach(c=> { %>
+                    <article class="candidate-card">
+                      <div class="candidate-card__details">
+                        <h3 class="candidate-card__name">
+                          <%= c.nome_trabalhador %> (<%= c.idade_trabalhador %> anos)
+                        </h3>
+                        <p class="candidate-card__email">E-mail: <%= c.email_trabalhador %>
+                        </p>
+                        <% if (c.mensagem) { %>
+                          <p class="candidate-card__message">
+                            "<%= c.mensagem %>"
+                          </p>
+                          <% } %>
+                            <div class="candidate-card__meta">
+                              <small>Candidatou-se em: <%= c.data_candidatura_formatada %></small>
+                              <small>Status: <strong>
+                                <%= c.status_candidatura %>
+                              </strong></small>
+                            </div>
+                      </div>
+
+                      <!-- Ações do Contratante (só aparecem se a candidatura for Pendente e o bico estiver Aberto) -->
+                      <% if (c.status_candidatura==='Pendente' && bico.status==='Aberto' ) { %>
+                        <div class="candidate-card__actions">
+                          <!-- Form Aceitar -->
+                          <form action="/bicos/candidaturas/status" method="POST">
+                            <input type="hidden" name="candidatura_id" value="<%= c.candidatura_id %>">
+                            <input type="hidden" name="novo_status" value="Aceito">
+                            <button class="manage-job__button manage-job__button--primary" type="submit">Aceitar</button>
+                          </form>
+
+                          <!-- Form Recusar -->
+                          <form action="/bicos/candidaturas/status" method="POST">
+                            <input type="hidden" name="candidatura_id" value="<%= c.candidatura_id %>">
+                            <input type="hidden" name="novo_status" value="Recusado">
+                            <button class="manage-job__button manage-job__button--danger" type="submit">Recusar</button>
+                          </form>
+                        </div>
+                        <% } else if (c.status_candidatura==='Aceito' ) { %>
+                          <a class="manage-job__button manage-job__button--secondary" href="/bicos/candidaturas/<%= c.candidatura_id %>/chat">Abrir conversa</a>
+                          <% } %>
+                    </article>
+                    <% }); %>
+                </div>
+                <% } %>
+
+                  <div class="manage-job__footer-action">
+                    <a class="manage-job__text-link" href="/bicos/ativos"><i
+                        class="ph ph-arrow-left" aria-hidden="true"></i> Voltar para Meus
+                      Bicos Ativos</a>
+                  </div>
+          </section>
+
+    </main>
+
+    <dialog
+      id="confirm-finalize-modal"
+      class="finalize-modal"
+      aria-labelledby="confirm-finalize-title"
+      aria-describedby="confirm-finalize-description"
+    >
+      <div class="finalize-modal__content">
+        <div class="finalize-modal__icon" aria-hidden="true">
+          <i class="ph ph-check-circle"></i>
+        </div>
+        <h2 id="confirm-finalize-title" class="finalize-modal__title">Finalizar serviço?</h2>
+        <p id="confirm-finalize-description" class="finalize-modal__description">
+          Esta ação concluirá o serviço. Deseja continuar?
+        </p>
+        <div class="finalize-modal__actions">
+          <button id="cancel-finalize-button" class="finalize-modal__button finalize-modal__button--secondary" type="button">
+            Cancelar
+          </button>
+          <button id="confirm-finalize-button" class="finalize-modal__button finalize-modal__button--primary" type="button">
+            Sim, finalizar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <%- include('../Partials/footer') %>
+      <script src="/js/gerenciarBico.js" defer></script>
+</body>
+
+</html>

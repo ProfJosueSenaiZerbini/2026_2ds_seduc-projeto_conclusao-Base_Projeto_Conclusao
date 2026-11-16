@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#191919">
+    <title>Ibico | Oportunidades de trabalho</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/homeTrabalhador.css">
+    <%- include('../Partials/phosphorIcons') %>
+</head>
+
+<body>
+    <%- include('../Partials/headertrabalhador') %>
+    <%
+        const listaVagas = Array.isArray(vagas) ? vagas : [];
+        const formatarValor = (valor) => Number(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const maiorValor = listaVagas.reduce((maior, vaga) => Math.max(maior, Number(vaga.valor) || 0), 0);
+
+        // Bairros agrupados sem diferenciar maiúsculas/acentos ("Gleba B" e "gleba b" contam como um só).
+        const normalizar = (texto) => String(texto || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+        const mapaBairros = new Map();
+        listaVagas.forEach((vaga) => {
+            const nome = String(vaga.bairro || '').trim();
+            if (!nome) return;
+            const chave = normalizar(nome);
+            const item = mapaBairros.get(chave) || { nome, qtd: 0 };
+            if (/\p{Lu}/u.test(nome) && !/\p{Lu}/u.test(item.nome)) item.nome = nome;
+            item.qtd += 1;
+            mapaBairros.set(chave, item);
+        });
+        const bairros = [...mapaBairros.values()].sort((a, b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'));
+        const totalBairros = bairros.length;
+
+        // Prazo real do serviço: só aparece quando a data cai entre hoje e os próximos 7 dias.
+        const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+        const prazoDaVaga = (dataServico) => {
+            if (!dataServico) return '';
+            const data = new Date(dataServico);
+            if (Number.isNaN(data.getTime())) return ''; // data inválida: sem selo (e sem erro 500)
+            const dias = Math.round((Date.parse(data.toISOString().slice(0, 10)) - Date.parse(hoje)) / 86400000);
+            if (dias === 0) return 'Hoje';
+            if (dias === 1) return 'Amanhã';
+            return dias > 1 && dias <= 7 ? 'Em ' + dias + ' dias' : '';
+        };
+    %>
+    <main class="home">
+        <section class="hero" aria-labelledby="heroTitle">
+            <div class="hero__content">
+                <span class="eyebrow"><i class="ph-fill ph-lightning" aria-hidden="true"></i> OPORTUNIDADES PARA VOCÊ</span>
+                <h1 id="heroTitle">Seu próximo bico começa aqui.</h1>
+                <p>Encontre serviços, compare pagamentos e veja as informações principais antes de abrir os detalhes da oportunidade.</p>
+                <% if (listaVagas.length > 0) { %>
+                <dl class="hero__stats">
+                    <div><dt>oportunidades cadastradas</dt><dd><%= listaVagas.length %></dd></div>
+                    <div><dt>bairros com vagas</dt><dd><%= totalBairros %></dd></div>
+                    <div><dt>maior pagamento listado</dt><dd>R$ <%= formatarValor(maiorValor) %></dd></div>
+                </dl>
+                <% } %>
+            </div>
+            <div class="hero__illustration" aria-hidden="true">
+                <div class="illustration-circle"><img class="hero__mascot" src="/img/mascote-tie-sangue.png" alt=""></div>
+            </div>
+        </section>
+
+        <!-- Barra de pesquisa: fica visível durante a rolagem -->
+        <div class="search-bar">
+            <section class="search-panel" aria-label="Pesquisar e organizar oportunidades">
+                <div class="filters">
+                    <label class="search-box"><i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                        <input type="search" id="searchInput" placeholder="Buscar serviço ou bairro"
+                            aria-label="Pesquisar por serviço ou bairro" autocomplete="off" enterkeyhint="search">
+                    </label>
+                    <label class="filter-select"><span>Ordenar por</span>
+                        <select id="sortSelect" aria-label="Ordenar oportunidades">
+                            <option value="recent">Mais recentes</option>
+                            <option value="highest">Maior pagamento</option>
+                            <option value="lowest">Menor pagamento</option>
+                            <option value="az">Nome A–Z</option>
+                        </select>
+                    </label>
+                    <button type="button" class="filter-reset" id="clearFilters"><i
+                            class="ph-fill ph-arrow-counter-clockwise" aria-hidden="true"></i> Limpar filtros</button>
+                </div>
+            </section>
+        </div>
+
+        <section class="opportunities" aria-labelledby="opportunitiesTitle">
+            <div class="section-heading opportunities__heading">
+                <div class="section-heading__top">
+                    <span class="eyebrow">ENCONTRE SEU PRÓXIMO SERVIÇO</span>
+                    <span class="results-count" id="resultsCount" role="status" aria-live="polite"><%= listaVagas.length %> <%= listaVagas.length === 1 ? 'vaga' : 'vagas' %></span>
+                </div>
+                <h2 id="opportunitiesTitle">Oportunidades abertas para você</h2>
+                <p>Compare pagamento, data e local e abra os detalhes do bico que combinar com você.</p>
+            </div>
+
+            <% if (bairros.length > 0) { %>
+            <div class="area-filter" role="group" aria-label="Atalhos por bairro">
+                <span class="area-filter__label"><i class="ph-fill ph-map-pin" aria-hidden="true"></i> Bairros com vagas</span>
+                <div class="area-chips">
+                    <% bairros.slice(0, 8).forEach(function (bairro) { %>
+                    <button type="button" class="area-chip" data-area="<%= bairro.nome %>" aria-pressed="false"><%= bairro.nome %> <span><%= bairro.qtd %></span></button>
+                    <% }); %>
+                </div>
+            </div>
+            <% } %>
+
+            <div class="jobs-column">
+                <div class="jobs-list" id="cardsGrid">
+                    <% if (listaVagas.length === 0) { %>
+                    <div class="empty-state"><i class="ph-fill ph-briefcase" aria-hidden="true"></i>
+                        <h3>Nenhum bico disponível por enquanto</h3>
+                        <p>Quando novas oportunidades forem cadastradas, elas aparecerão aqui.</p>
+                    </div>
+                    <% } else { %>
+                    <% listaVagas.forEach(function (vaga) {
+                        const prazo = prazoDaVaga(vaga.data_servico);
+                        const tituloVaga = vaga.titulo || 'Serviço sem título';
+                    %>
+                    <article class="job-card" data-title="<%= vaga.titulo || '' %>"
+                        data-location="<%= vaga.bairro || '' %>"
+                        data-price="<%= Number(vaga.valor) || 0 %>"
+                        data-date="<%= vaga.data_servico ? new Date(vaga.data_servico).getTime() : 0 %>">
+                        <div class="job-icon" aria-hidden="true"><i class="ph-fill ph-briefcase"></i></div>
+                        <div class="job-card__main">
+                            <% if (prazo) { %><span class="job-badge"><i class="ph-fill ph-lightning" aria-hidden="true"></i> <%= prazo %></span><% } %>
+                            <h3><%= tituloVaga %></h3>
+                            <ul class="job-meta">
+                                <li><i class="ph-fill ph-map-pin" aria-hidden="true"></i> <%= vaga.bairro || 'Bairro a confirmar' %></li>
+                                <li><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= vaga.data_servico ? new Date(vaga.data_servico).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Data a combinar' %></li>
+                                <li><i class="ph ph-clock" aria-hidden="true"></i> <%= vaga.horario || 'Horário a combinar' %></li>
+                            </ul>
+                        </div>
+                        <div class="job-card__aside">
+                            <div class="job-price"><span>Pagamento</span><strong>R$ <%= formatarValor(vaga.valor) %></strong></div>
+                            <a href="/bicos/<%= vaga.id %>" class="btn-details" aria-label="Ver detalhes: <%= tituloVaga %>">Ver detalhes <i class="ph-fill ph-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                    </article>
+                    <% }); %>
+                    <% } %>
+                </div>
+
+                <div class="no-results" id="noResults" hidden>
+                    <i class="ph-fill ph-magnifying-glass" aria-hidden="true"></i>
+                    <h3>Nenhuma oportunidade encontrada</h3>
+                    <p>Tente outro serviço ou bairro, ou limpe os filtros para ver todas as vagas.</p>
+                    <button type="button" class="filter-reset" id="clearFiltersEmpty"><i class="ph-fill ph-arrow-counter-clockwise" aria-hidden="true"></i> Limpar filtros</button>
+                </div>
+
+                <% if (listaVagas.length > 0) { %>
+                <p class="feed-progress" id="feedProgress" aria-live="polite"></p>
+                <% } %>
+                <% if (listaVagas.length > 6) { %>
+                <button type="button" class="load-more" id="loadMoreBtn">Carregar mais oportunidades <i class="ph-fill ph-caret-down" aria-hidden="true"></i></button>
+                <% } %>
+            </div>
+        </section>
+    </main>
+    <%- include('../Partials/footer') %>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/js/hometrabalhador.js" defer></script>
+</body>
+
+</html>
