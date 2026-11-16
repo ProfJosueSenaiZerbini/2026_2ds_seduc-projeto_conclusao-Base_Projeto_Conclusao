@@ -93,7 +93,9 @@
                         <span class="badge badge--success">Saldo adicionado</span>
                         <% } else if (transacao.status==='RESERVA' ) { %>
                           <span class="badge badge--pending">Valor reservado</span>
-                          <% } %>
+                          <% } else if (transacao.status==='ESTORNO' ) { %>
+                            <span class="badge badge--success">Valor estornado</span>
+                            <% } %>
                     </td>
                     <td
                       class="text-right <%= transacao.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">

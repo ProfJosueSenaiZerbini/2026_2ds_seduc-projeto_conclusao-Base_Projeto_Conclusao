@@ -26,6 +26,7 @@ export const exibirChatCandidatura = async (req, res) => {
                 b.id AS bico_id,
                 b.titulo,
                 b.valor,
+                b.status AS bico_status,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 b.horario,
                 b.contratante_id,
@@ -89,7 +90,9 @@ export const exibirChatCandidatura = async (req, res) => {
             contato,
             bico,
             candidaturaId: req.params.candidatura_id,
-            mensagens
+            mensagens,
+            // Bico cancelado: a conversa continua legível, mas não aceita novas mensagens.
+            conversaBloqueada: candidatura.bico_status === 'Cancelado'
         });
     } catch (erro) {
         console.error('Erro ao abrir conversa da candidatura:', erro);
@@ -200,7 +203,7 @@ export const enviarMensagemChat = async (req, res) => {
 
     try {
         const candidaturas = await pool.query(
-            `SELECT c.id
+            `SELECT c.id, b.status AS bico_status
              FROM candidaturas c
              JOIN bicos b ON b.id = c.bico_id
              WHERE c.id = ?
@@ -215,6 +218,13 @@ export const enviarMensagemChat = async (req, res) => {
 
         if (candidaturas.length === 0) {
             return res.status(404).json({ sucesso: false, erro: 'Conversa não encontrada.' });
+        }
+
+        if (candidaturas[0].bico_status === 'Cancelado') {
+            return res.status(409).json({
+                sucesso: false,
+                erro: 'Este bico foi cancelado. Não é possível enviar novas mensagens.'
+            });
         }
 
         const resultado = await pool.query(

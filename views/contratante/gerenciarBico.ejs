@@ -44,13 +44,26 @@
         <p class="job-description">
           <%= bico.descricao %>
         </p>
-        <% if (Number(usuario.id || usuario.id_usuario)===Number(bico.contratante_id) && bico.status==='Em andamento' )
-          { %>
-          <form id="form-finalizar-bico" class="job-summary__action" action="/bicos/<%= bico.id %>/finalizar" method="POST">
-            <button id="btn-finalizar-bico" class="manage-job__button manage-job__button--primary" type="submit">
-              Finalizar Serviço
-            </button>
-          </form>
+        <% const ehDonoDoBico = Number(usuario.id || usuario.id_usuario)===Number(bico.contratante_id);
+           const podeCancelar = ehDonoDoBico && (bico.status==='Aberto' || bico.status==='Em andamento');
+           const valorBicoFmt = Number(bico.valor).toFixed(2).replace('.', ','); %>
+        <% if (ehDonoDoBico && (bico.status==='Em andamento' || podeCancelar)) { %>
+          <div class="job-summary__actions">
+            <% if (bico.status==='Em andamento') { %>
+              <form id="form-finalizar-bico" class="job-summary__action" action="/bicos/<%= bico.id %>/finalizar" method="POST">
+                <button id="btn-finalizar-bico" class="manage-job__button manage-job__button--primary" type="submit">
+                  Finalizar Serviço
+                </button>
+              </form>
+            <% } %>
+            <% if (podeCancelar) { %>
+              <form id="form-cancelar-bico" class="job-summary__action" action="/bicos/<%= bico.id %>/cancelar" method="POST">
+                <button id="btn-cancelar-bico" class="manage-job__button manage-job__button--danger" type="submit">
+                  Cancelar bico
+                </button>
+              </form>
+            <% } %>
+          </div>
           <% } %>
             <p id="feedback-finalizar-bico" class="job-feedback" role="status" aria-live="polite"></p>
       </section>
@@ -176,6 +189,41 @@
         </div>
       </div>
     </dialog>
+
+    <% if (podeCancelar) { %>
+    <dialog
+      id="confirm-cancel-modal"
+      class="finalize-modal"
+      aria-labelledby="confirm-cancel-title"
+      aria-describedby="confirm-cancel-description"
+    >
+      <div class="finalize-modal__content">
+        <div class="finalize-modal__icon" aria-hidden="true">
+          <i class="ph ph-warning-circle"></i>
+        </div>
+        <h2 id="confirm-cancel-title" class="finalize-modal__title">Cancelar bico?</h2>
+        <p id="confirm-cancel-description" class="finalize-modal__description">
+          <% if (bico.status==='Em andamento') { %>
+            Este bico será cancelado e o valor reservado de <strong>R$ <%= valorBicoFmt %></strong> será estornado ao seu saldo simulado.
+          <% } else { %>
+            Este bico será cancelado e as candidaturas pendentes serão recusadas. Nenhum valor foi reservado, então não há estorno.
+          <% } %>
+          Esta ação não pode ser desfeita.
+        </p>
+        <label class="finalize-modal__label" for="motivo-cancelamento">Motivo (opcional)</label>
+        <textarea id="motivo-cancelamento" class="finalize-modal__textarea" maxlength="255" rows="3"
+          placeholder="Explique brevemente o motivo (até 255 caracteres)."></textarea>
+        <div class="finalize-modal__actions">
+          <button id="cancel-cancel-button" class="finalize-modal__button finalize-modal__button--secondary" type="button">
+            Voltar
+          </button>
+          <button id="confirm-cancel-button" class="finalize-modal__button finalize-modal__button--danger" type="button">
+            Sim, cancelar bico
+          </button>
+        </div>
+      </div>
+    </dialog>
+    <% } %>
 
     <%- include('../Partials/footer') %>
       <script src="/js/gerenciarBico.js" defer></script>

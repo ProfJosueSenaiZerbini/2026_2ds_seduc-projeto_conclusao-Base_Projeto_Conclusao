@@ -96,6 +96,12 @@
   margin: 22px 0 0;
 }
 
+.job-summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+}
+
 .manage-job__button {
   display: inline-flex;
   min-height: 44px;
@@ -544,6 +550,36 @@
 
 .finalize-modal__button--primary:hover {
   background: var(--contractor-sidebar-secondary);
+}
+
+.finalize-modal__button--danger {
+  background: #b91c1c;
+  color: var(--contractor-sidebar-white);
+}
+
+.finalize-modal__button--danger:hover {
+  background: #991b1b;
+}
+
+.finalize-modal__label {
+  display: block;
+  margin: 18px 0 6px;
+  color: var(--contractor-sidebar-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.finalize-modal__textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--global-ibico-border);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.9375rem;
+  resize: vertical;
 }
 
 .finalize-modal__button--secondary {

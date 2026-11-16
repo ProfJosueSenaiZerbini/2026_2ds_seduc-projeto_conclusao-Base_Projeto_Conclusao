@@ -11,6 +11,7 @@ import {
     finalizarBico,
     salvarAvaliacaoBico,
     cancelarCandidatura,
+    cancelarBico,
 } from '../controllers/bicoController.js';
 import {
     exibirChatCandidatura,
@@ -49,5 +50,9 @@ router.get('/:id/gerenciar', requireAuth, requireRole('contratante'), exibirGere
 
 // Adicione a rota protegida para perfil 'trabalhador'
 router.post('/candidaturas/cancelar', requireAuth, requireRole('trabalhador'), cancelarCandidatura);
+
+// Cancelamento do bico pelo Contratante (com estorno simulado da reserva).
+// Deve ficar depois de '/candidaturas/cancelar' para '/:id/cancelar' não capturar essa rota.
+router.post('/:id/cancelar', requireAuth, requireRole('contratante'), cancelarBico);
 
 export default router;
