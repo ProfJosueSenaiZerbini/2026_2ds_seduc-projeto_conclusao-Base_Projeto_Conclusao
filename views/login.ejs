@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibico - Login</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/login.css">
+    <%- include('Partials/phosphorIcons') %>
+</head>
+
+<body>
+
+    <div class="panel" id="panel">
+        <div class="brand">Ibico</div>
+        <div class="panel-intro">
+            <h1 id="loginTitle">Acesse sua conta</h1>
+            <p class="subtitle" id="loginSubtitle">Escolha como deseja acessar a plataforma</p>
+        </div>
+
+
+        <% if (erro) { %>
+            <div class="erro-passarinho-login">
+                <img src="/img/passarinho_transparente.png" alt="Passarinho">
+
+                <div class="balao-erro-login">
+                    <img src="/img/balao_transparente.png" alt="">
+                    <span>
+                        <%= erro %>
+                    </span>
+                </div>
+            </div>
+            <% } %>
+
+
+                <form action="/login" method="POST">
+                    <!-- Campo oculto para enviar o tipo de perfil (contratante ou trabalhador) -->
+                    <input type="hidden" name="tipoPerfil" id="tipoPerfilInput" value="contratante">
+
+                    <div class="toggle-row">
+                        <button type="button" class="toggle-btn" id="btnWork">
+                            <i class="icon ph ph-wrench" aria-hidden="true"></i>
+                            Quero Trabalhar
+                        </button>
+
+
+                        <button type="button" class="toggle-btn active-hire" id="btnHire">
+                            <i class="icon ph ph-briefcase" aria-hidden="true"></i>
+                            Quero Contratar
+                        </button>
+                    </div>
+
+                    <div class="field-wrap">
+                        <label>E-mail Corporativo ou Pessoal</label>
+                        <!-- ADICIONADO: name="email" -->
+                        <input type="email" name="email" placeholder="exemplo@ibico.com.br" required>
+                    </div>
+
+                    <div class="field-wrap password-field">
+                        <div class="field-top">
+                            <label class="password-label">Senha</label>
+                            <a href="#" class="forgot">Esqueceu a senha?</a>
+                        </div>
+                        <!-- ADICIONADO: name="senha" -->
+                        <input type="password" name="senha" placeholder="••••••••" required>
+                        <button type="button" class="eye" aria-label="Mostrar senha" aria-pressed="false">
+                            <i class="ph ph-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <label class="remember">
+                        <input type="checkbox" name="lembrar">
+                        Lembrar de mim neste dispositivo
+                    </label>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Entrar na Plataforma <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+
+                    <p class="signup">Não tem uma conta? <a href="/cadastrar">Criar uma conta gratuitamente</a></p>
+
+                    <div class="divider">Ou entre com</div>
+
+                    <div class="social-row">
+                        <button type="button" class="social-btn"><i class="ph ph-google-logo" aria-hidden="true"></i> Google</button>
+                        <button type="button" class="social-btn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i> LinkedIn</button>
+                    </div>
+
+                </form>
+    </div>
+
+    <div class="connection-art" aria-hidden="true">
+        <svg class="connection-art-desktop" viewBox="0 0 250 900" preserveAspectRatio="none" focusable="false">
+            <path class="connection-ribbon" d="M112 -20 C54 95 188 160 126 275 C70 380 190 440 130 555 C69 665 185 735 116 920" />
+            <path class="connection-wave" d="M112 -20 C54 95 188 160 126 275 C70 380 190 440 130 555 C69 665 185 735 116 920" />
+            <path class="connection-links" d="M130 174 C156 194 177 218 190 250 M130 306 C155 328 174 353 187 382 M130 486 C155 507 174 532 188 562 M130 654 C157 674 176 699 190 730" />
+            <circle class="connection-node" cx="130" cy="174" r="4" />
+            <circle class="connection-node" cx="190" cy="250" r="4" />
+            <circle class="connection-node" cx="130" cy="306" r="4" />
+            <circle class="connection-node" cx="187" cy="382" r="4" />
+            <circle class="connection-node" cx="130" cy="486" r="4" />
+            <circle class="connection-node" cx="188" cy="562" r="4" />
+            <circle class="connection-node" cx="130" cy="654" r="4" />
+            <circle class="connection-node" cx="190" cy="730" r="4" />
+            <g class="connection-icon" transform="translate(177 402)">
+                <circle class="connection-icon-glow" cx="14" cy="14" r="18" />
+                <path d="M5 10h18v13H5z M10 10V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3 M5 15h18 M12 15v2h4v-2" />
+            </g>
+            <g class="connection-icon" transform="translate(174 662)">
+                <circle class="connection-icon-glow" cx="14" cy="14" r="18" />
+                <path d="m5 14 6 6L23 8 M8 5h8 M8 23h12" />
+            </g>
+        </svg>
+        <svg class="connection-art-mobile" viewBox="0 0 390 128" preserveAspectRatio="none" focusable="false">
+            <path class="connection-ribbon" d="M-12 63 C58 30 112 91 178 62 S302 35 402 70" />
+            <path class="connection-wave" d="M-12 63 C58 30 112 91 178 62 S302 35 402 70" />
+            <path class="connection-links" d="M66 55 C96 43 118 46 143 62 M247 52 C273 45 296 49 320 60" />
+            <circle class="connection-node" cx="66" cy="55" r="3.5" />
+            <circle class="connection-node" cx="143" cy="62" r="3.5" />
+            <circle class="connection-node" cx="247" cy="52" r="3.5" />
+            <circle class="connection-node" cx="320" cy="60" r="3.5" />
+            <g class="connection-icon" transform="translate(294 70)">
+                <circle class="connection-icon-glow" cx="12" cy="12" r="15" />
+                <path d="M5 9h14v11H5z M9 9V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3 M5 13h14" />
+            </g>
+        </svg>
+    </div>
+
+    <div class="side">
+        <div class="bird-layer show" id="birdHire"></div>
+        <div class="bird-layer" id="birdWork"></div>
+        <div class="side-caption" id="sideCaption">
+            <span class="caption-eyebrow">Para quem contrata</span>
+            <div class="name">Araponga</div>
+            <div class="latin">Procnias nudicollis</div>
+            <div class="image-credit">
+                Foto: <a href="https://commons.wikimedia.org/wiki/File:Araponga-comum_-_PE_Tur%C3%ADstico_do_Alto_Ribeira_-_Clodomiro_Esteves_Junior%28001%29.jpg" target="_blank" rel="noopener noreferrer">Clodomiro Esteves Junior</a>
+                · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>
+                · enquadramento e cores ajustados em CSS
+            </div>
+        </div>
+    </div>
+    <script src="/js/login.js"></script>
+</body>
+
+</html>

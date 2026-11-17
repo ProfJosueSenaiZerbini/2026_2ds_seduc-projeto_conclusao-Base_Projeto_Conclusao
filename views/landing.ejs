@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F3EBDD">
+  <meta name="description"
+    content="O iBico aproxima quem precisa de um serviço de quem procura uma oportunidade de trabalho.">
+  <title>iBico — Conexões que fazem acontecer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <%- include('Partials/phosphorIcons') %>
+  <link rel="stylesheet" href="/css/landing.css">
+  <script src="/js/landing.js" defer></script>
+</head>
+
+<body class="landing-page" data-profile="neutral">
+  <a class="landing-skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="landing-header">
+    <div class="landing-header__inner">
+      <a class="landing-brand" href="#inicio" aria-label="iBico — início">
+        <span class="landing-brand__mark" aria-hidden="true">i</span>
+        <span>Bico</span>
+      </a>
+
+      <nav class="landing-nav" aria-label="Navegação principal">
+        <a href="#inicio">Início</a>
+        <a href="#proposito">Propósito</a>
+        <a href="#jornada">Jornada</a>
+      </nav>
+
+      <div class="landing-header__account">
+        <a class="landing-login-link" href="/login">Entrar</a>
+        <a class="landing-header__signup" href="/cadastrar">Criar conta <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+      </div>
+
+      <div class="landing-switcher" role="group" aria-label="Escolha ou troque seu perfil">
+        <button type="button" class="landing-switcher__reset" data-profile-select="neutral" aria-pressed="true">
+          Visão geral
+        </button>
+        <button type="button" class="landing-switcher__profile" data-profile-select="contratante" aria-pressed="false">
+          <span class="landing-switcher__dot landing-switcher__dot--hire" aria-hidden="true"></span>
+          Contratar
+        </button>
+        <button type="button" class="landing-switcher__profile" data-profile-select="trabalhador" aria-pressed="false">
+          <span class="landing-switcher__dot landing-switcher__dot--work" aria-hidden="true"></span>
+          Trabalhar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="landing-hero" id="inicio" aria-label="Apresentação do iBico">
+      <div class="landing-hero__state landing-hero__state--neutral" data-state="neutral">
+        <div class="landing-hero__neutral-copy">
+          <p class="landing-eyebrow"><span aria-hidden="true"></span> Conexões de trabalho, perto de você</p>
+          <h1>Um serviço precisa de ajuda.<br><span>Alguém sabe fazer.</span></h1>
+          <p class="landing-hero__description">
+            O iBico aproxima pessoas que precisam de serviços rápidos de quem procura oportunidades para trabalhar.
+          </p>
+          <a class="landing-text-link" href="#perfis">Conheça os dois caminhos <i class="ph ph-arrow-down" aria-hidden="true"></i></a>
+          <span class="landing-hero__index" aria-hidden="true">01 <i></i> UMA PLATAFORMA, DOIS CAMINHOS</span>
+        </div>
+
+        <div class="landing-choice" id="perfis" aria-labelledby="landing-choice-title">
+          <div class="landing-choice__heading">
+            <p class="landing-choice__eyebrow">Por onde você quer começar?</p>
+            <h2 id="landing-choice-title">Escolha o seu perfil.</h2>
+          </div>
+
+          <div class="landing-choice__options">
+            <button type="button" class="landing-choice__option landing-choice__option--hire" data-profile-select="contratante"
+              aria-label="Quero contratar um serviço. Conheça a experiência para contratantes.">
+              <span class="landing-choice__number">01 / CONTRATANTE</span>
+              <span class="landing-choice__title">Quero contratar<br>um serviço</span>
+              <span class="landing-choice__action">Conhecer este caminho <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
+              <img src="/img/mascote-araponga.png" alt="" aria-hidden="true">
+              <span class="landing-choice__orbit" aria-hidden="true"></span>
+            </button>
+
+            <button type="button" class="landing-choice__option landing-choice__option--work" data-profile-select="trabalhador"
+              aria-label="Quero trabalhar e encontrar oportunidades. Conheça a experiência para trabalhadores.">
+              <span class="landing-choice__number">02 / TRABALHADOR</span>
+              <span class="landing-choice__title">Quero trabalhar<br>e encontrar oportunidades</span>
+              <span class="landing-choice__action">Conhecer este caminho <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
+              <img src="/img/mascote-tie-sangue.png" alt="" aria-hidden="true">
+              <span class="landing-choice__orbit" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-hero__state landing-hero__state--hire" data-state="contratante" hidden>
+        <div class="landing-hero__profile-copy">
+          <p class="landing-eyebrow"><span aria-hidden="true"></span> Para quem precisa contratar</p>
+          <h1>Você precisa de um serviço?<br><span>Encontre quem possa fazer.</span></h1>
+          <p class="landing-hero__description">
+            Publique o bico com os detalhes do trabalho e acompanhe as candidaturas de quem está disponível.
+          </p>
+          <div class="landing-hero__actions">
+            <a class="landing-button" href="/cadastrar">Criar conta de contratante <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+            <a class="landing-hero__login" href="/login">Já tenho uma conta <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <span class="landing-hero__index" aria-hidden="true">01 <i></i> PERFIL CONTRATANTE</span>
+        </div>
+
+        <figure class="landing-hero__mascot landing-hero__mascot--hire">
+          <span class="landing-hero__mascot-orbit" aria-hidden="true"></span>
+          <img src="/img/mascote-araponga.png" alt="Araponga, mascote da experiência para contratantes">
+          <figcaption><span>ARAPONGA</span><i></i> Para quem contrata</figcaption>
+        </figure>
+      </div>
+
+      <div class="landing-hero__state landing-hero__state--work" data-state="trabalhador" hidden>
+        <div class="landing-hero__profile-copy">
+          <p class="landing-eyebrow"><span aria-hidden="true"></span> Para quem procura trabalho</p>
+          <h1>Seu próximo trabalho<br><span>pode começar por aqui.</span></h1>
+          <p class="landing-hero__description">
+            Explore serviços disponíveis, candidate-se aos que combinam com você e acompanhe cada candidatura.
+          </p>
+          <div class="landing-hero__actions">
+            <a class="landing-button" href="/cadastrar">Criar conta de trabalhador <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+            <a class="landing-hero__login" href="/login">Já tenho uma conta <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <span class="landing-hero__index" aria-hidden="true">02 <i></i> PERFIL TRABALHADOR</span>
+        </div>
+
+        <figure class="landing-hero__mascot landing-hero__mascot--work">
+          <span class="landing-hero__mascot-orbit" aria-hidden="true"></span>
+          <img src="/img/mascote-tie-sangue.png" alt="Tiê-de-sangue, mascote da experiência para trabalhadores">
+          <figcaption><span>TIÊ-DE-SANGUE</span><i></i> Para quem trabalha</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="landing-purpose" id="proposito" aria-label="Nosso propósito">
+      <div class="landing-purpose__state landing-purpose__state--neutral" data-state="neutral">
+        <p class="landing-section-index"><span>01</span> Nosso propósito</p>
+        <div class="landing-purpose__neutral">
+          <h2>Fazer a conexão<br><span>que estava faltando.</span></h2>
+          <p>
+            Um serviço do dia a dia pode ser uma oportunidade de trabalho. O iBico aproxima quem precisa de ajuda
+            de quem tem habilidade e disponibilidade para oferecê-la.
+          </p>
+          <span class="landing-purpose__annotation"><i aria-hidden="true"></i> Uma necessidade encontra uma habilidade.</span>
+        </div>
+      </div>
+
+      <div class="landing-purpose__state landing-purpose__state--hire" data-state="contratante" hidden>
+        <p class="landing-section-index"><span>01</span> Um serviço para resolver</p>
+        <div class="landing-purpose__selected">
+          <h2>Encontre apoio<br><span>para o trabalho que precisa fazer.</span></h2>
+          <p>
+            Descreva o serviço, informe os detalhes e veja quem se candidatou. Você decide quais candidaturas aceitar
+            ou recusar e conversa com a pessoa escolhida após o aceite.
+          </p>
+          <span class="landing-purpose__annotation"><i aria-hidden="true"></i> A decisão sobre quem contratar é sua.</span>
+        </div>
+      </div>
+
+      <div class="landing-purpose__state landing-purpose__state--work" data-state="trabalhador" hidden>
+        <p class="landing-section-index"><span>01</span> Uma oportunidade para encontrar</p>
+        <div class="landing-purpose__selected">
+          <h2>Mostre o que sabe fazer.<br><span>Encontre um bico que combine.</span></h2>
+          <p>
+            Consulte os serviços disponíveis, escolha uma oportunidade e envie sua candidatura. Depois, acompanhe
+            os status e o histórico e converse com o contratante se sua candidatura for aceita.
+          </p>
+          <span class="landing-purpose__annotation"><i aria-hidden="true"></i> Suas habilidades podem encontrar uma oportunidade.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-journey" id="jornada" aria-label="Como funciona">
+      <div class="landing-journey__state landing-journey__state--neutral" data-state="neutral">
+        <header class="landing-journey__intro">
+          <p class="landing-section-index"><span>02</span> Como funciona</p>
+          <h2>Dois percursos.<br><span>Um ponto de encontro.</span></h2>
+          <p>Escolha um perfil para conhecer os passos da sua jornada no iBico.</p>
+          <a href="#perfis" class="landing-text-link">Escolher perfil <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+        </header>
+        <div class="landing-journey__neutral-mark" aria-hidden="true"><span>i</span><i></i><small>iBico<br>conecta</small></div>
+      </div>
+
+      <div class="landing-journey__state landing-journey__state--hire" data-state="contratante" hidden>
+        <header class="landing-journey__intro">
+          <p class="landing-section-index"><span>02</span> Seu caminho como contratante</p>
+          <h2>Do pedido<br><span>à conclusão do serviço.</span></h2>
+          <p>Você acompanha as etapas e escolhe quem realizará o trabalho.</p>
+        </header>
+        <ol class="landing-steps">
+          <li><span>01</span><div><h3>Publique um bico</h3><p>Informe serviço, valor, bairro, data e horário.</p></div></li>
+          <li><span>02</span><div><h3>Veja as candidaturas</h3><p>Consulte as pessoas interessadas no serviço.</p></div></li>
+          <li><span>03</span><div><h3>Aceite ou recuse</h3><p>Escolha entre as candidaturas recebidas.</p></div></li>
+          <li><span>04</span><div><h3>Converse após o aceite</h3><p>Combine os detalhes pelo chat com o trabalhador.</p></div></li>
+          <li><span>05</span><div><h3>Finalize e avalie</h3><p>Ao concluir o bico, finalize e avalie o trabalhador.</p></div></li>
+        </ol>
+      </div>
+
+      <div class="landing-journey__state landing-journey__state--work" data-state="trabalhador" hidden>
+        <header class="landing-journey__intro">
+          <p class="landing-section-index"><span>02</span> Seu caminho como trabalhador</p>
+          <h2>Da busca<br><span>ao serviço em andamento.</span></h2>
+          <p>Encontre bicos e acompanhe o andamento das suas candidaturas.</p>
+        </header>
+        <ol class="landing-steps">
+          <li><span>01</span><div><h3>Consulte os bicos</h3><p>Explore os serviços disponíveis na plataforma.</p></div></li>
+          <li><span>02</span><div><h3>Envie uma candidatura</h3><p>Escolha um serviço e candidate-se.</p></div></li>
+          <li><span>03</span><div><h3>Acompanhe os status</h3><p>Consulte o andamento e o histórico da candidatura.</p></div></li>
+          <li><span>04</span><div><h3>Converse após o aceite</h3><p>Combine os detalhes do serviço pelo chat.</p></div></li>
+          <li><span>05</span><div><h3>Acompanhe o bico</h3><p>Após o aceite, o serviço fica em andamento.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="landing-next-step" aria-label="Próximo passo">
+      <div class="landing-next-step__state landing-next-step__state--neutral" data-state="neutral">
+        <p class="landing-section-index"><span>03</span> Vamos começar?</p>
+        <h2>Encontre o caminho<br><span>que faz sentido para você.</span></h2>
+        <a href="#perfis" class="landing-button">Escolher meu perfil <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+      </div>
+      <div class="landing-next-step__state landing-next-step__state--hire" data-state="contratante" hidden>
+        <p class="landing-section-index"><span>03</span> Próximo passo</p>
+        <h2>Tem um serviço<br><span>para tirar do papel?</span></h2>
+        <div class="landing-next-step__actions">
+          <a class="landing-button" href="/cadastrar">Criar conta de contratante <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+          <a class="landing-next-step__login" href="/login">Entrar na minha conta</a>
+        </div>
+      </div>
+      <div class="landing-next-step__state landing-next-step__state--work" data-state="trabalhador" hidden>
+        <p class="landing-section-index"><span>03</span> Próximo passo</p>
+        <h2>Pronto para procurar<br><span>seu próximo bico?</span></h2>
+        <div class="landing-next-step__actions">
+          <a class="landing-button" href="/cadastrar">Criar conta de trabalhador <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+          <a class="landing-next-step__login" href="/login">Entrar na minha conta</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <a class="landing-brand" href="#inicio" aria-label="iBico — voltar ao início">
+      <span class="landing-brand__mark" aria-hidden="true">i</span>
+      <span>Bico</span>
+    </a>
+    <p class="landing-footer__state landing-footer__state--neutral" data-state="neutral">Conectando quem precisa de um serviço a quem procura trabalho.</p>
+    <p class="landing-footer__state landing-footer__state--hire" data-state="contratante" hidden>Seu próximo serviço pode começar com uma conexão.</p>
+    <p class="landing-footer__state landing-footer__state--work" data-state="trabalhador" hidden>Uma habilidade encontra espaço para acontecer.</p>
+    <a href="#inicio" class="landing-footer__top">Voltar ao início <i class="ph ph-arrow-up" aria-hidden="true"></i></a>
+  </footer>
+</body>
+
+</html>
