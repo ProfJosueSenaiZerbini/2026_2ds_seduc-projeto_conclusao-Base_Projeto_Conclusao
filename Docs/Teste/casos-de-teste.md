@@ -2,7 +2,7 @@
 
 Todos os valores financeiros são **simulados** (não existe pagamento real).
 
-**Execução de referência:** 17/11/2026, Firefox (Playwright) + `node --test`, banco MariaDB 10.11 recriado a partir do `schema.sql`.
+**Execução de referência:** 17/11/2026, Firefox (Playwright) + `node --test`, banco local `db_bico` (MariaDB 10.11).
 - Testes unitários (`npm run test:unit`): 32 de 32 aprovados (15 de idade/cadastro/perfil + 17 do cancelamento de bico), em `tests/unit/`.
 - Testes E2E (`npm test`): 56 de 56 aprovados (28 anteriores + 28 do roteiro CT02–CT13), em `tests/e2e/`.
 - A suíte completa (`npm run test:unit` e `npm test`) foi executada duas vezes seguidas em 17/11/2026 (11:33 e 11:34) e passou inteira nas duas, sem falhas intermitentes. O Playwright usa 2 workers.
