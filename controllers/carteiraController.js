@@ -27,7 +27,13 @@ export const exibirCarteiraContratante = async (req, res) => {
 
     const transacoes = await db.query(
       `SELECT
-        m.descricao,
+        -- Mostra o título do bico no lugar do id gravado em m.descricao (registros antigos também).
+        CASE
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'RESERVA' THEN CONCAT('Reserva – ', b.titulo)
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'CREDITO' THEN CONCAT('Pagamento recebido – ', b.titulo)
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'ESTORNO' THEN CONCAT('Estorno – ', b.titulo)
+          ELSE m.descricao
+        END AS descricao,
         m.valor,
         DATE_FORMAT(m.criado_em, '%d/%m/%Y %H:%i') AS dataHora,
         m.tipo_movimentacao AS status,
@@ -36,6 +42,7 @@ export const exibirCarteiraContratante = async (req, res) => {
           WHEN m.tipo_movimentacao = 'RESERVA' THEN 'Saída'
         END AS tipo
        FROM movimentacoes_carteira m
+       LEFT JOIN bicos b ON b.id = m.bico_id
        WHERE m.usuario_id = ?
        ORDER BY m.criado_em DESC, m.id DESC`,
       [usuarioId]
@@ -127,12 +134,19 @@ export const exibirCarteiraTrabalhador = async (req, res) => {
 
     const transacoes = await db.query(
       `SELECT
-        m.descricao,
+        -- Mostra o título do bico no lugar do id gravado em m.descricao (registros antigos também).
+        CASE
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'RESERVA' THEN CONCAT('Reserva – ', b.titulo)
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'CREDITO' THEN CONCAT('Pagamento recebido – ', b.titulo)
+          WHEN b.titulo IS NOT NULL AND m.tipo_movimentacao = 'ESTORNO' THEN CONCAT('Estorno – ', b.titulo)
+          ELSE m.descricao
+        END AS descricao,
         m.valor,
         DATE_FORMAT(m.criado_em, '%d/%m/%Y %H:%i') AS dataHora,
         m.tipo_movimentacao AS status,
         'Entrada' AS tipo
        FROM movimentacoes_carteira m
+       LEFT JOIN bicos b ON b.id = m.bico_id
        WHERE m.usuario_id = ?
          AND m.tipo_movimentacao = 'CREDITO'
        ORDER BY m.criado_em DESC, m.id DESC`,
