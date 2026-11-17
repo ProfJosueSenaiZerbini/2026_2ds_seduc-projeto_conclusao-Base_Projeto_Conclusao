@@ -42,7 +42,7 @@
                     <div class="banner-linha">
                         <h2><%= usuario.nome %></h2>
                         <span class="pill pill-role"><i class="dot"></i>Contratante</span>
-                        <span class="pill pill-verificado">Conta Ibico</span>
+                        <span class="pill pill-conta">Conta Ibico</span>
                     </div>
                     <p class="banner-bio">Encontre profissionais e acompanhe seus bicos publicados.</p>
                 </div>
@@ -50,17 +50,27 @@
 
             <div class="stats">
                 <div class="stat">
-                    <span class="stat-label">Tipo de conta</span>
-                    <strong class="stat-valor">Contratante</strong>
+                    <span class="stat-label">Bicos concluídos</span>
+                    <strong class="stat-valor"><%= reputacao.concluidos %></strong>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Avaliação média</span>
+                    <strong class="stat-valor">
+                        <%= reputacao.media !== null ? reputacao.media.toFixed(1).replace('.', ',') + ' ★' : '—' %>
+                        <small>(<%= reputacao.totalAvaliacoes %> <%= reputacao.totalAvaliacoes === 1 ? 'avaliação' : 'avaliações' %>)</small>
+                    </strong>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Saldo disponível</span>
                     <strong class="stat-valor verde"><%= formatarMoedaBRL(usuario.saldo_simulado) %></strong>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">Acesso à plataforma</span>
-                    <span class="badge-ativo">Ativo</span>
+                    <span class="stat-label">Membro desde</span>
+                    <strong class="stat-valor stat-texto"><%= membroDesde || usuario.data_cadastro_formatada %></strong>
                 </div>
+            </div>
+            <div class="ver-publico">
+                <a class="btn-link" id="link-perfil-publico" href="/perfil/publico/<%= usuario.id %>">Ver como os outros veem meu perfil</a>
             </div>
 
             <div class="perfil-corpo">

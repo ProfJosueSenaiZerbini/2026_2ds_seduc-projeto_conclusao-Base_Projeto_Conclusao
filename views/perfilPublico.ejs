@@ -11,6 +11,14 @@
 </head>
 
 <body>
+    <%
+        const ehContratante = perfil.tipo === 'contratante';
+        const media = reputacao.media;
+        const mediaTexto = media === null ? '' : media.toFixed(1).replace('.', ',');
+        const total = reputacao.totalAvaliacoes;
+        const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+        const LIMITE_INICIAL = 5;
+    %>
     <header class="public-header">
         <a class="public-brand" href="/">iBico</a>
     </header>
@@ -27,19 +35,19 @@
                 <h1 id="worker-name"><%= perfil.nome %></h1>
                 <ul class="profile-facts" aria-label="Resumo do perfil">
                     <% if (perfil.membroDesde) { %><li id="perfil-membro-desde">Membro desde <%= perfil.membroDesde %></li><% } %>
-                    <li id="perfil-bicos-finalizados"><%= bicosFinalizados %> <%= bicosFinalizados === 1 ? 'bico finalizado' : 'bicos finalizados' %></li>
+                    <li id="perfil-ultimo-servico">
+                        <% if (reputacao.ultimoServico) { %>Último serviço concluído em <%= reputacao.ultimoServico %><% } else { %>Nenhum serviço concluído ainda<% } %>
+                    </li>
                 </ul>
-                <% if (quantidadeAvaliacoes > 0) { %>
+                <% if (total > 0) { %>
                     <div class="overall-rating">
-                        <span class="rating-stars" aria-label="Média de <%= mediaAvaliacoes.toFixed(1).replace('.', ',') %> de 5 estrelas">
+                        <span class="rating-stars" aria-label="Média de <%= mediaTexto %> de 5 estrelas">
                             <% for (let estrela = 1; estrela <= 5; estrela++) { %>
-                                <span aria-hidden="true"><%= estrela <= Math.round(mediaAvaliacoes) ? '★' : '☆' %></span>
+                                <span aria-hidden="true"><%= estrela <= Math.round(media) ? '★' : '☆' %></span>
                             <% } %>
                         </span>
-                        <strong><%= mediaAvaliacoes.toFixed(1).replace('.', ',') %> de 5</strong>
-                        <span class="review-count">
-                            <%= quantidadeAvaliacoes %> <%= quantidadeAvaliacoes === 1 ? 'avaliação' : 'avaliações' %>
-                        </span>
+                        <strong><%= mediaTexto %> de 5</strong>
+                        <span class="review-count"><%= plural(total, 'avaliação', 'avaliações') %></span>
                     </div>
                 <% } else { %>
                     <p class="no-rating" id="perfil-sem-avaliacoes">Ainda sem avaliações</p>
@@ -47,11 +55,67 @@
             </div>
         </section>
 
+        <!-- Reputação: números calculados a partir do que aconteceu na plataforma -->
+        <section class="reputation-section" id="perfil-reputacao" aria-labelledby="reputation-title">
+            <div class="section-heading">
+                <h2 id="reputation-title">Reputação</h2>
+                <span>Calculada a partir do histórico no iBico</span>
+            </div>
+
+            <div class="reputation-grid">
+                <div class="reputation-block">
+                    <h3>Distribuição das notas</h3>
+                    <ul class="dist-list" id="perfil-distribuicao" aria-label="Número de avaliações por nota">
+                        <% reputacao.barras.forEach((barra) => { %>
+                            <li class="dist-row" data-estrelas="<%= barra.estrelas %>">
+                                <span class="dist-label"><%= barra.estrelas %>★</span>
+                                <span class="dist-track" aria-hidden="true"><span class="dist-fill" style="width: <%= barra.percentual %>%"></span></span>
+                                <span class="dist-count"><%= barra.quantidade %></span>
+                            </li>
+                        <% }); %>
+                    </ul>
+                    <% if (total === 0) { %><p class="reputation-note">Ainda sem avaliações.</p><% } %>
+                </div>
+
+                <div class="reputation-block">
+                    <h3>Bicos</h3>
+                    <dl class="indicator-list">
+                        <% if (ehContratante) { %>
+                            <div><dt>Bicos publicados</dt><dd id="perfil-bicos-publicados"><%= reputacao.publicados %></dd></div>
+                            <div>
+                                <dt>Bicos concluídos</dt>
+                                <dd id="perfil-bicos-concluidos"><%= plural(reputacao.concluidos, 'bico concluído', 'bicos concluídos') %></dd>
+                                <small>Todos pagos pela carteira simulada (valor simulado, sem pagamento real).</small>
+                            </div>
+                            <div>
+                                <dt>Cancelados depois de aceitar um trabalhador</dt>
+                                <dd id="perfil-cancelados-apos-aceite"><%= reputacao.canceladosAposAceite %></dd>
+                                <small>Os que tiveram estorno da reserva.</small>
+                            </div>
+                            <div><dt>Cancelados antes de aceitar</dt><dd id="perfil-cancelados-antes"><%= reputacao.canceladosAntesDoAceite %></dd></div>
+                            <div>
+                                <dt>Taxa de conclusão</dt>
+                                <% if (reputacao.taxaConclusao !== null) { %>
+                                    <dd id="perfil-taxa-conclusao"><%= reputacao.taxaConclusao %>%</dd>
+                                    <small>Concluídos ÷ (concluídos + cancelados depois de aceitar).</small>
+                                <% } else { %>
+                                    <dd id="perfil-taxa-conclusao" class="indicator-empty">Sem histórico suficiente</dd>
+                                <% } %>
+                            </div>
+                        <% } else { %>
+                            <div><dt>Bicos concluídos</dt><dd id="perfil-bicos-concluidos"><%= plural(reputacao.concluidos, 'bico concluído', 'bicos concluídos') %></dd></div>
+                            <div><dt>Bicos em andamento</dt><dd id="perfil-bicos-andamento"><%= reputacao.emAndamento %></dd></div>
+                        <% } %>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
         <section class="reviews-section" aria-labelledby="reviews-title">
             <div class="section-heading">
                 <h2 id="reviews-title">Avaliações recebidas</h2>
-                <% if (quantidadeAvaliacoes > 0) { %>
-                    <span><%= quantidadeAvaliacoes %> no total</span>
+                <% if (total > 0) { %>
+                    <span><%= total %> no total</span>
                 <% } %>
             </div>
 
@@ -62,12 +126,12 @@
                     <span>As avaliações aparecerão aqui após a conclusão de um serviço.</span>
                 </div>
             <% } else { %>
-                <div class="reviews-list">
-                    <% avaliacoes.forEach(avaliacao => { %>
-                        <article class="review-card">
+                <div class="reviews-list" id="lista-avaliacoes">
+                    <% avaliacoes.forEach((avaliacao, indice) => { %>
+                        <article class="review-card<%= indice >= LIMITE_INICIAL ? ' review-card--extra' : '' %>"<%- indice >= LIMITE_INICIAL ? ' hidden' : '' %>>
                             <div class="review-heading">
                                 <div>
-                                    <h3><%= avaliacao.avaliador_nome %></h3>
+                                    <h3><%= avaliacao.avaliador_nome %> <span class="review-role"><%= avaliacao.avaliador_rotulo %></span></h3>
                                     <time><%= avaliacao.data_avaliacao %></time>
                                 </div>
                                 <div class="review-stars" aria-label="<%= avaliacao.nota %> de 5 estrelas">
@@ -80,9 +144,14 @@
                         </article>
                     <% }); %>
                 </div>
+                <% if (avaliacoes.length > LIMITE_INICIAL) { %>
+                    <button type="button" class="see-all-button" id="ver-todas-avaliacoes" aria-expanded="false" aria-controls="lista-avaliacoes"
+                        data-total="<%= avaliacoes.length %>">Ver todas (<%= avaliacoes.length %>)</button>
+                <% } %>
             <% } %>
         </section>
     </main>
+    <script src="/js/perfilPublico.js" defer></script>
 </body>
 
 </html>

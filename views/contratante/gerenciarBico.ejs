@@ -98,6 +98,9 @@
                           <% } %>
                           · <a class="candidate-card__link" href="/perfil/publico/<%= c.trabalhador_id %>">Ver perfil</a>
                         </p>
+                        <p class="candidate-card__concluidos">
+                          <%= Number(c.bicos_concluidos) %> <%= Number(c.bicos_concluidos) === 1 ? 'bico concluído' : 'bicos concluídos' %>
+                        </p>
                         <% if (c.mensagem) { %>
                           <p class="candidate-card__message">
                             "<%= c.mensagem %>"

@@ -103,6 +103,30 @@
                     </div>
                   </div>
                 </div>
+                <% if (ehTrabalhador) { %>
+                <%
+                  const concluidosContratante = Number(bico.contratante_bicos_concluidos || 0);
+                  const canceladosContratante = Number(bico.contratante_cancelados_apos_aceite || 0);
+                  const totalAvContratante = Number(bico.contratante_total_avaliacoes || 0);
+                %>
+                <div class="section-block" id="sobre-contratante">
+                  <h3>Sobre o contratante</h3>
+                  <p class="sobre-contratante__nome"><strong><%= bico.contratante_nome %></strong></p>
+                  <ul class="sobre-contratante__lista">
+                    <li id="sobre-contratante-media">
+                      <% if (totalAvContratante > 0) { %>
+                        <span class="contratante-nota__estrela">★ <%= Number(bico.contratante_media).toFixed(1).replace('.', ',') %></span>
+                        (<%= totalAvContratante %> <%= totalAvContratante === 1 ? 'avaliação' : 'avaliações' %>)
+                      <% } else { %>
+                        Ainda sem avaliações
+                      <% } %>
+                    </li>
+                    <li id="sobre-contratante-concluidos"><%= concluidosContratante %> <%= concluidosContratante === 1 ? 'bico concluído' : 'bicos concluídos' %></li>
+                    <li id="sobre-contratante-cancelados"><%= canceladosContratante %> <%= canceladosContratante === 1 ? 'cancelado depois de aceitar um trabalhador' : 'cancelados depois de aceitar um trabalhador' %></li>
+                  </ul>
+                  <a class="sobre-contratante__link" id="sobre-contratante-link" href="/perfil/publico/<%= bico.contratante_id %>">Ver perfil completo do contratante</a>
+                </div>
+                <% } %>
               </div>
 
 

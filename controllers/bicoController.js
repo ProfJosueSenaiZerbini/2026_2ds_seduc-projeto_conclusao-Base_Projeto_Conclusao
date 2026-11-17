@@ -1,5 +1,6 @@
 import db from '../config/database.js';
 import { definirAlerta } from '../middleware/sessaoMiddleware.js';
+import { sqlBicosConcluidosDoTrabalhador, sqlBicosConcluidosDoContratante, sqlCanceladosAposAceiteDoContratante } from './reputacao.js';
 import {
     PRAZO_AVALIACAO_DIAS,
     SQL_FINALIZADO_EM,
@@ -121,6 +122,8 @@ export const exibirDetalhesBico = async (req, res) => {
             SELECT b.*, u.nome AS contratante_nome,
                    ${sqlMediaAvaliacoes('u.id', 'contratante_media')},
                    ${sqlTotalAvaliacoes('u.id', 'contratante_total_avaliacoes')},
+                   ${sqlBicosConcluidosDoContratante('u.id', 'contratante_bicos_concluidos')},
+                   ${sqlCanceladosAposAceiteDoContratante('u.id', 'contratante_cancelados_apos_aceite')},
                    DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada
             FROM bicos b
             JOIN usuarios u ON b.contratante_id = u.id
@@ -1469,7 +1472,8 @@ export const exibirGerenciamentoBico = async (req, res) => {
                 u.id AS trabalhador_id,
                 u.nome AS nome_trabalhador,
                 ${sqlMediaAvaliacoes('u.id', 'media_avaliacoes')},
-                ${sqlTotalAvaliacoes('u.id', 'total_avaliacoes')}
+                ${sqlTotalAvaliacoes('u.id', 'total_avaliacoes')},
+                ${sqlBicosConcluidosDoTrabalhador('u.id', 'bicos_concluidos')}
             FROM candidaturas c
             JOIN usuarios u ON c.trabalhador_id = u.id
             WHERE c.bico_id = ?

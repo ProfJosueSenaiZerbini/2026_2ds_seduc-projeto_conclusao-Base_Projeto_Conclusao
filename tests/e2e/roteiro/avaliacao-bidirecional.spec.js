@@ -61,7 +61,7 @@ test.describe('Avaliação bidirecional (contratante e trabalhador)', () => {
     await expect(pagina.locator('#perfil-tipo')).toContainText('Contratante');
     await expect(pagina.locator('h1')).toContainText(contratante.nome);
     await expect(pagina.locator('#perfil-membro-desde')).toContainText(/Membro desde \S+ de \d{4}/);
-    await expect(pagina.locator('#perfil-bicos-finalizados')).toContainText('1 bico finalizado');
+    await expect(pagina.locator('#perfil-bicos-concluidos')).toContainText('1 bico concluído');
     await expect(pagina.locator('.rating-stars')).toHaveAttribute('aria-label', /5,0 de 5/);
     await expect(pagina.locator('body')).toContainText('1 avaliação');
     const avaliacao = pagina.locator('.review-card');
