@@ -15,11 +15,11 @@
 
 <body>
     <%
-        const bicosConcluidos = usuario.bicos_concluidos != null ? usuario.bicos_concluidos : 0;
-        const avaliacao = usuario.avaliacao_media != null ? Number(usuario.avaliacao_media).toFixed(1) : '—';
-        const totalAvaliacoes = usuario.total_avaliacoes != null ? usuario.total_avaliacoes : 0;
-        const taxaResposta = usuario.taxa_resposta != null ? usuario.taxa_resposta : 100;
-        const bio = usuario.bio || 'Disponível para pequenos reparos, montagens e serviços gerais';
+        // Números reais (os mesmos do perfil público): nada de indicador fixo.
+        const bicosConcluidos = reputacao.concluidos;
+        const avaliacao = reputacao.media !== null ? reputacao.media.toFixed(1).replace('.', ',') : '—';
+        const totalAvaliacoes = reputacao.totalAvaliacoes;
+        const bio = usuario.bio || '';
         const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'TR';
     %>
 
@@ -49,18 +49,13 @@
             <div class="pt-banner">
                 <div class="pt-avatar">
                     <span><%= iniciais %></span>
-                    <i class="pt-avatar-status" title="Online"></i>
                 </div>
                 <div class="pt-banner-info">
                     <div class="pt-banner-linha">
                         <h2><%= usuario.nome %></h2>
                         <span class="pt-pill pt-pill-role"><i class="pt-dot"></i><%= usuario.tipo_perfil ? usuario.tipo_perfil.toLowerCase() : 'trabalhador' %></span>
-                        <span class="pt-pill pt-pill-verificado">
-                            <i class="ph-fill ph-seal-check" aria-hidden="true"></i>
-                            Perfil Verificado
-                        </span>
                     </div>
-                    <p class="pt-banner-bio"><%= bio %></p>
+                    <% if (bio) { %><p class="pt-banner-bio"><%= bio %></p><% } %>
                 </div>
             </div>
 
@@ -74,17 +69,22 @@
                     <span class="pt-stat-label">Avaliação média</span>
                     <strong class="pt-stat-valor">
                         <%= avaliacao %> <span class="pt-estrela">★</span>
-                        <small>(<%= totalAvaliacoes %> opiniões)</small>
+                        <small>(<%= totalAvaliacoes %> <%= totalAvaliacoes === 1 ? 'avaliação' : 'avaliações' %>)</small>
                     </strong>
                 </div>
                 <div class="pt-stat">
-                    <span class="pt-stat-label">Taxa de resposta</span>
-                    <strong class="pt-stat-valor pt-destaque"><%= taxaResposta %>%</strong>
+                    <span class="pt-stat-label">Membro desde</span>
+                    <strong class="pt-stat-valor pt-stat-texto"><%= membroDesde || usuario.data_cadastro_formatada %></strong>
                 </div>
                 <div class="pt-stat">
-                    <span class="pt-stat-label">Status na plataforma</span>
-                    <span class="pt-badge-ativo">Ativo &amp; Seguro</span>
+                    <span class="pt-stat-label">Último serviço concluído</span>
+                    <strong class="pt-stat-valor pt-stat-texto"><%= reputacao.ultimoServico || 'Nenhum ainda' %></strong>
                 </div>
+            </div>
+            <div class="pt-ver-publico">
+                <a class="pt-btn-link" id="link-perfil-publico" href="/perfil/publico/<%= usuario.id %>">
+                    <i class="ph ph-eye" aria-hidden="true"></i> Ver como os outros veem meu perfil
+                </a>
             </div>
 
             <div class="pt-corpo">
@@ -110,7 +110,6 @@
                         <label>Email</label>
                         <div class="pt-campo-linha">
                             <div class="pt-campo-valor pt-mono"><%= usuario.email %></div>
-                            <span class="pt-tag-confirmado">Confirmado</span>
                         </div>
                     </div>
 
@@ -140,7 +139,7 @@
                                 <i class="ph ph-calendar-blank" aria-hidden="true"></i>
                                 <%= usuario.data_cadastro_formatada %>
                             </div>
-                            <span class="pt-tag-neutra">Membro recente</span>
+                            <% if (membroRecente) { %><span class="pt-tag-neutra">Membro recente</span><% } %>
                         </div>
                     </div>
                 </div>
@@ -150,12 +149,8 @@
                     <div>
                         <h3 class="pt-sub-titulo">
                             <i class="ph ph-shield-check" aria-hidden="true"></i>
-                            Segurança e Verificação
+                            Segurança
                         </h3>
-                        <ul class="pt-lista-seguranca">
-                            <li><span><i class="pt-dot"></i>Documento de Identidade validado</span><b>Aprovado</b></li>
-                            <li><span><i class="pt-dot"></i>Telefone cadastrado e verificado</span><b>Ativo</b></li>
-                        </ul>
                         <button type="button" class="pt-btn-link pt-btn-senha" id="ptBtnSenha">Alterar senha</button>
                     </div>
                 </div>

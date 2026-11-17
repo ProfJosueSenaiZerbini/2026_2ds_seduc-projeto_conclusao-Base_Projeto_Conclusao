@@ -175,13 +175,13 @@ body {
   background: #1fc98a;
 }
 
-.pill-verificado {
+.pill-conta {
   background: rgba(255, 255, 255, .12);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, .25);
 }
 
-.pill-verificado svg {
+.pill-conta svg {
   color: #1fc98a;
 }
 
@@ -614,3 +614,5 @@ body {
     font-size: 1.8rem;
   }
 }
+.stat-texto { font-size: 1.05rem; }
+.ver-publico { padding: 14px 32px; border-bottom: 1px solid var(--contractor-profile-border); }

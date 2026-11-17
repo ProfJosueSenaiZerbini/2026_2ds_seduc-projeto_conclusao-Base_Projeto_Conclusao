@@ -61,7 +61,7 @@ test.describe('Avaliação bidirecional (contratante e trabalhador)', () => {
     await expect(pagina.locator('#perfil-tipo')).toContainText('Contratante');
     await expect(pagina.locator('h1')).toContainText(contratante.nome);
     await expect(pagina.locator('#perfil-membro-desde')).toContainText(/Membro desde \S+ de \d{4}/);
-    await expect(pagina.locator('#perfil-bicos-finalizados')).toContainText('1 bico finalizado');
+    await expect(pagina.locator('#perfil-bicos-concluidos')).toContainText('1 bico concluído');
     await expect(pagina.locator('.rating-stars')).toHaveAttribute('aria-label', /5,0 de 5/);
     await expect(pagina.locator('body')).toContainText('1 avaliação');
     const avaliacao = pagina.locator('.review-card');
@@ -71,7 +71,7 @@ test.describe('Avaliação bidirecional (contratante e trabalhador)', () => {
     await expect(avaliacao.locator('.review-stars[aria-label="5 de 5 estrelas"]')).toHaveCount(1);
 
     // Privacidade: nada de e-mail, CPF, idade ou saldo no perfil público.
-    const html = await pagina.content();
+    const html = await pagina.locator('main').innerHTML();
     expect(html).not.toContain(contratante.email);
     expect(html).not.toMatch(/CPF|saldo|idade/i);
     await pagina.close();

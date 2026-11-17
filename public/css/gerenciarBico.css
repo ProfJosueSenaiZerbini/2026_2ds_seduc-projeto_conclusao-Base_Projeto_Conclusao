@@ -724,3 +724,6 @@
 .candidate-section .mascote-vazio {
   margin: 16px 0 0;
 }
+
+.candidate-card__concluidos { margin-top: 2px; }
+.candidate-card__concluidos { margin: 2px 0 0; font-size: 0.9rem; color: #475569; }

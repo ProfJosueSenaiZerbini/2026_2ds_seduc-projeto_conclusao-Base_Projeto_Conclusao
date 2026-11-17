@@ -1,20 +1,34 @@
 import bcrypt from 'bcrypt';
 import pool from '../config/database.js';
 import { validarEmail, validarIdade, validarNome, validarSenha } from '../validations/usuarioValidation.js';
+import { buscarReputacao } from './reputacao.js';
+
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const formatarMembroDesde = (data) => {
+    const d = data ? new Date(data) : null;
+    return d && !Number.isNaN(d.getTime()) ? `${MESES[d.getMonth()]} de ${d.getFullYear()}` : null;
+};
+
+// "Membro recente": cadastro com menos de 30 dias.
+const DIAS_MEMBRO_RECENTE = 30;
+export const cadastroRecente = (criadoEm, agora = new Date()) => {
+    const data = criadoEm ? new Date(criadoEm) : null;
+    if (!data || Number.isNaN(data.getTime())) return false;
+    return (agora.getTime() - data.getTime()) < DIAS_MEMBRO_RECENTE * 24 * 60 * 60 * 1000;
+};
 
 export const exibirPerfil = async (req, res) => {
     const sessao = req.session?.usuario;
     if (!sessao) return res.redirect('/login');
     try {
-        const rows = await pool.query("SELECT id, nome, email, cpf, idade, tipo_perfil, saldo_simulado, DATE_FORMAT(criado_em, '%d/%m/%Y') AS data_cadastro_formatada FROM usuarios WHERE id = ?", [sessao.id || sessao.id_usuario]);
+        const rows = await pool.query("SELECT id, nome, email, cpf, idade, tipo_perfil, saldo_simulado, criado_em, DATE_FORMAT(criado_em, '%d/%m/%Y') AS data_cadastro_formatada FROM usuarios WHERE id = ?", [sessao.id || sessao.id_usuario]);
         const usuario = rows[0];
         if (!usuario) return res.redirect('/login');
         const tipoPerfil = usuario.tipo_perfil?.trim().toLowerCase();
-        if (tipoPerfil === 'trabalhador') {
-            return res.render('trabalhador/perfilTrabalhador', { usuario });
-        }
-        if (tipoPerfil === 'contratante') {
-            return res.render('contratante/perfilContratante', { usuario });
+        if (tipoPerfil === 'trabalhador' || tipoPerfil === 'contratante') {
+            const reputacao = await buscarReputacao(pool, usuario.id, tipoPerfil);
+            const view = tipoPerfil === 'trabalhador' ? 'trabalhador/perfilTrabalhador' : 'contratante/perfilContratante';
+            return res.render(view, { usuario, reputacao, membroDesde: formatarMembroDesde(usuario.criado_em), membroRecente: cadastroRecente(usuario.criado_em) });
         }
         return res.status(403).send('Acesso negado para o perfil desta conta.');
     } catch (erro) {
@@ -68,11 +82,10 @@ export const criarAtualizadorSenha = (banco, hasher = bcrypt) => async (req, res
 };
 export const atualizarSenha = criarAtualizadorSenha(pool, bcrypt);
 
-const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
-// Perfil público de trabalhador ou contratante. Expõe SOMENTE: nome, tipo de perfil, membro desde,
-// média e quantidade de avaliações recebidas, bicos finalizados e a lista de avaliações recebidas.
-// Nunca devolve e-mail, CPF, idade ou saldo (a consulta nem seleciona essas colunas).
+// Perfil público de trabalhador ou contratante. Expõe SOMENTE: nome, tipo de perfil, membro desde, último
+// serviço concluído, indicadores de reputação (média, distribuição das notas, bicos) e as avaliações recebidas.
+// Nunca devolve e-mail, CPF, idade ou saldo (as consultas nem selecionam essas colunas).
 export const exibirPerfilPublico = async (req, res) => {
     const idRecebido = req.params?.id;
     const usuarioId = typeof idRecebido === 'string' && /^\d+$/.test(idRecebido)
@@ -97,49 +110,36 @@ export const exibirPerfilPublico = async (req, res) => {
             return res.status(404).send('Perfil não encontrado.');
         }
 
-        const estatisticas = await pool.query(
-            `SELECT COUNT(*) AS quantidade, AVG(nota) AS media
-             FROM avaliacoes
-             WHERE avaliado_id = ?`,
-            [usuarioId]
-        );
-        const resumo = estatisticas[0] || {};
-
-        const coluna = perfil.tipo_perfil === 'trabalhador' ? 'trabalhador_id' : 'contratante_id';
-        const finalizados = await pool.query(
-            `SELECT COUNT(*) AS total FROM bicos WHERE ${coluna} = ? AND status = 'Finalizado'`,
-            [usuarioId]
-        );
+        // Poucas consultas, sem N+1: notas agrupadas, contadores de bicos e a lista de avaliações.
+        const reputacao = await buscarReputacao(pool, usuarioId, perfil.tipo_perfil);
 
         const avaliacoes = await pool.query(
             `SELECT a.nota,
                     a.comentario,
                     avaliador.nome AS avaliador_nome,
+                    LOWER(avaliador.tipo_perfil) AS avaliador_tipo,
                     DATE_FORMAT(a.data_atualizacao, '%d/%m/%Y') AS data_avaliacao
              FROM avaliacoes a
              JOIN usuarios avaliador ON avaliador.id = a.avaliador_id
              WHERE a.avaliado_id = ?
-             ORDER BY a.data_atualizacao DESC, a.id DESC`,
+             ORDER BY a.data_atualizacao DESC, a.id DESC
+             LIMIT 200`,
             [usuarioId]
         );
 
-        const desde = perfil.criado_em ? new Date(perfil.criado_em) : null;
-
         return res.render('perfilPublico', {
             perfil: {
+                id: perfil.id,
                 nome: perfil.nome,
                 tipo: perfil.tipo_perfil,
                 rotuloTipo: perfil.tipo_perfil === 'trabalhador' ? 'Trabalhador' : 'Contratante',
-                membroDesde: desde && !Number.isNaN(desde.getTime())
-                    ? `${MESES[desde.getMonth()]} de ${desde.getFullYear()}`
-                    : null
+                membroDesde: formatarMembroDesde(perfil.criado_em)
             },
-            mediaAvaliacoes: resumo.media === null || resumo.media === undefined ? 0 : Number(resumo.media),
-            quantidadeAvaliacoes: Number(resumo.quantidade || 0),
-            bicosFinalizados: Number(finalizados[0]?.total || 0),
+            reputacao,
             avaliacoes: avaliacoes.map((avaliacao) => ({
                 ...avaliacao,
-                nota: Number(avaliacao.nota)
+                nota: Number(avaliacao.nota),
+                avaliador_rotulo: avaliacao.avaliador_tipo === 'trabalhador' ? 'Trabalhador' : 'Contratante'
             }))
         });
     } catch (erro) {
