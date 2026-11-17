@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS movimentacoes_carteira (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     bico_id INT DEFAULT NULL,
-    tipo_movimentacao ENUM('ADICAO', 'RESERVA', 'CREDITO') NOT NULL,
+    tipo_movimentacao ENUM('ADICAO', 'RESERVA', 'CREDITO', 'ESTORNO') NOT NULL,
     valor DECIMAL(10, 2) NOT NULL,
     descricao VARCHAR(255) DEFAULT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

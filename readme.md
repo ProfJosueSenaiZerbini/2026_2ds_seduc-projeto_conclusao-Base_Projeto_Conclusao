@@ -67,6 +67,8 @@ Substitua `seu_usuario` pelo usuário do seu banco de dados. O terminal solicita
 
 Ou, pelo **phpMyAdmin / MySQL Workbench**, abra o arquivo `schema.sql` e execute o script completo.
 
+> **Banco já criado antes do cancelamento de bico?** Execute uma vez `migrations/001_estorno.sql` (adiciona o tipo `ESTORNO` à tabela `movimentacoes_carteira`). Quem criou o banco com o `schema.sql` atual não precisa.
+
 ### 4. 🔐 Configure as variáveis de ambiente
 
 Crie um arquivo chamado `.env` na raiz do projeto com as seguintes variáveis:

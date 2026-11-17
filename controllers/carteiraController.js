@@ -32,7 +32,7 @@ export const exibirCarteiraContratante = async (req, res) => {
         DATE_FORMAT(m.criado_em, '%d/%m/%Y %H:%i') AS dataHora,
         m.tipo_movimentacao AS status,
         CASE
-          WHEN m.tipo_movimentacao = 'ADICAO' THEN 'Entrada'
+          WHEN m.tipo_movimentacao IN ('ADICAO', 'ESTORNO') THEN 'Entrada'
           WHEN m.tipo_movimentacao = 'RESERVA' THEN 'Saída'
         END AS tipo
        FROM movimentacoes_carteira m

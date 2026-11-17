@@ -279,7 +279,7 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
             JOIN usuarios u ON u.id = b.contratante_id
-            WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status <> 'Finalizado'
+            WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status NOT IN ('Finalizado', 'Cancelado')
             ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
@@ -408,11 +408,49 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
             ORDER BY candidatura_ordem_ts DESC, c.id DESC
         `;
 
+        // Candidatura aceita cujo bico foi cancelado pelo contratante: nunca aparece como em andamento.
+        // A data e o motivo vêm do evento 'Cancelamento' mais recente do bico.
+        const queryCanceladosPeloContratante = `
+            SELECT
+                c.id AS candidatura_id,
+                UNIX_TIMESTAMP(COALESCE(ec.data_evento, c.atualizado_em)) AS candidatura_ordem_ts,
+                DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS candidatura_criada_formatada,
+                DATE_FORMAT(c.atualizado_em, '%d/%m/%Y %H:%i') AS candidatura_atualizada_formatada,
+                b.id AS bico_id,
+                b.titulo,
+                b.descricao,
+                b.valor,
+                b.status AS bico_status,
+                b.horario,
+                b.bairro AS local,
+                u.nome AS cliente_nome,
+                DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
+                c.status AS status_anterior,
+                'Cancelado' AS status_novo,
+                DATE_FORMAT(ec.data_evento, '%d/%m/%Y %H:%i') AS data_alteracao_formatada,
+                ec.observacao,
+                1 AS cancelado_pelo_contratante
+            FROM candidaturas c
+            JOIN bicos b ON c.bico_id = b.id
+            JOIN usuarios u ON u.id = b.contratante_id
+            LEFT JOIN historico_eventos_bicos ec ON ec.id = (
+                SELECT e2.id FROM historico_eventos_bicos e2
+                WHERE e2.bico_id = b.id AND e2.tipo_evento = 'Cancelamento' AND e2.status_novo = 'Cancelado'
+                ORDER BY e2.data_evento DESC, e2.id DESC LIMIT 1
+            )
+            WHERE c.trabalhador_id = ? AND c.status = 'Aceito' AND b.status = 'Cancelado'
+            ORDER BY candidatura_ordem_ts DESC, c.id DESC
+        `;
+
         const bicosAceitos = await pool.query(queryAceitos, [trabalhador_id]);
         const bicosConcluidos = await pool.query(queryConcluidos, [trabalhador_id]);
         const bicosPendentes = await pool.query(queryPendentes, [trabalhador_id]);
         const bicosRecusados = await pool.query(queryRecusados, [trabalhador_id]);
-        const bicosCancelados = await pool.query(queryCancelados, [trabalhador_id]);
+        const canceladosPeloTrabalhador = await pool.query(queryCancelados, [trabalhador_id]);
+        const canceladosPeloContratante = await pool.query(queryCanceladosPeloContratante, [trabalhador_id]);
+        const bicosCancelados = [...canceladosPeloContratante, ...canceladosPeloTrabalhador]
+            .sort((a, b) => Number(b.candidatura_ordem_ts) - Number(a.candidatura_ordem_ts));
 
         return res.render('trabalhador/historicoTrabalhador', {
             aceitos: bicosAceitos,

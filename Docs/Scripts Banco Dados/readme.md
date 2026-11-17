@@ -13,6 +13,12 @@ O script oficial de criação é o [`schema.sql`](../../schema.sql), na raiz do 
 3. Selecione `db_bico` → **Importar** → escolha `schema.sql` (UTF-8, formato SQL) → **Executar**.
 4. Confira: 8 tabelas, todas InnoDB.
 
+## Migrações
+
+A pasta [`migrations/`](../../migrations) tem scripts para bancos que já foram criados com um `schema.sql` anterior. Quem cria o banco do zero com o `schema.sql` atual não precisa deles.
+
+- `001_estorno.sql`: adiciona `ESTORNO` ao ENUM `movimentacoes_carteira.tipo_movimentacao` (cancelamento de bico com estorno simulado). Execute uma única vez no `db_bico` (phpMyAdmin → SQL, ou MySQL Workbench). Não altera linhas existentes.
+
 ## Tabelas
 
 Ordem de criação (cada tabela só referencia tabelas anteriores):
@@ -64,7 +70,7 @@ Mensagens da conversa de uma candidatura aceita. `candidatura_id` (FK, `ON DELET
 Histórico de mudanças de status das candidaturas. `candidatura_id` (FK, `ON DELETE CASCADE`), `status_anterior` (opcional) e `status_novo` (ENUM igual ao de `candidaturas`), `alterado_por` (FK → usuarios), `observacao` VARCHAR(255), `data_alteracao`.
 
 ### movimentacoes_carteira
-Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adição de saldo), `tipo_movimentacao` ENUM `ADICAO`, `RESERVA`, `CREDITO`; `valor` DECIMAL(10,2) com CHECK `> 0`; `descricao` VARCHAR(255); `criado_em`. Restrição única `(bico_id, tipo_movimentacao)`: cada bico gera no máximo uma reserva e um crédito (várias adições de saldo são permitidas, pois `bico_id` é nulo nelas).
+Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adição de saldo), `tipo_movimentacao` ENUM `ADICAO`, `RESERVA`, `CREDITO`, `ESTORNO`; `valor` DECIMAL(10,2) com CHECK `> 0`; `descricao` VARCHAR(255); `criado_em`. Restrição única `(bico_id, tipo_movimentacao)`: cada bico gera no máximo uma reserva, um crédito e um estorno (o estorno devolve ao contratante a reserva de um bico cancelado; várias adições de saldo são permitidas, pois `bico_id` é nulo nelas).
 
 ## Relacionamentos
 
@@ -77,7 +83,7 @@ Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adiç�
 ## Regras garantidas pelo banco
 
 - E-mail e CPF únicos; saldo nunca negativo; idade entre 18 e 90; valor do bico e das movimentações maior que zero; nota de 1 a 5.
-- Uma candidatura por trabalhador em cada bico; uma avaliação por bico; uma reserva e um crédito por bico.
+- Uma candidatura por trabalhador em cada bico; uma avaliação por bico; uma reserva, um crédito e um estorno por bico.
 
 ## Exclusões (chaves estrangeiras)
 
@@ -106,5 +112,5 @@ Efeito prático:
 ## Observações
 
 - O `sql_mode` padrão do XAMPP não é estrito: um texto longo demais seria cortado e um valor de ENUM inválido seria gravado como texto vazio, ambos apenas com aviso. A aplicação valida os dados antes de gravar. Os CHECKs são aplicados mesmo sem modo estrito.
-- Limitação conhecida: não há cancelamento de bico com estorno financeiro (valores permanecem simulados).
+- O contratante pode cancelar um bico `Aberto` ou `Em andamento` (`POST /bicos/:id/cancelar`). No segundo caso, a reserva volta ao saldo dele e é registrada como `ESTORNO` em `movimentacoes_carteira`. Bico finalizado não pode ser cancelado. Todos os valores permanecem simulados.
 - Para quem já tem um banco antigo: este script não migra dados existentes. As diferenças para o schema antigo são os CHECKs de `usuarios` e `bicos`, a coluna `bicos.criado_em` e o charset/motor explícitos.

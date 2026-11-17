@@ -59,14 +59,16 @@
     </section>
 
     <footer class="chat-input-bar">
-      <p id="chat-feedback" class="message__erro-aviso" role="status" aria-live="polite"></p>
+      <% const bloqueada = (typeof conversaBloqueada !== 'undefined') && conversaBloqueada; %>
+      <p id="chat-feedback" class="message__erro-aviso" role="status" aria-live="polite"><%= bloqueada ? 'Este bico foi cancelado pelo contratante. A conversa está disponível apenas para leitura.' : '' %></p>
       <form id="form-chat" class="chat-input-bar__form">
         <textarea
           id="input-mensagem"
           class="chat-input-bar__campo"
           aria-label="Mensagem"
           aria-describedby="chat-feedback"
-          placeholder="Digite uma mensagem"
+          placeholder="<%= bloqueada ? 'Conversa encerrada: bico cancelado' : 'Digite uma mensagem' %>"
+          <%= bloqueada ? 'disabled' : '' %>
         ></textarea>
         <button
           id="btn-enviar"

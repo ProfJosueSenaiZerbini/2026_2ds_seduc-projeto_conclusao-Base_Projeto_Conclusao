@@ -26,6 +26,7 @@
     const rotuloDataPainel = rotuloBadge === 'Recusado' ? 'Recusada em' : (rotuloBadge === 'Cancelado' ? 'Cancelada em' : 'Data da alteração');
     // Painel de Recusado/Cancelado: explicação do estado + observação somente quando for real e relevante.
     const ehRecusado = rotuloBadge === 'Recusado' || (!rotuloBadge && bico.status_novo === 'Recusado');
+    const canceladoPeloContratante = !!bico.cancelado_pelo_contratante; // candidatura aceita cujo bico foi cancelado pelo contratante
     const observacaoTexto = String(bico.observacao || '').trim();
     const OBSERVACAO_PADRAO_CANCELAMENTO = 'Candidatura cancelada pelo próprio trabalhador'; // texto automático: já está na explicação
     const mostrarObservacao = !!observacaoTexto && (ehRecusado || observacaoTexto !== OBSERVACAO_PADRAO_CANCELAMENTO);
@@ -51,7 +52,7 @@
         <% if (tipo==='pendente' ) { %>
             <span class="badge badge--warning">Pendente</span>
         <% } else if (tipo==='cancelado' ) { %>
-            <span class="badge <%= ehRecusado ? 'badge--danger' : 'badge--cancelado' %>"><%= rotuloBadge || bico.status_novo || 'Cancelado' %></span>
+            <span class="badge <%= ehRecusado ? 'badge--danger' : 'badge--cancelado' %>"><%= canceladoPeloContratante ? 'Cancelado pelo contratante' : (rotuloBadge || bico.status_novo || 'Cancelado') %></span>
         <% } else { %>
             <span class="badge badge--success"><span class="badge__dot"></span>Aceito</span>
             <span class="badge <%= classeServico %>"><%= rotuloServico %></span>
@@ -117,6 +118,8 @@
                             <div class="bico-card__cancel <%= ehRecusado ? 'bico-card__cancel--recusado' : 'bico-card__cancel--cancelado' %>">
                                 <% if (ehRecusado) { %>
                                 <p class="bico-card__cancel-titulo"><i class="ph-fill ph-x-circle" aria-hidden="true"></i><strong>O contratante não selecionou sua candidatura.</strong></p>
+                                <% } else if (canceladoPeloContratante) { %>
+                                <p class="bico-card__cancel-titulo"><i class="ph-fill ph-prohibit" aria-hidden="true"></i><strong>O contratante cancelou este bico. O serviço não será realizado.</strong></p>
                                 <% } else { %>
                                 <p class="bico-card__cancel-titulo"><i class="ph-fill ph-prohibit" aria-hidden="true"></i><strong>Você cancelou esta candidatura. Não é possível se candidatar novamente a este serviço.</strong></p>
                                 <% } %>

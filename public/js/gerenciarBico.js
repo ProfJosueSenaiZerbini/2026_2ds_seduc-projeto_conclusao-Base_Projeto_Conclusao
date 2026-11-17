@@ -55,6 +55,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Cancelamento do bico: modal de confirmação (com motivo opcional) e envio por fetch.
+  const formCancelar = document.getElementById('form-cancelar-bico');
+  const modalCancelar = document.getElementById('confirm-cancel-modal');
+
+  if (formCancelar && modalCancelar) {
+    const botaoCancelarBico = document.getElementById('btn-cancelar-bico');
+    const botaoConfirmarCancelamento = document.getElementById('confirm-cancel-button');
+    const botaoVoltar = document.getElementById('cancel-cancel-button');
+    const campoMotivo = document.getElementById('motivo-cancelamento');
+    const feedbackCancelamento = document.getElementById('feedback-finalizar-bico');
+
+    const fecharModalCancelamento = () => {
+      modalCancelar.classList.add('is-closing');
+      window.setTimeout(() => {
+        if (modalCancelar.open) modalCancelar.close();
+        modalCancelar.classList.remove('is-closing');
+      }, 170);
+    };
+
+    formCancelar.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      if (botaoCancelarBico.disabled) return;
+      modalCancelar.showModal();
+      botaoVoltar.focus();
+    });
+
+    botaoVoltar.addEventListener('click', fecharModalCancelamento);
+    modalCancelar.addEventListener('cancel', (evento) => {
+      evento.preventDefault();
+      fecharModalCancelamento();
+    });
+    modalCancelar.addEventListener('click', (evento) => {
+      if (evento.target === modalCancelar) fecharModalCancelamento();
+    });
+
+    botaoConfirmarCancelamento.addEventListener('click', async () => {
+      botaoConfirmarCancelamento.disabled = true;
+      botaoCancelarBico.disabled = true;
+      feedbackCancelamento.textContent = '';
+
+      try {
+        const resposta = await fetch(formCancelar.action, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: new URLSearchParams({ motivo: campoMotivo.value }).toString(),
+          credentials: 'same-origin'
+        });
+
+        let dados;
+        try {
+          dados = await resposta.json();
+        } catch (_erroJson) {
+          throw new Error('O servidor retornou uma resposta inválida.');
+        }
+
+        if (!resposta.ok || dados.sucesso !== true) {
+          throw new Error(dados.erro || 'Não foi possível cancelar o bico.');
+        }
+
+        // Recarrega a página para refletir o novo status e as candidaturas recusadas.
+        window.location.reload();
+      } catch (erro) {
+        fecharModalCancelamento();
+        feedbackCancelamento.textContent = erro instanceof TypeError
+          ? 'Falha de conexão. Verifique sua rede e tente novamente.'
+          : erro.message || 'Não foi possível cancelar o bico.';
+        botaoConfirmarCancelamento.disabled = false;
+        botaoCancelarBico.disabled = false;
+      }
+    });
+  }
+
   const form = document.getElementById('form-finalizar-bico');
   const botao = document.getElementById('btn-finalizar-bico');
   const feedback = document.getElementById('feedback-finalizar-bico');
