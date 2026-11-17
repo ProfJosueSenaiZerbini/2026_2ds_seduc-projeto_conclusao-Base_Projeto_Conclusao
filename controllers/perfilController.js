@@ -68,66 +68,82 @@ export const criarAtualizadorSenha = (banco, hasher = bcrypt) => async (req, res
 };
 export const atualizarSenha = criarAtualizadorSenha(pool, bcrypt);
 
-export const exibirPerfilPublicoTrabalhador = async (req, res) => {
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+// Perfil público de trabalhador ou contratante. Expõe SOMENTE: nome, tipo de perfil, membro desde,
+// média e quantidade de avaliações recebidas, bicos finalizados e a lista de avaliações recebidas.
+// Nunca devolve e-mail, CPF, idade ou saldo (a consulta nem seleciona essas colunas).
+export const exibirPerfilPublico = async (req, res) => {
     const idRecebido = req.params?.id;
-    const trabalhadorId = typeof idRecebido === 'string' && /^\d+$/.test(idRecebido)
+    const usuarioId = typeof idRecebido === 'string' && /^\d+$/.test(idRecebido)
         ? Number(idRecebido)
         : NaN;
 
-    if (!Number.isSafeInteger(trabalhadorId) || trabalhadorId <= 0 || trabalhadorId > 2147483647) {
-        return res.status(400).send('Identificador de trabalhador inválido.');
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0 || usuarioId > 2147483647) {
+        return res.status(400).send('Identificador de usuário inválido.');
     }
 
     try {
-        const trabalhadores = await pool.query(
-            `SELECT id, nome
+        const usuarios = await pool.query(
+            `SELECT id, nome, LOWER(tipo_perfil) AS tipo_perfil, criado_em
              FROM usuarios
-             WHERE id = ? AND LOWER(tipo_perfil) = 'trabalhador'
+             WHERE id = ? AND LOWER(tipo_perfil) IN ('trabalhador', 'contratante')
              LIMIT 1`,
-            [trabalhadorId]
+            [usuarioId]
         );
-        const trabalhador = trabalhadores[0];
+        const perfil = usuarios[0];
 
-        if (!trabalhador) {
-            return res.status(404).send('Perfil de trabalhador não encontrado.');
+        if (!perfil) {
+            return res.status(404).send('Perfil não encontrado.');
         }
 
         const estatisticas = await pool.query(
-            `SELECT COUNT(*) AS quantidade, AVG(a.nota) AS media
-             FROM avaliacoes a
-             JOIN usuarios contratante
-               ON contratante.id = a.avaliador_id
-              AND LOWER(contratante.tipo_perfil) = 'contratante'
-             WHERE a.avaliado_id = ?`,
-            [trabalhadorId]
+            `SELECT COUNT(*) AS quantidade, AVG(nota) AS media
+             FROM avaliacoes
+             WHERE avaliado_id = ?`,
+            [usuarioId]
         );
         const resumo = estatisticas[0] || {};
+
+        const coluna = perfil.tipo_perfil === 'trabalhador' ? 'trabalhador_id' : 'contratante_id';
+        const finalizados = await pool.query(
+            `SELECT COUNT(*) AS total FROM bicos WHERE ${coluna} = ? AND status = 'Finalizado'`,
+            [usuarioId]
+        );
 
         const avaliacoes = await pool.query(
             `SELECT a.nota,
                     a.comentario,
-                    contratante.nome AS contratante_nome,
+                    avaliador.nome AS avaliador_nome,
                     DATE_FORMAT(a.data_atualizacao, '%d/%m/%Y') AS data_avaliacao
              FROM avaliacoes a
-             JOIN usuarios contratante
-               ON contratante.id = a.avaliador_id
-              AND LOWER(contratante.tipo_perfil) = 'contratante'
+             JOIN usuarios avaliador ON avaliador.id = a.avaliador_id
              WHERE a.avaliado_id = ?
-             ORDER BY a.data_atualizacao DESC, a.bico_id DESC`,
-            [trabalhadorId]
+             ORDER BY a.data_atualizacao DESC, a.id DESC`,
+            [usuarioId]
         );
 
-        return res.render('trabalhador/perfilPublicoTrabalhador', {
-            trabalhador,
-            mediaAvaliacoes: resumo.media === null ? 0 : Number(resumo.media),
+        const desde = perfil.criado_em ? new Date(perfil.criado_em) : null;
+
+        return res.render('perfilPublico', {
+            perfil: {
+                nome: perfil.nome,
+                tipo: perfil.tipo_perfil,
+                rotuloTipo: perfil.tipo_perfil === 'trabalhador' ? 'Trabalhador' : 'Contratante',
+                membroDesde: desde && !Number.isNaN(desde.getTime())
+                    ? `${MESES[desde.getMonth()]} de ${desde.getFullYear()}`
+                    : null
+            },
+            mediaAvaliacoes: resumo.media === null || resumo.media === undefined ? 0 : Number(resumo.media),
             quantidadeAvaliacoes: Number(resumo.quantidade || 0),
+            bicosFinalizados: Number(finalizados[0]?.total || 0),
             avaliacoes: avaliacoes.map((avaliacao) => ({
                 ...avaliacao,
                 nota: Number(avaliacao.nota)
             }))
         });
     } catch (erro) {
-        console.error('Erro ao exibir perfil público do trabalhador:', erro?.code || 'erro inesperado');
-        return res.status(500).send('Erro ao carregar o perfil público do trabalhador.');
+        console.error('Erro ao exibir perfil público:', erro?.code || 'erro inesperado');
+        return res.status(500).send('Erro ao carregar o perfil público.');
     }
 };

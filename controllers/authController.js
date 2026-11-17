@@ -1,5 +1,6 @@
 import pool from '../config/database.js';
 import bcrypt from 'bcrypt';
+import { PRAZO_AVALIACAO_DIAS, SQL_FINALIZADO_EM } from './avaliacaoRegras.js';
 import {
     normalizarCPF,
     validarConfirmacaoSenha,
@@ -228,6 +229,23 @@ export const homeContratante = async (req, res) => {
             [contratanteId]
         );
         const candidaturasPendentes = Number(resultadoCandidaturas[0]?.total || 0);
+
+        // "Aguardando sua avaliação": bicos finalizados que este contratante ainda não avaliou e cujo
+        // prazo de avaliação (PRAZO_AVALIACAO_DIAS dias após a finalização) não terminou.
+        const resultadoParaAvaliar = await pool.query(
+            `SELECT COUNT(*) AS total
+             FROM bicos b
+             WHERE b.contratante_id = ?
+               AND b.status = 'Finalizado'
+               AND b.trabalhador_id IS NOT NULL
+               AND NOT EXISTS (
+                   SELECT 1 FROM avaliacoes a
+                   WHERE a.bico_id = b.id AND a.avaliador_id = ?
+               )
+               AND DATE_ADD(${SQL_FINALIZADO_EM}, INTERVAL ? DAY) > NOW()`,
+            [contratanteId, contratanteId, PRAZO_AVALIACAO_DIAS]
+        );
+        const bicosParaAvaliar = Number(resultadoParaAvaliar[0]?.total || 0);
         const bicosAtivos = bicos.filter(
             bico => bico.status === 'Aberto' || bico.status === 'Em andamento'
         );
@@ -240,6 +258,7 @@ export const homeContratante = async (req, res) => {
             bicos,
             bicosAtivos,
             candidaturasPendentes,
+            bicosParaAvaliar,
             bicosEmAndamento
         });
     } catch (erro) {
@@ -273,6 +292,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS candidatura_status
@@ -301,6 +323,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS candidatura_status
@@ -330,6 +355,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS candidatura_status
@@ -356,6 +384,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 h.status_anterior,
@@ -390,6 +421,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 h.status_anterior,
@@ -424,6 +458,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 b.horario,
                 b.bairro AS local,
                 u.nome AS cliente_nome,
+                u.id AS cliente_id,
+                (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_nota,
+                (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
                 c.status AS status_anterior,

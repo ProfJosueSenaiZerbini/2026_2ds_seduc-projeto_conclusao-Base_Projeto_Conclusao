@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import {
   BASE, criarConta, sufixoUnico, formulario,
   adicionarSaldo, publicarBico, candidatar, listarCandidatos, aceitar,
-  lerSaldoTrabalhador, statusDoBico, consultarBanco
+  lerSaldoTrabalhador, statusDoBico, consultarBanco, executarNoBanco
 } from '../support/cenario.js';
 
 const VALOR = 150;
@@ -185,7 +185,7 @@ test.describe('CT13 – Avaliação de bico finalizado', () => {
     await pagina.locator('label[for="nota-5"]').click();
     await pagina.locator('#comentario-avaliacao').fill('Excelente trabalho, muito pontual.');
     await pagina.locator('#btn-salvar-avaliacao').click();
-    await expect(pagina.locator('#feedback-avaliacao-bico')).toContainText('Avaliação salva com sucesso.');
+    await expect(pagina.locator('#feedback-avaliacao-bico')).toContainText('Avaliação registrada.');
 
     const titulo2 = `Avaliar CT13 B ${sufixoUnico()}`;
     const bico2 = await montarBicoEmAndamento(contratante, trabalhador, titulo2);
@@ -222,6 +222,7 @@ test.describe('CT13 – Avaliação de bico finalizado', () => {
     const contratante = await criarConta(browser, 'contratante', 'ct13rc');
     const outro = await criarConta(browser, 'contratante', 'ct13ro');
     const trabalhador = await criarConta(browser, 'trabalhador', 'ct13rt');
+    const terceiro = await criarConta(browser, 'trabalhador', 'ct13rx');
 
     // Bico Em andamento (não finalizado).
     const { bicoId: emAndamento } = await montarBicoEmAndamento(contratante, trabalhador, `Avaliar andamento CT13 ${sufixoUnico()}`);
@@ -246,18 +247,18 @@ test.describe('CT13 – Avaliação de bico finalizado', () => {
       await (await contratante.ctx.request.get(`${BASE}/bicos/${emAndamento}/gerenciar`)).text()
     )?.[1];
     const semNotas = await (await contratante.ctx.request.get(`${BASE}/perfil/publico/${idTrabalhador}`)).text();
-    expect(semNotas).toContain('Este trabalhador ainda não recebeu avaliações.');
+    expect(semNotas).toContain('Ainda sem avaliações');
 
-    // Outro contratante e o trabalhador não podem avaliar.
+    // Quem não participa do bico (outro contratante e outro trabalhador) não pode avaliar.
     expect((await avaliar(outro.ctx, emAndamento, { nota: '5' })).status()).toBe(403);
-    expect((await avaliar(trabalhador.ctx, emAndamento, { nota: '5' })).status()).toBe(403);
+    expect((await avaliar(terceiro.ctx, emAndamento, { nota: '5' })).status()).toBe(403);
     const aindaSem = await (await contratante.ctx.request.get(`${BASE}/perfil/publico/${idTrabalhador}`)).text();
-    expect(aindaSem).toContain('Este trabalhador ainda não recebeu avaliações.');
+    expect(aindaSem).toContain('Ainda sem avaliações');
 
     // Comentário acima de 500 caracteres é recusado.
     const longo = await avaliar(contratante.ctx, emAndamento, { nota: '5', comentario: 'a'.repeat(501) });
     expect(longo.status()).toBe(400);
 
-    for (const c of [contratante, outro, trabalhador]) await c.ctx.close();
+    for (const c of [contratante, outro, trabalhador, terceiro]) await c.ctx.close();
   });
 });

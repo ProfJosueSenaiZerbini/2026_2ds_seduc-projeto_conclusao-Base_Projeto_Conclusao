@@ -55,7 +55,7 @@ Todas as tabelas têm `id INT AUTO_INCREMENT` como chave primária. Colunas de d
 | criado_em | TIMESTAMP | data/hora da publicação (padrão: atual) |
 
 ### avaliacoes
-Uma avaliação por bico (`bico_id` único). `bico_id`, `avaliador_id` e `avaliado_id` são FKs (bicos / usuarios / usuarios). `nota` TINYINT com CHECK entre 1 e 5; `comentario` VARCHAR(500) opcional; `data_atualizacao` TIMESTAMP atualizado automaticamente a cada alteração.
+Até duas avaliações por bico: uma de cada participante (`UNIQUE (bico_id, avaliador_id)`), o contratante avaliando o trabalhador e o trabalhador avaliando o contratante; `CHECK (avaliador_id <> avaliado_id)`. `bico_id`, `avaliador_id` e `avaliado_id` são FKs (bicos / usuarios / usuarios). `nota` TINYINT com CHECK entre 1 e 5; `comentario` VARCHAR(500) opcional; `criado_em` TIMESTAMP da primeira avaliação; `data_atualizacao` TIMESTAMP atualizado automaticamente a cada alteração.
 
 ### historico_eventos_bicos
 Eventos de status do bico (hoje, a finalização). `bico_id` (FK, `ON DELETE RESTRICT`), `usuario_id` (FK), `tipo_evento` VARCHAR(50), `status_anterior` e `status_novo` (ENUM igual ao de `bicos`, opcionais), `observacao` VARCHAR(255), `data_evento` TIMESTAMP.
@@ -77,7 +77,7 @@ Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adiç�
 - `usuarios` 1—N `bicos` (como contratante e, opcionalmente, como trabalhador contratado).
 - `bicos` 1—N `candidaturas`; `usuarios` 1—N `candidaturas` (como trabalhador).
 - `candidaturas` 1—N `historico_candidaturas` e 1—N `mensagens_chat`.
-- `bicos` 1—0..1 `avaliacoes`; `bicos` 1—N `historico_eventos_bicos` e `movimentacoes_carteira`.
+- `bicos` 1—0..2 `avaliacoes`; `bicos` 1—N `historico_eventos_bicos` e `movimentacoes_carteira`.
 - `usuarios` também é referenciado por `avaliacoes` (avaliador e avaliado), `historico_eventos_bicos` (autor), `mensagens_chat` (remetente), `historico_candidaturas` (quem alterou) e `movimentacoes_carteira` (dono da carteira).
 
 ## Regras garantidas pelo banco

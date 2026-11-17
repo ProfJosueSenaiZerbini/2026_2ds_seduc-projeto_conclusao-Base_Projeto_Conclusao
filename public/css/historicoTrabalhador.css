@@ -968,3 +968,6 @@ body {
     animation: none;
   }
 }
+
+.meta__link { color: inherit; text-decoration: underline; }
+.meta__no-rating { margin-left: 6px; font-size: 0.8em; color: #64748b; }

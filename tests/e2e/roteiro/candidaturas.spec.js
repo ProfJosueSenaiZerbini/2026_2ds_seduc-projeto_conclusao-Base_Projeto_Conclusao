@@ -42,10 +42,10 @@ test.describe('Candidaturas e reserva de saldo', () => {
     await expect(pagina.locator('#aceitos')).not.toContainText(titulo);
     await pagina.close();
 
-    // Contratante: um candidato, com o e-mail do trabalhador e status Pendente.
+    // Contratante: um candidato, com o nome do trabalhador e status Pendente.
     const candidatos = await listarCandidatos(contratante.ctx, bicoId);
     expect(candidatos).toHaveLength(1);
-    expect(candidatos[0]).toMatchObject({ email: trabalhadorA.email, status: 'Pendente' });
+    expect(candidatos[0]).toMatchObject({ nome: trabalhadorA.nome, status: 'Pendente' });
 
     // Segunda candidatura do mesmo trabalhador ao mesmo bico.
     const segunda = await candidatar(trabalhadorA.ctx, bicoId);
@@ -69,7 +69,7 @@ test.describe('Candidaturas e reserva de saldo', () => {
 
     const candidatos = await listarCandidatos(contratante.ctx, bicoId);
     expect(candidatos.map((c) => c.status)).toEqual(['Pendente', 'Pendente']);
-    const daA = candidatos.find((c) => c.email === trabalhadorA.email);
+    const daA = candidatos.find((c) => c.nome === trabalhadorA.nome);
     expect(daA?.candidaturaId).toBeTruthy();
 
     const saldoAntes = await lerSaldoContratante(contratante.ctx);
@@ -100,8 +100,8 @@ test.describe('Candidaturas e reserva de saldo', () => {
     expect(await statusDaMinhaCandidatura(trabalhadorA.ctx, bicoId)).toBe('Aceito');
     expect(await statusDaMinhaCandidatura(trabalhadorB.ctx, bicoId)).toBe('Recusado');
     const depois = await listarCandidatos(contratante.ctx, bicoId);
-    expect(depois.find((c) => c.email === trabalhadorA.email).status).toBe('Aceito');
-    expect(depois.find((c) => c.email === trabalhadorB.email).status).toBe('Recusado');
+    expect(depois.find((c) => c.nome === trabalhadorA.nome).status).toBe('Aceito');
+    expect(depois.find((c) => c.nome === trabalhadorB.nome).status).toBe('Recusado');
 
     // O bico em andamento não aparece mais para novas candidaturas.
     const paginaB = await trabalhadorB.ctx.newPage();

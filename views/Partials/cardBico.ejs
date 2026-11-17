@@ -91,10 +91,12 @@
                                 <span class="meta__icon"><i class="ph ph-user" aria-hidden="true"></i></span>
                                 <div><span class="meta__label">Cliente</span>
                                     <span class="meta__value">
-                                        <%= bico.cliente_nome || '-' %>
+                                        <% if (bico.cliente_id) { %>
+                                            <a class="meta__link" href="/perfil/publico/<%= bico.cliente_id %>"><%= bico.cliente_nome || '-' %></a>
+                                        <% } else { %><%= bico.cliente_nome || '-' %><% } %>
                                             <% if (bico.cliente_nota) { %><span class="meta__star">★ <%=
-                                                        Number(bico.cliente_nota).toFixed(1) %></span>
-                                                <% } %>
+                                                        Number(bico.cliente_nota).toFixed(1).replace('.', ',') %> (<%= Number(bico.cliente_total_avaliacoes || 0) %>)</span>
+                                                <% } else { %><span class="meta__no-rating">Sem avaliações</span><% } %>
                                     </span>
                                 </div>
                             </div>

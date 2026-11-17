@@ -1015,3 +1015,8 @@ body main.home {
     transition: none !important;
   }
 }
+
+.home .job-contratante { margin: 4px 0 8px; font-size: 0.9rem; color: #475569; }
+.home .job-contratante a { color: inherit; font-weight: 600; text-decoration: underline; }
+.home .job-contratante__nota { margin-left: 6px; color: #b45309; font-weight: 700; }
+.home .job-contratante__nota--vazia { color: #64748b; font-weight: 400; }

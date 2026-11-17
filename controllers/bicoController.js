@@ -1,5 +1,16 @@
 import db from '../config/database.js';
+import {
+    PRAZO_AVALIACAO_DIAS,
+    SQL_FINALIZADO_EM,
+    sqlMediaAvaliacoes,
+    sqlTotalAvaliacoes,
+    calcularPrazoAvaliacao,
+    normalizarComentario,
+    carregarContextoAvaliacao
+} from './avaliacaoRegras.js';
 import { validarTituloBico, validarDescricaoBico, validarBairroBico, validarDataServico, validarHorarioServico } from '../validations/bicoValidation.js';
+
+export { PRAZO_AVALIACAO_DIAS };
 
 export const exibirFormularioPublicar = (req, res) => {
     if (!req.session?.usuario) {
@@ -106,6 +117,8 @@ export const exibirDetalhesBico = async (req, res) => {
         // 1. Busca os detalhes do bico
         const queryBico = `
             SELECT b.*, u.nome AS contratante_nome,
+                   ${sqlMediaAvaliacoes('u.id', 'contratante_media')},
+                   ${sqlTotalAvaliacoes('u.id', 'contratante_total_avaliacoes')},
                    DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada
             FROM bicos b
             JOIN usuarios u ON b.contratante_id = u.id
@@ -135,10 +148,18 @@ export const exibirDetalhesBico = async (req, res) => {
             minhaCandidatura = Array.isArray(candidaturas) ? candidaturas[0] : candidaturas;
         }
 
+        // Trabalhador do bico finalizado: carrega a avaliação que ele já fez e o prazo para editá-la.
+        const ehTrabalhadorDoBico = bicoEncontrado.status === 'Finalizado'
+            && Number(bicoEncontrado.trabalhador_id) === Number(trabalhador_id);
+        const avaliacao = ehTrabalhadorDoBico
+            ? await carregarContextoAvaliacao(db, bicoEncontrado.id, Number(trabalhador_id))
+            : null;
+
         return res.render('detalhesBico', {
             bico: bicoEncontrado,
             minhaCandidatura: minhaCandidatura || null,
-            usuario: usuarioLogado
+            usuario: usuarioLogado,
+            avaliacao
         });
     } catch (erro) {
         console.error('❌ Erro ao buscar detalhes do bico:', erro);
@@ -1138,14 +1159,14 @@ export const criarCanceladorBico = (banco) => async (req, res) => {
 
 export const cancelarBico = criarCanceladorBico(db);
 
-export const salvarAvaliacaoBico = async (req, res) => {
+// Avaliação bidirecional: o contratante do bico avalia o trabalhador e o trabalhador do bico avalia o
+// contratante. Só bicos Finalizados, dentro de PRAZO_AVALIACAO_DIAS dias da finalização.
+// A avaliação pode ser editada dentro do mesmo prazo.
+export const criarSalvadorAvaliacaoBico = (banco, agora = () => new Date()) => async (req, res) => {
     const bicoIdNum = typeof req.params?.id === 'string' && req.params.id.trim() !== ''
         ? Number(req.params.id)
         : NaN;
     const usuario = req.session?.usuario;
-    const perfil = typeof usuario?.tipo_perfil === 'string'
-        ? usuario.tipo_perfil.trim().toLowerCase()
-        : '';
     const usuarioIdNum = Number(usuario?.id || usuario?.id_usuario);
 
     if (!Number.isInteger(bicoIdNum) || bicoIdNum <= 0) {
@@ -1154,10 +1175,6 @@ export const salvarAvaliacaoBico = async (req, res) => {
 
     if (!usuario || !Number.isInteger(usuarioIdNum) || usuarioIdNum <= 0) {
         return res.status(401).json({ sucesso: false, erro: 'Autenticação necessária.' });
-    }
-
-    if (perfil !== 'contratante') {
-        return res.status(403).json({ sucesso: false, erro: 'Apenas contratantes podem avaliar este serviço.' });
     }
 
     const notaRecebida = req.body?.nota;
@@ -1176,14 +1193,16 @@ export const salvarAvaliacaoBico = async (req, res) => {
         return res.status(400).json({ sucesso: false, erro: 'O comentário deve ser um texto de até 500 caracteres.' });
     }
 
-    const comentario = comentarioRecebido ?? null;
+    const comentario = normalizarComentario(comentarioRecebido);
     if (comentario !== null && Array.from(comentario).length > 500) {
         return res.status(400).json({ sucesso: false, erro: 'O comentário deve ter no máximo 500 caracteres.' });
     }
 
     try {
-        const resultadoBico = await db.query(
-            'SELECT contratante_id, trabalhador_id, status FROM bicos WHERE id = ?',
+        const resultadoBico = await banco.query(
+            `SELECT b.contratante_id, b.trabalhador_id, b.status, ${SQL_FINALIZADO_EM} AS finalizado_em
+             FROM bicos b
+             WHERE b.id = ?`,
             [bicoIdNum]
         );
         const bico = obterPrimeiraLinha(resultadoBico);
@@ -1192,7 +1211,11 @@ export const salvarAvaliacaoBico = async (req, res) => {
             return res.status(404).json({ sucesso: false, erro: 'Bico não encontrado.' });
         }
 
-        if (Number(bico.contratante_id) !== usuarioIdNum) {
+        // Só os dois participantes do bico avaliam; cada um avalia o outro.
+        const ehContratante = Number(bico.contratante_id) === usuarioIdNum;
+        const ehTrabalhador = Number(bico.trabalhador_id) === usuarioIdNum;
+
+        if (!ehContratante && !ehTrabalhador) {
             return res.status(403).json({ sucesso: false, erro: 'Você não tem autorização para avaliar este bico.' });
         }
 
@@ -1200,23 +1223,39 @@ export const salvarAvaliacaoBico = async (req, res) => {
             return res.status(409).json({ sucesso: false, erro: 'Somente bicos finalizados podem ser avaliados.' });
         }
 
-        const trabalhadorIdNum = Number(bico.trabalhador_id);
-        if (!Number.isInteger(trabalhadorIdNum) || trabalhadorIdNum <= 0) {
+        const avaliadoId = ehContratante ? Number(bico.trabalhador_id) : Number(bico.contratante_id);
+        if (!Number.isInteger(avaliadoId) || avaliadoId <= 0) {
             return res.status(409).json({ sucesso: false, erro: 'Este bico não possui um trabalhador associado.' });
         }
 
-        await db.query(
-            `INSERT INTO avaliacoes (bico_id, avaliador_id, avaliado_id, nota, comentario)
-             VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE
-                avaliador_id = VALUES(avaliador_id),
-                avaliado_id = VALUES(avaliado_id),
-                nota = VALUES(nota),
-                comentario = VALUES(comentario)`,
-            [bicoIdNum, usuarioIdNum, trabalhadorIdNum, nota, comentario]
-        );
+        // Depois do prazo não se cria nem se edita avaliação.
+        if (calcularPrazoAvaliacao(bico.finalizado_em, agora()).encerrado) {
+            return res.status(409).json({
+                sucesso: false,
+                erro: `O prazo de ${PRAZO_AVALIACAO_DIAS} dias para avaliar este bico terminou.`
+            });
+        }
 
-        return res.json({ sucesso: true, mensagem: 'Avaliação salva com sucesso.' });
+        const existentes = await banco.query(
+            'SELECT id FROM avaliacoes WHERE bico_id = ? AND avaliador_id = ?',
+            [bicoIdNum, usuarioIdNum]
+        );
+        const existente = obterPrimeiraLinha(existentes);
+
+        if (existente) {
+            await banco.query(
+                'UPDATE avaliacoes SET nota = ?, comentario = ? WHERE id = ?',
+                [nota, comentario, existente.id]
+            );
+            return res.json({ sucesso: true, acao: 'atualizada', mensagem: 'Avaliação atualizada.' });
+        }
+
+        await banco.query(
+            `INSERT INTO avaliacoes (bico_id, avaliador_id, avaliado_id, nota, comentario)
+             VALUES (?, ?, ?, ?, ?)`,
+            [bicoIdNum, usuarioIdNum, avaliadoId, nota, comentario]
+        );
+        return res.json({ sucesso: true, acao: 'criada', mensagem: 'Avaliação registrada.' });
     } catch (erro) {
         if (erro?.code === 'ER_DUP_ENTRY' || erro?.errno === 1062) {
             return res.status(409).json({ sucesso: false, erro: 'Não foi possível salvar a avaliação devido a um conflito. Tente novamente.' });
@@ -1226,6 +1265,8 @@ export const salvarAvaliacaoBico = async (req, res) => {
         return res.status(500).json({ sucesso: false, erro: 'Erro interno ao salvar a avaliação.' });
     }
 };
+
+export const salvarAvaliacaoBico = criarSalvadorAvaliacaoBico(db);
 
 // 4. Exibir o histórico apenas para o contratante do bico ou seu trabalhador.
 export const criarExibidorHistoricoCandidatura = (banco) => async (req, res) => {
@@ -1347,8 +1388,8 @@ export const exibirGerenciamentoBico = async (req, res) => {
                 DATE_FORMAT(c.criado_em, '%d/%m/%Y %H:%i') AS data_candidatura_formatada,
                 u.id AS trabalhador_id,
                 u.nome AS nome_trabalhador,
-                u.email AS email_trabalhador,
-                u.idade AS idade_trabalhador
+                ${sqlMediaAvaliacoes('u.id', 'media_avaliacoes')},
+                ${sqlTotalAvaliacoes('u.id', 'total_avaliacoes')}
             FROM candidaturas c
             JOIN usuarios u ON c.trabalhador_id = u.id
             WHERE c.bico_id = ?
@@ -1358,10 +1399,15 @@ export const exibirGerenciamentoBico = async (req, res) => {
         const resCandidatos = await db.query(queryCandidatos, [bicoIdNum]);
         const candidatos = Array.isArray(resCandidatos?.[0]) ? resCandidatos[0] : resCandidatos;
 
+        const avaliacao = bicoEncontrado.status === 'Finalizado' && Number(bicoEncontrado.trabalhador_id) > 0
+            ? await carregarContextoAvaliacao(db, bicoIdNum, contratanteIdNum)
+            : null;
+
         return res.render('contratante/gerenciarBico', {
             bico: bicoEncontrado,
             candidatos: Array.isArray(candidatos) ? candidatos : [],
-            usuario: req.session.usuario
+            usuario: req.session.usuario,
+            avaliacao
         });
     } catch (erro) {
         console.error('❌ Erro ao carregar gerenciamento do bico:', erro);

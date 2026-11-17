@@ -31,7 +31,8 @@ router.post('/novo', requireAuth, requireRole('contratante'), cadastrarBico);
 router.get('/:id/candidatos', requireAuth, requireRole('contratante'), exibirGerenciamentoBico);
 router.post('/candidaturas/status', requireAuth, requireRole('contratante'), atualizarStatusCandidatura);
 router.post('/:id/finalizar', requireAuth, requireRole('contratante'), finalizarBico);
-router.post('/:id/avaliacao', requireAuth, requireRole('contratante'), salvarAvaliacaoBico);
+// Contratante e trabalhador do bico avaliam um ao outro; a regra de quem pode fica no controller.
+router.post('/:id/avaliacao', requireAuth, requireRole('contratante', 'trabalhador'), salvarAvaliacaoBico);
 router.get('/candidaturas/:candidatura_id/chat', requireAuth, exibirChatCandidatura);
 router.get('/candidaturas/:candidatura_id/chat/mensagens', requireAuth, listarNovasMensagensChat);
 router.post('/candidaturas/:candidatura_id/chat/mensagens', requireAuth, enviarMensagemChat);

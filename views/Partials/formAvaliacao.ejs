@@ -1,0 +1,55 @@
+<%
+  // Formulário de avaliação do bico finalizado (usado por contratante e trabalhador).
+  // Variáveis: bico, avaliacao { avaliacaoFeita: {nota, comentario} | null, prazoEncerrado, prazoAte },
+  //            alvo ('trabalhador' | 'contratante'), perfilAlvoId.
+  const feita = avaliacao.avaliacaoFeita;
+%>
+<section class="section-block manage-job__card evaluation-section" aria-labelledby="titulo-avaliacao-bico">
+  <h2 id="titulo-avaliacao-bico">Avaliar <%= alvo %></h2>
+  <a class="manage-job__link" href="/perfil/publico/<%= perfilAlvoId %>">Ver perfil e avaliações</a>
+
+  <% if (avaliacao.prazoEncerrado) { %>
+    <%# Prazo terminou: só leitura, sem botão. %>
+    <div id="avaliacao-somente-leitura" class="evaluation-readonly">
+      <% if (feita) { %>
+        <div class="evaluation-readonly__stars" role="img" aria-label="Sua nota: <%= feita.nota %> de 5 estrelas">
+          <% for (let estrela = 1; estrela <= 5; estrela++) { %>
+            <span aria-hidden="true"><%= estrela <= feita.nota ? '★' : '☆' %></span>
+          <% } %>
+        </div>
+        <p class="evaluation-readonly__comment"><%= feita.comentario || 'Nenhum comentário foi informado.' %></p>
+      <% } else { %>
+        <p class="evaluation-readonly__comment">Você não avaliou este bico dentro do prazo.</p>
+      <% } %>
+    </div>
+    <p class="evaluation-note" id="avaliacao-prazo">
+      O prazo para avaliar terminou em <%= avaliacao.prazoAte %>. A avaliação não pode mais ser criada nem alterada.
+    </p>
+  <% } else { %>
+    <form id="form-avaliacao-bico" action="/bicos/<%= bico.id %>/avaliacao" method="POST">
+      <fieldset class="evaluation-rating">
+        <legend>Nota <span aria-hidden="true">*</span></legend>
+        <div class="evaluation-stars">
+          <% [5, 4, 3, 2, 1].forEach(nota => { %>
+            <input class="evaluation-star-input" type="radio" id="nota-<%= nota %>" name="nota"
+              value="<%= nota %>" required <%= feita && feita.nota === nota ? 'checked' : '' %>>
+            <label class="evaluation-star" for="nota-<%= nota %>"
+              aria-label="<%= nota %> estrela<%= nota > 1 ? 's' : '' %>">★</label>
+          <% }); %>
+        </div>
+      </fieldset>
+
+      <label class="evaluation-comment-label" for="comentario-avaliacao">Comentário (opcional)</label>
+      <textarea id="comentario-avaliacao" name="comentario" maxlength="500" rows="4"
+        placeholder="Conte como foi o serviço (até 500 caracteres)."><%= feita && feita.comentario ? feita.comentario : '' %></textarea>
+
+      <button id="btn-salvar-avaliacao" class="evaluation-submit" type="submit">
+        <%= feita ? 'Atualizar avaliação' : 'Salvar avaliação' %>
+      </button>
+      <p id="feedback-avaliacao-bico" class="evaluation-feedback" role="status" aria-live="polite"></p>
+    </form>
+    <p class="evaluation-note" id="avaliacao-prazo">
+      <%= feita ? 'Você pode editar até' : 'Você pode avaliar até' %> <%= avaliacao.prazoAte %>.
+    </p>
+  <% } %>
+</section>

@@ -129,6 +129,15 @@
                         <div class="job-card__main">
                             <% if (prazo) { %><span class="job-badge"><i class="ph-fill ph-lightning" aria-hidden="true"></i> <%= prazo %></span><% } %>
                             <h3><%= tituloVaga %></h3>
+                            <p class="job-contratante">
+                                <i class="ph ph-user" aria-hidden="true"></i>
+                                <a href="/perfil/publico/<%= vaga.contratante_id %>"><%= vaga.contratante_nome %></a>
+                                <% if (Number(vaga.contratante_total_avaliacoes) > 0) { %>
+                                    <span class="job-contratante__nota">★ <%= Number(vaga.contratante_media).toFixed(1).replace('.', ',') %> (<%= Number(vaga.contratante_total_avaliacoes) %>)</span>
+                                <% } else { %>
+                                    <span class="job-contratante__nota job-contratante__nota--vazia">Sem avaliações</span>
+                                <% } %>
+                            </p>
                             <ul class="job-meta">
                                 <li><i class="ph-fill ph-map-pin" aria-hidden="true"></i> <%= vaga.bairro || 'Bairro a confirmar' %></li>
                                 <li><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= vaga.data_servico ? new Date(vaga.data_servico).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Data a combinar' %></li>

@@ -36,6 +36,13 @@
         <div class="stat-icon" aria-hidden="true"><i class="ph ph-users-three"></i></div>
         <p class="stat-label">Candidaturas pendentes</p>
         <p class="stat-value"><%= candidaturasPendentes ?? 0 %></p>
+        <p class="stat-note">Aguardando sua resposta</p>
+      </article>
+
+      <article class="stat-card" id="card-para-avaliar">
+        <div class="stat-icon" aria-hidden="true"><i class="ph ph-star"></i></div>
+        <p class="stat-label">Bicos para avaliar</p>
+        <p class="stat-value" id="valor-para-avaliar"><%= bicosParaAvaliar ?? 0 %></p>
         <p class="stat-note">Aguardando sua avaliação</p>
       </article>
 
