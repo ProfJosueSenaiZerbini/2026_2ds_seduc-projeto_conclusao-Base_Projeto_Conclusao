@@ -1,0 +1,737 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iBico - Meus Bicos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/bicosAtivos.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
+  <%- include('../Partials/phosphorIcons') %>
+
+  <style>
+    /* Barra de filtros */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: #64748b;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    /* Botão selecionado */
+    .filter-btn.active {
+      background-color: #ffffff;
+      color: #111827;
+      border-color: #e5e7eb;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      font-weight: 700;
+    }
+
+    .filter-btn:hover:not(.active) {
+      background-color: #e9efed;
+      color: #111827;
+    }
+
+    .filter-btn span {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    /* Campo de busca */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-box input {
+      min-width: 0;
+    }
+
+    /* Esconde os cards que não correspondem ao filtro */
+    .job-card[hidden] {
+      display: none !important;
+    }
+
+    /* Mensagem quando não houver resultados */
+    .empty-filter-message {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 35px 20px;
+      text-align: center;
+      color: #64748b;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+    }
+
+    .empty-filter-message.visible {
+      display: block;
+    }
+
+    .empty-filter-message h3 {
+      margin: 0 0 8px;
+      color: #111827;
+      font-size: 16px;
+    }
+
+    .empty-filter-message p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .filters-bar {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .search-box input {
+        width: 100%;
+      }
+
+      .filter-tabs {
+        width: 100%;
+        justify-content: space-between;
+        gap: 4px;
+      }
+
+      .filter-btn {
+        flex: 1;
+        padding: 9px 7px;
+        font-size: 12px;
+      }
+    }
+
+    /* Abas do painel (mesmo desenho das abas do histórico do trabalhador). */
+    .painel-abas {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      margin: 0 0 24px;
+      border-radius: 14px;
+      background: #eef2f0;
+      overflow-x: auto;
+    }
+
+    .painel-abas__aba {
+      flex: 1 1 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      color: #475569;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .painel-abas__aba:hover:not(.painel-abas__aba--ativa) { background: #e2e8e5; color: #111827; }
+
+    .painel-abas__aba--ativa {
+      background: #14332b;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(20, 51, 43, 0.25);
+    }
+
+    .painel-abas__contagem {
+      min-width: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(100, 116, 139, 0.18);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .painel-abas__aba--ativa .painel-abas__contagem { background: rgba(255, 255, 255, 0.22); }
+
+    .selo-avaliacao {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .selo-avaliacao--avaliar { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    .selo-avaliacao--avaliado { background: #dcfce7; color: #166534; border-color: #86efac; }
+    .selo-avaliacao--encerrado { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+
+    .badge-done { background: #e2e8f0; color: #334155; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+    .job-note { margin: 8px 0 0; color: #475569; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+    .job-note ~ .job-footer { margin-top: 18px; }
+  </style>
+</head>
+
+<body>
+
+  <%- include('../Partials/headerContratante') %>
+
+  <main class="dashboard-container">
+
+    <!-- Cabeçalho -->
+    <header class="dashboard-header">
+      <div class="header-titles">
+        <span class="category-tag">PAINEL DE ATIVIDADES</span>
+        <h1>Meus Bicos</h1>
+        <p>Acompanhe seus bicos ativos, concluídos e cancelados em um só lugar.</p>
+      </div>
+
+      <a href="/bicos/novo" class="btn-new-job">
+        <i class="ph ph-plus" aria-hidden="true"></i> Publicar Novo Bico
+      </a>
+    </header>
+
+    <nav class="painel-abas" aria-label="Status dos bicos">
+      <a class="painel-abas__aba <%= aba === 'ativos' ? 'painel-abas__aba--ativa' : '' %>" id="aba-ativos"
+        href="/bicos/ativos?aba=ativos" <%- aba === 'ativos' ? 'aria-current="page"' : '' %>>
+        Ativos <span class="painel-abas__contagem"><%= bicos.length %></span>
+      </a>
+      <a class="painel-abas__aba <%= aba === 'concluidos' ? 'painel-abas__aba--ativa' : '' %>" id="aba-concluidos"
+        href="/bicos/ativos?aba=concluidos" <%- aba === 'concluidos' ? 'aria-current="page"' : '' %>>
+        Concluídos <span class="painel-abas__contagem"><%= concluidos.length %></span>
+      </a>
+      <a class="painel-abas__aba <%= aba === 'cancelados' ? 'painel-abas__aba--ativa' : '' %>" id="aba-cancelados"
+        href="/bicos/ativos?aba=cancelados" <%- aba === 'cancelados' ? 'aria-current="page"' : '' %>>
+        Cancelados <span class="painel-abas__contagem"><%= cancelados.length %></span>
+      </a>
+    </nav>
+
+    <% if (aba === 'ativos') { %>
+
+    <!-- Métricas calculadas a partir dos dados do banco -->
+    <section class="metrics-grid">
+
+      <div class="metric-card">
+        <div class="metric-icon icon-green"><i class="ph ph-check-circle" aria-hidden="true"></i></div>
+
+        <div class="metric-info">
+          <span class="metric-label">Bicos ativos</span>
+
+          <strong class="metric-value">
+            <%= bicos.length %>
+          </strong>
+
+          <span class="metric-sub text-green">Ativos agora</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon icon-yellow"><i class="ph ph-clock" aria-hidden="true"></i></div>
+
+        <div class="metric-info">
+          <span class="metric-label">Em andamento</span>
+
+          <strong class="metric-value">
+            <%= bicos.filter(bico => bico.status === 'Em andamento').length %>
+          </strong>
+
+          <span class="metric-sub text-muted">Em andamento</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon icon-blue"><i class="ph ph-briefcase" aria-hidden="true"></i></div>
+
+        <div class="metric-info">
+          <span class="metric-label">Investido no mês</span>
+
+          <strong class="metric-value">
+            R$ <%= bicos.reduce(
+              (total, bico) => total + Number(bico.valor || 0),
+              0
+            ).toFixed(2).replace('.', ',') %>
+          </strong>
+
+          <span class="metric-sub text-green">
+            Valor dos bicos ativos
+          </span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Listagem dos bicos -->
+    <section class="content-section">
+
+      <div class="section-bar">
+
+        <div class="section-title">
+          <h2>Seus bicos</h2>
+
+          <p>
+            <%= bicos.length %> oportunidades ativas
+          </p>
+        </div>
+
+        <!-- Busca e filtros -->
+        <div class="filters-bar">
+
+          <div class="search-box">
+            <span class="search-icon"><i class="ph ph-magnifying-glass" aria-hidden="true"></i></span>
+
+            <input
+              type="text"
+              id="searchBico"
+              placeholder="Buscar bico..."
+              aria-label="Buscar bicos por título ou bairro"
+            >
+          </div>
+
+          <div class="filter-tabs" role="group" aria-label="Filtrar bicos">
+
+            <button
+              type="button"
+              class="filter-btn active"
+              data-filter="todos"
+              aria-pressed="true"
+            >
+              Todos
+              <span>
+                <%= bicos.length %>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="filter-btn"
+              data-filter="aberto"
+              aria-pressed="false"
+            >
+              Abertos
+              <span>
+                <%= bicos.filter(
+                  bico => bico.status === 'Aberto'
+                ).length %>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="filter-btn"
+              data-filter="andamento"
+              aria-pressed="false"
+            >
+              Em andamento
+              <span>
+                <%= bicos.filter(
+                  bico => bico.status === 'Em andamento'
+                ).length %>
+              </span>
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards gerados pelos dados retornados do banco -->
+      <div class="jobs-grid" id="jobsGrid">
+
+        <% bicos.forEach(bico => { %>
+
+          <article
+            class="job-card"
+            data-status="<%= bico.status %>"
+            data-titulo="<%= bico.titulo || '' %>"
+            data-bairro="<%= bico.bairro || '' %>"
+          >
+
+            <div class="job-card-header">
+
+              <span class="badge <%= bico.status === 'Em andamento' ? 'badge-ongoing' : 'badge-open' %>">
+                <i class="ph-fill ph-circle" aria-hidden="true"></i> <%= bico.status %>
+              </span>
+
+              <button
+                type="button"
+                class="btn-more"
+                aria-label="Mais opções para <%= bico.titulo %>"
+              >
+                <i class="ph ph-dots-three" aria-hidden="true"></i>
+              </button>
+
+            </div>
+
+            <h3 class="job-title">
+              <%= bico.titulo %>
+            </h3>
+
+            <div class="job-meta">
+
+              <span>
+                <i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %>
+              </span>
+
+              <span>
+                <i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= bico.data_servico_formatada %>
+                <%= bico.horario %>
+              </span>
+
+            </div>
+
+            <div class="job-footer">
+
+              <div class="user-info">
+
+                <div class="avatar avatar-purple">
+                  <%= bico.nome_trabalhador
+                    ? bico.nome_trabalhador.slice(0, 2).toUpperCase()
+                    : '+' %>
+                </div>
+
+                <div>
+                  <span class="user-role">
+                    <%= bico.nome_trabalhador
+                      ? 'Profissional'
+                      : 'Propostas' %>
+                  </span>
+
+                  <strong class="user-name">
+                    <%= bico.nome_trabalhador
+                      || 'Aguardando profissional' %>
+                  </strong>
+                </div>
+
+              </div>
+
+              <div class="price-info">
+
+                <span class="price-label">
+                  Valor combinado
+                </span>
+
+                <strong class="price-value">
+                  R$ <%= Number(bico.valor || 0)
+                    .toFixed(2)
+                    .replace('.', ',') %>
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="job-actions">
+              <a
+                href="/bicos/<%= bico.id %>/gerenciar"
+                class="job-details-link"
+              >
+                Ver Detalhes
+              </a>
+            </div>
+
+          </article>
+
+        <% }); %>
+
+        <!-- Aparece quando o filtro não encontrar nenhum bico -->
+        <div
+          id="emptyFilterMessage"
+          class="empty-filter-message"
+          role="status"
+          aria-live="polite"
+        >
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
+          <h3 id="emptyFilterTitle">
+            Nenhum bico encontrado
+          </h3>
+
+          <p id="emptyFilterText">
+            Não existem bicos para este filtro.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <% } else if (aba === 'concluidos') { %>
+
+    <section class="content-section" id="painel-concluidos">
+      <div class="section-bar">
+        <div class="section-title">
+          <h2>Bicos concluídos</h2>
+          <p><%= concluidos.length %> <%= concluidos.length === 1 ? 'bico finalizado' : 'bicos finalizados' %></p>
+        </div>
+      </div>
+
+      <% if (concluidos.length === 0) { %>
+        <div class="empty-filter-message visible" role="status">
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
+          <h3>Nenhum bico concluído</h3>
+          <p>Quando você finalizar um bico, ele aparecerá aqui para ser avaliado.</p>
+        </div>
+      <% } else { %>
+      <div class="jobs-grid">
+        <% concluidos.forEach(bico => { %>
+          <article class="job-card" data-bico-id="<%= bico.id %>">
+            <div class="job-card-header">
+              <span class="badge badge-done"><i class="ph-fill ph-circle" aria-hidden="true"></i> Finalizado</span>
+              <a class="selo-avaliacao selo-avaliacao--<%= bico.selo_avaliacao.tipo %>" href="/bicos/<%= bico.id %>/gerenciar"><%= bico.selo_avaliacao.texto %></a>
+            </div>
+
+            <h3 class="job-title"><%= bico.titulo %></h3>
+
+            <div class="job-meta">
+              <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+              <span><i class="ph ph-check-circle" aria-hidden="true"></i> Finalizado em <%= bico.finalizado_em_formatada %></span>
+            </div>
+
+            <div class="job-footer">
+              <div class="user-info">
+                <div class="avatar avatar-purple"><%= bico.nome_trabalhador ? bico.nome_trabalhador.slice(0, 2).toUpperCase() : '-' %></div>
+                <div>
+                  <span class="user-role">Profissional</span>
+                  <strong class="user-name"><%= bico.nome_trabalhador || '-' %></strong>
+                </div>
+              </div>
+              <div class="price-info">
+                <span class="price-label">Valor pago</span>
+                <strong class="price-value">R$ <%= Number(bico.valor || 0).toFixed(2).replace('.', ',') %></strong>
+              </div>
+            </div>
+
+            <div class="job-actions">
+              <a href="/bicos/<%= bico.id %>/gerenciar" class="job-details-link">Ver Detalhes</a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <% } else { %>
+
+    <section class="content-section" id="painel-cancelados">
+      <div class="section-bar">
+        <div class="section-title">
+          <h2>Bicos cancelados</h2>
+          <p><%= cancelados.length %> <%= cancelados.length === 1 ? 'bico cancelado' : 'bicos cancelados' %></p>
+        </div>
+      </div>
+
+      <% if (cancelados.length === 0) { %>
+        <div class="empty-filter-message visible" role="status">
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
+          <h3>Nenhum bico cancelado</h3>
+          <p>Os bicos que você cancelar aparecerão aqui.</p>
+        </div>
+      <% } else { %>
+      <div class="jobs-grid">
+        <% cancelados.forEach(bico => { %>
+          <article class="job-card" data-bico-id="<%= bico.id %>">
+            <div class="job-card-header">
+              <span class="badge badge-cancelled"><i class="ph-fill ph-circle" aria-hidden="true"></i> Cancelado</span>
+            </div>
+
+            <h3 class="job-title"><%= bico.titulo %></h3>
+
+            <div class="job-meta">
+              <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+              <span><i class="ph ph-x-circle" aria-hidden="true"></i> Cancelado em <%= bico.cancelado_em_formatada || 'data não registrada' %></span>
+            </div>
+
+            <p class="job-note"><strong>Motivo:</strong> <%= bico.motivo || 'Não informado' %></p>
+            <p class="job-note">
+              <% if (bico.valor_estornado !== null && bico.valor_estornado !== undefined) { %>
+                <strong>Estorno:</strong> R$ <%= Number(bico.valor_estornado).toFixed(2).replace('.', ',') %> devolvido à sua carteira
+              <% } else { %>
+                <strong>Estorno:</strong> não houve (nenhum valor estava reservado)
+              <% } %>
+            </p>
+
+            <div class="job-footer">
+              <div class="price-info">
+                <span class="price-label">Valor do bico</span>
+                <strong class="price-value">R$ <%= Number(bico.valor || 0).toFixed(2).replace('.', ',') %></strong>
+              </div>
+            </div>
+
+            <div class="job-actions">
+              <a href="/bicos/<%= bico.id %>/gerenciar" class="job-details-link">Ver Detalhes</a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <% } %>
+
+  </main>
+
+  <%- include('../Partials/footer') %>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const searchInput = document.getElementById('searchBico');
+      const jobCards = document.querySelectorAll('.job-card');
+
+      // Nas abas Concluídos e Cancelados não há busca nem filtros.
+      if (!searchInput) return;
+
+      const emptyMessage = document.getElementById('emptyFilterMessage');
+      const emptyTitle = document.getElementById('emptyFilterTitle');
+      const emptyText = document.getElementById('emptyFilterText');
+
+      let activeFilter = 'todos';
+
+      // Normaliza texto para facilitar a pesquisa.
+      function normalizeText(text) {
+        return (text || '')
+          .toString()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .trim();
+      }
+
+      // Verifica se o bico pertence ao filtro selecionado.
+      function matchesFilter(status) {
+        if (activeFilter === 'todos') {
+          return true;
+        }
+
+        if (activeFilter === 'aberto') {
+          return status === 'Aberto';
+        }
+
+        if (activeFilter === 'andamento') {
+          return status === 'Em andamento';
+        }
+
+        return false;
+      }
+
+      // Aplica o filtro de status e a busca ao mesmo tempo.
+      function applyFilters() {
+        const searchTerm = normalizeText(searchInput.value);
+        let visibleCount = 0;
+
+        jobCards.forEach(function (card) {
+          const status = card.dataset.status || '';
+          const titulo = normalizeText(card.dataset.titulo);
+          const bairro = normalizeText(card.dataset.bairro);
+
+          const statusMatches = matchesFilter(status);
+
+          const searchMatches =
+            searchTerm === '' ||
+            titulo.includes(searchTerm) ||
+            bairro.includes(searchTerm);
+
+          const shouldShow = statusMatches && searchMatches;
+
+          card.hidden = !shouldShow;
+
+          if (shouldShow) {
+            visibleCount++;
+          }
+        });
+
+        // Exibe uma mensagem se não houver resultados.
+        if (visibleCount === 0) {
+          emptyMessage.classList.add('visible');
+
+          if (searchTerm !== '') {
+            emptyTitle.textContent = 'Nenhum bico encontrado';
+            emptyText.textContent =
+              'Tente pesquisar por outro título ou bairro.';
+          } else if (activeFilter === 'andamento') {
+            emptyTitle.textContent = 'Nenhum bico em andamento';
+            emptyText.textContent =
+              'Quando houver bicos em andamento, eles aparecerão aqui.';
+          } else if (activeFilter === 'aberto') {
+            emptyTitle.textContent = 'Nenhum bico aberto';
+            emptyText.textContent =
+              'Não há bicos abertos para exibir neste momento.';
+          } else {
+            emptyTitle.textContent = 'Nenhum bico cadastrado';
+            emptyText.textContent =
+              'Quando você publicar um bico, ele aparecerá aqui.';
+          }
+        } else {
+          emptyMessage.classList.remove('visible');
+        }
+      }
+
+      // Altera o botão ativo e aplica o filtro correspondente.
+      filterButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+
+          activeFilter = button.dataset.filter;
+
+          filterButtons.forEach(function (item) {
+            const isActive = item === button;
+
+            item.classList.toggle('active', isActive);
+            item.setAttribute('aria-pressed', String(isActive));
+          });
+
+          applyFilters();
+        });
+      });
+
+      // Atualiza os resultados conforme o usuário digita.
+      searchInput.addEventListener('input', applyFilters);
+
+      // Estado inicial: Todos selecionado.
+      applyFilters();
+    });
+  </script>
+
+</body>
+</html>
