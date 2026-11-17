@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             subtitle.textContent = 'Acesse sua conta de contratante e encontre talentos para seus bicos.';
 
             if (tipoPerfilInput) tipoPerfilInput.value = 'contratante'; // Atualiza o valor do form
+            trocarMascoteDoAlerta('contratante');
         } else {
             btnWork.classList.remove('active-work');
             void btnWork.offsetWidth; // Força o reflow para reiniciar animação CSS
@@ -49,7 +50,21 @@ document.addEventListener('DOMContentLoaded', () => {
             subtitle.textContent = 'Acesse sua conta de trabalhador e descubra novas oportunidades.';
 
             if (tipoPerfilInput) tipoPerfilInput.value = 'trabalhador'; // Atualiza o valor do form
+            trocarMascoteDoAlerta('trabalhador');
         }
+    }
+
+    // O alerta de erro mostra só o mascote do perfil escolhido (araponga = Contratar, tiê = Trabalhar)
+    // e troca na hora junto com o seletor; o mascote que aparece fica triste.
+    function trocarMascoteDoAlerta(perfil) {
+        const alerta = document.getElementById('alerta-sistema');
+        if (!alerta) return;
+        alerta.querySelectorAll('[data-mascote-perfil]').forEach((caixa) => {
+            const ativo = caixa.dataset.mascotePerfil === perfil;
+            caixa.hidden = !ativo;
+            const mascote = caixa.querySelector('.mascote');
+            if (ativo && mascote && window.Mascotes) window.Mascotes.triste(mascote);
+        });
     }
 
     // Adiciona os eventos diretamente nos botões se eles existirem na tela
@@ -72,16 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const avisoErro = document.querySelector('.erro-passarinho-login');
+    const avisoErro = document.querySelector('.alerta-sistema[data-auto-ocultar]');
 
     if (avisoErro) {
         setTimeout(() => {
-            avisoErro.classList.add('sumindo');
+            avisoErro.classList.add('alerta-sistema--saindo');
 
             setTimeout(() => {
                 avisoErro.remove();
             }, 500);
-        }, 4000);
+        }, 8000);
     }
 
 });

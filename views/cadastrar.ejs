@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criar Conta — Ibico</title>
   <link rel="stylesheet" href="/css/cadastro.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('Partials/phosphorIcons') %>
 </head>
 
@@ -71,13 +72,7 @@
           <p class="auth-sub" id="signupSubtitle">Escolha seu perfil e comece a usar o iBico.</p>
 
           <% if (erro) { %>
-            <div class="erro-passarinho-cadastro">
-              <img src="/img/passarinho_transparente.png" alt="Passarinho">
-              <div class="balao-erro-cadastro">
-                <img src="/img/balao_transparente.png" alt="">
-                <span><%= erro %></span>
-              </div>
-            </div>
+            <%- include('Partials/alerta', { alerta: { tipo: 'erro', mensagem: erro }, area: 'seletor', perfilInicial: (dados && dados.tipoPerfil) ? dados.tipoPerfil : 'contratante' }) %>
           <% } %>
 
           <label class="role-label">Eu quero...</label>
@@ -177,6 +172,7 @@
     </div>
   </main>
 
+  <script src="/js/mascotes.js"></script>
   <script src="/js/cadastrar.js"></script>
 </body>
 

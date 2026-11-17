@@ -1,59 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const formAvaliacao = document.getElementById('form-avaliacao-bico');
-  const botaoAvaliacao = document.getElementById('btn-salvar-avaliacao');
-  const feedbackAvaliacao = document.getElementById('feedback-avaliacao-bico');
-
-  if (formAvaliacao && botaoAvaliacao && feedbackAvaliacao) {
-    formAvaliacao.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
-
-      if (botaoAvaliacao.disabled) return;
-
-      botaoAvaliacao.disabled = true;
-      feedbackAvaliacao.textContent = '';
-      feedbackAvaliacao.className = 'evaluation-feedback';
-
-      try {
-        const campos = new FormData(formAvaliacao);
-        const corpo = new URLSearchParams({
-          nota: campos.get('nota'),
-          comentario: campos.get('comentario') || ''
-        });
-        const resposta = await fetch(formAvaliacao.action, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-          },
-          body: corpo.toString(),
-          credentials: 'same-origin'
-        });
-
-        let dados;
-        try {
-          dados = await resposta.json();
-        } catch (_erroJson) {
-          throw new Error('O servidor retornou uma resposta inválida.');
-        }
-
-        if (!resposta.ok || dados.sucesso !== true) {
-          throw new Error(dados.erro || 'Não foi possível salvar a avaliação.');
-        }
-
-        feedbackAvaliacao.textContent = dados.mensagem || 'Avaliação salva com sucesso.';
-        feedbackAvaliacao.classList.add('evaluation-feedback--success');
-        formAvaliacao.querySelectorAll('input, textarea, button').forEach((campo) => {
-          campo.disabled = true;
-        });
-      } catch (erro) {
-        feedbackAvaliacao.textContent = erro instanceof TypeError
-          ? 'Falha de conexão. Verifique sua rede e tente novamente.'
-          : erro.message || 'Não foi possível salvar a avaliação.';
-        feedbackAvaliacao.classList.add('evaluation-feedback--error');
-        botaoAvaliacao.disabled = false;
-      }
-    });
-  }
+  // O envio da avaliação fica em /js/avaliacaoBico.js.
 
   // Cancelamento do bico: modal de confirmação (com motivo opcional) e envio por fetch.
   const formCancelar = document.getElementById('form-cancelar-bico');
@@ -201,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     evento.preventDefault();
 
     if (botao.disabled || !await confirmarFinalizacao()) return;
+    if (window.Mascotes) window.Mascotes.prepararSom(); // o som só toca logo após um clique do usuário
 
     botao.disabled = true;
     feedback.textContent = '';
@@ -223,12 +170,14 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(dados.erro || 'Não foi possível finalizar o serviço.');
       }
 
-      const statusIcon = document.createElement('i');
-      statusIcon.className = 'ph-fill ph-circle';
-      statusIcon.setAttribute('aria-hidden', 'true');
-      statusBico.replaceChildren(statusIcon, document.createTextNode(` ${dados.status}`));
-      feedback.textContent = dados.mensagem || 'Serviço finalizado com sucesso.';
-      form.remove();
+      // Recarrega a página para refletir o novo status: some o botão "Cancelar bico" e aparece o
+      // formulário de avaliação (renderizado pelo servidor), além do saldo atualizado no menu.
+      // A araponga comemora (com canto) ANTES de recarregar; depois de ~1,2 s a página recarrega.
+      if (window.Mascotes) {
+        window.Mascotes.sucesso(feedback, 'Serviço finalizado com sucesso! Agora você pode avaliar o trabalhador.', 'araponga');
+        await new Promise((resolver) => setTimeout(resolver, 1200));
+      }
+      window.location.reload();
     } catch (erro) {
       feedback.textContent = erro instanceof TypeError
         ? 'Falha de conexão. Verifique sua rede e tente novamente.'

@@ -13,7 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <%- include('Partials/phosphorIcons') %>
   <link rel="stylesheet" href="/css/landing.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <script src="/js/landing.js" defer></script>
+  <script src="/js/mascotes.js" defer></script>
 </head>
 
 <body class="landing-page" data-profile="neutral">
@@ -73,21 +75,21 @@
           </div>
 
           <div class="landing-choice__options">
-            <button type="button" class="landing-choice__option landing-choice__option--hire" data-profile-select="contratante"
+            <button type="button" class="landing-choice__option landing-choice__option--hire" data-profile-select="contratante" data-mascote-alvo
               aria-label="Quero contratar um serviço. Conheça a experiência para contratantes.">
               <span class="landing-choice__number">01 / CONTRATANTE</span>
               <span class="landing-choice__title">Quero contratar<br>um serviço</span>
               <span class="landing-choice__action">Conhecer este caminho <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
-              <img src="/img/mascote-araponga.png" alt="" aria-hidden="true">
+              <%- include('Partials/mascote', { ave: 'araponga', piscar: true, interacao: 'asas', pouso: true }) %>
               <span class="landing-choice__orbit" aria-hidden="true"></span>
             </button>
 
-            <button type="button" class="landing-choice__option landing-choice__option--work" data-profile-select="trabalhador"
+            <button type="button" class="landing-choice__option landing-choice__option--work" data-profile-select="trabalhador" data-mascote-alvo
               aria-label="Quero trabalhar e encontrar oportunidades. Conheça a experiência para trabalhadores.">
               <span class="landing-choice__number">02 / TRABALHADOR</span>
               <span class="landing-choice__title">Quero trabalhar<br>e encontrar oportunidades</span>
               <span class="landing-choice__action">Conhecer este caminho <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
-              <img src="/img/mascote-tie-sangue.png" alt="" aria-hidden="true">
+              <%- include('Partials/mascote', { ave: 'tie', piscar: true, interacao: 'asas', pouso: true }) %>
               <span class="landing-choice__orbit" aria-hidden="true"></span>
             </button>
           </div>
@@ -108,9 +110,9 @@
           <span class="landing-hero__index" aria-hidden="true">01 <i></i> PERFIL CONTRATANTE</span>
         </div>
 
-        <figure class="landing-hero__mascot landing-hero__mascot--hire">
+        <figure class="landing-hero__mascot landing-hero__mascot--hire" data-mascote-alvo>
           <span class="landing-hero__mascot-orbit" aria-hidden="true"></span>
-          <img src="/img/mascote-araponga.png" alt="Araponga, mascote da experiência para contratantes">
+          <%- include('Partials/mascote', { ave: 'araponga', piscar: true, interacao: 'asas' }) %>
           <figcaption><span>ARAPONGA</span><i></i> Para quem contrata</figcaption>
         </figure>
       </div>
@@ -129,9 +131,9 @@
           <span class="landing-hero__index" aria-hidden="true">02 <i></i> PERFIL TRABALHADOR</span>
         </div>
 
-        <figure class="landing-hero__mascot landing-hero__mascot--work">
+        <figure class="landing-hero__mascot landing-hero__mascot--work" data-mascote-alvo>
           <span class="landing-hero__mascot-orbit" aria-hidden="true"></span>
-          <img src="/img/mascote-tie-sangue.png" alt="Tiê-de-sangue, mascote da experiência para trabalhadores">
+          <%- include('Partials/mascote', { ave: 'tie', piscar: true, interacao: 'asas' }) %>
           <figcaption><span>TIÊ-DE-SANGUE</span><i></i> Para quem trabalha</figcaption>
         </figure>
       </div>

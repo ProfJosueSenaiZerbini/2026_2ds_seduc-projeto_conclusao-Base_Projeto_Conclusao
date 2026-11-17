@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ibico - Login</title>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/login.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
     <%- include('Partials/phosphorIcons') %>
 </head>
 
@@ -20,22 +21,13 @@
 
 
         <% if (erro) { %>
-            <div class="erro-passarinho-login">
-                <img src="/img/passarinho_transparente.png" alt="Passarinho">
-
-                <div class="balao-erro-login">
-                    <img src="/img/balao_transparente.png" alt="">
-                    <span>
-                        <%= erro %>
-                    </span>
-                </div>
-            </div>
+            <%- include('Partials/alerta', { alerta: { tipo: 'erro', mensagem: erro }, area: 'seletor', perfilInicial: (typeof tipoPerfil !== 'undefined' ? tipoPerfil : 'contratante'), autoOcultar: true }) %>
             <% } %>
 
 
                 <form action="/login" method="POST">
                     <!-- Campo oculto para enviar o tipo de perfil (contratante ou trabalhador) -->
-                    <input type="hidden" name="tipoPerfil" id="tipoPerfilInput" value="contratante">
+                    <input type="hidden" name="tipoPerfil" id="tipoPerfilInput" value="<%= (typeof tipoPerfil !== 'undefined' && String(tipoPerfil).toLowerCase() === 'trabalhador') ? 'trabalhador' : 'contratante' %>">
 
                     <div class="toggle-row">
                         <button type="button" class="toggle-btn" id="btnWork">
@@ -138,6 +130,7 @@
             </div>
         </div>
     </div>
+    <script src="/js/mascotes.js"></script>
     <script src="/js/login.js"></script>
 </body>
 

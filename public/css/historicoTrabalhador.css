@@ -631,14 +631,14 @@ body {
 
 .tip-popup__icon {
   display: grid;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
   place-items: center;
-  border-radius: 50%;
-  background: var(--history-red-soft);
-  color: var(--history-brand);
-  font-size: 19px;
+}
+
+.tip-popup__icon .mascote {
+  width: 56px;
 }
 
 .tip-popup__body {
@@ -968,3 +968,13 @@ body {
     animation: none;
   }
 }
+
+.meta__link { color: inherit; text-decoration: underline; }
+.meta__no-rating { margin-left: 6px; font-size: 0.8em; color: #64748b; }
+
+.selo-avaliacao { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border: 1px solid transparent; }
+.selo-avaliacao--avaliar { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.selo-avaliacao--avaliado { background: #dcfce7; color: #166534; border-color: #86efac; }
+.selo-avaliacao--encerrado { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+
+.empty > p { margin: 0; }

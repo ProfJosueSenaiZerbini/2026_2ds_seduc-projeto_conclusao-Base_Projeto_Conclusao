@@ -57,7 +57,8 @@ const USUARIOS = {
   marcos:  { nome: 'Marcos Oliveira', email: 'marcos.oliveira@exemplo.com', cpf: cpfValido('529173846'), idade: '45', tipo: 'contratante' },
   rafael:  { nome: 'Rafael Souza',    email: 'rafael.souza@exemplo.com',    cpf: cpfValido('617284953'), idade: '27', tipo: 'trabalhador' },
   juliana: { nome: 'Juliana Lima',    email: 'juliana.lima@exemplo.com',    cpf: cpfValido('742915368'), idade: '31', tipo: 'trabalhador' },
-  diego:   { nome: 'Diego Santos',    email: 'diego.santos@exemplo.com',    cpf: cpfValido('853261479'), idade: '23', tipo: 'trabalhador' }
+  diego:   { nome: 'Diego Santos',    email: 'diego.santos@exemplo.com',    cpf: cpfValido('853261479'), idade: '23', tipo: 'trabalhador' },
+  beatriz: { nome: 'Beatriz Nogueira', email: 'beatriz.nogueira@exemplo.com', cpf: cpfValido('196348275'), idade: '36', tipo: 'contratante' }
 };
 
 // dono: quem publica. dias: deslocamento da data do serviço (negativo = já realizado).
@@ -70,7 +71,7 @@ const BICOS = {
     descricao: 'Ajudante para montagem de mesas e cadeiras, apoio no buffet e organização do espaço em confraternização de família.' },
   guardaRoupa:{ dono: 'carla',  titulo: 'Montagem de guarda-roupa', bairro: 'Cambuí', valor: '150.00', dias: 5, horario: '14:00',
     descricao: 'Montagem de guarda-roupa de 6 portas com espelho. As ferramentas básicas ficam por conta do profissional.' },
-  chuveiro:   { dono: 'carla',  titulo: 'Troca de resistência do chuveiro', bairro: 'Nova Campinas', valor: '90.00', dias: 6, horario: '16:00',
+  chuveiro:   { dono: 'carla',  titulo: 'Troca de resistência do chuveiro', bairro: 'Nova Campinas', valor: '90.00', dias: -2, horario: '16:00',
     descricao: 'Troca da resistência e revisão da fiação do chuveiro elétrico do banheiro social. Resistência já comprada.' },
   portao:     { dono: 'marcos', titulo: 'Pintura de portão', bairro: 'Castelo', valor: '250.00', dias: -7, horario: '08:30',
     descricao: 'Lixar e pintar portão de ferro de 3 metros com tinta esmalte preta. Tinta e pincéis por minha conta.' },
@@ -83,7 +84,17 @@ const BICOS = {
   calcada:    { dono: 'marcos', titulo: 'Lavagem de calçada e quintal', bairro: 'Bosque', valor: '110.00', dias: 3, horario: '09:30',
     descricao: 'Lavagem com lavadora de alta pressão da calçada e do quintal de uma casa térrea. A lavadora é fornecida.' },
   ventilador: { dono: 'marcos', titulo: 'Instalação de ventilador de teto', bairro: 'Taquaral', valor: '100.00', dias: 9, horario: '13:30',
-    descricao: 'Instalar dois ventiladores de teto em quarto e sala, com fixação no forro e ligação elétrica ao interruptor.' }
+    descricao: 'Instalar dois ventiladores de teto em quarto e sala, com fixação no forro e ligação elétrica ao interruptor.' },
+  // Finalizados pelo Marcos (Rafael): um dentro do prazo de avaliação e outro com o prazo já encerrado.
+  reboco:     { dono: 'marcos', titulo: 'Reparo de reboco na parede da sala', bairro: 'Castelo', valor: '140.00', dias: -3, horario: '08:00',
+    descricao: 'Remover o reboco solto de uma parede de 12 m² da sala, refazer a massa e deixar pronta para pintura.' },
+  telhado:    { dono: 'marcos', titulo: 'Troca de telhas do quintal', bairro: 'Sousas', valor: '160.00', dias: -10, horario: '07:30',
+    descricao: 'Substituir 30 telhas quebradas da cobertura do quintal e vedar as emendas com manta.' },
+  // Cancelados pelo Marcos: um ainda aberto (sem estorno) e um já aceito (com estorno).
+  persiana:   { dono: 'marcos', titulo: 'Instalação de persianas', bairro: 'Mansões Santo Antônio', valor: '120.00', dias: 6, horario: '09:00',
+    descricao: 'Instalar três persianas de enrolar nas janelas do escritório, com fixação em parede de alvenaria.' },
+  azulejo:    { dono: 'marcos', titulo: 'Troca de azulejos da cozinha', bairro: 'Jardim Chapadão', valor: '130.00', dias: 5, horario: '13:00',
+    descricao: 'Retirar o revestimento antigo da parede da pia e assentar azulejos novos, com rejunte e acabamento.' }
 };
 
 // ---------------------------------------------------------------- infraestrutura
@@ -169,7 +180,7 @@ async function main() {
 
     // ---- 2. Saldo nas carteiras ------------------------------------------------------------------------
     console.log('> Adicionando saldo simulado...');
-    for (const [chave, valor] of [['carla', '500.00'], ['marcos', '500.00'], ['carla', '300.00']]) {
+    for (const [chave, valor] of [['carla', '500.00'], ['marcos', '1500.00'], ['carla', '300.00'], ['beatriz', '100.00']]) {
       const r = await ctx[chave].request.post(`${BASE}/carteira/contratante/adicionar-saldo`, form({ valor }));
       await esperar(r, 302, `adicionar saldo de ${chave}`);
     }
@@ -177,7 +188,7 @@ async function main() {
     // ---- 3. Bicos publicados (ordem = ordem de criação) -----------------------------------------------
     console.log('> Publicando bicos...');
     const ordemPublicacao = ['torneira', 'portao', 'limpeza', 'evento', 'jardinagem', 'prateleiras', 'calcada',
-      'estante', 'ventilador', 'chuveiro', 'guardaRoupa'];
+      'estante', 'ventilador', 'chuveiro', 'guardaRoupa', 'reboco', 'telhado', 'persiana', 'azulejo'];
     for (const chave of ordemPublicacao) {
       const b = BICOS[chave];
       const r = await ctx[b.dono].request.post(`${BASE}/bicos/novo`, form({
@@ -225,6 +236,35 @@ async function main() {
     await decidir('marcos', 'portao', 'rafael', 'Aceito');
     await finalizar('marcos', 'portao');
     await avaliar('marcos', 'portao', 4, 'Pintura bem feita e acabamento caprichado. Atrasou um pouco no início, mas entregou no combinado.');
+
+    // Avaliações no sentido inverso: o trabalhador avalia o contratante do mesmo bico.
+    await avaliar('rafael', 'torneira', 5, 'A Carla explicou tudo direitinho, deixou o material separado e pagou na hora. Contratante nota 10.');
+    await avaliar('rafael', 'portao', 5, 'O Marcos deixou o portão liberado e a tinta pronta. Tudo combinado foi cumprido, foi tranquilo trabalhar.');
+
+    // Terceiro bico finalizado: Juliana e Carla se avaliam (Carla fecha com média 4,5 em 2 avaliações).
+    await candidatar('juliana', 'chuveiro', 'Sou eletricista de residências e levo o multímetro para testar a fiação antes de trocar a resistência.');
+    await decidir('carla', 'chuveiro', 'juliana', 'Aceito');
+    await finalizar('carla', 'chuveiro');
+    await avaliar('carla', 'chuveiro', 5, 'A Juliana trocou a resistência, revisou a fiação e ainda me explicou como evitar o problema. Muito profissional.');
+    await avaliar('juliana', 'chuveiro', 4, 'A Carla foi cordial e pagou certinho. Só demorou um pouco para liberar o acesso ao banheiro.');
+
+    // Dois bicos do Marcos finalizados pelo Rafael e ainda sem avaliação de nenhum dos lados
+    // (um dentro do prazo e outro, ajustado mais abaixo, com o prazo encerrado).
+    for (const chave of ['reboco', 'telhado']) {
+      await candidatar('rafael', chave, 'Tenho experiência na área e posso começar na data combinada, com material e ferramentas próprias.');
+      await decidir('marcos', chave, 'rafael', 'Aceito');
+      await finalizar('marcos', chave);
+    }
+
+    // Cancelados pelo Marcos: um aberto (sem estorno) e um já aceito pelo Diego (com estorno da reserva).
+    const cancelarBico = async (dono, chave, motivo) => {
+      const r = await ctx[dono].request.post(`${BASE}/bicos/${ids.bicos[chave]}/cancelar`, { form: { motivo }, failOnStatusCode: false });
+      await esperar(r, 200, `cancelar ${chave}`);
+    };
+    await cancelarBico('marcos', 'persiana', 'Contratei outro profissional por indicação de um vizinho.');
+    await candidatar('diego', 'azulejo', 'Faço assentamento de revestimentos há 6 anos e levo as ferramentas.');
+    await decidir('marcos', 'azulejo', 'diego', 'Aceito');
+    await cancelarBico('marcos', 'azulejo', 'Mudei o projeto da cozinha e não vou mais trocar o revestimento agora.');
 
     // Bico cancelado com estorno: aceita a Juliana (o Rafael é recusado automaticamente) e depois cancela.
     await candidatar('rafael', 'limpeza', 'Posso fazer a limpeza no dia combinado, tenho equipamento próprio.');
@@ -284,9 +324,20 @@ async function main() {
       const minutos = (msgs.length - i) * 6 + 50;
       await banco.query('UPDATE mensagens_chat SET criado_em = NOW() - INTERVAL ? MINUTE WHERE id = ?', [minutos, msgs[i].id]);
     }
-    // Avaliações: define a data explicitamente (evita o ON UPDATE sobrescrever).
-    await banco.query('UPDATE avaliacoes SET data_atualizacao = NOW() - INTERVAL 5 DAY WHERE bico_id = ?', [ids.bicos.portao]);
-    await banco.query('UPDATE avaliacoes SET data_atualizacao = NOW() - INTERVAL 2 DAY WHERE bico_id = ?', [ids.bicos.torneira]);
+    // Finalização e avaliações: torneira (há 2 dias) e chuveiro (há 1 dia) ainda estão dentro do prazo de 7 dias;
+    // o portão (10 dias) e o telhado (9 dias) já estão com o prazo encerrado (avaliação só para leitura).
+    // O reboco (2 dias) fica sem avaliação de ambos os lados: selo "Avaliar" / "Avaliar contratante".
+    // A data é definida explicitamente nas duas colunas (evita o ON UPDATE sobrescrever).
+    for (const [bico, dias] of [['torneira', 2], ['chuveiro', 1], ['portao', 10], ['reboco', 2], ['telhado', 9]]) {
+      await banco.query("UPDATE historico_eventos_bicos SET data_evento = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND status_novo = 'Finalizado'", [dias, ids.bicos[bico]]);
+      await banco.query("UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'CREDITO'", [dias, ids.bicos[bico]]);
+      await banco.query('UPDATE avaliacoes SET criado_em = NOW() - INTERVAL ? DAY, data_atualizacao = NOW() - INTERVAL ? DAY WHERE bico_id = ?', [dias, dias, ids.bicos[bico]]);
+      // Publicação, candidatura e reserva acontecem antes da finalização (ordem cronológica coerente nas telas).
+      await banco.query('UPDATE bicos SET criado_em = NOW() - INTERVAL ? DAY WHERE id = ?', [dias + 4, ids.bicos[bico]]);
+      await banco.query('UPDATE candidaturas SET criado_em = NOW() - INTERVAL ? DAY, atualizado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ?', [dias + 3, dias + 2, ids.bicos[bico]]);
+      await banco.query('UPDATE historico_candidaturas h JOIN candidaturas c ON c.id = h.candidatura_id SET h.data_alteracao = NOW() - INTERVAL ? DAY WHERE c.bico_id = ?', [dias + 2, ids.bicos[bico]]);
+      await banco.query("UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'RESERVA'", [dias + 2, ids.bicos[bico]]);
+    }
 
     // ---- 6. Capturas -----------------------------------------------------------------------------------
     console.log('> Capturando telas...');
@@ -294,7 +345,7 @@ async function main() {
     for (const chave of Object.keys(USUARIOS)) await entrar(chave);
 
     const resultados = [];
-    const capturar = async ({ arquivo, usuario, url, preparar, fullPage = false, contexto, esperarSeletor }) => {
+    const capturar = async ({ arquivo, usuario, url, preparar, fullPage = false, contexto, esperarSeletor, espera = 700, elemento }) => {
       const c = contexto || (usuario ? ctx[usuario] : await novoContexto());
       const pagina = await c.newPage();
       const problemas = [];
@@ -308,10 +359,12 @@ async function main() {
         await pagina.evaluate(() => document.fonts.ready);
         await pagina.waitForLoadState('networkidle');
         await pagina.mouse.move(1, 1);
-        await pausa(700);
+        // Espera as animações dos mascotes (pouso, curioso, triste...) terminarem: a ave sai parada no galho.
+        await pausa(espera);
         const alturaConteudo = await pagina.evaluate(() => document.documentElement.scrollHeight);
         const destino = path.join(PASTA_PRINTS, arquivo);
-        await pagina.screenshot({ path: destino, fullPage });
+        if (elemento) await pagina.locator(elemento).screenshot({ path: destino });
+        else await pagina.screenshot({ path: destino, fullPage });
         resultados.push({ arquivo, ok: true, alturaConteudo, fullPage, problemas });
         console.log(`  ok  ${arquivo}  (altura da página: ${alturaConteudo}px${fullPage ? ', página inteira' : ''})${problemas.length ? '  AVISOS: ' + problemas.join(' | ') : ''}`);
       } catch (erro) {
@@ -326,7 +379,7 @@ async function main() {
     const idRafael = ids.usuarios.rafael;
     const idChat = ids.candidaturas['evento:rafael'];
 
-    await capturar({ arquivo: '01-landing-page.png', contexto: visitante, url: '/' });
+    await capturar({ arquivo: '01-landing-page.png', contexto: visitante, url: '/', espera: 3000 });
     await capturar({ arquivo: '02a-login.png', contexto: visitante, url: '/login' });
     await capturar({ arquivo: '02b-cadastro.png', contexto: visitante, url: '/cadastrar' });
     await capturar({ arquivo: '03-painel-contratante.png', usuario: 'carla', url: '/homeContratante', fullPage: true });
@@ -340,6 +393,10 @@ async function main() {
     await capturar({ arquivo: '07a-carteira-contratante.png', usuario: 'carla', url: '/carteira/contratante', fullPage: true });
     await capturar({ arquivo: '07b-carteira-trabalhador.png', usuario: 'rafael', url: '/carteira/trabalhador' });
     await capturar({ arquivo: '08-perfil-publico.png', usuario: 'carla', url: `/perfil/publico/${idRafael}` });
+    await capturar({ arquivo: '12a-avaliar-trabalhador.png', usuario: 'carla', url: `/bicos/${ids.bicos.torneira}/gerenciar`, fullPage: true, esperarSeletor: '#form-avaliacao-bico' });
+    await capturar({ arquivo: '12b-avaliar-contratante.png', usuario: 'rafael', url: `/bicos/${ids.bicos.torneira}`, fullPage: true, esperarSeletor: '#form-avaliacao-bico' });
+    await capturar({ arquivo: '12c-avaliacao-encerrada.png', usuario: 'marcos', url: `/bicos/${ids.bicos.portao}/gerenciar`, fullPage: true, esperarSeletor: '#avaliacao-somente-leitura' });
+    await capturar({ arquivo: '13-perfil-publico-contratante.png', usuario: 'rafael', url: `/perfil/publico/${ids.usuarios.carla}` });
     await capturar({
       arquivo: '09-publicar-bico.png', usuario: 'carla', url: '/bicos/novo', fullPage: true,
       preparar: async (p) => {
@@ -365,6 +422,54 @@ async function main() {
     const mobile = await novoContexto({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     await mobile.request.post(`${BASE}/login`, form({ email: USUARIOS.rafael.email, senha: SENHA, tipoPerfil: 'trabalhador' }));
     await capturar({ arquivo: '11-mobile-painel-trabalhador.png', contexto: mobile, url: '/hometrabalhador' });
+
+    // ---- Versão final: abas de Meus Bicos, selos, alerta, dica e comemoração -------------------------
+    await capturar({ arquivo: '14-meus-bicos-concluidos.png', usuario: 'marcos', url: '/bicos/ativos?aba=concluidos', fullPage: true });
+    await capturar({ arquivo: '15-meus-bicos-cancelados.png', usuario: 'marcos', url: '/bicos/ativos?aba=cancelados', fullPage: true });
+    await capturar({
+      arquivo: '16-historico-concluidos.png', usuario: 'rafael', url: '/historico?aba=concluidos', fullPage: true,
+      preparar: async (p) => {
+        await p.waitForSelector('#fecharDica', { state: 'visible' });
+        await p.click('#fecharDica');
+        await p.waitForSelector('#dicaPopup', { state: 'hidden' });
+      }
+    });
+    await capturar({
+      arquivo: '18-publicar-dica.png', usuario: 'carla', url: '/bicos/novo',
+      preparar: async (p) => { await p.click('.mascot-assistant__toggle'); await p.waitForSelector('#mascot-tip', { state: 'visible' }); },
+      espera: 1800
+    });
+
+    // Alerta de saldo insuficiente: a Beatriz (saldo R$ 100,00) tenta aceitar um candidato de um bico de R$ 200,00.
+    const palco = await ctx.beatriz.request.post(`${BASE}/bicos/novo`, form({
+      titulo: 'Montagem de palco para festa junina', descricao: 'Montagem de palco de madeira de 4 x 3 metros e instalação da iluminação básica para uma festa junina de bairro.',
+      valor: '200.00', bairro: 'Cambuí', data_servico: dataRelativa(10), horario: '15:00'
+    }));
+    await esperar(palco, 302, 'publicar palco');
+    const [bicoPalco] = await banco.query('SELECT id FROM bicos WHERE titulo = ? AND contratante_id = ?', ['Montagem de palco para festa junina', ids.usuarios.beatriz]);
+    const rPalco = await ctx.diego.request.post(`${BASE}/bicos/candidatar`, form({ bico_id: String(bicoPalco.id), mensagem: 'Tenho experiência em montagem de estruturas de madeira e posso ir com um ajudante.' }));
+    await esperar(rPalco, 302, 'candidatura no palco');
+    await capturar({
+      arquivo: '17-alerta-saldo-insuficiente.png', usuario: 'beatriz', url: `/bicos/${bicoPalco.id}/gerenciar`,
+      preparar: async (p) => {
+        await p.getByRole('button', { name: 'Aceitar' }).click();
+        await p.waitForSelector('#alerta-sistema');
+      },
+      espera: 2400
+    });
+
+    // Sucesso depois de avaliar: o Marcos avalia o Rafael no bico do reboco e a araponga comemora (meio do movimento).
+    await capturar({
+      arquivo: '19-sucesso-avaliacao.png', usuario: 'marcos', url: `/bicos/${ids.bicos.reboco}/gerenciar`,
+      esperarSeletor: '#form-avaliacao-bico', elemento: '.evaluation-section', espera: 0,
+      preparar: async (p) => {
+        await p.locator('label[for="nota-5"]').click();
+        await p.locator('#comentario-avaliacao').fill('Reboco bem acabado e parede pronta para pintar. Trabalho limpo e dentro do prazo.');
+        await p.locator('#btn-salvar-avaliacao').click();
+        await p.waitForSelector('#feedback-avaliacao-bico .mascote');
+        await pausa(380);
+      }
+    });
 
     console.log('\n> Resumo');
     console.log(JSON.stringify({ ids, resultados: resultados.map(({ arquivo, ok, erro, alturaConteudo }) => ({ arquivo, ok, erro, alturaConteudo })) }, null, 2));

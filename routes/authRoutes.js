@@ -2,6 +2,7 @@ import express from 'express';
 import pool from '../config/database.js';
 import { cadastrarUsuario, logarUsuario, homeContratante, exibirHistoricoTrabalhador } from '../controllers/authController.js';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
+import { contarBicosParaAvaliar } from '../controllers/avaliacaoRegras.js';
 
 const router = express.Router();
 
@@ -22,7 +23,11 @@ const renderHomeTrabalhador = async (req, res) => {
         // Vagas abertas, exceto as que o contratante já recusou para este trabalhador
         // e as que o próprio trabalhador cancelou (não pode se candidatar de novo).
         const vagas = await pool.query(
-            `SELECT * FROM bicos b
+            `SELECT b.*, u.nome AS contratante_nome,
+                    (SELECT ROUND(AVG(av.nota), 1) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS contratante_media,
+                    (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS contratante_total_avaliacoes
+             FROM bicos b
+             JOIN usuarios u ON u.id = b.contratante_id
              WHERE b.status = 'Aberto'
                AND NOT EXISTS (
                    SELECT 1 FROM candidaturas c
@@ -33,9 +38,12 @@ const renderHomeTrabalhador = async (req, res) => {
             [req.session.usuario.id]
         );
 
+        const bicosParaAvaliar = await contarBicosParaAvaliar(pool, 'trabalhador_id', req.session.usuario.id);
+
         return res.render('trabalhador/homeTrabalhador', {
             usuario: req.session.usuario,
-            vagas
+            vagas,
+            bicosParaAvaliar
         });
     } catch (erro) {
         console.error('Erro ao buscar bicos no banco:', erro);

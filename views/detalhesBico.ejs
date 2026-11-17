@@ -12,6 +12,7 @@
   <%- include('Partials/phosphorIcons') %>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/detalhesBico.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
 </head>
 
 <body class="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' ? 'worker-details' : '' %>">
@@ -108,13 +109,22 @@
               <!-- SIDEBAR -->
               <aside class="sidebar-right">
                 <div class="summary-card">
-                  <h3>Candidatar-se</h3>
+                  <h3><%= bico.status === 'Aberto' ? 'Candidatar-se' : (minhaCandidatura ? 'Sua participação' : 'Sobre o bico') %></h3>
 
                   <div class="summary-item">
                     <span>Contratante</span>
                     <strong>
                       <%= bico.contratante_nome %>
                     </strong>
+                    <span class="contratante-nota">
+                      <% if (Number(bico.contratante_total_avaliacoes) > 0) { %>
+                        <span class="contratante-nota__estrela">★ <%= Number(bico.contratante_media).toFixed(1).replace('.', ',') %></span>
+                        (<%= Number(bico.contratante_total_avaliacoes) %> <%= Number(bico.contratante_total_avaliacoes) === 1 ? 'avaliação' : 'avaliações' %>)
+                      <% } else { %>
+                        Sem avaliações
+                      <% } %>
+                      · <a class="contratante-nota__link" href="/perfil/publico/<%= bico.contratante_id %>">Ver perfil</a>
+                    </span>
                   </div>
 
                   <% if (usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase()==='trabalhador' ) { %>
@@ -301,6 +311,15 @@
                 </div>
               </aside>
             </main>
+
+            <% if (avaliacao) { %>
+              <%# Trabalhador do bico finalizado avalia o contratante. %>
+              <div class="avaliacao-wrap">
+                <%- include('Partials/formAvaliacao', { bico, avaliacao, alvo: 'contratante', perfilAlvoId: bico.contratante_id }) %>
+              </div>
+              <script src="/js/mascotes.js" defer></script>
+              <script src="/js/avaliacaoBico.js" defer></script>
+            <% } %>
 
             <!-- PARTIAL DO FOOTER -->
             <%- include('Partials/footer') %>

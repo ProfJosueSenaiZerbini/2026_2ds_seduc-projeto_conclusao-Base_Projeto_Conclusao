@@ -81,12 +81,13 @@ export const publicarBico = async (ctx, titulo, valor = 150) => {
 export const candidatar = (ctxTrabalhador, bicoId, mensagem = 'Tenho interesse neste bico.') =>
   ctxTrabalhador.request.post(`${BASE}/bicos/candidatar`, formulario({ bico_id: String(bicoId), mensagem }));
 
-// Lê a tela de gerenciamento e devolve [{ candidaturaId, status, email }] de todos os candidatos.
+// Lê a tela de gerenciamento e devolve [{ candidaturaId, status, nome, trabalhadorId }] de todos os candidatos.
 export const listarCandidatos = async (ctxContratante, bicoId) => {
   const html = await (await ctxContratante.request.get(`${BASE}/bicos/${bicoId}/gerenciar`)).text();
   return html.split('<article class="candidate-card">').slice(1).map((bloco) => ({
     candidaturaId: Number((/name="candidatura_id" value="(\d+)"/.exec(bloco) || /candidaturas\/(\d+)\/chat/.exec(bloco) || [])[1]) || null,
-    email: (/E-mail:\s*([^\s<]+)/.exec(bloco) || [])[1],
+    nome: (/candidate-card__name">\s*([^<]+?)\s*<\/h3>/.exec(bloco) || [])[1],
+    trabalhadorId: Number((/\/perfil\/publico\/(\d+)/.exec(bloco) || [])[1]) || null,
     status: (/Status:\s*<strong>\s*([A-Za-zçã ]+?)\s*<\/strong>/.exec(bloco) || [])[1]
   }));
 };
@@ -120,4 +121,18 @@ export const consultarBanco = async (sql, params = []) => {
   } finally {
     await conexao.end();
   }
+};
+
+// Escrita no banco, usada somente para envelhecer dados que o próprio teste criou (ex.: simular que o
+// prazo de 7 dias de avaliação já passou). Nunca aponta para dados de outros testes.
+export const executarNoBanco = async (sql, params = []) => consultarBanco(sql, params);
+
+// Faz a finalização do bico "acontecer" há N dias (evento de finalização e crédito do pagamento).
+export const envelhecerFinalizacao = async (bicoId, dias) => {
+  await executarNoBanco(
+    `UPDATE historico_eventos_bicos SET data_evento = DATE_SUB(NOW(), INTERVAL ? DAY)
+     WHERE bico_id = ? AND status_novo = 'Finalizado'`, [dias, bicoId]);
+  await executarNoBanco(
+    `UPDATE movimentacoes_carteira SET criado_em = DATE_SUB(NOW(), INTERVAL ? DAY)
+     WHERE bico_id = ? AND tipo_movimentacao = 'CREDITO'`, [dias, bicoId]);
 };

@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import bicoRoutes from './routes/bicoRoutes.js';
 import carteiraRoutes from './routes/carteiraRoutes.js'; 
 import perfilRoutes from './routes/perfilRoutes.js';
+import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
@@ -61,6 +62,9 @@ app.use((req, res, next) => {
     res.locals.rotaAtual = req.path;
   next();
 });
+
+// Saldo sempre atual (lido do banco) e alerta de uma só exibição para as views.
+app.use(carregarDadosDaSessao);
 
 
 // 2. CONECTANDO AS SUAS ROTAS:

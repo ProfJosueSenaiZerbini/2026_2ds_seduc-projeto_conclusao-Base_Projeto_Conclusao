@@ -46,12 +46,15 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
     avaliado_id INT NOT NULL,
     nota TINYINT NOT NULL,
     comentario VARCHAR(500) DEFAULT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP NOT NULL
         DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
 
-    CONSTRAINT uk_avaliacoes_bico UNIQUE (bico_id),
+    -- Cada participante avalia o bico uma vez (contratante -> trabalhador e trabalhador -> contratante).
+    CONSTRAINT uk_avaliacoes_bico_avaliador UNIQUE (bico_id, avaliador_id),
     CONSTRAINT chk_avaliacoes_nota CHECK (nota BETWEEN 1 AND 5),
+    CONSTRAINT chk_avaliacoes_participantes CHECK (avaliador_id <> avaliado_id),
     CONSTRAINT fk_avaliacoes_bico
         FOREIGN KEY (bico_id) REFERENCES bicos(id),
     CONSTRAINT fk_avaliacoes_avaliador

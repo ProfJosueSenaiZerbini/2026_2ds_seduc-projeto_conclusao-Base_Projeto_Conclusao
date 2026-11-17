@@ -92,7 +92,7 @@ test.describe('CT05 – Publicar bico válido e inválido', () => {
     await page.locator('input[name="horario"]').fill('10:00');
     await page.getByRole('button', { name: /Publicar Vaga/i }).click();
 
-    await expect(page.locator('.balao-erro')).toContainText('O título deve ter entre 3 e 100 caracteres.');
+    await expect(page.locator('#alerta-sistema')).toContainText('O título deve ter entre 3 e 100 caracteres.');
     await page.close();
   });
 });

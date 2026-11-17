@@ -1015,3 +1015,11 @@ body main.home {
     transition: none !important;
   }
 }
+
+.home .job-contratante { margin: 4px 0 8px; font-size: 0.9rem; color: #475569; }
+.home .job-contratante a { color: inherit; font-weight: 600; text-decoration: underline; }
+.home .job-contratante__nota { margin-left: 6px; color: #b45309; font-weight: 700; }
+.home .job-contratante__nota--vazia { color: #64748b; font-weight: 400; }
+
+.home .hero__avaliar { display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,0.12); color: #fff; font-weight: 600; text-decoration: none; }
+.home .hero__avaliar:hover { background: rgba(255,255,255,0.2); }

@@ -10,6 +10,7 @@
     <%- include('../Partials/phosphorIcons') %>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/historicoTrabalhador.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
 </head>
 
 <body>
@@ -72,9 +73,10 @@
                         <section class="tab-panel <%= i === 0 ? 'tab-panel--active' : '' %>" id="<%= aba.id %>" role="tabpanel"
                             aria-labelledby="tab-<%= aba.id %>"<%- aba.lista.length === 0 ? ' tabindex="0"' : '' %>>
                             <% if (aba.lista.length===0) { %>
-                                <p class="empty">
-                                    <%= aba.vazio %>
-                                </p>
+                                <div class="empty">
+                                    <%- include('../Partials/mascoteVazio', { area: 'trabalhador' }) %>
+                                    <p><%= aba.vazio %></p>
+                                </div>
                                 <% } else { %>
                                     <ul class="bicos-list">
                                         <% aba.lista.forEach(bico=> { %>
@@ -96,7 +98,7 @@
 
             <!-- Pop-up: Dica para Profissionais -->
             <aside class="tip-popup" id="dicaPopup" role="region" aria-labelledby="dicaTitulo" hidden>
-                <div class="tip-popup__icon" aria-hidden="true"><i class="ph ph-lightbulb"></i></div>
+                <div class="tip-popup__icon" aria-hidden="true"><%- include('../Partials/mascote', { ave: 'tie', comGalho: false, tamanho: 56, piscar: true }) %></div>
                 <div class="tip-popup__body">
                     <h4 id="dicaTitulo">Dica para Profissionais</h4>
                     <p>Use o chat para combinar horário e local com o contratante. Ao finalizar o serviço, o valor simulado
@@ -107,6 +109,7 @@
 
             <%- include('../Partials/footer') %>
 
+                <script src="/js/mascotes.js"></script>
                 <script src="/js/historicoTrabalhador.js"></script>
 </body>
 

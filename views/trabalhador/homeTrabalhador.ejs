@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/homeTrabalhador.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
     <%- include('../Partials/phosphorIcons') %>
 </head>
 
@@ -53,6 +54,10 @@
                 <span class="eyebrow"><i class="ph-fill ph-lightning" aria-hidden="true"></i> OPORTUNIDADES PARA VOCÊ</span>
                 <h1 id="heroTitle">Seu próximo bico começa aqui.</h1>
                 <p>Encontre serviços, compare pagamentos e veja as informações principais antes de abrir os detalhes da oportunidade.</p>
+                <a class="hero__avaliar" id="link-para-avaliar" href="/historico?aba=concluidos">
+                    <i class="ph-fill ph-star" aria-hidden="true"></i>
+                    Bicos para avaliar: <strong id="valor-para-avaliar"><%= typeof bicosParaAvaliar !== 'undefined' ? bicosParaAvaliar : 0 %></strong>
+                </a>
                 <% if (listaVagas.length > 0) { %>
                 <dl class="hero__stats">
                     <div><dt>oportunidades cadastradas</dt><dd><%= listaVagas.length %></dd></div>
@@ -62,7 +67,7 @@
                 <% } %>
             </div>
             <div class="hero__illustration" aria-hidden="true">
-                <div class="illustration-circle"><img class="hero__mascot" src="/img/mascote-tie-sangue.png" alt=""></div>
+                <div class="illustration-circle" data-mascote-alvo><%- include('../Partials/mascote', { ave: 'tie', piscar: true, interacao: 'asas', classe: 'hero__mascot' }) %></div>
             </div>
         </section>
 
@@ -129,6 +134,15 @@
                         <div class="job-card__main">
                             <% if (prazo) { %><span class="job-badge"><i class="ph-fill ph-lightning" aria-hidden="true"></i> <%= prazo %></span><% } %>
                             <h3><%= tituloVaga %></h3>
+                            <p class="job-contratante">
+                                <i class="ph ph-user" aria-hidden="true"></i>
+                                <a href="/perfil/publico/<%= vaga.contratante_id %>"><%= vaga.contratante_nome %></a>
+                                <% if (Number(vaga.contratante_total_avaliacoes) > 0) { %>
+                                    <span class="job-contratante__nota">★ <%= Number(vaga.contratante_media).toFixed(1).replace('.', ',') %> (<%= Number(vaga.contratante_total_avaliacoes) %>)</span>
+                                <% } else { %>
+                                    <span class="job-contratante__nota job-contratante__nota--vazia">Sem avaliações</span>
+                                <% } %>
+                            </p>
                             <ul class="job-meta">
                                 <li><i class="ph-fill ph-map-pin" aria-hidden="true"></i> <%= vaga.bairro || 'Bairro a confirmar' %></li>
                                 <li><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= vaga.data_servico ? new Date(vaga.data_servico).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Data a combinar' %></li>
@@ -162,6 +176,7 @@
     </main>
     <%- include('../Partials/footer') %>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/js/mascotes.js" defer></script>
     <script src="/js/hometrabalhador.js" defer></script>
 </body>
 

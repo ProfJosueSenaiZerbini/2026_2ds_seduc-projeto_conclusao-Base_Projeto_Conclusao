@@ -10,6 +10,8 @@ if (mascotToggle && mascotTip && mascotTipClose) {
       isOpen ? 'Fechar dica para publicar um bico' : 'Abrir dica para publicar um bico',
     );
     mascotTip.hidden = !isOpen;
+    // Ao abrir a dica, a araponga inclina a cabeça, curiosa.
+    if (isOpen && window.Mascotes) window.Mascotes.curioso(mascotToggle.querySelector('.mascote'));
   };
 
   mascotToggle.addEventListener('click', () => {

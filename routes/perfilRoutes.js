@@ -4,13 +4,13 @@ import {
     exibirPerfil, 
     atualizarPerfil, 
     atualizarSenha,
-    exibirPerfilPublicoTrabalhador
+    exibirPerfilPublico
 } from '../controllers/perfilController.js';
 
 const router = express.Router();
 
-// Perfil público: exige autenticação e retorna somente dados públicos do trabalhador.
-router.get('/publico/:id', requireAuth, exibirPerfilPublicoTrabalhador);
+// Perfil público de trabalhador ou contratante: exige autenticação e retorna somente dados públicos.
+router.get('/publico/:id', requireAuth, exibirPerfilPublico);
 
 // Como esta rota já é montada com /perfil no app.js:
 // GET /perfil -> Exibe a página do perfil

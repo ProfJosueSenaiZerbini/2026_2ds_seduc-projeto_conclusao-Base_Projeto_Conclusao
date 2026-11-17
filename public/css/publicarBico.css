@@ -449,69 +449,6 @@ textarea {
   color: var(--publish-green-muted);
 }
 
-.erro-passarinho {
-    position: fixed;
-    top: 90px;
-    left: 30px;
-
-    display: flex;
-    align-items: center;
-    gap: 5px;
-
-    z-index: 1000;
-
-    animation: sairErro 0.5s ease 5s forwards;
-}
-
-.erro-passarinho > img {
-    width: 90px;
-    height: auto;
-
-    animation: entrarPassarinho 0.5s ease;
-}
-
-.balao-erro {
-    position: relative;
-    width: 350px;
-
-    opacity: 0;
-    animation: aparecerBalao 0.5s ease 0.4s forwards;
-}
-
-.balao-erro > img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.balao-erro span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
-    width: 80%;
-
-    text-align: center;
-    color: white;
-
-    font-size: 14px;
-    font-weight: 500;
-}
-
-@keyframes entrarPassarinho {
-    from {
-        opacity: 0;
-        transform: translateX(-100px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 @media (max-width: 480px) {
   .mascot-assistant {
     gap: 8px;
@@ -592,26 +529,3 @@ textarea {
   }
 }
 
-@keyframes aparecerBalao {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes sairErro {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateX(-100px);
-    }
-}

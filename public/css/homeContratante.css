@@ -124,7 +124,7 @@ body.home-contratante-page {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 18px;
   margin: 0 0 42px;
 }
@@ -414,3 +414,6 @@ body.home-contratante-page {
   .home-button, .stat-card, .vaga-card { transition: none; }
   .home-button-primary:hover, .stat-card:hover, .vaga-card:hover { transform: none; }
 }
+
+.stat-card--link { text-decoration: none; color: inherit; cursor: pointer; transition: box-shadow 0.18s ease, transform 0.18s ease; }
+.stat-card--link:hover { box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12); transform: translateY(-2px); }

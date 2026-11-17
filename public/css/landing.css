@@ -447,24 +447,22 @@ body[data-profile="trabalhador"] .landing-hero::after {
   font-weight: 700;
 }
 
-.landing-choice__option img {
+.landing-choice__option .mascote {
   position: absolute;
   right: -5px;
   bottom: 24px;
   z-index: 1;
   width: 43%;
-  max-height: 150px;
-  object-fit: contain;
-  object-position: bottom right;
+  max-width: 160px;
   filter: drop-shadow(0 8px 8px rgba(25, 25, 25, 0.09));
   pointer-events: none;
 }
 
-.landing-choice__option--work img {
+.landing-choice__option--work .mascote {
   right: 0;
   bottom: 20px;
   width: 40%;
-  max-height: 145px;
+  max-width: 184px;
 }
 
 .landing-choice__orbit {
@@ -597,11 +595,9 @@ body[data-profile="trabalhador"] .landing-hero::after {
   border-radius: 47% 53% 55% 45% / 50% 43% 57% 50%;
 }
 
-.landing-hero__mascot img {
+.landing-hero__mascot .mascote {
   display: block;
   width: min(88%, 390px);
-  max-height: 430px;
-  object-fit: contain;
   filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.18));
 }
 
@@ -975,14 +971,14 @@ body[data-profile="trabalhador"] .landing-hero::after {
     margin-top: 11px;
   }
 
-  .landing-choice__option img {
+  .landing-choice__option .mascote {
     width: 31%;
-    max-height: 135px;
+    max-width: 144px;
   }
 
-  .landing-choice__option--work img {
+  .landing-choice__option--work .mascote {
     width: 29%;
-    max-height: 130px;
+    max-width: 165px;
   }
 
   .landing-hero__state--hire,
@@ -1073,14 +1069,14 @@ body[data-profile="trabalhador"] .landing-hero::after {
     font-size: clamp(19px, 3vw, 24px);
   }
 
-  .landing-choice__option img {
+  .landing-choice__option .mascote {
     width: 42%;
-    max-height: 125px;
+    max-width: 134px;
   }
 
-  .landing-choice__option--work img {
+  .landing-choice__option--work .mascote {
     width: 39%;
-    max-height: 120px;
+    max-width: 152px;
   }
 
   .landing-hero__state--hire,
@@ -1095,9 +1091,9 @@ body[data-profile="trabalhador"] .landing-hero::after {
     min-height: 380px;
   }
 
-  .landing-hero__mascot img {
+  .landing-hero__mascot .mascote {
     width: 100%;
-    max-height: 340px;
+    max-width: 364px;
   }
 
   .landing-hero__actions {
@@ -1285,18 +1281,18 @@ body[data-profile="trabalhador"] .landing-hero::after {
     font-size: 8px;
   }
 
-  .landing-choice__option img {
+  .landing-choice__option .mascote {
     right: 0;
     bottom: 8px;
     width: 33%;
-    max-height: 132px;
+    max-width: 141px;
   }
 
-  .landing-choice__option--work img {
+  .landing-choice__option--work .mascote {
     right: 0;
     bottom: 8px;
     width: 31%;
-    max-height: 126px;
+    max-width: 160px;
   }
 
   .landing-choice__orbit {
@@ -1351,9 +1347,8 @@ body[data-profile="trabalhador"] .landing-hero::after {
     width: min(70%, 260px);
   }
 
-  .landing-hero__mascot img {
+  .landing-hero__mascot .mascote {
     width: min(72%, 250px);
-    max-height: 245px;
   }
 
   .landing-hero__mascot figcaption {

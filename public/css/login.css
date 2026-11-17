@@ -757,75 +757,6 @@ input:focus {
     }
 }
 
-/* Aviso de erro do login */
-.erro-passarinho-login {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    margin: 0 0 20px;
-    animation: aparecerErro 0.4s ease forwards;
-}
-
-.erro-passarinho-login>img {
-    position: relative;
-    z-index: 2;
-    width: 54px;
-    height: auto;
-    flex-shrink: 0;
-}
-
-.balao-erro-login {
-    position: relative;
-    z-index: 1;
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 64px;
-    box-sizing: border-box;
-    padding: 12px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.balao-erro-login>img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    z-index: 0;
-}
-
-.balao-erro-login span {
-    position: relative;
-    z-index: 1;
-    color: #333;
-    font-size: 14px;
-    line-height: 1.4;
-    text-align: center;
-    overflow-wrap: anywhere;
-}
-
-@media (max-width: 380px) {
-    .erro-passarinho-login {
-        gap: 6px;
-    }
-
-    .erro-passarinho-login>img {
-        width: 42px;
-    }
-
-    .balao-erro-login {
-        padding: 10px 12px;
-    }
-
-    .balao-erro-login span {
-        font-size: 12px;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -837,31 +768,3 @@ input:focus {
     }
 }
 
-@keyframes aparecerErro {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Animação de saída */
-.erro-passarinho-login.sumindo {
-    animation: desaparecerErro 0.5s ease forwards;
-}
-
-@keyframes desaparecerErro {
-    to {
-        opacity: 0;
-        transform: translateY(-8px);
-        margin-top: 0;
-        margin-bottom: 0;
-        height: 0;
-        min-height: 0;
-        overflow: hidden;
-    }
-}
