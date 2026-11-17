@@ -126,14 +126,21 @@
   border-radius: 12px; background: #fdecec; color: #3a1010;
   animation: alerta-entra .35s cubic-bezier(.2,.7,.3,1);
 }
-.alerta-sistema .mascote { width: 56px; }
+/* Mascote do alerta: 64 px (48 px no celular), sobre um círculo claro suave para a araponga ter contraste. */
+.alerta-sistema__ave {
+  display: inline-grid; place-items: center; flex-shrink: 0; width: 76px; height: 76px; border-radius: 50%;
+  background: rgba(255, 255, 255, .88); box-shadow: inset 0 0 0 1px rgba(198, 40, 40, .12);
+}
+.alerta-sistema__ave[hidden] { display: none; }
+.alerta-sistema .mascote { width: 64px; }
+@media (max-width: 480px) {
+  .alerta-sistema__ave { width: 58px; height: 58px; }
+  .alerta-sistema .mascote { width: 48px !important; }
+}
 .alerta-sistema__texto { flex: 1 1 260px; min-width: 0; display: flex; align-items: flex-start; gap: 8px; margin: 0; font-size: 15px; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
 .alerta-sistema__icone { flex-shrink: 0; margin-top: 1px; color: #b91c1c; font-size: 20px; }
 .alerta-sistema__acao { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 10px; background: #c62828; color: #fff; font-weight: 700; text-decoration: none; }
 .alerta-sistema__acao:hover, .alerta-sistema__acao:focus-visible { background: #a61f1f; }
-/* Caixa nas cores da área (login, cadastro, publicar bico). */
-.alerta-sistema--contratante { background: #eef6f2; border-color: #a9cdbb; border-left-color: #14332b; color: #14332b; }
-.alerta-sistema--trabalhador { background: #fbeeee; border-color: #e3b5b9; border-left-color: #8b1a2b; color: #4a1018; }
 .alerta-sistema--saindo { opacity: 0; translate: 0 -8px; transition: opacity .4s ease, translate .4s ease; }
 @keyframes alerta-entra { from { opacity: 0; translate: 0 -10px; } to { opacity: 1; translate: 0 0; } }
 

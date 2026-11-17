@@ -4,25 +4,23 @@
   // include com { alerta: { mensagem } }.
   // Parâmetro `area`: 'contratante' (araponga) | 'trabalhador' (tiê) | 'seletor' (as duas aves; só a do perfil
   // escolhido fica visível, trocada pelo JS junto com o seletor — use `perfilInicial`). Sem `area`, vale o perfil logado.
-  // `estilo`: 'padrao' (vermelho-claro) ou 'area' (caixa nas cores da área).
+  // A caixa é sempre vermelho-claro; a cor da área aparece só no mascote.
   const perfilLogado = typeof usuario !== 'undefined' && usuario
     ? String(usuario.tipo_perfil || '').trim().toLowerCase() : '';
   const areaAlerta = (typeof area !== 'undefined' && area) ? area : (perfilLogado === 'trabalhador' ? 'trabalhador' : 'contratante');
   const perfilVisivel = (typeof perfilInicial !== 'undefined' && String(perfilInicial).toLowerCase() === 'trabalhador') ? 'trabalhador' : 'contratante';
-  const estiloAlerta = (typeof estilo !== 'undefined' && estilo === 'area') ? 'area' : 'padrao';
-  const classeCaixa = estiloAlerta === 'area' ? ' alerta-sistema--' + (areaAlerta === 'seletor' ? perfilVisivel : areaAlerta) : '';
 %>
 <% if (typeof alerta !== 'undefined' && alerta && alerta.mensagem) { %>
-  <div class="alerta-sistema<%= classeCaixa %>" id="alerta-sistema" role="alert" data-area="<%= areaAlerta %>"<%- typeof autoOcultar !== 'undefined' && autoOcultar ? ' data-auto-ocultar' : '' %>>
+  <div class="alerta-sistema" id="alerta-sistema" role="alert" data-area="<%= areaAlerta %>"<%- typeof autoOcultar !== 'undefined' && autoOcultar ? ' data-auto-ocultar' : '' %>>
     <% if (areaAlerta === 'seletor') { %>
-      <span class="alerta-sistema__mascote-troca" data-mascote-perfil="contratante"<%- perfilVisivel === 'contratante' ? '' : ' hidden' %>>
-        <%- include('mascote', { ave: 'araponga', tamanho: 56, comGalho: false }) %>
+      <span class="alerta-sistema__ave" data-mascote-perfil="contratante"<%- perfilVisivel === 'contratante' ? '' : ' hidden' %>>
+        <%- include('mascote', { ave: 'araponga', tamanho: 64, comGalho: false }) %>
       </span>
-      <span class="alerta-sistema__mascote-troca" data-mascote-perfil="trabalhador"<%- perfilVisivel === 'trabalhador' ? '' : ' hidden' %>>
-        <%- include('mascote', { ave: 'tie', tamanho: 56, comGalho: false }) %>
+      <span class="alerta-sistema__ave" data-mascote-perfil="trabalhador"<%- perfilVisivel === 'trabalhador' ? '' : ' hidden' %>>
+        <%- include('mascote', { ave: 'tie', tamanho: 64, comGalho: false }) %>
       </span>
     <% } else { %>
-      <%- include('mascote', { ave: areaAlerta === 'trabalhador' ? 'tie' : 'araponga', tamanho: 56, comGalho: false }) %>
+      <span class="alerta-sistema__ave"><%- include('mascote', { ave: areaAlerta === 'trabalhador' ? 'tie' : 'araponga', tamanho: 64, comGalho: false }) %></span>
     <% } %>
     <p class="alerta-sistema__texto">
       <i class="ph-fill ph-warning-circle alerta-sistema__icone" aria-hidden="true"></i>

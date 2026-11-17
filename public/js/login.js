@@ -59,8 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function trocarMascoteDoAlerta(perfil) {
         const alerta = document.getElementById('alerta-sistema');
         if (!alerta) return;
-        alerta.classList.remove('alerta-sistema--contratante', 'alerta-sistema--trabalhador');
-        alerta.classList.add('alerta-sistema--' + perfil);
         alerta.querySelectorAll('[data-mascote-perfil]').forEach((caixa) => {
             const ativo = caixa.dataset.mascotePerfil === perfil;
             caixa.hidden = !ativo;
