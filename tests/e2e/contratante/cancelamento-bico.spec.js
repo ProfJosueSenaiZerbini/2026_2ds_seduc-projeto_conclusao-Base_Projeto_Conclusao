@@ -57,6 +57,9 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     expect(resposta.status()).toBe(302);
   };
 
+  // Texto exibido no extrato para o estorno de um bico (título do bico, não o id).
+  const textoEstorno = (titulo) => `Estorno – ${titulo}`;
+
   const publicarBico = async (ctx, titulo) => {
     const data = new Date();
     data.setDate(data.getDate() + 7);
@@ -136,7 +139,7 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     // Sem reserva, o saldo não muda e não há ESTORNO no extrato.
     expect(await lerSaldo(contratante.ctx)).toBe(saldoAntes);
     const extrato = await (await contratante.ctx.request.get(`${BASE}/carteira/contratante`)).text();
-    expect(extrato).not.toContain(`Estorno do bico: ${bicoId}`);
+    expect(extrato).not.toContain(textoEstorno(titulo));
 
     // O bico sai de "Bicos ativos" e a candidatura aparece como Recusada para o trabalhador.
     const ativos = await (await contratante.ctx.request.get(`${BASE}/bicos/ativos`)).text();
@@ -175,7 +178,7 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     // Extrato: o estorno é uma entrada.
     const paginaContratante = await contratante.ctx.newPage();
     await paginaContratante.goto(`${BASE}/carteira/contratante`);
-    const linhaEstorno = paginaContratante.locator('tr', { hasText: `Estorno do bico: ${bicoId}` });
+    const linhaEstorno = paginaContratante.locator('tr', { hasText: textoEstorno(titulo) });
     await expect(linhaEstorno).toHaveCount(1);
     await expect(linhaEstorno).toContainText('Entrada');
     await expect(linhaEstorno).toContainText('Valor estornado');
@@ -212,7 +215,8 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     const { contratante, trabalhador } = sessoes;
 
     await adicionarSaldo(contratante.ctx, 200);
-    const bicoId = await publicarBico(contratante.ctx, `Cancelar finalizado ${Date.now()}`);
+    const titulo = `Cancelar finalizado ${Date.now()}`;
+    const bicoId = await publicarBico(contratante.ctx, titulo);
     await candidatar(trabalhador.ctx, bicoId);
     await aceitar(contratante.ctx, await idCandidaturaPendente(contratante.ctx, bicoId));
 
@@ -226,7 +230,9 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     expect((await resposta.json()).erro).toMatch(/finalizados não podem ser cancelados/);
     expect(await lerSaldo(contratante.ctx)).toBe(saldoAntes);
     const extrato = await (await contratante.ctx.request.get(`${BASE}/carteira/contratante`)).text();
-    expect(extrato).not.toContain(`Estorno do bico: ${bicoId}`);
+    // O extrato mostra o título do bico (a reserva existe), mas não há estorno.
+    expect(extrato).toContain(`Reserva – ${titulo}`);
+    expect(extrato).not.toContain(textoEstorno(titulo));
   });
 
   test('outro contratante e o trabalhador não conseguem cancelar o bico', async () => {
@@ -248,7 +254,8 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     const { contratante, trabalhador } = sessoes;
 
     await adicionarSaldo(contratante.ctx, 200);
-    const bicoId = await publicarBico(contratante.ctx, `Cancelar duplicado ${Date.now()}`);
+    const titulo = `Cancelar duplicado ${Date.now()}`;
+    const bicoId = await publicarBico(contratante.ctx, titulo);
     await candidatar(trabalhador.ctx, bicoId);
     await aceitar(contratante.ctx, await idCandidaturaPendente(contratante.ctx, bicoId));
     const saldoComReserva = await lerSaldo(contratante.ctx);
@@ -262,7 +269,7 @@ test.describe('Cancelamento de bico pelo contratante', () => {
     expect(await lerSaldo(contratante.ctx), 'estorno uma única vez').toBe(saldoComReserva + VALOR);
 
     const extrato = await (await contratante.ctx.request.get(`${BASE}/carteira/contratante`)).text();
-    expect(extrato.split(`Estorno do bico: ${bicoId}`).length - 1).toBe(1);
+    expect(extrato.split(textoEstorno(titulo)).length - 1).toBe(1);
   });
 
   test('tela: o modal avisa do estorno e cancela o bico pelo botão', async () => {

@@ -271,7 +271,8 @@ body {
 }
 
 .role-label {
-  margin: 16px 0 8px;
+  display: block;
+  margin: 16px 0 12px;
   color: var(--ink-700);
   font-size: 13px;
   font-weight: 650;

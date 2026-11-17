@@ -851,6 +851,7 @@ body main.home {
     margin: 0 -14px;
     padding: 2px 14px 6px;
     overflow-x: auto;
+    scroll-padding-inline: 14px; /* o snap não pode colar a primeira chip na borda da tela */
     scroll-snap-type: x proximity;
     scrollbar-width: none;
   }
