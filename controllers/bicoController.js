@@ -1,10 +1,12 @@
 import db from '../config/database.js';
+import { definirAlerta } from '../middleware/sessaoMiddleware.js';
 import {
     PRAZO_AVALIACAO_DIAS,
     SQL_FINALIZADO_EM,
     sqlMediaAvaliacoes,
     sqlTotalAvaliacoes,
     calcularPrazoAvaliacao,
+    montarSeloAvaliacao,
     normalizarComentario,
     carregarContextoAvaliacao
 } from './avaliacaoRegras.js';
@@ -167,6 +169,12 @@ export const exibirDetalhesBico = async (req, res) => {
     }
 };
 
+const ABAS_BICOS_CONTRATANTE = ['ativos', 'concluidos', 'cancelados'];
+
+// Painel "Bicos" do contratante, com três abas (?aba=ativos|concluidos|cancelados):
+// - ativos: Aberto e Em andamento;
+// - concluidos: Finalizados, com data de finalização, trabalhador e selo de avaliação;
+// - cancelados: Cancelados, com data, motivo e se houve estorno.
 export const exibirBicosAtivosContratante = async (req, res) => {
     if (!req.session?.usuario) {
         return res.redirect('/login');
@@ -174,9 +182,11 @@ export const exibirBicosAtivosContratante = async (req, res) => {
 
     try {
         const usuarioId = req.session.usuario.id;
+        const abaPedida = typeof req.query?.aba === 'string' ? req.query.aba : 'ativos';
+        const aba = ABAS_BICOS_CONTRATANTE.includes(abaPedida) ? abaPedida : 'ativos';
 
         const bicosAtivos = await db.query(
-            `SELECT 
+            `SELECT
                 b.id,
                 b.titulo,
                 b.descricao,
@@ -188,13 +198,65 @@ export const exibirBicosAtivosContratante = async (req, res) => {
                 u.nome AS nome_trabalhador
              FROM bicos b
              LEFT JOIN usuarios u ON b.trabalhador_id = u.id
-             WHERE b.contratante_id = ? 
+             WHERE b.contratante_id = ?
                AND b.status IN ('Aberto', 'Em andamento')
              ORDER BY b.data_servico ASC`,
             [usuarioId]
         );
 
-        res.render('contratante/bicosAtivos', { bicos: bicosAtivos });
+        const concluidosBrutos = await db.query(
+            `SELECT
+                b.id,
+                b.titulo,
+                b.valor,
+                b.bairro,
+                DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                b.horario,
+                u.nome AS nome_trabalhador,
+                ${SQL_FINALIZADO_EM} AS finalizado_em,
+                DATE_FORMAT(${SQL_FINALIZADO_EM}, '%d/%m/%Y') AS finalizado_em_formatada,
+                (SELECT av.nota FROM avaliacoes av WHERE av.bico_id = b.id AND av.avaliador_id = b.contratante_id) AS minha_nota
+             FROM bicos b
+             LEFT JOIN usuarios u ON u.id = b.trabalhador_id
+             WHERE b.contratante_id = ?
+               AND b.status = 'Finalizado'
+             ORDER BY finalizado_em DESC, b.id DESC`,
+            [usuarioId]
+        );
+        const bicosConcluidos = concluidosBrutos.map((bico) => ({
+            ...bico,
+            selo_avaliacao: montarSeloAvaliacao(bico.minha_nota, bico.finalizado_em, 'Avaliar')
+        }));
+
+        const bicosCancelados = await db.query(
+            `SELECT
+                b.id,
+                b.titulo,
+                b.valor,
+                b.bairro,
+                DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
+                b.horario,
+                (SELECT DATE_FORMAT(ev.data_evento, '%d/%m/%Y') FROM historico_eventos_bicos ev
+                  WHERE ev.bico_id = b.id AND ev.status_novo = 'Cancelado'
+                  ORDER BY ev.id DESC LIMIT 1) AS cancelado_em_formatada,
+                (SELECT ev.observacao FROM historico_eventos_bicos ev
+                  WHERE ev.bico_id = b.id AND ev.status_novo = 'Cancelado'
+                  ORDER BY ev.id DESC LIMIT 1) AS motivo,
+                (SELECT mv.valor FROM movimentacoes_carteira mv
+                  WHERE mv.bico_id = b.id AND mv.tipo_movimentacao = 'ESTORNO' LIMIT 1) AS valor_estornado
+             FROM bicos b
+             WHERE b.contratante_id = ?
+               AND b.status = 'Cancelado'
+             ORDER BY b.id DESC`,
+            [usuarioId]
+        );
+
+        res.render('contratante/bicosAtivos', {
+            bicos: bicosAtivos,
+            aba,
+            concluidos: bicosConcluidos,
+            cancelados: bicosCancelados
+        });
     } catch (error) {
         console.error('🚫 Erro ao buscar bicos ativos:', error);
         res.status(500).send('Erro ao carregar os bicos ativos.');
@@ -341,9 +403,25 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
     let connection;
     let transacaoAtiva = false;
 
+    // Depois que o bico é identificado e o contratante confirmado como dono, as recusas por regra
+    // (400/409) voltam para a tela de gerenciamento com um alerta estilizado, em vez de texto puro.
+    // Nada muda no banco: a transação é desfeita antes.
+    let bicoIdDoAlerta = null;
+
     const responderComRollback = async (status, mensagem) => {
         await connection.rollback();
         transacaoAtiva = false;
+
+        if (bicoIdDoAlerta && (status === 400 || status === 409)) {
+            const faltaSaldo = /^(Saldo insuficiente|Não foi possível reservar o valor)/.test(mensagem);
+            definirAlerta(req, {
+                tipo: 'erro',
+                mensagem,
+                acao: faltaSaldo ? { rotulo: 'Adicionar saldo', href: '/carteira/contratante' } : null
+            });
+            return res.redirect(`/bicos/${bicoIdDoAlerta}/gerenciar`);
+        }
+
         return res.status(status).send(mensagem);
     };
 
@@ -387,6 +465,8 @@ export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => 
                 'Você não tem autorização para alterar esta candidatura.'
             );
         }
+
+        bicoIdDoAlerta = bicoId;
 
         // 3. Bloqueia a candidatura.
         const resultadoCandidatura = await connection.query(

@@ -76,6 +76,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Depois de finalizar a página recarrega; o aviso guardado antes do reload mostra a mensagem de
+  // sucesso com o pulinho da araponga (uma vez só, e só neste bico).
+  const CHAVE_FINALIZADO = 'ibico:bico-finalizado';
+  const feedbackFinalizacao = document.getElementById('feedback-finalizar-bico');
+  try {
+    if (feedbackFinalizacao && sessionStorage.getItem(CHAVE_FINALIZADO) === window.location.pathname) {
+      sessionStorage.removeItem(CHAVE_FINALIZADO);
+      if (typeof window.mostrarSucessoComMascote === 'function') {
+        window.mostrarSucessoComMascote(feedbackFinalizacao, 'Serviço finalizado com sucesso. Agora você pode avaliar o trabalhador.', '/img/mascote-araponga.png');
+      } else {
+        feedbackFinalizacao.textContent = 'Serviço finalizado com sucesso. Agora você pode avaliar o trabalhador.';
+      }
+    }
+  } catch (_erroArmazenamento) {
+    // Sem sessionStorage (modo privado/bloqueado): a página continua correta, só sem a mensagem.
+  }
+
   const form = document.getElementById('form-finalizar-bico');
   const botao = document.getElementById('btn-finalizar-bico');
   const feedback = document.getElementById('feedback-finalizar-bico');
@@ -169,12 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(dados.erro || 'Não foi possível finalizar o serviço.');
       }
 
-      const statusIcon = document.createElement('i');
-      statusIcon.className = 'ph-fill ph-circle';
-      statusIcon.setAttribute('aria-hidden', 'true');
-      statusBico.replaceChildren(statusIcon, document.createTextNode(` ${dados.status}`));
-      feedback.textContent = dados.mensagem || 'Serviço finalizado com sucesso.';
-      form.remove();
+      // Recarrega a página para refletir o novo status: some o botão "Cancelar bico" e aparece o
+      // formulário de avaliação (renderizado pelo servidor), além do saldo atualizado no menu.
+      try {
+        sessionStorage.setItem(CHAVE_FINALIZADO, window.location.pathname);
+      } catch (_erroArmazenamento) {
+        // Sem sessionStorage: recarrega do mesmo jeito, apenas sem a mensagem de sucesso.
+      }
+      window.location.reload();
     } catch (erro) {
       feedback.textContent = erro instanceof TypeError
         ? 'Falha de conexão. Verifique sua rede e tente novamente.'

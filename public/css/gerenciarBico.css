@@ -719,3 +719,8 @@
 .candidate-card__stars { color: #b45309; font-weight: 700; }
 .candidate-card__no-rating { color: #64748b; }
 .candidate-card__link { color: var(--contractor-sidebar-primary, #0f766e); font-weight: 600; text-decoration: underline; }
+
+/* Mascote da lista de candidatos vazia: alinhado ao texto, que fica a esquerda. */
+.candidate-section .mascote-vazio {
+  margin: 16px 0 0;
+}

@@ -64,3 +64,37 @@ export const carregarContextoAvaliacao = async (banco, bicoId, usuarioId, agora 
         prazoAte: prazo.limiteFormatado
     };
 };
+
+// Selo de avaliação mostrado nos cards de bicos concluídos.
+// - já avaliou: "Avaliado ★N"; sem avaliação e dentro do prazo: convite para avaliar; fora do prazo: encerrado.
+export const montarSeloAvaliacao = (nota, finalizadoEm, textoAvaliar = 'Avaliar', agora = new Date()) => {
+    if (nota !== null && nota !== undefined) {
+        return { tipo: 'avaliado', texto: `Avaliado ★${Number(nota)}` };
+    }
+    if (!calcularPrazoAvaliacao(finalizadoEm, agora).encerrado) {
+        return { tipo: 'avaliar', texto: textoAvaliar };
+    }
+    return { tipo: 'encerrado', texto: 'Prazo encerrado' };
+};
+
+// Conta os bicos finalizados em que o usuário (contratante ou trabalhador) ainda não avaliou o outro
+// lado e o prazo de avaliação não terminou. `colunaPapel`: 'contratante_id' ou 'trabalhador_id'.
+export const contarBicosParaAvaliar = async (banco, colunaPapel, usuarioId) => {
+    if (!['contratante_id', 'trabalhador_id'].includes(colunaPapel)) {
+        throw new Error('Papel inválido para contar bicos a avaliar.');
+    }
+    const linhas = await banco.query(
+        `SELECT COUNT(*) AS total
+         FROM bicos b
+         WHERE b.${colunaPapel} = ?
+           AND b.status = 'Finalizado'
+           AND b.trabalhador_id IS NOT NULL
+           AND NOT EXISTS (
+               SELECT 1 FROM avaliacoes a
+               WHERE a.bico_id = b.id AND a.avaliador_id = ?
+           )
+           AND DATE_ADD(${SQL_FINALIZADO_EM}, INTERVAL ? DAY) > NOW()`,
+        [usuarioId, usuarioId, PRAZO_AVALIACAO_DIAS]
+    );
+    return Number(linhas[0]?.total || 0);
+};

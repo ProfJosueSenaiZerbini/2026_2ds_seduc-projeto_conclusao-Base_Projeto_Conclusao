@@ -12,6 +12,7 @@
   <%- include('Partials/phosphorIcons') %>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/detalhesBico.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
 </head>
 
 <body class="<%= usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' ? 'worker-details' : '' %>">
@@ -108,7 +109,7 @@
               <!-- SIDEBAR -->
               <aside class="sidebar-right">
                 <div class="summary-card">
-                  <h3>Candidatar-se</h3>
+                  <h3><%= bico.status === 'Aberto' ? 'Candidatar-se' : (minhaCandidatura ? 'Sua participação' : 'Sobre o bico') %></h3>
 
                   <div class="summary-item">
                     <span>Contratante</span>

@@ -1,4 +1,26 @@
 // Envio do formulário de avaliação do bico (contratante e trabalhador).
+
+// Mensagem de sucesso com o mascote da área dando um pulinho (também usada após finalizar o bico).
+// O mascote é recriado a cada chamada para a animação recomeçar.
+window.mostrarSucessoComMascote = (elemento, texto, mascote) => {
+  if (!elemento) return;
+  elemento.replaceChildren();
+  elemento.classList.add('mascote-sucesso');
+  if (mascote) {
+    const img = document.createElement('img');
+    img.src = mascote;
+    img.alt = '';
+    img.width = 40;
+    img.height = 40;
+    img.setAttribute('aria-hidden', 'true');
+    img.className = 'mascote-sucesso__img mascote--pulo';
+    elemento.append(img);
+  }
+  const mensagem = document.createElement('span');
+  mensagem.textContent = texto;
+  elemento.append(mensagem);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const formAvaliacao = document.getElementById('form-avaliacao-bico');
   const botaoAvaliacao = document.getElementById('btn-salvar-avaliacao');
@@ -42,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(dados.erro || 'Não foi possível salvar a avaliação.');
       }
 
-      feedbackAvaliacao.textContent = dados.mensagem || 'Avaliação registrada.';
+      window.mostrarSucessoComMascote(feedbackAvaliacao, dados.mensagem || 'Avaliação registrada.', formAvaliacao.dataset.mascote);
       feedbackAvaliacao.classList.add('evaluation-feedback--success');
       // A avaliação continua editável até o fim do prazo: o formulário segue ativo, agora como edição.
       botaoAvaliacao.textContent = 'Atualizar avaliação';

@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iBico - Meus Bicos Ativos</title>
+  <title>iBico - Meus Bicos</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -15,6 +15,7 @@
 
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/bicosAtivos.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('../Partials/phosphorIcons') %>
 
   <style>
@@ -145,6 +146,73 @@
         font-size: 12px;
       }
     }
+
+    /* Abas do painel (mesmo desenho das abas do histórico do trabalhador). */
+    .painel-abas {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      margin: 0 0 24px;
+      border-radius: 14px;
+      background: #eef2f0;
+      overflow-x: auto;
+    }
+
+    .painel-abas__aba {
+      flex: 1 1 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      color: #475569;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .painel-abas__aba:hover:not(.painel-abas__aba--ativa) { background: #e2e8e5; color: #111827; }
+
+    .painel-abas__aba--ativa {
+      background: #14332b;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(20, 51, 43, 0.25);
+    }
+
+    .painel-abas__contagem {
+      min-width: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(100, 116, 139, 0.18);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .painel-abas__aba--ativa .painel-abas__contagem { background: rgba(255, 255, 255, 0.22); }
+
+    .selo-avaliacao {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .selo-avaliacao--avaliar { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    .selo-avaliacao--avaliado { background: #dcfce7; color: #166534; border-color: #86efac; }
+    .selo-avaliacao--encerrado { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+
+    .badge-done { background: #e2e8f0; color: #334155; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+    .job-note { margin: 8px 0 0; color: #475569; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+    .job-note ~ .job-footer { margin-top: 18px; }
   </style>
 </head>
 
@@ -158,14 +226,31 @@
     <header class="dashboard-header">
       <div class="header-titles">
         <span class="category-tag">PAINEL DE ATIVIDADES</span>
-        <h1>Meus Bicos Ativos</h1>
-        <p>Acompanhe o que está rolando e mantenha tudo sob controle.</p>
+        <h1>Meus Bicos</h1>
+        <p>Acompanhe seus bicos ativos, concluídos e cancelados em um só lugar.</p>
       </div>
 
       <a href="/bicos/novo" class="btn-new-job">
         <i class="ph ph-plus" aria-hidden="true"></i> Publicar Novo Bico
       </a>
     </header>
+
+    <nav class="painel-abas" aria-label="Status dos bicos">
+      <a class="painel-abas__aba <%= aba === 'ativos' ? 'painel-abas__aba--ativa' : '' %>" id="aba-ativos"
+        href="/bicos/ativos?aba=ativos" <%- aba === 'ativos' ? 'aria-current="page"' : '' %>>
+        Ativos <span class="painel-abas__contagem"><%= bicos.length %></span>
+      </a>
+      <a class="painel-abas__aba <%= aba === 'concluidos' ? 'painel-abas__aba--ativa' : '' %>" id="aba-concluidos"
+        href="/bicos/ativos?aba=concluidos" <%- aba === 'concluidos' ? 'aria-current="page"' : '' %>>
+        Concluídos <span class="painel-abas__contagem"><%= concluidos.length %></span>
+      </a>
+      <a class="painel-abas__aba <%= aba === 'cancelados' ? 'painel-abas__aba--ativa' : '' %>" id="aba-cancelados"
+        href="/bicos/ativos?aba=cancelados" <%- aba === 'cancelados' ? 'aria-current="page"' : '' %>>
+        Cancelados <span class="painel-abas__contagem"><%= cancelados.length %></span>
+      </a>
+    </nav>
+
+    <% if (aba === 'ativos') { %>
 
     <!-- Métricas calculadas a partir dos dados do banco -->
     <section class="metrics-grid">
@@ -398,6 +483,7 @@
           role="status"
           aria-live="polite"
         >
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
           <h3 id="emptyFilterTitle">
             Nenhum bico encontrado
           </h3>
@@ -410,6 +496,119 @@
       </div>
     </section>
 
+    <% } else if (aba === 'concluidos') { %>
+
+    <section class="content-section" id="painel-concluidos">
+      <div class="section-bar">
+        <div class="section-title">
+          <h2>Bicos concluídos</h2>
+          <p><%= concluidos.length %> <%= concluidos.length === 1 ? 'bico finalizado' : 'bicos finalizados' %></p>
+        </div>
+      </div>
+
+      <% if (concluidos.length === 0) { %>
+        <div class="empty-filter-message visible" role="status">
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
+          <h3>Nenhum bico concluído</h3>
+          <p>Quando você finalizar um bico, ele aparecerá aqui para ser avaliado.</p>
+        </div>
+      <% } else { %>
+      <div class="jobs-grid">
+        <% concluidos.forEach(bico => { %>
+          <article class="job-card" data-bico-id="<%= bico.id %>">
+            <div class="job-card-header">
+              <span class="badge badge-done"><i class="ph-fill ph-circle" aria-hidden="true"></i> Finalizado</span>
+              <a class="selo-avaliacao selo-avaliacao--<%= bico.selo_avaliacao.tipo %>" href="/bicos/<%= bico.id %>/gerenciar"><%= bico.selo_avaliacao.texto %></a>
+            </div>
+
+            <h3 class="job-title"><%= bico.titulo %></h3>
+
+            <div class="job-meta">
+              <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+              <span><i class="ph ph-check-circle" aria-hidden="true"></i> Finalizado em <%= bico.finalizado_em_formatada %></span>
+            </div>
+
+            <div class="job-footer">
+              <div class="user-info">
+                <div class="avatar avatar-purple"><%= bico.nome_trabalhador ? bico.nome_trabalhador.slice(0, 2).toUpperCase() : '-' %></div>
+                <div>
+                  <span class="user-role">Profissional</span>
+                  <strong class="user-name"><%= bico.nome_trabalhador || '-' %></strong>
+                </div>
+              </div>
+              <div class="price-info">
+                <span class="price-label">Valor pago</span>
+                <strong class="price-value">R$ <%= Number(bico.valor || 0).toFixed(2).replace('.', ',') %></strong>
+              </div>
+            </div>
+
+            <div class="job-actions">
+              <a href="/bicos/<%= bico.id %>/gerenciar" class="job-details-link">Ver Detalhes</a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <% } else { %>
+
+    <section class="content-section" id="painel-cancelados">
+      <div class="section-bar">
+        <div class="section-title">
+          <h2>Bicos cancelados</h2>
+          <p><%= cancelados.length %> <%= cancelados.length === 1 ? 'bico cancelado' : 'bicos cancelados' %></p>
+        </div>
+      </div>
+
+      <% if (cancelados.length === 0) { %>
+        <div class="empty-filter-message visible" role="status">
+          <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
+          <h3>Nenhum bico cancelado</h3>
+          <p>Os bicos que você cancelar aparecerão aqui.</p>
+        </div>
+      <% } else { %>
+      <div class="jobs-grid">
+        <% cancelados.forEach(bico => { %>
+          <article class="job-card" data-bico-id="<%= bico.id %>">
+            <div class="job-card-header">
+              <span class="badge badge-cancelled"><i class="ph-fill ph-circle" aria-hidden="true"></i> Cancelado</span>
+            </div>
+
+            <h3 class="job-title"><%= bico.titulo %></h3>
+
+            <div class="job-meta">
+              <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+              <span><i class="ph ph-x-circle" aria-hidden="true"></i> Cancelado em <%= bico.cancelado_em_formatada || 'data não registrada' %></span>
+            </div>
+
+            <p class="job-note"><strong>Motivo:</strong> <%= bico.motivo || 'Não informado' %></p>
+            <p class="job-note">
+              <% if (bico.valor_estornado !== null && bico.valor_estornado !== undefined) { %>
+                <strong>Estorno:</strong> R$ <%= Number(bico.valor_estornado).toFixed(2).replace('.', ',') %> devolvido à sua carteira
+              <% } else { %>
+                <strong>Estorno:</strong> não houve (nenhum valor estava reservado)
+              <% } %>
+            </p>
+
+            <div class="job-footer">
+              <div class="price-info">
+                <span class="price-label">Valor do bico</span>
+                <strong class="price-value">R$ <%= Number(bico.valor || 0).toFixed(2).replace('.', ',') %></strong>
+              </div>
+            </div>
+
+            <div class="job-actions">
+              <a href="/bicos/<%= bico.id %>/gerenciar" class="job-details-link">Ver Detalhes</a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <% } %>
+
   </main>
 
   <%- include('../Partials/footer') %>
@@ -420,6 +619,9 @@
       const filterButtons = document.querySelectorAll('.filter-btn');
       const searchInput = document.getElementById('searchBico');
       const jobCards = document.querySelectorAll('.job-card');
+
+      // Nas abas Concluídos e Cancelados não há busca nem filtros.
+      if (!searchInput) return;
 
       const emptyMessage = document.getElementById('emptyFilterMessage');
       const emptyTitle = document.getElementById('emptyFilterTitle');

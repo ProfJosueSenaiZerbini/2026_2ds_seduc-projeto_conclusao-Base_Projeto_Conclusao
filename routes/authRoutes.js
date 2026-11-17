@@ -2,6 +2,7 @@ import express from 'express';
 import pool from '../config/database.js';
 import { cadastrarUsuario, logarUsuario, homeContratante, exibirHistoricoTrabalhador } from '../controllers/authController.js';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
+import { contarBicosParaAvaliar } from '../controllers/avaliacaoRegras.js';
 
 const router = express.Router();
 
@@ -37,9 +38,12 @@ const renderHomeTrabalhador = async (req, res) => {
             [req.session.usuario.id]
         );
 
+        const bicosParaAvaliar = await contarBicosParaAvaliar(pool, 'trabalhador_id', req.session.usuario.id);
+
         return res.render('trabalhador/homeTrabalhador', {
             usuario: req.session.usuario,
-            vagas
+            vagas,
+            bicosParaAvaliar
         });
     } catch (erro) {
         console.error('Erro ao buscar bicos no banco:', erro);

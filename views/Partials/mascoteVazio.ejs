@@ -1,0 +1,6 @@
+<%
+  // Mascote pequeno para listas vazias. Variável: area ('contratante' | 'trabalhador').
+  const mascoteVazio = (typeof area !== 'undefined' && area === 'trabalhador')
+    ? '/img/mascote-tie-sangue.png'
+    : '/img/mascote-araponga.png';
+%><img class="mascote-vazio mascote--inclina" src="<%= mascoteVazio %>" alt="" aria-hidden="true" width="56" height="56">

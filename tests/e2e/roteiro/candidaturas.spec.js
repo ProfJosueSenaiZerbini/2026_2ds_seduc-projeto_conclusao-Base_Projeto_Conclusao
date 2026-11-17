@@ -125,8 +125,13 @@ test.describe('Candidaturas e reserva de saldo', () => {
     expect(saldoAntes).toBe(100);
 
     const resposta = await aceitar(pobre.ctx, candidatos[0].candidaturaId);
-    expect(resposta.status()).toBe(400);
-    expect(await resposta.text()).toContain('Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.');
+    // A recusa volta para a tela de gerenciamento com um alerta estilizado (não mais texto puro).
+    expect(resposta.status()).toBe(302);
+    expect(resposta.headers().location).toBe(`/bicos/${bicoId}/gerenciar`);
+    const tela = await (await pobre.ctx.request.get(`${BASE}/bicos/${bicoId}/gerenciar`)).text();
+    expect(tela).toContain('id="alerta-sistema"');
+    expect(tela).toContain('Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.');
+    expect(tela).toContain('href="/carteira/contratante"');
 
     // Saldo, status do bico e candidaturas continuam como estavam.
     expect(await lerSaldoContratante(pobre.ctx)).toBe(saldoAntes);

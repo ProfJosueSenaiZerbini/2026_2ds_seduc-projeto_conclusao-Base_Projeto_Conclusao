@@ -1,0 +1,133 @@
+/* =============================================================================
+   Animação dos mascotes (araponga = contratante, tiê-sangue = trabalhador).
+   Só CSS, só transform/opacity. Cada efeito usa uma propriedade de transformação
+   própria (translate, scale ou rotate) para que possam ser combinados no mesmo
+   elemento sem um anular o outro e sem mexer no "transform" que a página já usa.
+   Transformações não ocupam espaço no layout: nada desloca o conteúdo ao redor.
+   ============================================================================= */
+
+.mascote--respira,
+.mascote--balanca,
+.mascote--entra-voando,
+.mascote--pulo,
+.mascote--inclina {
+  /* Gira e "respira" a partir da base (galho/pés), não do centro. */
+  transform-origin: 50% 100%;
+  animation:
+    var(--mascote-anim-entra, none),
+    var(--mascote-anim-respira, none),
+    var(--mascote-anim-balanca, none),
+    var(--mascote-anim-pulo, none),
+    var(--mascote-anim-inclina, none);
+}
+
+/* Respiração: leve escala vertical (~2%), contínua. */
+.mascote--respira {
+  --mascote-anim-respira: mascote-respira 3.6s ease-in-out infinite;
+}
+
+/* Balanço no galho: rotação de ±2°, contínua. */
+.mascote--balanca {
+  --mascote-anim-balanca: mascote-balanca 4.6s ease-in-out infinite;
+}
+
+/* Chegada voando: entra de lado, em arco, com fade (uma vez). */
+.mascote--entra-voando {
+  --mascote-anim-entra: mascote-entra-voando 0.8s cubic-bezier(0.22, 0.7, 0.3, 1) both;
+}
+
+/* Depois de chegar voando, a respiração e o balanço começam (não durante o voo). */
+.mascote--entra-voando.mascote--respira {
+  --mascote-anim-respira: mascote-respira 3.6s ease-in-out 0.8s infinite;
+}
+
+.mascote--entra-voando.mascote--balanca {
+  --mascote-anim-balanca: mascote-balanca 4.6s ease-in-out 0.8s infinite;
+}
+
+/* Lado de onde a ave chega: -1 = esquerda (padrão), 1 = direita. */
+.mascote--da-direita {
+  --mascote-lado: 1;
+}
+
+/* Pulinho de comemoração (uma vez). */
+.mascote--pulo {
+  --mascote-anim-pulo: mascote-pulo 0.6s ease-out 1;
+}
+
+/* Inclina a cabeça/corpo uma vez ao aparecer (estados vazios e alertas). */
+.mascote--inclina {
+  --mascote-anim-inclina: mascote-inclina 1s ease-in-out 0.15s 1 both;
+}
+
+@keyframes mascote-respira {
+  0%, 100% { scale: 1 1; }
+  50% { scale: 1 1.02; }
+}
+
+@keyframes mascote-balanca {
+  0%, 100% { rotate: -2deg; }
+  50% { rotate: 2deg; }
+}
+
+@keyframes mascote-entra-voando {
+  0% {
+    opacity: 0;
+    translate: calc(var(--mascote-lado, -1) * 56px) -28px;
+  }
+  55% {
+    opacity: 1;
+    translate: calc(var(--mascote-lado, -1) * 16px) -14px;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes mascote-pulo {
+  0%, 100% { translate: 0 0; }
+  35% { translate: 0 -14px; }
+  65% { translate: 0 0; }
+  82% { translate: 0 -4px; }
+}
+
+@keyframes mascote-inclina {
+  0%, 100% { rotate: 0deg; }
+  35% { rotate: -9deg; }
+  70% { rotate: 4deg; }
+}
+
+/* Mascote pequeno dos estados vazios (tamanho fixo: não desloca o conteúdo ao carregar). */
+.mascote-vazio {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  object-fit: contain;
+}
+
+/* Mensagem de sucesso com o mascote (após avaliar e após finalizar). */
+.mascote-sucesso {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mascote-sucesso__img {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* Quem pede menos movimento: nenhum mascote se mexe. */
+@media (prefers-reduced-motion: reduce) {
+  .mascote--respira,
+  .mascote--balanca,
+  .mascote--entra-voando,
+  .mascote--pulo,
+  .mascote--inclina {
+    animation: none !important;
+  }
+}

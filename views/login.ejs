@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ibico - Login</title>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/login.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
     <%- include('Partials/phosphorIcons') %>
 </head>
 
@@ -21,7 +22,7 @@
 
         <% if (erro) { %>
             <div class="erro-passarinho-login">
-                <img src="/img/passarinho_transparente.png" alt="Passarinho">
+                <img class="mascote--respira" src="/img/passarinho_transparente.png" alt="Passarinho">
 
                 <div class="balao-erro-login">
                     <img src="/img/balao_transparente.png" alt="">
@@ -125,8 +126,8 @@
     </div>
 
     <div class="side">
-        <div class="bird-layer show" id="birdHire"></div>
-        <div class="bird-layer" id="birdWork"></div>
+        <div class="bird-layer show mascote--respira" id="birdHire"></div>
+        <div class="bird-layer mascote--respira" id="birdWork"></div>
         <div class="side-caption" id="sideCaption">
             <span class="caption-eyebrow">Para quem contrata</span>
             <div class="name">Araponga</div>

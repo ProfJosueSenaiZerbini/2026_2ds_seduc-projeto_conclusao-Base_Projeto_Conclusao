@@ -143,6 +143,10 @@
                                     </div>
 
                                     <div class="bico-card__actions">
+                                        <% if (tipo === 'concluido' && bico.selo_avaliacao) { %>
+                                        <a class="selo-avaliacao selo-avaliacao--<%= bico.selo_avaliacao.tipo %>"
+                                            href="/bicos/<%= bico.bico_id || bico.id %>"><%= bico.selo_avaliacao.texto %></a>
+                                        <% } %>
                                         <a class="btn btn--secondary"
                                             href="/bicos/<%= bico.bico_id || bico.id %>">Ver detalhes</a>
 

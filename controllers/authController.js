@@ -1,6 +1,6 @@
 import pool from '../config/database.js';
 import bcrypt from 'bcrypt';
-import { PRAZO_AVALIACAO_DIAS, SQL_FINALIZADO_EM } from './avaliacaoRegras.js';
+import { SQL_FINALIZADO_EM, contarBicosParaAvaliar, montarSeloAvaliacao } from './avaliacaoRegras.js';
 import {
     normalizarCPF,
     validarConfirmacaoSenha,
@@ -232,20 +232,7 @@ export const homeContratante = async (req, res) => {
 
         // "Aguardando sua avaliação": bicos finalizados que este contratante ainda não avaliou e cujo
         // prazo de avaliação (PRAZO_AVALIACAO_DIAS dias após a finalização) não terminou.
-        const resultadoParaAvaliar = await pool.query(
-            `SELECT COUNT(*) AS total
-             FROM bicos b
-             WHERE b.contratante_id = ?
-               AND b.status = 'Finalizado'
-               AND b.trabalhador_id IS NOT NULL
-               AND NOT EXISTS (
-                   SELECT 1 FROM avaliacoes a
-                   WHERE a.bico_id = b.id AND a.avaliador_id = ?
-               )
-               AND DATE_ADD(${SQL_FINALIZADO_EM}, INTERVAL ? DAY) > NOW()`,
-            [contratanteId, contratanteId, PRAZO_AVALIACAO_DIAS]
-        );
-        const bicosParaAvaliar = Number(resultadoParaAvaliar[0]?.total || 0);
+        const bicosParaAvaliar = await contarBicosParaAvaliar(pool, 'contratante_id', contratanteId);
         const bicosAtivos = bicos.filter(
             bico => bico.status === 'Aberto' || bico.status === 'Em andamento'
         );
@@ -328,7 +315,9 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
                 (SELECT COUNT(*) FROM avaliacoes av WHERE av.avaliado_id = u.id) AS cliente_total_avaliacoes,
                 DATE_FORMAT(b.data_servico, '%d/%m/%Y') AS data_servico_formatada,
                 DATE_FORMAT(b.data_servico, '%Y-%m-%d') AS data_servico_iso,
-                c.status AS candidatura_status
+                c.status AS candidatura_status,
+                (SELECT av.nota FROM avaliacoes av WHERE av.bico_id = b.id AND av.avaliador_id = c.trabalhador_id) AS minha_nota,
+                ${SQL_FINALIZADO_EM} AS finalizado_em_raw
             FROM candidaturas c
             JOIN bicos b ON c.bico_id = b.id
             JOIN usuarios u ON u.id = b.contratante_id
@@ -481,7 +470,10 @@ export const exibirHistoricoTrabalhador = async (req, res) => {
         `;
 
         const bicosAceitos = await pool.query(queryAceitos, [trabalhador_id]);
-        const bicosConcluidos = await pool.query(queryConcluidos, [trabalhador_id]);
+        const bicosConcluidos = (await pool.query(queryConcluidos, [trabalhador_id])).map((bico) => ({
+            ...bico,
+            selo_avaliacao: montarSeloAvaliacao(bico.minha_nota, bico.finalizado_em_raw, 'Avaliar contratante')
+        }));
         const bicosPendentes = await pool.query(queryPendentes, [trabalhador_id]);
         const bicosRecusados = await pool.query(queryRecusados, [trabalhador_id]);
         const canceladosPeloTrabalhador = await pool.query(queryCancelados, [trabalhador_id]);

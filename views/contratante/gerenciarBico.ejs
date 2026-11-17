@@ -7,6 +7,7 @@
   <title>iBico - Gerenciar Bico</title>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/gerenciarBico.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('../Partials/phosphorIcons') %>
 </head>
 
@@ -15,6 +16,7 @@
   <%- include('../Partials/headerContratante') %>
 
     <main class="main-container manage-job">
+      <%- include('../Partials/alerta') %>
 
       <!-- Cabeçalho do Bico -->
       <section class="section-block manage-job__card job-summary">
@@ -77,6 +79,7 @@
             <h2 class="manage-job__section-title">Candidatos Inscritos (<%= candidatos.length %>)</h2>
 
             <% if (candidatos.length===0) { %>
+              <%- include('../Partials/mascoteVazio', { area: 'contratante' }) %>
               <p class="candidate-empty">Nenhum trabalhador se candidatou a esta vaga até o momento.</p>
               <% } else { %>
                 <div class="candidates-list">
@@ -135,8 +138,7 @@
 
                   <div class="manage-job__footer-action">
                     <a class="manage-job__text-link" href="/bicos/ativos"><i
-                        class="ph ph-arrow-left" aria-hidden="true"></i> Voltar para Meus
-                      Bicos Ativos</a>
+                        class="ph ph-arrow-left" aria-hidden="true"></i> Voltar para Meus Bicos</a>
                   </div>
           </section>
 

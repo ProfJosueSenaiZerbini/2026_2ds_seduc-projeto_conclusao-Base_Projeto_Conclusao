@@ -131,6 +131,11 @@
     });
   });
 
+  // Permite abrir direto uma aba pela URL (ex.: /historico?aba=concluidos).
+  const abaDaUrl = new URLSearchParams(window.location.search).get('aba');
+  const abaInicial = abaDaUrl && document.getElementById('tab-' + abaDaUrl);
+  if (abaInicial) ativarAba(abaInicial);
+
   buscaEl.addEventListener('input', () => { paginaAtual = 1; renderizar(); });
   ordenarEl.addEventListener('change', () => { paginaAtual = 1; renderizar(); });
 

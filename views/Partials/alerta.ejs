@@ -1,0 +1,20 @@
+<%
+  // Alerta de uma só exibição (res.locals.alerta). Formato:
+  //   { tipo: 'erro', mensagem: '...', acao: { rotulo: '...', href: '...' } | null }
+  // Mascote da área: araponga para contratante, tiê-sangue para trabalhador.
+  const ehTrabalhadorAlerta = typeof usuario !== 'undefined' && usuario
+    && String(usuario.tipo_perfil || '').trim().toLowerCase() === 'trabalhador';
+  const mascoteAlerta = ehTrabalhadorAlerta ? '/img/mascote-tie-sangue.png' : '/img/mascote-araponga.png';
+%>
+<% if (typeof alerta !== 'undefined' && alerta && alerta.mensagem) { %>
+  <div class="alerta-sistema alerta-sistema--<%= alerta.tipo || 'erro' %>" id="alerta-sistema" role="alert">
+    <img class="alerta-sistema__mascote mascote--inclina" src="<%= mascoteAlerta %>" alt="" aria-hidden="true" width="52" height="52">
+    <p class="alerta-sistema__texto">
+      <i class="ph-fill ph-warning-circle alerta-sistema__icone" aria-hidden="true"></i>
+      <span id="alerta-sistema-mensagem"><%= alerta.mensagem %></span>
+    </p>
+    <% if (alerta.acao && alerta.acao.href) { %>
+      <a class="alerta-sistema__acao" id="alerta-sistema-acao" href="<%= alerta.acao.href %>"><%= alerta.acao.rotulo %></a>
+    <% } %>
+  </div>
+<% } %>

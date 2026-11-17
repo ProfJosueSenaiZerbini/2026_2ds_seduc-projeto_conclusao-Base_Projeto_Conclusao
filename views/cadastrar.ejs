@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criar Conta — Ibico</title>
   <link rel="stylesheet" href="/css/cadastro.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('Partials/phosphorIcons') %>
 </head>
 
@@ -72,7 +73,7 @@
 
           <% if (erro) { %>
             <div class="erro-passarinho-cadastro">
-              <img src="/img/passarinho_transparente.png" alt="Passarinho">
+              <img class="mascote--respira" src="/img/passarinho_transparente.png" alt="Passarinho">
               <div class="balao-erro-cadastro">
                 <img src="/img/balao_transparente.png" alt="">
                 <span><%= erro %></span>

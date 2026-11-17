@@ -10,6 +10,7 @@
     <%- include('../Partials/phosphorIcons') %>
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/historicoTrabalhador.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
 </head>
 
 <body>
@@ -73,6 +74,7 @@
                             aria-labelledby="tab-<%= aba.id %>"<%- aba.lista.length === 0 ? ' tabindex="0"' : '' %>>
                             <% if (aba.lista.length===0) { %>
                                 <p class="empty">
+                                    <%- include('../Partials/mascoteVazio', { area: 'trabalhador' }) %>
                                     <%= aba.vazio %>
                                 </p>
                                 <% } else { %>
