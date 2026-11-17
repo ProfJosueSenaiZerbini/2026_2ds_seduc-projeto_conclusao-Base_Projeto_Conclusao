@@ -76,13 +76,13 @@ test.describe('Fluxo completo por cliques', () => {
     await expect(pc.locator('#btn-cancelar-bico')).toHaveCount(1);
     await pc.locator('#btn-finalizar-bico').click();
     await pc.locator('#confirm-finalize-button').click();
+    // A araponga comemora ANTES de a página recarregar (aguarda ~1,2 s).
+    await expect(pc.locator('#feedback-finalizar-bico .mascote.araponga')).toBeVisible();
+    await expect(pc.locator('#feedback-finalizar-bico')).toContainText('Serviço finalizado com sucesso');
     await expect(pc.locator('#status-bico')).toContainText('Finalizado');
     await expect(pc.locator('#btn-cancelar-bico')).toHaveCount(0);
     await expect(pc.locator('#btn-finalizar-bico')).toHaveCount(0);
     await expect(pc.locator('#form-avaliacao-bico')).toBeVisible();
-    // Mensagem de sucesso com o pulinho da araponga (mostrada uma vez, depois do recarregamento).
-    await expect(pc.locator('#feedback-finalizar-bico')).toContainText('Serviço finalizado com sucesso.');
-    await expect(pc.locator('#feedback-finalizar-bico img.mascote--pulo')).toHaveAttribute('src', '/img/mascote-araponga.png');
 
     // Contratante volta para a home: o card "Bicos para avaliar" leva à aba Concluídos.
     await irPara(pc, 'Início');
@@ -99,7 +99,9 @@ test.describe('Fluxo completo por cliques', () => {
     await pc.locator('#comentario-avaliacao').fill('Excelente, recomendo.');
     await pc.locator('#btn-salvar-avaliacao').click();
     await expect(pc.locator('#feedback-avaliacao-bico')).toContainText('Avaliação registrada.');
-    await expect(pc.locator('#feedback-avaliacao-bico img.mascote--pulo')).toHaveAttribute('src', '/img/mascote-araponga.png');
+    // Comemoração da araponga com botão de som (o som vem ligado por padrão).
+    await expect(pc.locator('#feedback-avaliacao-bico.sucesso-mascote .mascote.araponga')).toBeVisible();
+    await expect(pc.locator('#feedback-avaliacao-bico .mascote-som')).toHaveAttribute('aria-pressed', 'true');
 
     // O selo na aba Concluídos vira "Avaliado ★5".
     await irPara(pc, 'Bicos');
@@ -206,6 +208,11 @@ test.describe('Aceitar sem saldo: alerta estilizado', () => {
     const alerta = pc.locator('#alerta-sistema');
     await expect(alerta).toBeVisible();
     await expect(alerta).toHaveAttribute('role', 'alert');
+    // Mascote da área (araponga) em estado triste enquanto o alerta estiver na tela.
+    const mascoteAlerta = alerta.locator('.mascote.araponga');
+    await expect(mascoteAlerta).toBeVisible();
+    await expect(mascoteAlerta).toHaveClass(/estado-triste/);
+    await expect(alerta.locator('.mascote.tie')).toHaveCount(0);
     await expect(alerta.locator('#alerta-sistema-mensagem')).toHaveText('Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.');
     const botao = alerta.getByRole('link', { name: 'Adicionar saldo' });
     await expect(botao).toBeVisible();

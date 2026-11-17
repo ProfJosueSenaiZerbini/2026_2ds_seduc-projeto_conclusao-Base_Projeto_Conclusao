@@ -8,6 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupTitle = document.getElementById('signupTitle');
   const signupSubtitle = document.getElementById('signupSubtitle');
 
+  // O alerta de erro mostra só o mascote do perfil escolhido (araponga = Contratante, tiê = Trabalhador),
+  // trocando na hora junto com a escolha; o mascote que aparece fica triste.
+  function trocarMascoteDoAlerta(perfil) {
+    const alerta = document.getElementById('alerta-sistema');
+    if (!alerta) return;
+    alerta.classList.remove('alerta-sistema--contratante', 'alerta-sistema--trabalhador');
+    alerta.classList.add('alerta-sistema--' + perfil);
+    alerta.querySelectorAll('[data-mascote-perfil]').forEach((caixa) => {
+      const ativo = caixa.dataset.mascotePerfil === perfil;
+      const eraVisivel = !caixa.hidden;
+      caixa.hidden = !ativo;
+      const mascote = caixa.querySelector('.mascote');
+      if (ativo && !eraVisivel && mascote && window.Mascotes) window.Mascotes.triste(mascote);
+    });
+  }
+
   // Função para alternar para a view de Trabalhador
   function ativarModoTrabalhador() {
     cardContratante.classList.remove('active');
@@ -21,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     visualDesc.textContent = 'Crie seu perfil, encontre serviços locais e conecte-se a quem precisa do seu trabalho.';
     signupTitle.textContent = 'Crie sua conta de Trabalhador';
     signupSubtitle.textContent = 'Encontre oportunidades e mostre o valor do seu trabalho.';
+    trocarMascoteDoAlerta('trabalhador');
 
   }
 
@@ -37,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     visualDesc.textContent = 'Publique seus bicos e encontre profissionais para realizar cada oportunidade com agilidade.';
     signupTitle.textContent = 'Crie sua conta de Contratante';
     signupSubtitle.textContent = 'Encontre profissionais para tirar seus projetos do papel.';
+    trocarMascoteDoAlerta('contratante');
 
   }
 

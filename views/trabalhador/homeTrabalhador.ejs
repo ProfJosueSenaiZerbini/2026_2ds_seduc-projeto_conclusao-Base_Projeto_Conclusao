@@ -67,7 +67,7 @@
                 <% } %>
             </div>
             <div class="hero__illustration" aria-hidden="true">
-                <div class="illustration-circle"><img class="hero__mascot mascote--respira mascote--balanca" src="/img/mascote-tie-sangue.png" alt=""></div>
+                <div class="illustration-circle" data-mascote-alvo><%- include('../Partials/mascote', { ave: 'tie', piscar: true, interacao: 'asas', classe: 'hero__mascot' }) %></div>
             </div>
         </section>
 
@@ -176,6 +176,7 @@
     </main>
     <%- include('../Partials/footer') %>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/js/mascotes.js" defer></script>
     <script src="/js/hometrabalhador.js" defer></script>
 </body>
 

@@ -42,7 +42,7 @@ test.describe('CT02 – Cadastro inválido', () => {
     await page.locator('#btnSubmit').click();
 
     await expect(page).toHaveURL(`${BASE}/cadastrar`);
-    await expect(page.locator('.balao-erro-cadastro')).toContainText('Digite um CPF válido.');
+    await expect(page.locator('#alerta-sistema')).toContainText('Digite um CPF válido.');
     await afirmarContaNaoCriada(page.request, dados.email);
   });
 
@@ -99,7 +99,7 @@ test.describe('CT03 – Login e rota interna sem login', () => {
     await page.locator('#submitBtn').click();
 
     await expect(page).toHaveURL(`${BASE}/login`);
-    await expect(page.locator('.balao-erro-login')).toContainText('Senha incorreta!');
+    await expect(page.locator('#alerta-sistema')).toContainText('Senha incorreta!');
     // A sessão não foi aberta: a home continua redirecionando para o login.
     await page.goto(`${BASE}/homeContratante`);
     await expect(page).toHaveURL(`${BASE}/login`);

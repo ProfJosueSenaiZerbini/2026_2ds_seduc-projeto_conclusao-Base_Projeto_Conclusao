@@ -27,7 +27,7 @@
     </p>
   <% } else { %>
     <form id="form-avaliacao-bico" action="/bicos/<%= bico.id %>/avaliacao" method="POST"
-      data-mascote="<%= alvo === 'trabalhador' ? '/img/mascote-araponga.png' : '/img/mascote-tie-sangue.png' %>">
+      data-ave="<%= alvo === 'trabalhador' ? 'araponga' : 'tie' %>">
       <fieldset class="evaluation-rating">
         <legend>Nota <span aria-hidden="true">*</span></legend>
         <div class="evaluation-stars">

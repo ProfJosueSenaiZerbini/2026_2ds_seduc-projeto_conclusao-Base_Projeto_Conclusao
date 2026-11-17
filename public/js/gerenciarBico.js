@@ -76,23 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Depois de finalizar a página recarrega; o aviso guardado antes do reload mostra a mensagem de
-  // sucesso com o pulinho da araponga (uma vez só, e só neste bico).
-  const CHAVE_FINALIZADO = 'ibico:bico-finalizado';
-  const feedbackFinalizacao = document.getElementById('feedback-finalizar-bico');
-  try {
-    if (feedbackFinalizacao && sessionStorage.getItem(CHAVE_FINALIZADO) === window.location.pathname) {
-      sessionStorage.removeItem(CHAVE_FINALIZADO);
-      if (typeof window.mostrarSucessoComMascote === 'function') {
-        window.mostrarSucessoComMascote(feedbackFinalizacao, 'Serviço finalizado com sucesso. Agora você pode avaliar o trabalhador.', '/img/mascote-araponga.png');
-      } else {
-        feedbackFinalizacao.textContent = 'Serviço finalizado com sucesso. Agora você pode avaliar o trabalhador.';
-      }
-    }
-  } catch (_erroArmazenamento) {
-    // Sem sessionStorage (modo privado/bloqueado): a página continua correta, só sem a mensagem.
-  }
-
   const form = document.getElementById('form-finalizar-bico');
   const botao = document.getElementById('btn-finalizar-bico');
   const feedback = document.getElementById('feedback-finalizar-bico');
@@ -164,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     evento.preventDefault();
 
     if (botao.disabled || !await confirmarFinalizacao()) return;
+    if (window.Mascotes) window.Mascotes.prepararSom(); // o som só toca logo após um clique do usuário
 
     botao.disabled = true;
     feedback.textContent = '';
@@ -188,10 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Recarrega a página para refletir o novo status: some o botão "Cancelar bico" e aparece o
       // formulário de avaliação (renderizado pelo servidor), além do saldo atualizado no menu.
-      try {
-        sessionStorage.setItem(CHAVE_FINALIZADO, window.location.pathname);
-      } catch (_erroArmazenamento) {
-        // Sem sessionStorage: recarrega do mesmo jeito, apenas sem a mensagem de sucesso.
+      // A araponga comemora (com canto) ANTES de recarregar; depois de ~1,2 s a página recarrega.
+      if (window.Mascotes) {
+        window.Mascotes.sucesso(feedback, 'Serviço finalizado com sucesso! Agora você pode avaliar o trabalhador.', 'araponga');
+        await new Promise((resolver) => setTimeout(resolver, 1200));
       }
       window.location.reload();
     } catch (erro) {

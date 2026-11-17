@@ -7,6 +7,7 @@
   <title>Publicar Novo Bico — Ibico</title>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/publicarBico.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('../Partials/phosphorIcons') %>
 </head>
 
@@ -30,7 +31,7 @@
       <section class="mascot-assistant" aria-label="Dica para publicar um bico">
         <button class="mascot-assistant__toggle" type="button" aria-label="Abrir dica para publicar um bico"
           aria-expanded="false" aria-controls="mascot-tip">
-          <img src="/img/passarinho_transparente.png" alt="">
+          <%- include('../Partials/mascote', { ave: 'araponga', comGalho: false, tamanho: 58 }) %>
           <span aria-hidden="true">?</span>
         </button>
         <aside class="mascot-assistant__bubble" id="mascot-tip" aria-labelledby="mascot-tip-title"
@@ -45,16 +46,7 @@
       </section>
 
       <% if (erro) { %>
-        <div class="erro-passarinho">
-          <img src="/img/passarinho_transparente.png" alt="Passarinho">
-
-          <div class="balao-erro">
-            <img src="/img/balao_transparente.png" alt="">
-            <span>
-              <%= erro %>
-            </span>
-          </div>
-        </div>
+        <%- include('../Partials/alerta', { alerta: { tipo: 'erro', mensagem: erro }, area: 'contratante', estilo: 'area' }) %>
         <% } %>
 
           <div class="form-layout">
@@ -168,6 +160,7 @@
 
     <%- include('../Partials/footer') %>
 
+    <script src="/js/mascotes.js" defer></script>
     <script src="/js/publicarBico.js" defer></script>
 </body>
 

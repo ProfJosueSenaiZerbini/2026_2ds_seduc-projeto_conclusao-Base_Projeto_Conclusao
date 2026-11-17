@@ -130,6 +130,8 @@ export const criarAutenticadorUsuario = (banco, hasher = bcrypt) => async (req, 
     const mostrarErro = (mensagem, status = 400) => {
         return res.status(status).render('login', {
             erro: mensagem,
+            // Mantém o perfil escolhido (Contratar/Trabalhar) depois de um erro.
+            tipoPerfil: String(body.tipoPerfil || '').toLowerCase() === 'trabalhador' ? 'trabalhador' : 'contratante',
         });
     };
 
