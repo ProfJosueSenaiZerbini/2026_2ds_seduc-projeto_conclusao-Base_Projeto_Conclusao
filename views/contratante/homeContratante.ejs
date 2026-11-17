@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Contratante — iBico</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/homeContratante.css">
+  <%- include('../Partials/phosphorIcons') %>
+</head>
+<body class="home-contratante-page">
+  <%- include('../Partials/headerContratante') %>
+
+  <main class="home-dashboard">
+    <header class="welcome-header">
+      <div class="welcome-copy">
+        <p class="home-eyebrow">PAINEL DO CONTRATANTE</p>
+        <h1>Olá, <%= usuario.nome %>!</h1>
+        <p>Acompanhe seus bicos e as candidaturas recebidas.</p>
+      </div>
+      <a href="/bicos/novo" class="home-button home-button-primary">
+        <span class="btn-icon" aria-hidden="true"><i class="ph ph-plus"></i></span>
+        Publicar novo bico
+      </a>
+    </header>
+
+    <section class="stats-grid" aria-label="Resumo dos seus bicos">
+      <article class="stat-card">
+        <div class="stat-icon" aria-hidden="true"><i class="ph ph-list-bullets"></i></div>
+        <p class="stat-label">Bicos publicados</p>
+        <p class="stat-value"><%= bicos ? bicos.length : 0 %></p>
+        <p class="stat-note">Em todos os status</p>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon" aria-hidden="true"><i class="ph ph-users-three"></i></div>
+        <p class="stat-label">Candidaturas pendentes</p>
+        <p class="stat-value"><%= candidaturasPendentes ?? 0 %></p>
+        <p class="stat-note">Aguardando sua avaliação</p>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon" aria-hidden="true"><i class="ph ph-arrow-up-right"></i></div>
+        <p class="stat-label">Bicos em andamento</p>
+        <p class="stat-value"><%= bicosEmAndamento ?? 0 %></p>
+        <p class="stat-note">Serviços em execução</p>
+      </article>
+    </section>
+
+    <section class="vagas-section" aria-labelledby="active-jobs-heading">
+      <div class="section-header">
+        <div>
+          <p class="home-eyebrow">ACOMPANHAMENTO</p>
+          <h2 id="active-jobs-heading">Bicos ativos</h2>
+        </div>
+        <a href="/bicos/ativos" class="section-link">Ver todas as vagas <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+      </div>
+
+      <div class="vagas-list">
+        <% if (bicosAtivos && bicosAtivos.length > 0) { %>
+          <% bicosAtivos.forEach(bico => { %>
+            <article class="vaga-card">
+              <div class="vaga-info">
+                <div class="vaga-meta">
+                  <span class="badge <%= bico.status === 'Em andamento' ? 'badge-ongoing' : 'badge-open' %>">
+                    <%= bico.status %>
+                  </span>
+          <span class="vaga-location"><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+                  <span class="vaga-value"><%= formatarMoedaBRL(bico.valor) %></span>
+                </div>
+                <h3 class="vaga-title"><%= bico.titulo %></h3>
+                <p class="vaga-description"><%= bico.descricao %></p>
+              </div>
+              <a href="/bicos/<%= bico.id %>/gerenciar" class="home-button home-button-secondary vaga-detail-button">
+                Ver detalhes
+              </a>
+            </article>
+          <% }); %>
+        <% } else { %>
+          <div class="empty-state">
+          <span class="empty-state-icon" aria-hidden="true"><i class="ph ph-plus"></i></span>
+            <h3>Nenhum bico ativo por enquanto</h3>
+            <p>Publique uma oportunidade para começar a receber candidaturas.</p>
+            <a href="/bicos/novo" class="home-button home-button-primary empty-state-button">
+              Publicar meu primeiro bico
+            </a>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <aside class="support-card" aria-labelledby="support-heading">
+      <div class="support-mark" aria-hidden="true">i</div>
+      <div>
+        <h2 id="support-heading">Precisa de ajuda?</h2>
+        <p>Nossa central de suporte está disponível para ajudar você.</p>
+      </div>
+        <a class="support-link">Acessar Central <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+    </aside>
+  </main>
+
+  <%- include('../Partials/footer') %>
+</body>
+</html>

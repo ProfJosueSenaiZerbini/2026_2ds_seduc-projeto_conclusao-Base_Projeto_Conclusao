@@ -1,0 +1,37 @@
+<footer class="footer <%= usuario && usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador' ? 'footer--worker' : '' %>">
+  <div class="footer-container">
+    <div class="footer-col">
+      <a href="/" class="brand">
+        <span class="brand-dot"></span>Ibico
+      </a>
+      <p class="footer__description">
+        Conectando quem precisa de bicos a quem quer trabalhar.
+      </p>
+      <span class="footer__copyright">
+        © 2026 Ibico Intermediação Ltda. Todos os direitos reservados.
+      </span>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Plataforma</h4>
+        <% if (usuario && usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'trabalhador') { %>
+          <!-- Trabalhadores recebem apenas links disponiveis para seu perfil. -->
+          <a href="/hometrabalhador">Início</a>
+          <a href="/historico">Histórico</a>
+        <% } else { %>
+          <!-- O link usa a rota real de publicacao de bicos. -->
+          <a href="/homeContratante">Início</a>
+          <a href="/bicos/novo">Publicar Bico</a>
+        <% } %>
+      </div>
+
+      <div class="footer-col">
+        <h4>Suporte & Legal</h4>
+        <a>Termos de Uso</a>
+        <a>Privacidade</a>
+        <a class="hint-link">Central de Ajuda</a>
+      </div>
+    </div>
+  </div>
+</footer>
