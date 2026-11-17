@@ -471,6 +471,11 @@ async function main() {
       }
     });
 
+    // Versão com reputação: o trabalhador (Diego) vê o bloco "Sobre o contratante" antes de se candidatar
+    // e o Rafael confere os números reais em "Meu Perfil".
+    await capturar({ arquivo: '20-sobre-o-contratante.png', usuario: 'diego', url: `/bicos/${ids.bicos.calcada}`, fullPage: true, esperarSeletor: '#sobre-contratante' });
+    await capturar({ arquivo: '21-perfil-privado-trabalhador.png', usuario: 'rafael', url: '/perfil', fullPage: true });
+
     console.log('\n> Resumo');
     console.log(JSON.stringify({ ids, resultados: resultados.map(({ arquivo, ok, erro, alturaConteudo }) => ({ arquivo, ok, erro, alturaConteudo })) }, null, 2));
   } finally {
