@@ -19,7 +19,7 @@
         const bicosConcluidos = reputacao.concluidos;
         const avaliacao = reputacao.media !== null ? reputacao.media.toFixed(1).replace('.', ',') : '—';
         const totalAvaliacoes = reputacao.totalAvaliacoes;
-        const bio = usuario.bio || 'Disponível para pequenos reparos, montagens e serviços gerais';
+        const bio = usuario.bio || '';
         const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'TR';
     %>
 
@@ -49,14 +49,13 @@
             <div class="pt-banner">
                 <div class="pt-avatar">
                     <span><%= iniciais %></span>
-                    <i class="pt-avatar-status" title="Online"></i>
                 </div>
                 <div class="pt-banner-info">
                     <div class="pt-banner-linha">
                         <h2><%= usuario.nome %></h2>
                         <span class="pt-pill pt-pill-role"><i class="pt-dot"></i><%= usuario.tipo_perfil ? usuario.tipo_perfil.toLowerCase() : 'trabalhador' %></span>
                     </div>
-                    <p class="pt-banner-bio"><%= bio %></p>
+                    <% if (bio) { %><p class="pt-banner-bio"><%= bio %></p><% } %>
                 </div>
             </div>
 
@@ -140,7 +139,7 @@
                                 <i class="ph ph-calendar-blank" aria-hidden="true"></i>
                                 <%= usuario.data_cadastro_formatada %>
                             </div>
-                            <span class="pt-tag-neutra">Membro recente</span>
+                            <% if (membroRecente) { %><span class="pt-tag-neutra">Membro recente</span><% } %>
                         </div>
                     </div>
                 </div>

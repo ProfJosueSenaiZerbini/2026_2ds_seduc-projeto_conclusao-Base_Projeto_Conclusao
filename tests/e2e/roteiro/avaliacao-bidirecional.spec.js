@@ -71,7 +71,7 @@ test.describe('Avaliação bidirecional (contratante e trabalhador)', () => {
     await expect(avaliacao.locator('.review-stars[aria-label="5 de 5 estrelas"]')).toHaveCount(1);
 
     // Privacidade: nada de e-mail, CPF, idade ou saldo no perfil público.
-    const html = await pagina.content();
+    const html = await pagina.locator('main').innerHTML();
     expect(html).not.toContain(contratante.email);
     expect(html).not.toMatch(/CPF|saldo|idade/i);
     await pagina.close();

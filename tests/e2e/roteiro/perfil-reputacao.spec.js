@@ -119,8 +119,9 @@ test.describe('Perfil público: reputação', () => {
 
   test('o perfil público nunca mostra e-mail, CPF, idade ou saldo', async () => {
     for (const id of [ids.idT1, ids.idC]) {
-      const html = await (await t2.ctx.request.get(`${BASE}/perfil/publico/${id}`)).text();
-      for (const email of [contratante.email, t1.email, t2.email]) expect(html).not.toContain(email);
+      const pagina = await (await t2.ctx.request.get(`${BASE}/perfil/publico/${id}`)).text();
+      const html = /<main[\s\S]*<\/main>/.exec(pagina)[0]; // o menu de quem vê fica fora do <main>
+      for (const email of [contratante.email, t1.email, t2.email]) expect(pagina).not.toContain(email);
       expect(html).not.toMatch(/CPF|saldo|idade|\d{3}\.\d{3}\.\d{3}-\d{2}/i);
     }
   });
@@ -289,5 +290,80 @@ test.describe('Sem indicadores fictícios', () => {
     await pc.close();
     await c.ctx.close();
     await t.ctx.close();
+  });
+});
+
+test.describe('Identidade visual do perfil público', () => {
+  test('tema e mascote acompanham o perfil exibido (verde/araponga, grafite-vinho/tiê), com o menu de quem vê', async ({ browser }) => {
+    const c = await criarConta(browser, 'contratante', 'tema_c');
+    const t = await criarConta(browser, 'trabalhador', 'tema_t');
+    const idC = await idPorEmail(c.email);
+    const idT = await idPorEmail(t.email);
+
+    // Trabalhador olhando um contratante: tema verde + araponga parada; menu de trabalhador.
+    const p1 = await t.ctx.newPage();
+    await p1.goto(`${BASE}/perfil/publico/${idC}`, { waitUntil: 'domcontentloaded' });
+    await expect(p1.locator('body')).toHaveClass(/tema-contratante/);
+    await expect(p1.locator('.perfil-mascote .mascote.araponga')).toBeVisible();
+    await expect(p1.locator('.perfil-mascote .mascote.tie')).toHaveCount(0);
+    await expect(p1.locator('header.navbar')).toBeVisible();
+    expect(await p1.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(242, 235, 223)'); // creme
+    expect(await p1.locator('.worker-card').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(20, 51, 43)'); // verde-escuro
+    expect(await p1.locator('body').evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Inter/);
+    // O mascote fica parado: sem animação e sem piscar automático.
+    expect(await p1.locator('.perfil-mascote .mascote, .perfil-mascote .mascote *').evaluateAll((els) => els.filter((e) => getComputedStyle(e).animationName !== 'none').length)).toBe(0);
+    await expect(p1.locator('.perfil-mascote .mascote')).not.toHaveAttribute('data-pisca', /.*/);
+    await p1.close();
+
+    // Contratante olhando um trabalhador: tema grafite/vinho + tiê; menu lateral do contratante.
+    const p2 = await c.ctx.newPage();
+    await p2.goto(`${BASE}/perfil/publico/${idT}`, { waitUntil: 'domcontentloaded' });
+    await expect(p2.locator('body')).toHaveClass(/tema-trabalhador/);
+    await expect(p2.locator('.perfil-mascote .mascote.tie')).toBeVisible();
+    await expect(p2.locator('.perfil-mascote .mascote.araponga')).toHaveCount(0);
+    await expect(p2.locator('.contractor-sidebar')).toBeVisible();
+    expect(await p2.locator('.worker-card').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(33, 27, 28)'); // grafite
+    expect(await p2.locator('.worker-avatar').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(139, 26, 43)'); // vinho
+    await p2.close();
+    await c.ctx.close();
+    await t.ctx.close();
+  });
+});
+
+test.describe('Textos fictícios removidos', () => {
+  test('login sem Google/LinkedIn; cadastro e publicar bico com textos fiéis ao sistema', async ({ browser, request }) => {
+    const login = await (await request.get(`${BASE}/login`)).text();
+    expect(login).not.toMatch(/Google|LinkedIn|Ou entre com/);
+
+    const cadastro = await (await request.get(`${BASE}/cadastrar`)).text();
+    expect(cadastro).not.toMatch(/milhares|mais confiável/i);
+    expect(cadastro).toContain('Conecte quem precisa de um serviço rápido a quem sabe fazer, perto de você.');
+
+    const c = await criarConta(browser, 'contratante', 'txt_c');
+    const publicar = await (await c.ctx.request.get(`${BASE}/bicos/novo`)).text();
+    expect(publicar).not.toMatch(/Pagamento garantido|Segurança Ibico|Verificado/);
+    expect(publicar).toContain('O valor fica reservado na sua carteira simulada quando você aceita um candidato.');
+    await c.ctx.close();
+  });
+
+  test('perfis privados: sem bolinha online, bio padrão nem lista "Ativo"; "Membro recente" só com menos de 30 dias', async ({ browser }) => {
+    const t = await criarConta(browser, 'trabalhador', 'txt_t');
+    const c = await criarConta(browser, 'contratante', 'txt_pc');
+
+    const ht = await (await t.ctx.request.get(`${BASE}/perfil`)).text();
+    expect(ht).not.toMatch(/pt-avatar-status|title="Online"|Disponível para pequenos reparos, montagens/);
+    expect(ht).toContain('Membro recente'); // cadastrado agora
+    expect(ht).toContain('Alterar senha');
+    const hc = await (await c.ctx.request.get(`${BASE}/perfil`)).text();
+    expect(hc).not.toMatch(/avatar-status|Conta ativa|Conta e segurança|Dados pessoais cadastrados|Perfil de contratante/);
+    expect(hc).toContain('Conta Ibico');
+    expect(hc).toContain('Cadastrado');
+    expect(hc).toContain('Alterar senha');
+
+    // Cadastro com mais de 30 dias: a tag some.
+    await consultarBanco('UPDATE usuarios SET criado_em = DATE_SUB(NOW(), INTERVAL 40 DAY) WHERE email = ?', [t.email]);
+    expect(await (await t.ctx.request.get(`${BASE}/perfil`)).text()).not.toContain('Membro recente');
+    await t.ctx.close();
+    await c.ctx.close();
   });
 });

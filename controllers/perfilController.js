@@ -9,6 +9,14 @@ const formatarMembroDesde = (data) => {
     return d && !Number.isNaN(d.getTime()) ? `${MESES[d.getMonth()]} de ${d.getFullYear()}` : null;
 };
 
+// "Membro recente": cadastro com menos de 30 dias.
+const DIAS_MEMBRO_RECENTE = 30;
+export const cadastroRecente = (criadoEm, agora = new Date()) => {
+    const data = criadoEm ? new Date(criadoEm) : null;
+    if (!data || Number.isNaN(data.getTime())) return false;
+    return (agora.getTime() - data.getTime()) < DIAS_MEMBRO_RECENTE * 24 * 60 * 60 * 1000;
+};
+
 export const exibirPerfil = async (req, res) => {
     const sessao = req.session?.usuario;
     if (!sessao) return res.redirect('/login');
@@ -20,7 +28,7 @@ export const exibirPerfil = async (req, res) => {
         if (tipoPerfil === 'trabalhador' || tipoPerfil === 'contratante') {
             const reputacao = await buscarReputacao(pool, usuario.id, tipoPerfil);
             const view = tipoPerfil === 'trabalhador' ? 'trabalhador/perfilTrabalhador' : 'contratante/perfilContratante';
-            return res.render(view, { usuario, reputacao, membroDesde: formatarMembroDesde(usuario.criado_em) });
+            return res.render(view, { usuario, reputacao, membroDesde: formatarMembroDesde(usuario.criado_em), membroRecente: cadastroRecente(usuario.criado_em) });
         }
         return res.status(403).send('Acesso negado para o perfil desta conta.');
     } catch (erro) {
