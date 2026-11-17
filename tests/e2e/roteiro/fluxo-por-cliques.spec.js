@@ -3,7 +3,7 @@
 import { test, expect } from '@playwright/test';
 import {
   BASE, criarConta, sufixoUnico, dataFutura, formulario,
-  adicionarSaldo, publicarBico, candidatar, listarCandidatos, aceitar, consultarBanco
+  adicionarSaldo, publicarBico, candidatar, listarCandidatos, aceitar, consultarBanco, envelhecerFinalizacao
 } from '../support/cenario.js';
 
 const VALOR = 150;
@@ -386,6 +386,43 @@ test.describe('Abas do painel de bicos do contratante', () => {
     await pt.locator('#tab-concluidos').click();
     await expect(pt.locator('#concluidos .selo-avaliacao--avaliado')).toHaveText('Avaliado ★3');
 
+    await pt.close();
+    await contratante.ctx.close();
+    await trabalhador.ctx.close();
+  });
+});
+
+test.describe('Selo "Prazo encerrado"', () => {
+  test('bico finalizado há mais de 7 dias mostra "Prazo encerrado" nos dois painéis (sem botão de avaliar)', async ({ browser }) => {
+    const contratante = await criarConta(browser, 'contratante', 'pe_c');
+    const trabalhador = await criarConta(browser, 'trabalhador', 'pe_t');
+    const titulo = `Prazo encerrado ${sufixoUnico()}`;
+    await adicionarSaldo(contratante.ctx, 300);
+    const id = await publicarBico(contratante.ctx, titulo, VALOR);
+    expect((await candidatar(trabalhador.ctx, id)).status()).toBe(302);
+    const [c] = await listarCandidatos(contratante.ctx, id);
+    expect((await aceitar(contratante.ctx, c.candidaturaId)).status()).toBe(302);
+    expect((await contratante.ctx.request.post(`${BASE}/bicos/${id}/finalizar`, { failOnStatusCode: false })).status()).toBe(200);
+    await envelhecerFinalizacao(id, 8);
+
+    // Contratante: aba Concluídos de "Meus Bicos" e home (o card não conta bico com prazo vencido).
+    const pc = await contratante.ctx.newPage();
+    await entrarPelaTela(pc, contratante.email, 'contratante');
+    await expect(pc.locator('#valor-para-avaliar')).toHaveText('0');
+    await irPara(pc, 'Bicos');
+    await pc.locator('#aba-concluidos').click();
+    await expect(pc.locator('.job-card', { hasText: titulo }).locator('.selo-avaliacao--encerrado')).toHaveText('Prazo encerrado');
+
+    // Trabalhador: Histórico, aba Concluídos.
+    const pt = await trabalhador.ctx.newPage();
+    await entrarPelaTela(pt, trabalhador.email, 'trabalhador');
+    await expect(pt.locator('#valor-para-avaliar')).toHaveText('0');
+    await pt.getByRole('link', { name: 'Histórico' }).first().click();
+    await pt.locator('#tab-concluidos').click();
+    await expect(pt.locator('#concluidos .selo-avaliacao--encerrado')).toHaveText('Prazo encerrado');
+    await expect(pt.locator('#concluidos .selo-avaliacao--avaliar')).toHaveCount(0);
+
+    await pc.close();
     await pt.close();
     await contratante.ctx.close();
     await trabalhador.ctx.close();
