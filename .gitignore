@@ -18,3 +18,5 @@ Thumbs.db
 .flaskenv*
 !.env.project
 !.env.vault
+# Pacote de capturas de tela do TCC (arquivo para enviar; as imagens ficam em Docs/Prints/)
+Docs/Prints.zip

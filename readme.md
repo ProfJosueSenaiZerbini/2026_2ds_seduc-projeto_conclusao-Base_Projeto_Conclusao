@@ -120,6 +120,10 @@ Após iniciar o servidor, abra no navegador:
 
 http://localhost:3000
 
+### 7. 📸 Gerar as capturas de tela (opcional)
+
+Com o MariaDB ligado, execute `node scripts/prints-tcc.js`. O script cria dados fictícios em um banco separado (`db_bico_prints`, sem tocar no `db_bico`) e salva as imagens em `Docs/Prints/`.
+
 ---
 
 ## 📌 Status
