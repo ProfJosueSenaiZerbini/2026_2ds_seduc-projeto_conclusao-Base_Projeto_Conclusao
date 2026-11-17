@@ -3,9 +3,9 @@
 Todos os valores financeiros são **simulados** (não existe pagamento real).
 
 **Execução de referência:** 17/11/2026, Firefox (Playwright) + `node --test`, banco local `db_bico` (MariaDB 10.11).
-- Testes unitários (`npm run test:unit`): 32 de 32 aprovados (15 de idade/cadastro/perfil + 17 do cancelamento de bico), em `tests/unit/`.
-- Testes E2E (`npm test`): 56 de 56 aprovados (28 anteriores + 28 do roteiro CT02–CT13), em `tests/e2e/`.
-- A suíte completa (`npm run test:unit` e `npm test`) foi executada duas vezes seguidas em 17/11/2026 (11:33 e 11:34) e passou inteira nas duas, sem falhas intermitentes. O Playwright usa 2 workers.
+- Testes unitários (`npm run test:unit`): 57 de 57 aprovados (15 de idade/cadastro/perfil + 17 do cancelamento de bico + 25 da avaliação), em `tests/unit/`.
+- Testes E2E (`npm test`): 61 de 61 aprovados (56 anteriores + 5 da avaliação bidirecional), em `tests/e2e/`.
+- A suíte completa (`npm run test:unit` e `npm test`) foi executada em 17/11/2026 às 14:00, 14:01 e 14:11 e passou inteira em todas as execuções. Em uma execução intermediária, feita antes de ajustar os testes à remoção de e-mail e idade da lista de candidatos, houve falhas (3 pelo ajuste pendente e 2 por travamento gráfico do Firefox); na execução seguinte tudo passou. O Playwright usa 2 workers.
 - Cada teste cria as próprias contas e bicos (e-mails e títulos únicos) pelas rotas reais da aplicação e não depende de dados prévios. Os helpers ficam em `tests/e2e/support/cenario.js`. Só o CT10 consulta o banco (somente leitura), para conferir o evento de finalização, que nenhuma tela exibe.
 
 **Legenda de status**
@@ -25,10 +25,13 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 | CT10 | `roteiro/finalizacao-chat-avaliacao.spec.js` › CT10 (finalização e pagamento; bloqueios) | Aprovado |
 | CT11 | `roteiro/candidaturas.spec.js` › CT11 (cancelar Pendente pela tela; Aceita recusada) | Aprovado |
 | CT12 | `roteiro/finalizacao-chat-avaliacao.spec.js` › CT12 (troca de mensagens e bloqueio de terceiros) | Aprovado |
-| CT13 | `roteiro/finalizacao-chat-avaliacao.spec.js` › CT13 (média no perfil público; avaliações recusadas) | Aprovado |
+| CT13 – Avaliação pelo contratante | `roteiro/finalizacao-chat-avaliacao.spec.js` › CT13 (média no perfil público; avaliações recusadas); `tests/unit/avaliacao.unit.js` | Aprovado |
 | CT14 | `contratante/cancelamento-bico.spec.js` + `tests/unit/cancelamento.unit.js` | Aprovado |
 | CT15 | `contratante/cancelamento-bico.spec.js` + `tests/unit/cancelamento.unit.js` | Aprovado |
 | CT16 | `contratante/cancelamento-bico.spec.js` + `tests/unit/cancelamento.unit.js` | Aprovado |
+| CT17 – Avaliação pelo trabalhador | `roteiro/avaliacao-bidirecional.spec.js` › "o trabalhador avalia o contratante e o contratante vê a nota no perfil público"; `roteiro/finalizacao-chat-avaliacao.spec.js` › CT13 recusada (usuário de fora, 403); `tests/unit/avaliacao.unit.js` | Aprovado |
+| CT18 – Prazo e edição da avaliação | `roteiro/avaliacao-bidirecional.spec.js` › "formulário volta preenchido…" e "depois de 7 dias da finalização…"; `tests/unit/avaliacao.unit.js` › "avaliação: edição e prazo de 7 dias" | Aprovado |
+| CT19 – Reputação e privacidade | `roteiro/avaliacao-bidirecional.spec.js` › "candidato mostra média e link do perfil; feed e detalhes…", "o trabalhador avalia o contratante…" (perfis públicos sem e-mail, CPF, idade e saldo) e "Aguardando sua avaliação…" | Aprovado |
 
 ---
 
@@ -92,10 +95,10 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 **Resultado esperado:** os participantes veem e enviam mensagens (envio responde 201); o terceiro recebe 404 "Conversa não encontrada." (a consulta só encontra a conversa para os dois participantes; 403 "Acesso não autorizado." fica para perfis que não são contratante nem trabalhador); mensagem vazia responde 400.
 **Status:** Aprovado. E2E em `roteiro/finalizacao-chat-avaliacao.spec.js`: contratante e trabalhador enviam (201) e veem as mensagens um do outro; mensagem vazia responde 400; um terceiro (outro trabalhador e outro contratante) não abre, não lê e não envia (resposta 404 "Conversa não encontrada.", sem vazar o conteúdo, e a mensagem do intruso não é gravada); sem login redireciona para `/login`.
 
-## CT13 – Avaliação de bico finalizado
+## CT13 – Avaliação pelo contratante
 **Procedimento:** como contratante, `POST /bicos/:id/avaliacao` com nota de 1 a 5 em um bico Finalizado; repetir com bico não finalizado e com nota fora do intervalo.
 **Resultado esperado:** bico finalizado com nota válida salva a avaliação; bico não finalizado responde 409 "Somente bicos finalizados podem ser avaliados."; nota fora de 1 a 5 responde 400 "A nota deve ser um número inteiro de 1 a 5."
-**Status:** Aprovado. E2E em `roteiro/finalizacao-chat-avaliacao.spec.js`: com notas 5 (pela tela) e 4, o perfil público do trabalhador mostra média 4,5, "2 avaliações", notas, comentários e o nome do contratante; reavaliar o mesmo bico atualiza a nota (média 3,0); bico Em andamento ou Aberto responde 409; notas 0, 6, -1, "abc", 4.5 e vazia respondem 400; outro contratante e trabalhador recebem 403; nada é gravado nas recusas.
+**Status:** Aprovado. E2E em `roteiro/finalizacao-chat-avaliacao.spec.js`: com notas 5 (pela tela) e 4, o perfil público do trabalhador mostra média 4,5, "2 avaliações", notas, comentários e o nome do contratante; reavaliar o mesmo bico atualiza a nota (média 3,0); bico Em andamento ou Aberto responde 409; notas 0, 6, -1, "abc", 4.5 e vazia respondem 400; outro contratante e um trabalhador que não é do bico recebem 403; nada é gravado nas recusas. Os unitários de `tests/unit/avaliacao.unit.js` repetem as regras de nota, estado do bico e comentário com banco falso.
 
 ## CT14 – Cancelar bico Aberto (sem estorno)
 **Procedimento:** como contratante, com um bico Aberto e uma candidatura Pendente, clicar em "Cancelar bico" em `/bicos/:id/gerenciar`, informar um motivo opcional e confirmar no modal (`POST /bicos/:id/cancelar`).
@@ -112,10 +115,26 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 **Resultado esperado:** (a) 409 "Bicos finalizados não podem ser cancelados." sem alterar saldo nem extrato; (b) e (c) 403 e o bico continua ativo; (d) a segunda tentativa responde 409 "Este bico já foi cancelado." e o estorno é feito uma única vez (também há bloqueio se já existir `CREDITO` ou `ESTORNO` para o bico).
 **Status:** Aprovado. E2E "bico Finalizado não pode ser cancelado", "outro contratante e o trabalhador não conseguem cancelar o bico" e "cancelar duas vezes não estorna duas vezes"; unitários de "cancelamentos bloqueados".
 
+## CT17 – Avaliação pelo trabalhador
+**Procedimento:** (a) como trabalhador do bico, com o bico Finalizado, `POST /bicos/:id/avaliacao` (ou o formulário "Avaliar contratante" na página do bico) com nota de 1 a 5 e comentário; (b) como um usuário de fora do bico (outro trabalhador ou outro contratante), tentar o mesmo.
+**Resultado esperado:** (a) responde 200 "Avaliação registrada." e a avaliação aparece no perfil público do contratante (`/perfil/publico/:id`) com nota, comentário e nome do trabalhador; a avaliação do contratante ao trabalhador é independente (duas avaliações no mesmo bico); (b) 403 e nada é gravado.
+**Status:** Aprovado. E2E em `roteiro/avaliacao-bidirecional.spec.js`: o trabalhador avalia, o contratante avalia o trabalhador (2 avaliações no banco) e o perfil público do contratante mostra ★ 5,0, "1 avaliação", o comentário e o nome do trabalhador; em `roteiro/finalizacao-chat-avaliacao.spec.js` (CT13 recusada): outro contratante e outro trabalhador recebem 403. Unitários: "o trabalhador do bico avalia o contratante", "contratante e trabalhador avaliam o mesmo bico de forma independente" e "um terceiro recebe 403".
+
+## CT18 – Prazo e edição da avaliação
+**Procedimento:** (a) dentro de 7 dias após a finalização, abrir a tela do bico finalizado (contratante em `/bicos/:id/gerenciar`; trabalhador em `/bicos/:id`), avaliar e reabrir a página; editar a avaliação; (b) depois de 7 dias da finalização (data do evento de finalização em `historico_eventos_bicos`), tentar criar ou editar a avaliação e abrir a tela.
+**Resultado esperado:** (a) antes de avaliar o formulário está vazio, com "Salvar avaliação" e "Você pode avaliar até DD/MM/AAAA"; depois, a estrela, o comentário e o botão "Atualizar avaliação" voltam preenchidos com "Você pode editar até DD/MM/AAAA"; a edição responde "Avaliação atualizada." e mantém uma só avaliação; comentário só com espaços é gravado como NULL; (b) 409 "O prazo de 7 dias para avaliar este bico terminou.", nada muda no banco e a tela mostra a avaliação só para leitura, sem formulário nem botão.
+**Status:** Aprovado. E2E em `roteiro/avaliacao-bidirecional.spec.js`: "formulário volta preenchido (contratante e trabalhador)…" e "depois de 7 dias da finalização não cria nem edita; a tela fica só para leitura" (o teste envelhece a finalização por SQL nos dados que ele mesmo criou). Unitários em `tests/unit/avaliacao.unit.js`: edição dentro do prazo atualiza, exatamente no 7º dia ainda é permitido, depois de 7 dias não cria nem edita (409) e comentário só com espaços vira NULL.
+
+## CT19 – Reputação e privacidade
+**Procedimento:** como contratante, abrir a lista de candidatos de um bico; como trabalhador, abrir o feed (`/hometrabalhador`) e os detalhes do bico; abrir os perfis públicos de trabalhador e de contratante; abrir a home do contratante.
+**Resultado esperado:** cada candidato mostra ★ média (n avaliações) ou "Sem avaliações" e o link "Ver perfil", sem e-mail nem idade; o feed, os detalhes do bico e o histórico mostram o contratante com nota e link para o perfil; o perfil público mostra apenas nome, tipo de perfil, "membro desde", média e quantidade de avaliações, bicos finalizados e as avaliações recebidas ("Ainda sem avaliações" quando não há), sem e-mail, CPF, idade ou saldo; o card "Bicos para avaliar" conta só bicos finalizados ainda não avaliados por este usuário e dentro do prazo.
+**Status:** Aprovado. E2E em `roteiro/avaliacao-bidirecional.spec.js`: "candidato mostra média e link do perfil; feed e detalhes mostram a nota do contratante" (★ 4,0 com "1 avaliação", "Sem avaliações", link correto, lista sem e-mail, "E-mail:" nem "N anos"; feed ★ 5,0 (1) com link; detalhes e histórico com nota e link); "o trabalhador avalia o contratante…" (perfis públicos sem o e-mail e sem as palavras CPF, saldo e idade; "Ainda sem avaliações" e 404 para perfil inexistente); "Aguardando sua avaliação…" (contagem 0 → 1 → 0, prazo vencido não conta e a avaliação do trabalhador não consome a pendência).
+
 ---
 
 ## Observações
-- Todos os 16 casos têm teste automatizado aprovado. Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT13) conferem o resultado de cada operação.
+- Todos os 19 casos têm teste automatizado aprovado. Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT19) conferem o resultado de cada operação.
+- O CT17 a CT19 exigem a tabela `avaliacoes` nova (schema atual ou `migrations/002_avaliacao_bidirecional.sql`).
 - O servidor precisa estar rodando em `http://localhost:3000` (`npm start`) com o banco ligado antes de `npm test`, e `NODE_ENV=development` (o cadastro dos testes usa CPFs fictícios de 1 a 9).
 - O E2E do cancelamento exige o banco com o tipo `ESTORNO` (schema atual ou `migrations/001_estorno.sql`).
 - A planilha antiga `Docs/Teste/Casos de Teste (1).xlsx` (citava `walletService.js`, JWT e filtro por categoria, que não existem neste projeto) foi removida do repositório.

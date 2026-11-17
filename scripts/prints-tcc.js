@@ -70,7 +70,7 @@ const BICOS = {
     descricao: 'Ajudante para montagem de mesas e cadeiras, apoio no buffet e organização do espaço em confraternização de família.' },
   guardaRoupa:{ dono: 'carla',  titulo: 'Montagem de guarda-roupa', bairro: 'Cambuí', valor: '150.00', dias: 5, horario: '14:00',
     descricao: 'Montagem de guarda-roupa de 6 portas com espelho. As ferramentas básicas ficam por conta do profissional.' },
-  chuveiro:   { dono: 'carla',  titulo: 'Troca de resistência do chuveiro', bairro: 'Nova Campinas', valor: '90.00', dias: 6, horario: '16:00',
+  chuveiro:   { dono: 'carla',  titulo: 'Troca de resistência do chuveiro', bairro: 'Nova Campinas', valor: '90.00', dias: -2, horario: '16:00',
     descricao: 'Troca da resistência e revisão da fiação do chuveiro elétrico do banheiro social. Resistência já comprada.' },
   portao:     { dono: 'marcos', titulo: 'Pintura de portão', bairro: 'Castelo', valor: '250.00', dias: -7, horario: '08:30',
     descricao: 'Lixar e pintar portão de ferro de 3 metros com tinta esmalte preta. Tinta e pincéis por minha conta.' },
@@ -226,6 +226,17 @@ async function main() {
     await finalizar('marcos', 'portao');
     await avaliar('marcos', 'portao', 4, 'Pintura bem feita e acabamento caprichado. Atrasou um pouco no início, mas entregou no combinado.');
 
+    // Avaliações no sentido inverso: o trabalhador avalia o contratante do mesmo bico.
+    await avaliar('rafael', 'torneira', 5, 'A Carla explicou tudo direitinho, deixou o material separado e pagou na hora. Contratante nota 10.');
+    await avaliar('rafael', 'portao', 5, 'O Marcos deixou o portão liberado e a tinta pronta. Tudo combinado foi cumprido, foi tranquilo trabalhar.');
+
+    // Terceiro bico finalizado: Juliana e Carla se avaliam (Carla fecha com média 4,5 em 2 avaliações).
+    await candidatar('juliana', 'chuveiro', 'Sou eletricista de residências e levo o multímetro para testar a fiação antes de trocar a resistência.');
+    await decidir('carla', 'chuveiro', 'juliana', 'Aceito');
+    await finalizar('carla', 'chuveiro');
+    await avaliar('carla', 'chuveiro', 5, 'A Juliana trocou a resistência, revisou a fiação e ainda me explicou como evitar o problema. Muito profissional.');
+    await avaliar('juliana', 'chuveiro', 4, 'A Carla foi cordial e pagou certinho. Só demorou um pouco para liberar o acesso ao banheiro.');
+
     // Bico cancelado com estorno: aceita a Juliana (o Rafael é recusado automaticamente) e depois cancela.
     await candidatar('rafael', 'limpeza', 'Posso fazer a limpeza no dia combinado, tenho equipamento próprio.');
     await candidatar('juliana', 'limpeza', 'Trabalho com limpeza pós-obra e levo meus produtos.');
@@ -284,9 +295,19 @@ async function main() {
       const minutos = (msgs.length - i) * 6 + 50;
       await banco.query('UPDATE mensagens_chat SET criado_em = NOW() - INTERVAL ? MINUTE WHERE id = ?', [minutos, msgs[i].id]);
     }
-    // Avaliações: define a data explicitamente (evita o ON UPDATE sobrescrever).
-    await banco.query('UPDATE avaliacoes SET data_atualizacao = NOW() - INTERVAL 5 DAY WHERE bico_id = ?', [ids.bicos.portao]);
-    await banco.query('UPDATE avaliacoes SET data_atualizacao = NOW() - INTERVAL 2 DAY WHERE bico_id = ?', [ids.bicos.torneira]);
+    // Finalização e avaliações: torneira (há 2 dias) e chuveiro (há 1 dia) ainda estão dentro do prazo de 7 dias;
+    // o portão foi finalizado há 10 dias (prazo encerrado, avaliação só para leitura).
+    // A data é definida explicitamente nas duas colunas (evita o ON UPDATE sobrescrever).
+    for (const [bico, dias] of [['torneira', 2], ['chuveiro', 1], ['portao', 10]]) {
+      await banco.query("UPDATE historico_eventos_bicos SET data_evento = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND status_novo = 'Finalizado'", [dias, ids.bicos[bico]]);
+      await banco.query("UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'CREDITO'", [dias, ids.bicos[bico]]);
+      await banco.query('UPDATE avaliacoes SET criado_em = NOW() - INTERVAL ? DAY, data_atualizacao = NOW() - INTERVAL ? DAY WHERE bico_id = ?', [dias, dias, ids.bicos[bico]]);
+      // Publicação, candidatura e reserva acontecem antes da finalização (ordem cronológica coerente nas telas).
+      await banco.query('UPDATE bicos SET criado_em = NOW() - INTERVAL ? DAY WHERE id = ?', [dias + 4, ids.bicos[bico]]);
+      await banco.query('UPDATE candidaturas SET criado_em = NOW() - INTERVAL ? DAY, atualizado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ?', [dias + 3, dias + 2, ids.bicos[bico]]);
+      await banco.query('UPDATE historico_candidaturas h JOIN candidaturas c ON c.id = h.candidatura_id SET h.data_alteracao = NOW() - INTERVAL ? DAY WHERE c.bico_id = ?', [dias + 2, ids.bicos[bico]]);
+      await banco.query("UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'RESERVA'", [dias + 2, ids.bicos[bico]]);
+    }
 
     // ---- 6. Capturas -----------------------------------------------------------------------------------
     console.log('> Capturando telas...');
@@ -340,6 +361,10 @@ async function main() {
     await capturar({ arquivo: '07a-carteira-contratante.png', usuario: 'carla', url: '/carteira/contratante', fullPage: true });
     await capturar({ arquivo: '07b-carteira-trabalhador.png', usuario: 'rafael', url: '/carteira/trabalhador' });
     await capturar({ arquivo: '08-perfil-publico.png', usuario: 'carla', url: `/perfil/publico/${idRafael}` });
+    await capturar({ arquivo: '12a-avaliar-trabalhador.png', usuario: 'carla', url: `/bicos/${ids.bicos.torneira}/gerenciar`, fullPage: true, esperarSeletor: '#form-avaliacao-bico' });
+    await capturar({ arquivo: '12b-avaliar-contratante.png', usuario: 'rafael', url: `/bicos/${ids.bicos.torneira}`, fullPage: true, esperarSeletor: '#form-avaliacao-bico' });
+    await capturar({ arquivo: '12c-avaliacao-encerrada.png', usuario: 'marcos', url: `/bicos/${ids.bicos.portao}/gerenciar`, fullPage: true, esperarSeletor: '#avaliacao-somente-leitura' });
+    await capturar({ arquivo: '13-perfil-publico-contratante.png', usuario: 'rafael', url: `/perfil/publico/${ids.usuarios.carla}` });
     await capturar({
       arquivo: '09-publicar-bico.png', usuario: 'carla', url: '/bicos/novo', fullPage: true,
       preparar: async (p) => {
