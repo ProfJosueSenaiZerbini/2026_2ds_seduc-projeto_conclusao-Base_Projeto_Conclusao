@@ -164,6 +164,33 @@ textarea {
   box-sizing: border-box;
 }
 
+/* Prefixo "R$" e ícone de bairro ficam dentro do campo, na mesma linha do input. */
+.input-with-prefix,
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-prefix > span,
+.input-with-icon > i {
+  position: absolute;
+  left: 14px;
+  color: var(--publish-green-muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.input-with-prefix > input {
+  padding-left: 42px;
+}
+
+.input-with-icon > input {
+  padding-left: 40px;
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
