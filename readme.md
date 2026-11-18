@@ -153,6 +153,14 @@ O projeto usa **Prettier** (formatação), **ESLint** (JavaScript) e **Stylelint
 
 Com elas, o `.vscode/settings.json` formata o arquivo ao salvar e mostra os avisos do ESLint e do Stylelint no editor.
 
+**`git blame` sem o commit de formatação:** o commit `style: formatação inicial com Prettier` mexeu em quase todas as linhas de JS e CSS. Para o `git blame` mostrar quem escreveu cada linha de verdade, rode uma vez em cada clone:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+O arquivo `.git-blame-ignore-revs` lista os commits só de formatação. A visualização de blame do GitHub já usa esse arquivo automaticamente. Quando houver outro commit só de formatação, acrescente o hash completo dele nesse arquivo.
+
 **GitHub Actions:** o workflow `.github/workflows/testes.yml` roda, a cada push na `main` e a cada pull request, a conferência de formatação, os dois linters, os testes unitários e os E2E, usando um MariaDB 11 com o `schema.sql`. Se os E2E falharem, o relatório do Playwright fica disponível como artifact.
 
 ---
