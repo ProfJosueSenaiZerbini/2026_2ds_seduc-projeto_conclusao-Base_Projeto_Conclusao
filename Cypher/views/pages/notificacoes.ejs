@@ -21,7 +21,8 @@
       <button class="button button-outline" type="submit">
         Marcar todas como lidas
       </button>
-    </form>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
   <% } %>
 </div>
 <% if (notificacoes.length) { %>
@@ -53,7 +54,8 @@
               <button class="button button-outline" type="submit">
                 Marcar como lida
               </button>
-            </form>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
           <% } %>
         </div>
       </article>

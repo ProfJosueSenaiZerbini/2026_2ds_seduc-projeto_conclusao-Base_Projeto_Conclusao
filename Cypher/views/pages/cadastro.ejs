@@ -1,140 +1,57 @@
-<%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="auth-page auth-page--register">
-  <aside class="auth-art" aria-label="Identidade Cypher">
-    <div class="auth-brand">
-      <div class="logo">
-        <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="logo-word">CYPHER</span>
-      </div>
-      <span>ECOSSISTEMA PROFISSIONAL DA CENA UNDERGROUND</span>
-    </div>
-    <div class="auth-quote">
-      <span>01 — CONECTAR</span>
-      <h1>Seu próximo<br><em>passo começa aqui.</em></h1>
-      <p>Um perfil profissional bem cuidado é o começo de novas oportunidades.</p>
-    </div>
-    <div class="auth-art-footer">
-      <div class="auth-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <p>Uma cena forte começa com quem constrói junto.</p>
-    </div>
-  </aside>
-  <main class="auth-panel auth-panel--register">
-    <div class="auth-panel-inner auth-panel-inner--register">
-      <div class="eyebrow">CADASTRO CYPHER</div>
-      <h2 data-register-title>Crie seu espaço.</h2>
-      <p class="auth-description" data-register-description>Vamos começar pelos dados essenciais da sua conta.</p>
-      <% if (erro) { %><p class="auth-message auth-message-error" role="alert"><%= erro %></p><% } %>
-      <form method="post" action="/register" data-register-form data-atuacao-form data-start-stage="<%= etapaInicial ?? 'conta' %>">
-        <ol class="register-step-indicator" aria-label="Etapas do cadastro">
-          <li data-step-indicator="conta" aria-current="step"><span>1</span><span>Conta</span></li>
-          <li data-step-indicator="categorias"><span>2</span><span>Atuação</span></li>
-          <li data-step-indicator="questionarios"><span>3</span><span>Trajetória</span></li>
-        </ol>
-        <section class="register-stage" data-register-stage="conta" aria-labelledby="register-account-title">
-          <div class="register-stage-heading">
-            <span class="register-stage-kicker">ETAPA 1 DE 3</span>
-            <h3 id="register-account-title">Dados da conta</h3>
-            <p>Use seus dados de acesso. Sua conta só será criada ao concluir o cadastro.</p>
-          </div>
-          <div class="register-account-fields">
-            <label for="register-name">Nome completo
-              <input id="register-name" name="name" value="<%= nome %>" placeholder="Seu nome" minlength="2" maxlength="80" autocomplete="name" required>
-            </label>
-            <label for="register-email">E-mail
-              <input id="register-email" type="email" name="email" value="<%= email %>" placeholder="voce@email.com" maxlength="254" autocomplete="email" required>
-            </label>
-            <label for="register-password">Senha
-              <input id="register-password" type="password" name="password" placeholder="Mínimo de 8 caracteres" minlength="8" maxlength="128" autocomplete="new-password" required>
-              <small>A senha não será guardada no navegador se você recarregar a página.</small>
-            </label>
-          </div>
-          <p class="register-inline-error" data-stage-error role="alert" hidden></p>
-          <button class="button button-lime full register-next" type="button" data-account-next>Próximo <span aria-hidden="true">→</span></button>
-        </section>
-        <section class="register-stage" data-register-stage="categorias" aria-labelledby="register-categories-title" hidden>
-          <div class="register-stage-heading">
-            <span class="register-stage-kicker">ETAPA 2 DE 3</span>
-            <h3 id="register-categories-title">Como você atua na cena?</h3>
-            <p>Escolha uma área para ver as profissões disponíveis. Você poderá adicionar profissões de outras áreas.</p>
-          </div>
-          <fieldset class="category-fieldset">
-            <legend class="category-label">SUAS ÁREAS E PROFISSÕES</legend>
-            <p class="category-selection-summary" data-category-summary>Nenhuma profissão selecionada</p>
-            <div class="professional-area-picker" data-category-area-picker aria-label="Áreas profissionais">
-              <% gruposProfissionais.forEach(grupo => { %>
-                <button type="button" class="professional-area-choice" data-category-area="<%= grupo.id %>" aria-pressed="false">
-                  <span><%= grupo.rotulo %></span>
-                  <small data-category-area-count hidden>0</small>
-                </button>
-              <% }) %>
-            </div>
-            <div class="professional-category-browser" data-category-browser hidden>
-              <button type="button" class="professional-category-back" data-category-back-to-areas>← Escolher outra área</button>
-              <div class="professional-catalog-groups category-grid category-grid--cards">
-              <% gruposProfissionais.forEach(grupo => { %>
-                <section class="professional-catalog-group" data-professional-group="<%= grupo.id %>" data-category-area-panel="<%= grupo.id %>" hidden>
-                  <h4><%= grupo.rotulo %> <span data-category-count hidden>0</span></h4>
-                  <div class="professional-catalog-group__options">
-                    <% grupo.profissoes.forEach(profissao => { %>
-                      <label class="category-option category-option--card<%= categoriasSelecionadas.includes(profissao.rotulo) ? ' selected' : '' %>">
-                        <input type="checkbox" name="categorias" value="<%= profissao.rotulo %>"<%= categoriasSelecionadas.includes(profissao.rotulo) ? ' checked' : '' %>>
-                        <span class="category-option-copy"><strong><%= profissao.rotulo %></strong></span>
-                        <span class="category-check lucide-icon" aria-hidden="true"><%- icones.check %></span>
-                      </label>
-                    <% }) %>
-                  </div>
-                </section>
-              <% }) %>
-              </div>
-            </div>
-            <p class="category-validation" data-category-validation role="alert" hidden>Selecione pelo menos uma categoria para continuar.</p>
-            <p class="category-approval-note" data-category-approval-note>Não encontrou sua atuação? Entre em contato com a equipe Cypher para solicitar uma nova profissão ou área.</p>
-          </fieldset>
-          <p class="register-inline-error" data-stage-error role="alert" hidden></p>
-          <div class="register-navigation">
-            <button class="button button-outline" type="button" data-register-back>Voltar</button>
-            <button class="button button-lime" type="button" data-categories-next>Continuar <span aria-hidden="true">→</span></button>
-          </div>
-        </section>
-        <section class="register-stage" data-register-stage="questionarios" aria-labelledby="register-questionnaires-title" hidden>
-          <div class="register-stage-heading">
-            <span class="register-stage-kicker">ETAPA 3 DE 3</span>
-            <h3 id="register-questionnaires-title">Sua trajetória profissional</h3>
-            <p>Responda uma pergunta por vez. Detalhes específicos são opcionais e não concedem permissões profissionais.</p>
-          </div>
-          <div class="questionnaire-progress" data-questionnaire-progress aria-live="polite">
-            <div class="questionnaire-progress__labels"><span data-question-current>Pergunta 1 de 1</span><span data-question-answered>0 respondidas · faltam 1</span></div>
-            <div class="questionnaire-progress__track" role="progressbar" aria-label="Progresso das perguntas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-question-progress-bar></span></div>
-            <span class="questionnaire-progress__percent" data-question-percent>0%</span>
-          </div>
-          <p class="questionnaire-category-context" data-question-category aria-live="polite"></p>
-          <section class="professional-questionnaires" aria-label="Questionário profissional">
-            <% questionariosAtuacao.forEach((questionario, indice) => { %>
-              <%- include('../partials/componentes/questionario-atuacao', {
-                categoriaAtuacao: questionario.categoria,
-                perguntasAtuacao: questionario.perguntas,
-                idQuestionario: `cadastro-atuacao-${indice}`,
-                legada: questionario.legada,
-                atuacoesExistentes: atuacoesExistentes || [],
-                formatarRespostaAtuacao
-              }) %>
-            <% }) %>
-          </section>
-          <p class="register-inline-error" data-stage-error role="alert" hidden></p>
-          <div class="register-navigation">
-            <button class="button button-outline" type="button" data-register-back>Voltar</button>
-            <button class="button button-outline" type="button" data-question-previous hidden>Pergunta anterior</button>
-            <button class="button button-lime" type="button" data-question-next>Próxima pergunta <span aria-hidden="true">→</span></button>
-            <button class="button button-lime" type="submit" data-register-submit hidden>Finalizar cadastro <span aria-hidden="true">→</span></button>
-          </div>
-        </section>
-        <input type="hidden" name="respostasAtuacoesJson" data-respostas-atuacoes-json value="{}">
-        <input type="hidden" name="visibilidadesAtuacoesJson" data-visibilidades-atuacoes-json value="{}">
-        <div class="ctag-note" data-register-ctag hidden><span class="lucide-icon" aria-hidden="true"><%- icones.badgeCheck %></span><span>Ao concluir, será gerada uma <strong>C-Tag única e imutável</strong> para sua conta.</span></div>
-      </form>
-      <p class="auth-switch">Já tem uma conta? <a href="/login">Entrar</a></p>
-    </div>
-  </main>
-</div>
-<script src="/js/questionario-atuacoes.js" defer></script>
-<%- include('../partials/fim-pagina') %>
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<link rel="stylesheet" href="/css/entrada.css">
+<main class="tag-page registration-page" data-tag-page data-active="<%= erro || tipoInicial ? dados.tipoConta : '' %>">
+<a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell">
+<header class="tag-intro"><h1>Boas-vindas à Cypher!</h1><p>Como você participa da cena?</p></header>
+<nav class="tag-stack" aria-label="Tipo de conta">
+<% for (const [tipo,nome,descricao] of [['consumidor','Público','Descubra e acompanhe a cena.'],['profissional','Profissional','Mostre a todos sua arte!']]) { %>
+<a href="<%= (erro || tipoInicial) && dados.tipoConta === tipo ? '/register' : '/register?tipo='+tipo %>" aria-label="<%= (erro || tipoInicial) && dados.tipoConta === tipo ? nome+' selecionado. Trocar tipo de conta' : 'Selecionar '+nome+'. '+descricao %>" class="tag-sticker" data-sticker="<%= tipo %>" aria-controls="cadastro-dados"><span class="sticker-paper"><span class="tag-band">CYPHER</span><strong><%= nome %></strong><small><%= descricao %></small></span></a>
+<% } %></nav>
+<section class="auth-panel tag-panel" id="cadastro-dados">
+<h2 data-register-title tabindex="-1">Crie sua conta</h2><p data-register-description>Preencha seus dados para continuar.</p>
+<% if(erro){ %><p class="auth-message auth-message-error" role="alert"><%= erro %></p><% } %>
+<form method="post" action="/register" data-register-form data-atuacao-form data-start-stage="<%= etapaInicial %>">
+<div hidden><% for(const tipo of ['consumidor','profissional']){ %><input type="radio" name="tipoConta" value="<%= tipo %>" <%= dados.tipoConta===tipo?'checked':'' %>><% } %></div>
+  <ol class="register-steps" aria-label="Dados da conta e etapas do cadastro">
+    <% for (const [id, nome] of [['conta','Nome'],['contato','Contato'],['acesso','Acesso'],['categorias','Atuação'],['vertentes','Vertentes'],['questionarios','Trajetória']]) { %>
+      <li data-step-indicator="<%= id %>" <%= ['categorias','vertentes','questionarios'].includes(id) ? 'data-professional-only' : '' %>><% if(id === 'vertentes'){ %><svg class="register-branch-path" viewBox="0 0 100 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1 L50 47 L100 1"/></svg><% } %><%= nome %></li>
+    <% } %>
+  </ol>
+  <section class="register-stage" data-register-stage="conta" aria-label="Nome e vulgo">
+    <label>Nome Completo<input id="register-name" name="name" minlength="2" maxlength="80" value="<%= dados.nomeInformado %>" autocomplete="name" required></label>
+    <label class="nickname-switch"><input type="checkbox" name="possuiVulgo" value="1" data-has-nickname <%= dados.vulgo ? 'checked' : '' %>> Possui vulgo?</label>
+    <div data-nickname-fields <%= dados.vulgo ? '' : 'hidden' %>><label>Vulgo / nome artístico<input name="vulgo" minlength="2" maxlength="80" value="<%= dados.vulgo %>" autocomplete="nickname"></label></div>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p>
+    <div class="register-navigation"><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
+  </section>
+  <section class="register-stage" data-register-stage="contato" aria-label="Username e e-mail" hidden>
+    <label>Username<input name="identificador" value="<%= dados.identificador === '@' ? '' : dados.identificador %>" minlength="3" maxlength="25" placeholder="@seu.identificador" autocomplete="username" autocapitalize="none" spellcheck="false" pattern="@?[a-zA-Z0-9_.]{3,24}" required data-handle-input aria-describedby="handle-help handle-state"><small id="handle-help">De 3 a 24 letras, números, ponto ou sublinhado. É exclusivo e diferente do nome e do vulgo.</small></label><p id="handle-state" data-handle-state role="status" aria-live="polite"></p>
+    <label>E-mail<input name="email" type="email" maxlength="254" value="<%= dados.email %>" autocomplete="email" required><small>Você precisará confirmar este endereço para ativar a conta.</small></label>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p>
+    <div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
+  </section>
+  <section class="register-stage" data-register-stage="acesso" aria-label="Nascimento, gênero e senha" hidden>
+    <%- include('../partials/componentes/olhos-senha') %>
+    <div class="form-grid"><label>Data de nascimento<input name="nascimento" type="date" value="<%= dados.nascimento %>" max="<%= hoje %>" required autocomplete="bday"><small>Você precisa ter 18 anos ou mais.</small></label><%- include('../partials/componentes/genero',{identidade:dados}) %></div>
+    <div class="form-grid"><label>Senha<input type="password" name="password" minlength="8" maxlength="128" autocomplete="new-password" required></label><label>Confirmar senha<input type="password" name="passwordConfirmation" minlength="8" maxlength="128" autocomplete="new-password" required></label></div>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-account-next>Próximo <span aria-hidden="true">→</span></button></div>
+  </section>
+  <section class="register-stage" data-register-stage="categorias" aria-label="Atuação" hidden>
+    <%- include('../partials/componentes/selecao-profissional',{gruposProfissionais,categoriasSelecionadas,vertentesDisponiveis,vertentesSelecionadas,mostrarVertentes:false}) %>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-categories-next>Continuar →</button></div>
+  </section>
+  <section class="register-stage register-branches-stage" data-register-stage="vertentes" aria-label="Vertentes do rap" hidden>
+    <%- include('../partials/componentes/vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
+    <p class="branches-selection-status" data-branches-status aria-live="polite">Escolha quantas quiser — ou continue sem selecionar.</p>
+    <div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
+  </section>
+  <section class="register-stage" data-register-stage="questionarios" aria-label="Trajetória" hidden>
+    <div class="questionnaire-progress" data-questionnaire-progress aria-live="polite"><div class="questionnaire-progress__labels"><span data-question-current>Pergunta 1 de 1</span><span data-question-answered>0 respondidas</span></div><div class="questionnaire-progress__track" role="progressbar" aria-label="Progresso das perguntas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-question-progress-bar></span></div><span class="questionnaire-progress__percent" data-question-percent>0%</span></div><p class="questionnaire-category-context" data-question-category aria-live="polite"></p>
+    <section class="professional-questionnaires" aria-label="Tempo de atuação por profissão"><% questionariosAtuacao.forEach((questionario,indice)=>{ %><%- include('../partials/componentes/questionario-atuacao',{categoriaAtuacao:questionario.categoria,perguntasAtuacao:questionario.perguntas,idQuestionario:`cadastro-atuacao-${indice}`,cadastro:true,legada:false,atuacoesExistentes,formatarRespostaAtuacao}) %><% }) %></section>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-outline" type="button" data-question-previous hidden>Profissão anterior</button><button class="button button-lime" type="button" data-question-next>Próxima profissão →</button><button class="button button-lime" type="submit" data-register-submit hidden>Finalizar cadastro →</button></div>
+  </section>
+  <noscript><style>[data-register-stage][hidden],[data-category-area-panel][hidden],[data-category-browser][hidden]{display:block!important}</style><p>Sem JavaScript, preencha os dados e, se for profissional, selecione as profissões e seus tempos de atuação abaixo.</p><button class="button button-lime" type="submit">Finalizar cadastro</button></noscript>
+  <input type="hidden" name="respostasAtuacoesJson" data-respostas-atuacoes-json value="{}"><input type="hidden" name="visibilidadesAtuacoesJson" data-visibilidades-atuacoes-json value="{}"><div class="ctag-note" data-register-ctag hidden>Seu ID Cypher é único e permanece vinculado à mesma conta.</div><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form></section>
+<p class="tag-login">Já tem uma conta? <a href="/login">Entrar</a></p>
+</div></div></main><script src="/js/questionario-atuacoes.js" defer></script><%- include('../partials/fim-pagina') %>

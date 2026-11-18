@@ -11,8 +11,8 @@ const profissoes = listarProfissoesCatalogo();
 assert.equal(grupos.length, 7, "O catálogo deve ter exatamente 7 grupos");
 assert.equal(
   profissoes.length,
-  36,
-  "O catálogo deve ter exatamente 36 profissões"
+  26,
+  "O catálogo deve ter exatamente 26 profissões"
 );
 assert.equal(
   new Set(grupos.map(grupo => grupo.id)).size,
@@ -36,7 +36,11 @@ assert.equal(
   "Organizador(a) de eventos"
 );
 assert.equal(obterProfissaoCatalogo("produtor-musical"), undefined);
+assert.equal(obterProfissaoCatalogo("freestyleiro")?.rotulo, "Freestyleiro");
+for (const id of ["freestyler", "muralista", "artista-digital", "manager", "produtor-executivo", "critico-musical", "social-media", "educador", "pesquisador-cultural", "articulador-cultural", "diretor-audiovisual"]) {
+  assert.equal(obterProfissaoCatalogo(id), undefined, `${id} não deve reaparecer no catálogo`);
+}
 
 console.log(
-  "OK: catálogo profissional com 7 grupos, 36 profissões e IDs estáveis."
+  "OK: catálogo profissional com 7 grupos, 26 profissões e IDs estáveis."
 );

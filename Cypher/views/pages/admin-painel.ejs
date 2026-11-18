@@ -1,0 +1,24 @@
+<%- include('../partials/cabecalho', {title,stylesheet}) %>
+<div class="app-shell"><%- include('../partials/navegacao-administrativa',{path,usuario}) %><main class="main-shell">
+<%- include('../partials/barra-superior',{breadcrumb:'Administração'}) %>
+<div class="page-content admin-page"><header class="page-header"><div><span class="eyebrow">CYPHER / EQUIPE</span><h1>Painel administrativo</h1><p>Olá, <%= usuario.name %>. Seu acesso é exclusivo da equipe.</p></div></header>
+<% if (mensagem) { %><p class="profile-message profile-message-success" role="status"><%= mensagem %></p><% } %>
+<% if (erro) { %><p class="profile-message profile-message-error" role="alert"><%= erro %></p><% } %>
+<% if (usuario.papelAdministrativo === 'editor') { %><section class="settings-section card-surface"><h2>Conteúdo educativo</h2><p>Seu papel é Editor. A gestão de artigos será disponibilizada na evolução da Cypher Central.</p></section><% } %>
+<% if (['super_admin','moderador'].includes(usuario.papelAdministrativo)) { %><section class="settings-section card-surface"><h2>Solicitações profissionais</h2><a class="button button-outline" href="/admin/revisao/excecoes">Analisar exceções de categorias</a></section><% } %>
+<% if (['super_admin','moderador'].includes(usuario.papelAdministrativo)) { %>
+<section class="settings-section card-surface"><h2>Exceção de identificador @</h2><p>Altere somente após analisar a solicitação. A decisão e o motivo ficam registrados.</p><form class="profile-edit-form" method="post" action="/admin/identificador"><label>@ atual<input name="atual" maxlength="25" required></label><label>Novo @<input name="novo" maxlength="25" required></label><label>Justificativa<textarea name="motivo" minlength="10" maxlength="500" required></textarea></label><button class="button button-outline" type="submit">Aplicar alteração excepcional</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form></section>
+<% } %>
+<% if (usuario.papelAdministrativo === 'super_admin') { %>
+<section class="settings-section card-surface"><h2>Adicionar integrante da equipe</h2><form class="profile-edit-form" method="post" action="/admin/equipe">
+<label>Nome<input name="nome" minlength="2" maxlength="80" required></label><label>E-mail<input type="email" name="email" maxlength="254" required></label>
+<label>Senha inicial<input type="password" name="senha" minlength="8" maxlength="128" autocomplete="new-password" required></label>
+<label>Papel<select name="papel"><option value="moderador">Moderador</option><option value="editor">Editor</option><option value="super_admin">Administrador Geral</option></select></label>
+<button class="button button-lime" type="submit">Criar acesso interno</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form></section>
+<section class="settings-section card-surface"><h2>Equipe</h2>
+<% equipe.forEach(pessoa => { %><article class="admin-review-card"><h3><%= pessoa.nome %></h3><p><%= pessoa.email %></p><p><%= pessoa.ativo ? 'Acesso ativo' : 'Acesso revogado' %></p>
+<% if (pessoa.id !== usuario.id) { %><form method="post" action="/admin/equipe/<%= pessoa.id %>"><label>Papel<select name="papel"><% ['super_admin','moderador','editor'].forEach(papel => { %><option value="<%= papel %>" <%= pessoa.papel === papel ? 'selected' : '' %>><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[papel] %></option><% }) %></select></label><label><input type="checkbox" name="ativo" value="1" <%= pessoa.ativo ? 'checked' : '' %>> Acesso ativo</label><button class="button button-outline" type="submit">Salvar acesso</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form><% } %></article><% }) %>
+</section>
+<section class="settings-section card-surface"><h2>Histórico administrativo</h2><% auditoria.forEach(item => { %><article class="admin-review-card"><strong><%= item.acao %></strong><p><%= item.autor %> → <%= item.alvo %></p><p><%= item.detalhe %></p><small><%= item.data %></small></article><% }) %></section>
+<% } %>
+</div></main></div><%- include('../partials/fim-pagina') %>

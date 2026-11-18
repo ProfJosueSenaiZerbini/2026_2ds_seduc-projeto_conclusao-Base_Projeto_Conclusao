@@ -15,22 +15,34 @@
     "test:persistence": "npm run build && node scripts/testar-persistencia-profissional.mjs",
     "test:relations": "npm run build && node scripts/testar-relacoes-profissionais.mjs",
     "test:profile-relations": "npm run build && node scripts/testar-integracao-cadastro-profissional.mjs",
+    "test:foundation": "npm run build && node scripts/testar-fundacao.mjs",
+    "test:security-http": "npm run build && node scripts/testar-seguranca-http.mjs",
     "format": "prettier --write src scripts public/js public/css",
-    "format:views": "node scripts/formatar-ejs.mjs"
+    "format:views": "node scripts/formatar-ejs.mjs",
+    "test:identity-http": "npm run build && node scripts/testar-identidade-http.mjs",
+    "test:email": "npm run build && node scripts/testar-entrega-email.mjs",
+    "email:verify": "npm run build && node scripts/verificar-smtp.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
-    "lucide-static": "^1.49.0"
+    "lucide-static": "^1.49.0",
+    "nodemailer": "^10.6.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/ejs": "^3.1.5",
     "@types/express": "4.17.21",
     "@types/node": "^24.7.0",
+    "@types/nodemailer": "^8.0.2",
+    "imapflow": "^2.12.1",
     "prettier": "^3.6.2",
     "tsx": "^4.19.1",
     "typescript": "5.6.3"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.2": true
   }
 }

@@ -58,8 +58,8 @@ const codigo = `
     { profissaoId: "mc", valorOriginal: "MC", origem: "catalogo" },
     { profissaoId: "beatmaker", valorOriginal: "Beatmaker", origem: "catalogo" },
   ]);
-  assert.equal(sincronizarVertentesProfissionaisUsuarioCypher(usuarioId), true);
-  assert.equal(listarVertentesProfissionaisUsuarioCypher(usuarioId).length, 2);
+  assert.equal(sincronizarVertentesProfissionaisUsuarioCypher(usuarioId), false);
+  assert.equal(listarVertentesProfissionaisUsuarioCypher(usuarioId).length, 0);
 
   salvarProfissoesUsuarioCypher(usuarioId, [
     { profissaoId: "beatmaker", valorOriginal: "Beatmaker", origem: "catalogo" },
@@ -73,7 +73,7 @@ const codigo = `
   assert.ok(preservadas.every(item => !item.associacaoAtiva));
   assert.throws(
     () => salvarVertentesProfissionaisUsuarioCypher(usuarioId, ["Trap"]),
-    /Somente Rapper, MC ou Freestyler/
+    /Somente Rapper/
   );
 
   salvarProfissoesUsuarioCypher(usuarioId, [

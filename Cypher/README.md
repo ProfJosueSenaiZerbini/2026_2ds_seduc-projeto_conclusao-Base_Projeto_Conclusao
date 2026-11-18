@@ -1,90 +1,103 @@
 # Cypher
 
-Plataforma web para profissionais da cena musical underground. Mantém a arquitetura MVC em Node.js, TypeScript, Express, EJS, CSS, JavaScript e SQLite local.
+Plataforma para profissionalização, conexão e valorização da cena underground do rap e da cultura hip-hop. Stack: Node.js, TypeScript, Express, EJS, SQLite e JavaScript vanilla.
 
-## Requisitos e execução
+## Executar
 
-- Node.js 20 ou superior
-- npm
+Ambiente verificado: Node.js 24.22.1 e npm 12.2.1 no Windows x64.
 
-Na raiz do projeto:
-
-```bash
+```sh
 npm ci
 npm run dev
 ```
 
-Acesse <http://localhost:3000/login>. `PORT` altera a porta. O banco é um arquivo local criado em `data/cypher.sqlite`; use `CYPHER_DB_PATH` para escolher outro caminho. Não é necessário servidor de banco. Migrações são aplicadas ao iniciar.
+Aplicação: `http://localhost:3000/login`. Administração: `http://localhost:3000/admin/login`. `PORT` altera a porta.
 
-Para habilitar a área privada da equipe, defina `CYPHER_ADMIN_EMAILS` com uma lista separada por vírgulas de e-mails de contas já cadastradas, por exemplo `CYPHER_ADMIN_EMAILS="equipe@example.com"`. O privilégio vem exclusivamente dessa allowlist de servidor; categorias profissionais não concedem acesso administrativo.
-
-Para verificar e executar a versão compilada:
-
-```bash
-npm run check
-npm run test:db
-npm run test:admin-ui
+```sh
 npm run build
 npm start
 ```
 
-## Contas, perfis e descoberta
+Os comandos devem ser executados nesta pasta. `CYPHER_DB_PATH` pode selecionar um banco separado; por padrão, usa `data/cypher.sqlite`.
 
-O cadastro valida nome, e-mail, senha e categorias no servidor; e-mails duplicados são recusados. Senhas são armazenadas com `scrypt` e sal aleatório. Sessões de 24 horas ficam no SQLite, que armazena apenas o hash do token. O cookie é `HttpOnly`; usa `SameSite=Lax` em HTTP local e `SameSite=None; Secure` quando HTTPS é reconhecido atrás de um proxy. Rotas privadas exigem sessão válida.
+## Acesso administrativo interno
 
-Contas novas começam com perfil e dados de contato ocultos. Cada pessoa pode editar o próprio perfil, categorias, biografia, contato, gêneros, equipamentos e status profissional, além de escolher quais informações ficam públicas. Categorias profissionais podem ser sugeridas pelo cadastro ou pela edição do perfil; pedidos ficam pendentes até a equipe aprovar e, então, entram como opções globais. A aprovação não altera automaticamente as categorias atuais do solicitante. A busca e `/p/:identificador` respeitam as preferências de privacidade.
+O primeiro Administrador Geral é provisionado automaticamente na inicialização, por configuração local em **`.env.local`**. Não existe comando de criação de Super Admin, conta administrativa no cadastro público ou senha padrão distribuída no código.
 
-O encerramento de conta exige a senha atual e a confirmação `EXCLUIR`. Registros próprios vinculados precisam ser removidos ou transferidos antes. Não existe acesso convidado, conta técnica ou atalho de demonstração. Toda autenticação exige uma conta real cadastrada.
+- Na primeira execução, se o arquivo não existir, o projeto gera um acesso local com senha aleatória forte e grava os campos `CYPHER_SUPER_ADMIN_EMAIL` e `CYPHER_SUPER_ADMIN_PASSWORD` no arquivo privado.
+- O acesso desta cópia já está configurado em `.env.local`. Consultar esse arquivo local para entrar; as credenciais não são impressas no terminal.
+- O arquivo fica fora de `public` e é ignorado pelo `.gitignore`. O banco guarda apenas o hash `scrypt` da senha.
+- O provisionamento ocorre somente quando ainda não existe administrador. Reiniciar ou editar a configuração inicial não redefine uma senha existente nem recria acesso revogado.
+- Demais integrantes são criados e gerenciados pelo Administrador Geral no painel interno, com histórico. A conta não possui perfil artístico, `@` público ou reputação.
+- `CYPHER_ADMIN_EMAILS` não concede mais privilégios.
 
-## Obras e créditos
+Papéis implementados:
 
-Cada conta autenticada recebe um UUID interno e um ID Cypher público, imutável e legível no formato `CYP-{INICIAIS}{NÚMERO}`. O número é sequencial para contas reais, não é reutilizado após exclusão e não há contas demonstrativas. Cada conta pode cadastrar, consultar, editar e excluir as próprias obras. Os registros armazenam tipo, gênero, status, descrição, letra, BPM, ISRC, ISWC, data de lançamento e link de escuta. A página `/works` mostra o catálogo completo; o perfil privado mostra até cinco obras recentes; e o perfil público mostra obras lançadas com letra e metadados públicos, sem expor BPM, ISRC ou ISWC.
+| Papel | Ações disponíveis nesta etapa |
+|---|---|
+| Administrador Geral | Equipe, papéis, revogação de acessos, auditoria, análises e exceções profissionais |
+| Moderador | Fila de exceções de categorias e esclarecimentos |
+| Editor | Identidade e painel interno próprios; gestão editorial será adicionada com a evolução da Central |
 
-O catálogo organiza as obras em Lançadas, Em produção, Rascunhos, Participações, Beats e Outros projetos. Filtros por status, tipo, gênero e papel, além da ordenação, são preservados em query parameters na URL de `/works`. Obras de terceiros em que o usuário possui crédito aparecem em Participações e não podem ser editadas pelo usuário.
+Administração e contas públicas usam cookies/sessões separados. Um login público não autoriza a área administrativa; a identidade administrativa não pode ser usada para publicar como artista.
 
-O formulário aceita Obra, Música e Beat, além dos formatos de lançamento já existentes (Single, EP, Álbum e Mixtape). Créditos vinculados a perfis e menções sem perfil são armazenados separadamente. Até a confirmação, ambos aparecem como não confirmados; o fluxo para outro profissional confirmar ou rejeitar um crédito ainda não está implementado. Não há upload de áudio.
+## Catálogo e permissões profissionais
 
-O cadastro de obras possui uma etapa contextual que orienta a pessoa entre Música, Single, EP, Álbum, Beat e Outro. A seleção adapta a orientação, os títulos das seções e a visibilidade de campos já existentes, sem alterar as rotas ou o contrato do controller. Campos persistentes específicos de licença, capa, áudio, samples e tracklist serão adicionados em mudanças próprias.
+O catálogo canônico tem **26 profissões em sete áreas**, distribuídas em 8/3/3/3/3/3/3. Freestyleiro é o rótulo e identificador atuais; as dez profissões retiradas não são aceitas por cadastro, edição ou gravação no model. Somente Rapper pode selecionar vertentes profissionais de rap.
 
-## Estado funcional
+As permissões seguem o contexto da atuação, não apenas a área:
 
-Cadastro, login, logout, sessões, autorização, edição e privacidade de perfil, busca de profissionais e gerenciamento das próprias obras usam o SQLite.
+- Rapper: obras e lançamentos musicais próprios.
+- Compositor(a): tipo Obra, para composição; não libera formatos de lançamento ou beats.
+- Beatmaker: Instrumental e Banco de Beats.
+- Produtor(a): produções musicais e instrumentais; beat exige também Beatmaker.
+- Freestyleiro: Música/Single para gravação própria de freestyle.
+- Organizador(a) de eventos: criação de eventos.
+- Letrista, MC, DJ e demais profissões não recebem publicação musical genérica. Suas modalidades próprias ainda precisam de implementação.
 
-Cadastro, gerenciamento e descoberta de eventos agora usam o SQLite. O interesse em oportunidades é persistido por usuário e evento, pode ser cancelado e permite ao responsável pelo evento acompanhar e atualizar o status para interessado, inscrito, confirmado ou rejeitado. Novos interesses só são aceitos em eventos reais e não encerrados. Não há fixtures demonstrativas: esses módulos dependem exclusivamente de registros reais. Solicitações de conexão e contato com produtores ainda não gravam operações persistentes. O Banco de Beats permite descobrir beats reais por qualquer conta autenticada, mas o cadastro de novos Beats exige a categoria `Beatmaker`; a propriedade continua controlando edição, exclusão e ofertas. Upload de áudio, capa, player real, compra e checkout continuam fora do escopo atual.
+Capacidades são cumulativas quando há múltiplas profissões. Gerenciar conteúdo próprio é diferente de criar: retirar uma profissão não transfere a propriedade; mudar o registro para um tipo diferente exige permissão para esse tipo. Rotas, formulários e models verificam as regras.
 
-Contas com a categoria `Organizador de eventos` podem criar novos eventos. Eventos reais próprios continuam podendo ser administrados com segurança para evitar recursos órfãos mesmo se a categoria for removida depois; eventos de terceiros não podem ser editados. Todas as contas autenticadas podem descobrir eventos reais e, quando o evento não está encerrado, demonstrar ou cancelar interesse. Filtros por categoria, localização, formato e período, além da ordenação por criação, data ou título, continuam disponíveis. A categoria `Beatmaker` habilita o cadastro de Beats; categorias múltiplas preservam capacidades cumulativas. Não há dados demonstrativos ativos nesta versão.
+Nesta versão, sugestões de novas profissões podem ser registradas e triadas, mas não expandem automaticamente o catálogo. Uma inclusão precisa de integração de atuação, questionário e permissões, evitando opções sem suporte funcional.
 
-## Estrutura
+O questionário ainda tem **quatro eixos por profissão**. A redução para tempo de atuação obrigatório no cadastro pertence à fase 2. A primeira alteração de profissões após o cadastro é livre; as seguintes respeitam o intervalo de 60 dias, com exceções administrativas registradas.
 
-- `src/aplicacao.ts`: inicialização do Express e do banco.
-- `src/app/routes/`: rotas HTTP e autorização.
-- `src/app/controllers/`: entry points separados por domínio, com fachada de compatibilidade durante a migração.
-- `src/app/validators/`: validações puras de autenticação, perfil, obra, crédito, evento e conta.
-- `src/app/models/`: regras de negócio, autenticação e persistência SQLite.
-- `views/pages/` e `views/partials/`: páginas EJS e componentes compartilhados.
-- `views/partials/componentes/estado-vazio.ejs`: padrão acessível e responsivo para ausência de dados.
-- `public/css/` e `public/js/`: estilos e interações do navegador.
-- `scripts/`: utilitários de formatação.
+## Banco e contas
 
-## Cadastro de obras por tipo
+Schema atual: **21**. A base de desenvolvimento foi recriada por orientação do usuário; não há público nem exigência de migração das contas de teste. O bootstrap recusa versões anteriores e futuras sem tentar converter silenciosamente seus dados. A cópia anterior ficou em `_seguranca/etapa-1-2026-11-16`, na pasta superior.
 
-A página `/works` inicia o cadastro por um modal de seleção entre Instrumental, Música, Single, EP, Álbum, Beat e Outro. Obras comuns seguem para `/works/new?tipo=<slug>` e recebem um formulário contextualizado. A opção Beat reutiliza o fluxo persistente do Banco de Beats em `/beats/new`, mantendo as regras próprias de licenças e ofertas. O tipo Instrumental utiliza o campo textual de tipo já existente em `obras`; essa melhoria não alterou a tabela `obras`.
+O banco suporta as naturezas Consumidor, Profissional e Administrativo. Organizador é uma profissão, não uma natureza de conta. A base estrutural e as restrições do Consumidor estão implementadas; a seleção de modalidade no cadastro e a experiência específica do público serão entregues na fase 2. O cadastro atual continua profissional e recusa criação administrativa por POST.
 
-O schema SQLite suportado pelo código é a versão 20. O banco inicia sem perfis, obras, créditos, eventos, Beats ou qualquer outro registro de demonstração; a limpeza v20 remove resíduos antigos de forma idempotente. A inicialização e as migrações são executadas transacionalmente; IDs públicos e números sequenciais têm índices únicos também em bancos atualizados. O catálogo profissional é canônico: `Rapper` e `MC` são profissões independentes, e `Produtor(a)` é o rótulo oficial. A migração v18 normaliza os rótulos antigos antes de carregar o sistema; não há categoria combinada nem camada de compatibilidade ambígua. A versão 20 mantém `profissoes_usuario` e `vertentes_profissionais_usuario` para a persistência por profissão e para vertentes profissionais separadas dos gêneros de obras.
+## Funcionalidades existentes e limites
 
-No perfil, categorias profissionais só podem ser alteradas uma vez a cada 60 dias a partir da seleção inicial no cadastro; salvamentos sem mudança de categorias não reiniciam o prazo. Se precisar alterar antes do prazo, a pessoa pode enviar uma solicitação com justificativa. A equipe analisa os pedidos em **Administrador → Exceções de categorias**, aprova liberando uma única alteração ou recusa registrando a justificativa; não é possível manter mais de um pedido pendente por conta. A autorização continua sendo consumida somente quando a mudança efetivamente ocorre. A equipe também pode conceder uma exceção direta para contas sem pedido pendente. Todas as decisões exigem justificativa, ficam auditadas e dependem da allowlist `CYPHER_ADMIN_EMAILS`. Inatividade, isoladamente, não é considerada indício de fraude nem dispara punição automática.
+- Cadastro/login, sessões, perfil, privacidade, busca e edição por seções.
+- Obras, metadados musicais, links, créditos e participações. Os status atuais de obras ainda serão removidos na fase correspondente.
+- Banco de Beats com licenças/ofertas persistidas; não há upload, player real, compra ou checkout.
+- Eventos e interesses persistidos, com gestão pelo responsável.
+- Notificações persistidas e operações de leitura.
+- Central baseada em FAQ; artigos e ferramentas editoriais ainda serão implementados.
+- Créditos ainda não possuem fluxo de confirmação pelo creditado.
+- Mensagens, seguidores, curtidas, comentários, galerias, portfólio Manual/Inteligente, selos e mapa/lembretes permanecem em evolução. Reputação calculada está em stand-by.
 
-O painel do Administrador tem páginas independentes para **Análises** e **Exceções de categorias**, acessadas por links normais e URLs próprias; a tela mostra somente a seção escolhida. Em Exceções, pedidos pendentes aparecem em uma fila de aprovação/recusa; a lista de contas de concessão direta continua exibindo até sete contas inicialmente, com busca entre todas as contas e expansão sob demanda. O layout adapta-se a telas menores e funciona sem bibliotecas de interface adicionais.
+Levantamento por profissão: [lacunas de expressão profissional](../planoEvolucao/02-dominios/lacunas-de-expressao-profissional.md).
 
-Os relatórios detalhados estão em `relatorios-incrementacao/melhoria-24-categorias-generos-revisao.md`, `relatorios-incrementacao/melhoria-25-revisao-categorias-profissionais.md`, `relatorios-incrementacao/melhoria-26-painel-administrador-navegavel.md` e `relatorios-incrementacao/melhoria-27-fluxo-solicitacao-excecao-categoria.md`.
+## Segurança e verificação
 
-### Estado factual inicial
+Senhas usam `scrypt` e sal aleatório; sessões armazenam hash do token. Escritas exigem token CSRF, com verificação de origem; logins têm limite local de tentativas por IP e rota. Cookies administrativos usam `HttpOnly` e `SameSite=Strict`. HTTPS ativa `Secure`. Atrás de proxy, habilitar `CYPHER_TRUST_PROXY=1` somente se o acesso realmente passar pelo proxy confiável.
 
-A versão 20 não carrega dados demonstrativos. O banco é iniciado sem usuários, perfis, obras, créditos, eventos, interesses, Beats, ofertas ou notificações. Durante o bootstrap, qualquer resíduo antigo marcado como demonstrativo é removido antes da aplicação aceitar requisições. O preenchimento futuro deverá ocorrer exclusivamente pelos fluxos reais de cadastro e operação do sistema.
+```sh
+npm run check
+npm run build
+npm run test:db
+npm run test:admin-ui
+npm run test:catalog
+npm run test:questionnaires
+npm run test:persistence
+npm run test:relations
+npm run test:profile-relations
+npm run test:foundation
+npm run test:security-http
+```
 
+Os testes usam bancos temporários. As verificações HTTP precisam de acesso local ao servidor. Existem arquivos antigos com `@ts-nocheck`; o check de TypeScript não equivale a cobertura integral da aplicação.
 
-### Questionários profissionais
-
-Cada profissão do catálogo possui exatamente quatro eixos contextuais: tempo de atuação, etapa dos projetos, participação coletiva e atividade prática. As respostas são validadas e persistidas por ID de profissão na tabela `respostas_atuacao_profissao`, sem misturar respostas de funções diferentes.
-
-O cadastro e a edição de perfil exibem as 36 profissões nos sete grupos canônicos: Música, Dança, Artes visuais, Audiovisual, Produção técnica, Gestão e produção e Comunicação e cultura. Os questionários são renderizados a partir dos IDs do catálogo e só são apresentados para as profissões selecionadas.
+Plano e resultados: [plano de ação](../planoEvolucao/00-planejamento/plano-de-acao.md) e [etapa 1](../planoEvolucao/04-implementacao/etapa-1-contas-permissoes-e-migracao.md).

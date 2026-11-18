@@ -379,8 +379,8 @@
     min-height: 67px;
   }
   .settings-index {
-    margin-inline: -20px;
-    padding-inline: 20px;
+    margin-inline: 0;
+    padding-inline: 8px;
   }
   .settings-index-link {
     min-height: 35px;

@@ -1,8 +1,11 @@
 // @ts-nocheck
 import Database from "better-sqlite3";
+import { rotuloProfissional } from "./tratamentoProfissional.js";
 import { randomUUID } from "node:crypto";
+import { normalizarIdentificador, nomePublico, iniciaisPublicas, validarDadosIdentidade, validarIdentificador } from "../validators/validarIdentidade.js";
 import fs from "node:fs";
 import path from "node:path";
+import { podePublicar, type TipoConta, type PapelAdministrativo } from "./permissoes.js";
 import { categoriasGerais } from "./modeloPerfil.js";
 import {
   catalogoPerguntasPorCategoria,
@@ -28,8 +31,15 @@ export type DadosNovaConta = {
   id: string;
   email: string;
   senhaHash: string;
-  tipoConta: "profissional" | "organizador";
+  tipoConta: TipoConta;
   nome: string;
+  nomeInformado?: string;
+  vulgo?: string;
+  usarVulgo?: boolean;
+  nascimento?: string;
+  tratamento?: string;
+  generoPersonalizado?: string;
+  vertentes?: string[];
   funcao: string;
   identificador: string;
   iniciais: string;
@@ -42,14 +52,26 @@ export type CredenciaisUsuario = {
   id: string;
   email: string;
   senhaHash: string;
+  tipoConta: TipoConta;
+  emailConfirmado: string | null;
 };
 export type UsuarioDaSessao = {
   id: string;
   email: string | null;
   publicCode: string;
-  tipoConta: "profissional" | "organizador";
+  tipoConta: TipoConta;
+  papelAdministrativo?: PapelAdministrativo | null;
   demonstracao: boolean;
   name: string;
+  nomeInformado?: string;
+  vulgo?: string;
+  usarVulgo?: boolean;
+  nascimento?: string;
+  tratamento?: string;
+  generoPersonalizado?: string;
+  identidadeRevisada?: boolean;
+  identificadorAlteradoEm?: string | null;
+  emailConfirmado?: string | null;
   role: string;
   city: string;
   handle: string;
@@ -80,12 +102,14 @@ export type DadosAtualizacaoPerfil = {
   propostaGenero?: string;
   categories: string[];
   atuacoes?: AtuacaoProfissionalPersistida[];
+  vertentes?: string[];
   otherCategory: string;
   equipment: string[];
   initials: string;
-  tipoConta: "profissional" | "organizador";
+  tipoConta: TipoConta;
 };
 export type PerfilPublico = {
+  rotulosCategorias: Record<string,string>;
   name: string;
   role: string;
   city: string;
@@ -121,6 +145,7 @@ export type FiltrosBuscaPerfisPublicos = {
   localizacao: string;
 };
 export type PerfilBuscaPublico = {
+  rotulosCategorias: Record<string,string>;
   name: string;
   role: string;
   city: string;
@@ -370,7 +395,7 @@ export type ObraContaPersistida = ObraPersistida & {
 };
 
 let banco;
-const versaoEsquema = 20;
+export const versaoEsquema = 24;
 function iniciaisPublicas(nome) {
   const partes = nome
     .normalize("NFD")
@@ -402,8 +427,9 @@ const esquema = `
     id TEXT PRIMARY KEY,
     email TEXT,
     senha_hash TEXT,
+    email_confirmado_em TEXT,
     tipo_conta TEXT NOT NULL DEFAULT 'profissional'
-      CHECK (tipo_conta IN ('profissional', 'organizador')),
+      CHECK (tipo_conta IN ('consumidor', 'profissional', 'administrativo')),
     demonstracao INTEGER NOT NULL DEFAULT 0 CHECK (demonstracao IN (0, 1)),
     codigo_publico TEXT NOT NULL UNIQUE,
     numero_sequencial INTEGER UNIQUE,
@@ -419,6 +445,14 @@ const esquema = `
     usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
     c_tag TEXT NOT NULL UNIQUE,
     nome TEXT NOT NULL,
+    nome_informado TEXT NOT NULL DEFAULT '',
+    vulgo TEXT NOT NULL DEFAULT '',
+    usar_vulgo INTEGER NOT NULL DEFAULT 0 CHECK (usar_vulgo IN (0,1)),
+    nascimento TEXT NOT NULL DEFAULT '',
+    tratamento TEXT NOT NULL DEFAULT '',
+    genero_personalizado TEXT NOT NULL DEFAULT '',
+    identidade_revisada INTEGER NOT NULL DEFAULT 0 CHECK (identidade_revisada IN (0,1)),
+    identificador_alterado_em TEXT,
     funcao TEXT NOT NULL,
     cidade TEXT NOT NULL DEFAULT '',
     identificador TEXT NOT NULL,
@@ -427,6 +461,7 @@ const esquema = `
     generos_json TEXT NOT NULL DEFAULT '[]',
     categorias_json TEXT NOT NULL DEFAULT '[]',
     outra_categoria TEXT NOT NULL DEFAULT '',
+    ultima_alteracao_categorias_em TEXT,
     etiqueta TEXT NOT NULL DEFAULT '',
     tom TEXT NOT NULL DEFAULT 'yellow',
     ordem_demo INTEGER NOT NULL DEFAULT 0,
@@ -808,7 +843,7 @@ function validarEntradasProfissionais(entradas) {
     if (!entrada.valorOriginal.trim()) {
       throw new Error("O valor original da profissão não pode ser vazio.");
     }
-    if (entrada.profissaoId && !obterProfissaoCatalogo(entrada.profissaoId)) {
+    if (!entrada.profissaoId || !obterProfissaoCatalogo(entrada.profissaoId) || obterProfissaoCatalogo(entrada.profissaoId).rotulo !== entrada.valorOriginal || entrada.origem !== "catalogo") {
       throw new Error(
         `Profissão não pertence ao catálogo: ${entrada.profissaoId}`
       );
@@ -825,25 +860,7 @@ function validarEntradasProfissionais(entradas) {
   }
 }
 function entradasProfissionaisDasCategorias(categorias) {
-  const idsPorRotulo = new Map([
-    ["Rapper", "rapper"],
-    ["MC", "mc"],
-    ["Compositor", "compositor"],
-    ["Letrista", "letrista"],
-    ["Beatmaker", "beatmaker"],
-    ["Produtor(a)", "produtor"],
-    ["DJ", "dj"],
-    ["Empresário", "empresario"],
-    ["Organizador de eventos", "organizador-eventos"],
-  ]);
-  return categorias.map(valorOriginal => {
-    const profissaoId = idsPorRotulo.get(valorOriginal) ?? null;
-    return {
-      profissaoId,
-      valorOriginal,
-      origem: profissaoId ? "catalogo" : "personalizado",
-    };
-  });
+  return categorias.map(valorOriginal => ({ profissaoId: idProfissaoPorCategoria(valorOriginal), valorOriginal, origem: "catalogo" }));
 }
 function vertentesElegiveisAtivas(db, usuarioId) {
   const placeholders = profissoesElegiveisParaVertentes
@@ -887,6 +904,8 @@ export function listarProfissoesUsuarioCypher(usuarioId, opcoes = {}) {
     .map(linha => mapearLinhaProfissao(linha));
 }
 export function salvarProfissoesUsuarioCypher(usuarioId, entradas) {
+  const natureza = bancoAtivo().prepare("SELECT tipo_conta FROM usuarios WHERE id=?").get(usuarioId)?.tipo_conta;
+  if (natureza === 'administrativo' || (natureza === 'consumidor' && entradas.length)) throw new Error("ACAO_PROFISSIONAL_NAO_PERMITIDA");
   validarEntradasProfissionais(entradas);
   const db = bancoAtivo();
   exigirUsuarioReal(db, usuarioId);
@@ -986,7 +1005,7 @@ export function salvarVertentesProfissionaisUsuarioCypher(
     if (!associacaoAtiva) {
       if (unicas.length > 0) {
         throw new Error(
-          "Somente Rapper, MC ou Freestyler podem selecionar vertentes profissionais."
+          "Somente Rapper pode selecionar vertentes profissionais."
         );
       }
       return;
@@ -1078,21 +1097,7 @@ function inserirPropostaCategoria(db, usuarioId, valorRecebido) {
   return resultado.changes === 1 ? "criada" : "ja_pendente";
 }
 export function listarCategoriasProfissionaisCypher() {
-  const aprovadas = bancoAtivo()
-    .prepare(
-      "SELECT categoria FROM categorias_profissionais_aprovadas ORDER BY categoria COLLATE NOCASE"
-    )
-    .all();
-  const resultado = [...categoriasGerais];
-  const conhecidas = new Set(resultado.map(normalizarCategoria));
-  for (const { categoria } of aprovadas) {
-    const normalizada = normalizarCategoria(categoria);
-    if (!conhecidas.has(normalizada)) {
-      resultado.push(categoria);
-      conhecidas.add(normalizada);
-    }
-  }
-  return resultado;
+  return [...categoriasGerais];
 }
 export function solicitarCategoriaProfissionalCypher(usuarioId, categoria) {
   const db = bancoAtivo();
@@ -1281,6 +1286,16 @@ function limparDadosDemonstrativos(conexao) {
   `);
 }
 
+function exigirPapelAdministrativo(usuarioId, acao) {
+  const conta = bancoAtivo().prepare(`SELECT a.papel FROM administradores a JOIN usuarios u ON u.id=a.usuario_id
+    WHERE a.usuario_id=? AND a.ativo=1 AND u.tipo_conta='administrativo'`).get(usuarioId);
+  if (!conta || !(conta.papel === 'super_admin' || (conta.papel === 'moderador' && acao === 'excecoes'))) throw new Error("ACESSO_ADMINISTRATIVO_NEGADO");
+}
+function exigirProfissional(usuarioId) {
+  const conta = bancoAtivo().prepare("SELECT tipo_conta FROM usuarios WHERE id=? AND demonstracao=0").get(usuarioId);
+  if (conta?.tipo_conta !== 'profissional') throw new Error("ACAO_PROFISSIONAL_NAO_PERMITIDA");
+}
+export function conexaoInternaCypher() { return bancoAtivo(); }
 export function inicializarBancoCypher() {
   if (banco) return;
   const caminho = caminhoBancoCypher();
@@ -1289,351 +1304,104 @@ export function inicializarBancoCypher() {
   conexao.pragma("foreign_keys = ON");
   conexao.pragma("busy_timeout = 5000");
   try {
-    const inicializar = conexao.transaction(() => {
-      const versaoAtual = conexao.pragma("user_version", {
-        simple: true,
-      });
-      if (versaoAtual > versaoEsquema) {
-        throw new Error(
-          `O banco Cypher usa uma versão de esquema mais recente (${versaoAtual}) que a suportada (${versaoEsquema}).`
-        );
+    conexao.transaction(() => {
+      const versao = conexao.pragma("user_version", { simple: true });
+      if (versao > versaoEsquema) throw new Error("O banco usa uma versão de esquema mais recente que a suportada.");
+      if (versao !== 0 && versao !== 21 && versao !== 22 && versao !== 23 && versao !== versaoEsquema) throw new Error("Banco de desenvolvimento anterior ao schema 21. Recrie a base de desenvolvimento antes de iniciar.");
+      if (versao === 0 && conexao.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'usuarios'").get()) throw new Error("Banco sem versão já contém usuários; recriação explícita necessária.");
+      if (versao === 21) {
+        conexao.exec(`ALTER TABLE perfis ADD COLUMN nome_informado TEXT NOT NULL DEFAULT '';
+          ALTER TABLE perfis ADD COLUMN vulgo TEXT NOT NULL DEFAULT '';
+          ALTER TABLE perfis ADD COLUMN usar_vulgo INTEGER NOT NULL DEFAULT 0 CHECK (usar_vulgo IN (0,1));
+          ALTER TABLE perfis ADD COLUMN nascimento TEXT NOT NULL DEFAULT '';
+          ALTER TABLE perfis ADD COLUMN tratamento TEXT NOT NULL DEFAULT '';
+          ALTER TABLE perfis ADD COLUMN identificador_alterado_em TEXT;
+          UPDATE perfis SET nome_informado=nome;
+        `);
+      }
+      if (versao === 21 || versao === 22) {
+        conexao.exec(`ALTER TABLE perfis ADD COLUMN genero_personalizado TEXT NOT NULL DEFAULT '';
+          ALTER TABLE perfis ADD COLUMN identidade_revisada INTEGER NOT NULL DEFAULT 0 CHECK (identidade_revisada IN (0,1));
+          UPDATE perfis SET identidade_revisada=1 WHERE usar_vulgo=1;`);
+      }
+      const colunasUsuarios = versao === 0
+        ? []
+        : conexao.pragma("table_info(usuarios)");
+      if (versao !== 0 && !colunasUsuarios.some(coluna => coluna.name === "email_confirmado_em")) {
+        conexao.exec("ALTER TABLE usuarios ADD COLUMN email_confirmado_em TEXT");
       }
       conexao.exec(esquema);
-      const garantirColunas = (tabela, colunas) => {
-        const existentes = new Set(
-          conexao.pragma(`table_info(${tabela})`).map(coluna => coluna.name)
+      conexao.exec(`
+        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_codigo_publico ON usuarios(codigo_publico);
+        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_numero_sequencial_real ON usuarios(numero_sequencial) WHERE demonstracao = 0 AND numero_sequencial IS NOT NULL;
+        CREATE TABLE IF NOT EXISTS administradores (
+          usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+          nome TEXT NOT NULL,
+          papel TEXT NOT NULL CHECK (papel IN ('super_admin','moderador','editor')),
+          ativo INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1)),
+          criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
-        for (const [nome, definicao] of colunas) {
-          if (!existentes.has(nome)) {
-            conexao.exec(
-              `ALTER TABLE ${tabela} ADD COLUMN ${nome} ${definicao}`
-            );
-          }
-        }
-      };
-      garantirColunas("usuarios", [
-        ["codigo_publico", "TEXT"],
-        ["numero_sequencial", "INTEGER"],
-      ]);
-      garantirColunas("perfis", [
-        ["categorias_json", "TEXT NOT NULL DEFAULT '[]'"],
-        ["outra_categoria", "TEXT NOT NULL DEFAULT ''"],
-        ["equipamentos_json", "TEXT NOT NULL DEFAULT '[]'"],
-        ["ultima_alteracao_categorias_em", "TEXT"],
-        [
-          "localizacao_publica",
-          "INTEGER NOT NULL DEFAULT 1 CHECK (localizacao_publica IN (0, 1))",
-        ],
-        [
-          "contato_publico",
-          "INTEGER NOT NULL DEFAULT 0 CHECK (contato_publico IN (0, 1))",
-        ],
-      ]);
-      garantirColunas("solicitacoes_excecao_categorias", [
-        ["categorias_antes_json", "TEXT NOT NULL DEFAULT '[]'"],
-        ["categorias_solicitadas_json", "TEXT NOT NULL DEFAULT '[]'"],
-        ["respostas_solicitadas_json", "TEXT NOT NULL DEFAULT '{}'"],
-        ["visibilidades_solicitadas_json", "TEXT NOT NULL DEFAULT '{}'"],
-        ["motivo_codigo", "TEXT NOT NULL DEFAULT ''"],
-      ]);
-      if (versaoAtual < 16) {
-        conexao.exec(`
-          UPDATE solicitacoes_excecao_categorias
-          SET categorias_antes_json = COALESCE((
-            SELECT p.categorias_json FROM perfis p
-            WHERE p.usuario_id = solicitacoes_excecao_categorias.usuario_id
-          ), '[]')
-          WHERE categorias_antes_json = '[]';
-        `);
-        conexao.exec(`
-          INSERT INTO historico_solicitacoes_categorias (
-            id, solicitacao_id, autor_id, autor_tipo, mensagem, criada_em
-          )
-          SELECT 'migracao-usuario-' || s.id, s.id, s.usuario_id,
-                 'usuario', s.motivo, s.criada_em
-          FROM solicitacoes_excecao_categorias s
-          WHERE trim(s.motivo) <> ''
-            AND NOT EXISTS (
-              SELECT 1 FROM historico_solicitacoes_categorias h
-              WHERE h.solicitacao_id = s.id
-            );
-          INSERT INTO historico_solicitacoes_categorias (
-            id, solicitacao_id, autor_id, autor_tipo, mensagem, criada_em
-          )
-          SELECT 'migracao-admin-' || s.id, s.id, s.revisor_id,
-                 'administrador', s.motivo_revisao, COALESCE(s.revisada_em, s.criada_em)
-          FROM solicitacoes_excecao_categorias s
-          WHERE trim(s.motivo_revisao) <> ''
-            AND NOT EXISTS (
-              SELECT 1 FROM historico_solicitacoes_categorias h
-              WHERE h.solicitacao_id = s.id AND h.autor_tipo = 'administrador'
-            );
-        `);
-      }
-      conexao.exec(`
-        UPDATE perfis
-        SET ultima_alteracao_categorias_em = COALESCE(atualizado_em, criado_em, CURRENT_TIMESTAMP)
-        WHERE demonstracao = 0 AND ultima_alteracao_categorias_em IS NULL
-      `);
-      garantirColunas("obras", [
-        ["genero", "TEXT NOT NULL DEFAULT ''"],
-        ["tipo_detalhe", "TEXT NOT NULL DEFAULT ''"],
-        ["genero_detalhe", "TEXT NOT NULL DEFAULT ''"],
-        ["funcao_detalhe", "TEXT NOT NULL DEFAULT ''"],
-        ["letra", "TEXT NOT NULL DEFAULT ''"],
-        ["data_lancamento", "TEXT NOT NULL DEFAULT ''"],
-        ["link_escuta", "TEXT NOT NULL DEFAULT ''"],
-      ]);
-      garantirColunas("beats", [
-        [
-          "venda_exclusiva",
-          "INTEGER NOT NULL DEFAULT 0 CHECK (venda_exclusiva IN (0, 1))",
-        ],
-      ]);
-      garantirColunas("eventos", [
-        ["categoria_detalhe", "TEXT NOT NULL DEFAULT ''"],
-        [
-          "tipo_participacao",
-          "TEXT NOT NULL DEFAULT 'aberta' CHECK (tipo_participacao IN ('aberta', 'aprovacao'))",
-        ],
-      ]);
-      if (versaoAtual < 13) {
-        const categoriasLegadas = conexao
-          .prepare(
-            `SELECT p.usuario_id AS usuarioId,
-                    p.categorias_json AS categoriasJson,
-                    p.outra_categoria AS outraCategoria
-             FROM perfis p JOIN usuarios u ON u.id = p.usuario_id
-             WHERE u.demonstracao = 0 AND trim(p.outra_categoria) <> ''`
-          )
-          .all();
-        const limparCategoriaLegada = conexao.prepare(
-          "UPDATE perfis SET funcao = ?, outra_categoria = '' WHERE usuario_id = ?"
+        CREATE TABLE IF NOT EXISTS auditoria_administrativa (
+          id TEXT PRIMARY KEY, autor_id TEXT REFERENCES usuarios(id),
+          acao TEXT NOT NULL, alvo_id TEXT REFERENCES usuarios(id),
+          detalhe TEXT NOT NULL DEFAULT '', criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
-        for (const perfil of categoriasLegadas) {
-          const categorias = JSON.parse(perfil.categoriasJson);
-          if (categorias.includes("Outros")) {
-            inserirPropostaCategoria(
-              conexao,
-              perfil.usuarioId,
-              perfil.outraCategoria
-            );
-            limparCategoriaLegada.run(categorias.join(" · "), perfil.usuarioId);
-          }
-        }
-      }
-      if (versaoAtual < 14) {
-        const categoriasAprovadas = conexao
-          .prepare(
-            `SELECT categoria, revisada_em AS aprovadaEm,
-                    revisor_id AS revisorId, revisor_email AS revisorEmail,
-                    motivo_revisao AS motivo
-             FROM propostas_categorias
-             WHERE status = 'aprovado'
-             ORDER BY datetime(revisada_em), id`
-          )
-          .all();
-        const existentes = conexao
-          .prepare("SELECT categoria FROM categorias_profissionais_aprovadas")
-          .all();
-        const conhecidas = new Set([
-          ...categoriasGerais.map(normalizarCategoria),
-          ...existentes.map(item => normalizarCategoria(item.categoria)),
-        ]);
-        const inserirCategoriaAprovada =
-          conexao.prepare(`INSERT INTO categorias_profissionais_aprovadas (
-             categoria, aprovada_em, revisor_id, revisor_email, motivo_aprovacao
-           ) VALUES (?, COALESCE(?, CURRENT_TIMESTAMP), ?, ?, ?)
-           ON CONFLICT DO NOTHING`);
-        for (const item of categoriasAprovadas) {
-          const chave = normalizarCategoria(item.categoria);
-          if (conhecidas.has(chave)) continue;
-          inserirCategoriaAprovada.run(
-            item.categoria,
-            item.aprovadaEm,
-            item.revisorId,
-            item.revisorEmail,
-            item.motivo
-          );
-          conhecidas.add(chave);
-        }
-      }
-      if (versaoAtual < 3) {
-        conexao.exec(`
-          UPDATE perfis
-          SET perfil_publico = 0, localizacao_publica = 0, contato_publico = 0
-          WHERE usuario_id IN (
-            SELECT id FROM usuarios WHERE demonstracao = 0
-          )
-        `);
-      }
-      let proximoNumero = conexao
-        .prepare(
-          "SELECT COALESCE(MAX(numero_sequencial), 0) + 1 AS proximo FROM usuarios WHERE demonstracao = 0"
-        )
-        .get().proximo;
-      const contasReais = conexao
-        .prepare(
-          `
-          SELECT u.id, u.codigo_publico AS codigoPublico,
-                 u.numero_sequencial AS numeroSequencial,
-                 p.nome
-          FROM usuarios u
-          LEFT JOIN perfis p ON p.usuario_id = u.id
-          WHERE u.demonstracao = 0
-            AND (u.codigo_publico IS NULL OR u.numero_sequencial IS NULL)
-          ORDER BY datetime(u.criado_em), u.id
-          `
-        )
-        .all();
-      const atualizarConta = conexao.prepare(
-        "UPDATE usuarios SET codigo_publico = ?, numero_sequencial = ? WHERE id = ?"
-      );
-      for (const conta of contasReais) {
-        const numero = conta.numeroSequencial ?? proximoNumero++;
-        const codigo =
-          conta.codigoPublico ??
-          codigoPublicoReal(iniciaisPublicas(conta.nome ?? "Conta"), numero);
-        atualizarConta.run(codigo, numero, conta.id);
-      }
-      conexao
-        .prepare(
-          `
-          INSERT INTO sequencias (nome, proximo_numero)
-          VALUES ('usuarios_reais', ?)
-          ON CONFLICT(nome) DO UPDATE SET
-            proximo_numero = MAX(sequencias.proximo_numero, excluded.proximo_numero)
-          `
-        )
-        .run(proximoNumero);
-      conexao.exec(`
-        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_codigo_publico
-          ON usuarios(codigo_publico) WHERE codigo_publico IS NOT NULL;
-        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_numero_sequencial_real
-          ON usuarios(numero_sequencial)
-          WHERE demonstracao = 0 AND numero_sequencial IS NOT NULL;
-      `);
-      conexao.exec(`
-        INSERT INTO ofertas_beats (id, beat_id, tipo, preco_centavos, descricao)
-        SELECT
-          'oferta-legada-' || b.id,
-          b.id,
-          b.licenca,
-          NULL,
-          b.condicoes_uso
-        FROM beats b
-        WHERE NOT EXISTS (
-          SELECT 1 FROM ofertas_beats o WHERE o.beat_id = b.id
-        )
-      `);
-      conexao.exec(`
-        DELETE FROM eventos WHERE demonstracao = 1;
-        DELETE FROM ofertas_beats
-        WHERE beat_id IN (SELECT id FROM beats WHERE demonstracao = 1);
-        DELETE FROM beats WHERE demonstracao = 1;
-      `);
-      if (versaoAtual < 18) {
-        const perfis = conexao
-          .prepare(
-            `SELECT usuario_id AS usuarioId, categorias_json AS categoriasJson
-             FROM perfis`
-          )
-          .all();
-        const atualizarPerfilCanonico = conexao.prepare(`UPDATE perfis
-           SET categorias_json = ?, funcao = ?, atualizado_em = CURRENT_TIMESTAMP
-           WHERE usuario_id = ?`);
-        for (const perfil of perfis) {
-          const categoriasAntigas = JSON.parse(perfil.categoriasJson);
-          const categorias = [
-            ...new Set(
-              categoriasAntigas.flatMap(categoria =>
-                categoria === "Rapper / MC"
-                  ? ["Rapper", "MC"]
-                  : categoria === "Produtor musical"
-                    ? ["Produtor(a)"]
-                    : [categoria]
-              )
-            ),
-          ];
-          if (
-            JSON.stringify(categorias) !== JSON.stringify(categoriasAntigas)
-          ) {
-            atualizarPerfilCanonico.run(
-              JSON.stringify(categorias),
-              categorias.join(" · "),
-              perfil.usuarioId
-            );
-          }
-        }
-        conexao
-          .prepare(
-            `UPDATE respostas_atuacao_categoria
-             SET categoria = 'Produtor(a)'
-             WHERE categoria = 'Produtor musical'`
-          )
-          .run();
-        const profissaoLegada = conexao
-          .prepare(
-            `SELECT id, usuario_id AS usuarioId, valor_original AS valorOriginal
-             FROM profissoes_usuario
-             WHERE valor_original IN ('Produtor musical', 'Rapper / MC')`
-          )
-          .all();
-        const profissaoAtiva =
-          conexao.prepare(`SELECT id FROM profissoes_usuario
-           WHERE usuario_id = ? AND profissao_id = ? AND estado = 'ativa'
-           LIMIT 1`);
-        const atualizarProfissao = conexao.prepare(`UPDATE profissoes_usuario
-           SET profissao_id = ?, valor_original = ?, origem = 'catalogo',
-               estado = 'ativa', desativada_em = NULL,
-               atualizada_em = CURRENT_TIMESTAMP
-           WHERE id = ?`);
-        const inativarProfissao = conexao.prepare(`UPDATE profissoes_usuario
-           SET estado = 'inativa', desativada_em = CURRENT_TIMESTAMP,
-               atualizada_em = CURRENT_TIMESTAMP
-           WHERE id = ?`);
-        const inserirProfissao = conexao.prepare(`INSERT INTO profissoes_usuario
-           (id, usuario_id, profissao_id, valor_original, origem, estado)
-           VALUES (?, ?, ?, ?, 'catalogo', 'ativa')`);
-        for (const linha of profissaoLegada) {
-          if (linha.valorOriginal === "Produtor musical") {
-            const existente = profissaoAtiva.get(linha.usuarioId, "produtor");
-            if (existente && existente.id !== linha.id)
-              inativarProfissao.run(linha.id);
-            else atualizarProfissao.run("produtor", "Produtor(a)", linha.id);
-            continue;
-          }
-          const rapper = profissaoAtiva.get(linha.usuarioId, "rapper");
-          const mc = profissaoAtiva.get(linha.usuarioId, "mc");
-          if (!rapper) {
-            atualizarProfissao.run("rapper", "Rapper", linha.id);
-            if (!mc)
-              inserirProfissao.run(randomUUID(), linha.usuarioId, "mc", "MC");
-          } else if (!mc) {
-            atualizarProfissao.run("mc", "MC", linha.id);
-          } else {
-            inativarProfissao.run(linha.id);
-          }
-        }
-      }
-      banco = conexao;
-      limparDadosDemonstrativos(conexao);
-      const violacoesChaveEstrangeira = conexao
-        .prepare("PRAGMA foreign_key_check")
-        .all();
-      if (violacoesChaveEstrangeira.length > 0) {
-        throw new Error(
-          `A inicialização do banco encontrou ${violacoesChaveEstrangeira.length} violação(ões) de chave estrangeira.`
+        CREATE TABLE IF NOT EXISTS identificadores_usuario (
+          identificador TEXT PRIMARY KEY COLLATE NOCASE,
+          usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+          reservado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
-      }
+        CREATE TABLE IF NOT EXISTS alteracoes_identificador (
+          id TEXT PRIMARY KEY, usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+          anterior TEXT NOT NULL, novo TEXT NOT NULL, autor_id TEXT REFERENCES usuarios(id),
+          motivo TEXT NOT NULL DEFAULT '', criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS tokens_confirmacao_email (
+          token_hash TEXT PRIMARY KEY, usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+          email_destino TEXT NOT NULL, finalidade TEXT NOT NULL CHECK (finalidade IN ('cadastro','alteracao')),
+          expira_em INTEGER NOT NULL, criado_em INTEGER NOT NULL, usado_em INTEGER
+        );
+        CREATE INDEX IF NOT EXISTS indice_tokens_email_usuario ON tokens_confirmacao_email(usuario_id,criado_em);
+        CREATE TABLE IF NOT EXISTS ativacoes_profissionais (
+          usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+          categorias_json TEXT NOT NULL, criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS preferencias_usuario (
+          usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+          regiao TEXT NOT NULL DEFAULT '', generos_json TEXT NOT NULL DEFAULT '[]',
+          tema TEXT NOT NULL DEFAULT 'light' CHECK (tema IN ('light','dark'))
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS indice_perfis_identificador ON perfis(identificador COLLATE NOCASE);
+        INSERT INTO identificadores_usuario (identificador,usuario_id) SELECT identificador,usuario_id FROM perfis WHERE 1 ON CONFLICT DO NOTHING;
+        CREATE TRIGGER IF NOT EXISTS impedir_perfil_administrativo
+        BEFORE INSERT ON perfis WHEN (SELECT tipo_conta FROM usuarios WHERE id = NEW.usuario_id) = 'administrativo'
+        BEGIN SELECT RAISE(ABORT, 'ADMINISTRADOR_NAO_POSSUI_PERFIL'); END;
+        CREATE TRIGGER IF NOT EXISTS auditar_proposta_genero AFTER UPDATE OF status ON propostas_generos
+        WHEN OLD.status <> NEW.status BEGIN
+          INSERT INTO auditoria_administrativa (id,autor_id,acao,alvo_id,detalhe)
+          VALUES (lower(hex(randomblob(16))),NEW.revisor_id,'genero_' || NEW.status,NEW.usuario_id,NEW.motivo_revisao);
+        END;
+        CREATE TRIGGER IF NOT EXISTS auditar_proposta_categoria AFTER UPDATE OF status ON propostas_categorias
+        WHEN OLD.status <> NEW.status BEGIN
+          INSERT INTO auditoria_administrativa (id,autor_id,acao,alvo_id,detalhe)
+          VALUES (lower(hex(randomblob(16))),NEW.revisor_id,'categoria_' || NEW.status,NEW.usuario_id,NEW.motivo_revisao);
+        END;
+        CREATE TRIGGER IF NOT EXISTS auditar_excecao AFTER INSERT ON excecoes_categorias BEGIN
+          INSERT INTO auditoria_administrativa (id,autor_id,acao,alvo_id,detalhe)
+          VALUES (lower(hex(randomblob(16))),NEW.administrador_id,'excecao_concedida',NEW.usuario_id,NEW.motivo);
+        END;
+        CREATE TRIGGER IF NOT EXISTS auditar_solicitacao_excecao AFTER UPDATE OF status ON solicitacoes_excecao_categorias
+        WHEN OLD.status <> NEW.status BEGIN
+          INSERT INTO auditoria_administrativa (id,autor_id,acao,alvo_id,detalhe)
+          VALUES (lower(hex(randomblob(16))),NEW.revisor_id,'solicitacao_' || NEW.status,NEW.usuario_id,NEW.motivo_revisao);
+        END;
+        INSERT INTO sequencias (nome, proximo_numero) VALUES ('usuarios_reais', 1) ON CONFLICT DO NOTHING;
+      `);
+      if (conexao.pragma("foreign_key_check").length) throw new Error("Integridade referencial inválida.");
       conexao.pragma(`user_version = ${versaoEsquema}`);
-    });
-    inicializar();
-  } catch (erro) {
-    banco = undefined;
-    conexao.close();
-    throw erro;
-  }
+    })();
+    banco = conexao;
+  } catch (erro) { conexao.close(); throw erro; }
 }
 export function listarEventosCypher(filtros, usuarioId) {
   const filtrosSql = [];
@@ -1900,7 +1668,13 @@ export function atualizarStatusInteresseEventoCypher(
     .run(status, eventoId, usuarioInteressadoId, organizadorId);
   return resultado.changes > 0;
 }
+function exigirPublicacao(usuarioId, modalidade, tipo) {
+  const conta = bancoAtivo().prepare(`SELECT u.tipo_conta AS tipoConta, u.email_confirmado_em AS confirmado, p.categorias_json AS categorias FROM usuarios u
+    LEFT JOIN perfis p ON p.usuario_id = u.id WHERE u.id = ? AND u.demonstracao = 0`).get(usuarioId);
+  if (!conta || !conta.confirmado || !podePublicar({ tipoConta: conta.tipoConta, categories: JSON.parse(conta.categorias || '[]') }, modalidade, tipo)) throw new Error("PUBLICACAO_NAO_PERMITIDA");
+}
 export function criarEventoCypher(proprietarioId, dados) {
+  exigirPublicacao(proprietarioId, "evento");
   const id = randomUUID();
   bancoAtivo()
     .prepare(
@@ -1934,6 +1708,7 @@ export function criarEventoCypher(proprietarioId, dados) {
   return id;
 }
 export function atualizarEventoCypher(id, proprietarioId, dados) {
+  exigirProfissional(proprietarioId);
   const resultado = bancoAtivo()
     .prepare(
       `
@@ -1966,6 +1741,7 @@ export function atualizarEventoCypher(id, proprietarioId, dados) {
   return resultado.changes > 0;
 }
 export function excluirEventoCypher(id, proprietarioId) {
+  exigirProfissional(proprietarioId);
   const resultado = bancoAtivo()
     .prepare(
       "DELETE FROM eventos WHERE id = ? AND proprietario_id = ? AND demonstracao = 0"
@@ -2010,6 +1786,7 @@ export function listarBeatsCypher(usuarioId) {
   }));
 }
 export function criarBeatCypher(produtorId, dados) {
+  exigirPublicacao(produtorId, "beat");
   const id = randomUUID();
   const db = bancoAtivo();
   db.transaction(() => {
@@ -2074,6 +1851,7 @@ export function obterBeatCypher(id, produtorId) {
   };
 }
 export function atualizarBeatCypher(id, produtorId, dados) {
+  exigirProfissional(produtorId);
   const db = bancoAtivo();
   const resultado = db.transaction(() => {
     const atualizacao = db
@@ -2107,6 +1885,7 @@ export function atualizarBeatCypher(id, produtorId, dados) {
   return resultado.changes > 0;
 }
 export function excluirBeatCypher(id, produtorId) {
+  exigirProfissional(produtorId);
   const resultado = bancoAtivo()
     .prepare(
       "DELETE FROM beats WHERE id = ? AND produtor_id = ? AND demonstracao = 0"
@@ -2246,6 +2025,17 @@ export function salvarRespostasAtuacaoProfissaoCypher(
     );
 }
 export function criarContaCypher(conta) {
+  if (conta.nomeInformado !== undefined) {
+    const erro = validarDadosIdentidade({nomeInformado:conta.nomeInformado,vulgo:conta.vulgo ?? "",usarVulgo:Boolean(conta.usarVulgo),nascimento:conta.nascimento ?? "",tratamento:conta.tratamento ?? "",generoPersonalizado:conta.generoPersonalizado}) || validarIdentificador(conta.identificador);
+    if (erro) throw new Error(erro);
+  }
+  if (!["profissional", "consumidor"].includes(conta.tipoConta)) throw new Error("TIPO_CONTA_INVALIDO");
+  if (!Array.isArray(conta.categorias) || new Set(conta.categorias).size !== conta.categorias.length ||
+      conta.categorias.some(categoria => !categoriasGerais.includes(categoria)) ||
+      (conta.tipoConta === "profissional" && conta.categorias.length === 0) ||
+      (conta.tipoConta === "consumidor" && conta.categorias.length !== 0)) throw new Error("CATEGORIA_PROFISSIONAL_INVALIDA");
+  const publico = nomePublico(conta.nomeInformado ?? conta.nome, conta.vulgo ?? "", Boolean(conta.usarVulgo));
+  conta = {...conta,nome:publico,identificador:normalizarIdentificador(conta.identificador),iniciais:iniciaisPublicas(publico)};
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
     const sequencia = db
@@ -2279,42 +2069,43 @@ export function criarContaCypher(conta) {
     db.prepare(
       `
       INSERT INTO perfis (
-        usuario_id, c_tag, nome, funcao, identificador, iniciais,
+        usuario_id, c_tag, identificador_alterado_em, nome, nome_informado, vulgo, usar_vulgo, nascimento, tratamento, genero_personalizado, funcao, identificador, iniciais,
         categorias_json, outra_categoria, generos_json,
         ultima_alteracao_categorias_em, perfil_publico,
         localizacao_publica, contato_publico, demonstracao
       ) VALUES (
-        @id, @cTag, @nome, @funcao, @identificador, @iniciais,
-        @categoriasJson, '', '[]', CURRENT_TIMESTAMP, 0, 0, 0, 0
+        @id, @cTag, CURRENT_TIMESTAMP, @nome, @nomeInformado, @vulgo, @usarVulgo, @nascimento, @tratamento, @generoPersonalizado, @funcao, @identificador, @iniciais,
+        @categoriasJson, '', '[]', CURRENT_TIMESTAMP, @perfilPublico, 0, 0, 0
       )
     `
     ).run({
       id: conta.id,
       cTag: conta.cTag,
       nome: conta.nome,
+      nomeInformado: conta.nomeInformado ?? conta.nome,
+      vulgo: conta.vulgo ?? "", usarVulgo: Number(Boolean(conta.usarVulgo)), nascimento: conta.nascimento ?? "", tratamento: conta.tratamento ?? "",
+      generoPersonalizado: conta.tratamento === "outro" ? conta.generoPersonalizado?.trim() ?? "" : "",
+      perfilPublico: Number(conta.tipoConta === "profissional"),
       funcao: conta.funcao,
       identificador: conta.identificador,
       iniciais: conta.iniciais,
       categoriasJson: JSON.stringify(conta.categorias),
     });
+    db.prepare("INSERT INTO identificadores_usuario (identificador,usuario_id) VALUES (?,?)").run(conta.identificador,conta.id);
     if (conta.atuacoes) {
       salvarAtuacoesCategoria(db, conta.id, conta.categorias, conta.atuacoes);
     }
-    if (conta.categorias.includes("Outros") && conta.outraCategoria) {
-      inserirPropostaCategoria(db, conta.id, conta.outraCategoria);
-    }
+    salvarProfissoesUsuarioCypher(conta.id, entradasProfissionaisDasCategorias(conta.categorias));
+    if (conta.vertentes) salvarVertentesProfissionaisUsuarioCypher(conta.id,conta.vertentes);
   });
   salvar();
-  salvarProfissoesUsuarioCypher(
-    conta.id,
-    entradasProfissionaisDasCategorias(conta.categorias)
-  );
 }
+
 export function buscarCredenciaisCypher(email) {
   return bancoAtivo()
     .prepare(
       `
-      SELECT id, email, senha_hash AS senhaHash
+      SELECT id, email, senha_hash AS senhaHash, tipo_conta AS tipoConta, email_confirmado_em AS emailConfirmado
       FROM usuarios
       WHERE email = ? COLLATE NOCASE AND demonstracao = 0
     `
@@ -2344,6 +2135,13 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
     db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash);
     return undefined;
   }
+  const interno = db.prepare(`SELECT u.id, u.email, u.tipo_conta AS tipoConta, a.nome AS name, a.papel AS papelAdministrativo, a.ativo
+    FROM usuarios u JOIN administradores a ON a.usuario_id = u.id WHERE u.id = ? AND u.tipo_conta = 'administrativo'`).get(sessao.usuario_id);
+  if (interno) {
+    if (!interno.ativo) { db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash); return undefined; }
+    return { ...interno, publicCode: "", demonstracao: false, role: interno.papelAdministrativo, city: "", handle: "", initials: "AD", cTag: "", reputation: 0,
+      genres: [], categories: [], otherCategory: "", biography: "", contact: "", availability: "", equipment: [], profilePublic: false, locationPublic: false, contactPublic: false };
+  }
   const perfil = db
     .prepare(
       `
@@ -2352,8 +2150,11 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
         u.email,
         u.codigo_publico AS publicCode,
         u.tipo_conta AS tipoConta,
+        u.email_confirmado_em AS emailConfirmado,
         u.demonstracao AS demonstracao,
         p.nome AS name,
+        p.nome_informado AS nomeInformado, p.vulgo, p.usar_vulgo AS usarVulgo,
+        p.nascimento, p.tratamento, p.genero_personalizado AS generoPersonalizado, p.identidade_revisada AS identidadeRevisada, p.identificador_alterado_em AS identificadorAlteradoEm,
         p.funcao AS role,
         p.cidade AS city,
         p.identificador AS handle,
@@ -2377,15 +2178,19 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
     `
     )
     .get(sessao.usuario_id);
-  if (!perfil) {
+  if (!perfil || !perfil.emailConfirmado) {
     db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash);
     return undefined;
   }
+  const categories = JSON.parse(perfil.categoriesJson) as string[];
   return {
     ...perfil,
+    role: perfil.tipoConta === "consumidor" ? "Público" : categories.map(categoria => rotuloProfissional(categoria, perfil.tratamento)).join(" · ") || perfil.role,
+    identidadeRevisada: Boolean(perfil.identidadeRevisada),
+    usarVulgo: Boolean(perfil.usarVulgo),
     demonstracao: Boolean(perfil.demonstracao),
     genres: JSON.parse(perfil.genresJson),
-    categories: JSON.parse(perfil.categoriesJson),
+    categories,
     equipment: JSON.parse(perfil.equipmentJson),
     profilePublic: Boolean(perfil.profilePublic),
     locationPublic: Boolean(perfil.locationPublic),
@@ -2393,11 +2198,12 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
   };
 }
 export function atualizarPerfilCypher(dados) {
+  exigirProfissional(dados.id);
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
     const atual = db
       .prepare(
-        `SELECT categorias_json AS categoriasJson,
+        `SELECT categorias_json AS categoriasJson, nome, vulgo, usar_vulgo AS usarVulgo,
                 ultima_alteracao_categorias_em AS alteradaEm
          FROM perfis WHERE usuario_id = ? AND demonstracao = 0`
       )
@@ -2475,6 +2281,7 @@ export function atualizarPerfilCypher(dados) {
         `
         UPDATE perfis SET
           nome = @name,
+          nome_informado = @nomeInformado,
           funcao = @role,
           cidade = @city,
           biografia = @biography,
@@ -2495,7 +2302,8 @@ export function atualizarPerfilCypher(dados) {
       )
       .run({
         id: dados.id,
-        name: dados.name,
+        name: nomePublico(dados.name,atual.vulgo,Boolean(atual.usarVulgo)),
+        nomeInformado: dados.name,
         role: dados.role,
         city: dados.city,
         biography: dados.biography,
@@ -2506,15 +2314,15 @@ export function atualizarPerfilCypher(dados) {
         categoriasMudaram: Number(categoriasMudaram),
         otherCategory: dados.otherCategory,
         equipmentJson: JSON.stringify(dados.equipment),
-        initials: dados.initials,
+        initials: iniciaisPublicas(nomePublico(dados.name,atual.vulgo,Boolean(atual.usarVulgo))),
       });
     if (atualizado.changes !== 1) return false;
     db.prepare(
       `
-      UPDATE usuarios SET tipo_conta = ?, atualizado_em = CURRENT_TIMESTAMP
+      UPDATE usuarios SET atualizado_em = CURRENT_TIMESTAMP
       WHERE id = ? AND demonstracao = 0
     `
-    ).run(dados.tipoConta, dados.id);
+    ).run(dados.id);
     const propostaGenero = dados.propostaGenero?.trim();
     if (dados.atuacoes) {
       salvarAtuacoesCategoria(db, dados.id, dados.categories, dados.atuacoes);
@@ -2525,18 +2333,15 @@ export function atualizarPerfilCypher(dados) {
          VALUES (?, ?, ?) ON CONFLICT DO NOTHING`
       ).run(randomUUID(), dados.id, propostaGenero);
     }
+    salvarProfissoesUsuarioCypher(dados.id, entradasProfissionaisDasCategorias(dados.categories));
+    if (dados.vertentes !== undefined) salvarVertentesProfissionaisUsuarioCypher(dados.id,dados.vertentes);
     return true;
   });
-  const atualizado = salvar();
-  if (atualizado) {
-    salvarProfissoesUsuarioCypher(
-      dados.id,
-      entradasProfissionaisDasCategorias(dados.categories)
-    );
-  }
-  return atualizado;
+  return salvar();
 }
 export function atualizarPrivacidadeCypher(id, preferencias) {
+  const conta = bancoAtivo().prepare("SELECT tipo_conta FROM usuarios WHERE id=?").get(id);
+  if (conta?.tipo_conta === "consumidor") preferencias = {profilePublic:false,locationPublic:false,contactPublic:false};
   const resultado = bancoAtivo()
     .prepare(
       `
@@ -2874,6 +2679,7 @@ export function revisarSolicitacaoExcecaoCategoriaCypher(
   aprovada,
   motivoRevisao
 ) {
+  exigirPapelAdministrativo(administradorId, "excecoes");
   const db = bancoAtivo();
   const executar = db.transaction(() => {
     const solicitacao = db
@@ -3024,6 +2830,7 @@ export function solicitarInformacaoSolicitacaoCategoriaCypher(
   administradorId,
   mensagem
 ) {
+  exigirPapelAdministrativo(administradorId, "excecoes");
   const db = bancoAtivo();
   const executar = db.transaction(() => {
     const pendente = db
@@ -3105,6 +2912,7 @@ export function concederExcecaoCategoriaCypher(
   administradorEmail,
   motivo
 ) {
+  exigirPapelAdministrativo(administradorId, "excecoes");
   const db = bancoAtivo();
   const executar = db.transaction(() => {
     const perfil = db
@@ -3150,6 +2958,7 @@ export function revisarPropostaGeneroCypher(
   aprovada,
   motivo
 ) {
+  exigirPapelAdministrativo(revisorId, "taxonomia");
   const db = bancoAtivo();
   const revisar = db.transaction(() => {
     const proposta = db
@@ -3198,6 +3007,7 @@ export function revisarPropostaCategoriaCypher(
   aprovada,
   motivo
 ) {
+  exigirPapelAdministrativo(revisorId, "taxonomia");
   const db = bancoAtivo();
   const revisar = db.transaction(() => {
     const proposta = db
@@ -3206,6 +3016,7 @@ export function revisarPropostaCategoriaCypher(
       )
       .get(propostaId);
     if (!proposta) return false;
+    if (aprovada && !categoriasGerais.includes(proposta.categoria)) return false;
     if (aprovada) {
       const chave = normalizarCategoria(proposta.categoria);
       const jaAtiva =
@@ -3301,7 +3112,7 @@ function ehColaboradorDaConta(db, titularId, visitanteId) {
              JOIN creditos c ON c.obra_id = o.id
              WHERE o.proprietario_id = ? AND c.usuario_creditado_id = ?
                AND o.demonstracao = 0 AND c.demonstracao = 0
-               AND o.publicada = 1 AND o.situacao = 'Lançado'
+               AND o.publicada = 1 AND o.situacao = 'Lançado' AND c.verificado = 1
            ) AS colaborador`
       )
       .get(titularId, visitanteId).colaborador
@@ -3354,7 +3165,7 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
       `
       SELECT
         u.id AS userId,
-        p.nome AS name,
+        p.nome AS name, p.tratamento,
         p.funcao AS role,
         CASE WHEN p.localizacao_publica = 1 THEN p.cidade ELSE '' END AS city,
         p.identificador AS handle,
@@ -3372,6 +3183,7 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
       JOIN perfis p ON p.usuario_id = u.id
       WHERE u.demonstracao = 0
         AND p.perfil_publico = 1
+        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
         AND p.identificador = ? COLLATE NOCASE
     `
     )
@@ -3387,8 +3199,9 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
   );
   const categories = atuacoes.map(atuacao => atuacao.categoria);
   return {
-    ...resultado,
-    role: categories.join(" · ") || "Atuação profissional",
+    ...Object.fromEntries(Object.entries(resultado).filter(([campo])=>campo!=="tratamento")),
+    rotulosCategorias: Object.fromEntries(categories.map(categoria=>[categoria,rotuloProfissional(categoria,resultado.tratamento)])),
+    role: categories.map(categoria=>rotuloProfissional(categoria,resultado.tratamento)).join(" · ") || "Atuação profissional",
     genres: JSON.parse(resultado.genresJson),
     categories,
     atuacoes,
@@ -3420,7 +3233,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId) {
       `
       SELECT
         u.id AS userId,
-        p.nome AS name,
+        p.nome AS name, p.tratamento,
         p.funcao AS role,
         p.cidade AS city,
         p.localizacao_publica AS locationPublic,
@@ -3436,6 +3249,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId) {
       WHERE u.demonstracao = 0
         AND p.demonstracao = 0
         AND p.perfil_publico = 1
+        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
         AND u.id <> ?
       ORDER BY p.nome COLLATE NOCASE ASC
     `
@@ -3452,7 +3266,8 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId) {
     ).map(atuacao => atuacao.categoria);
     return {
       name: linha.name,
-      role: categories.join(" · ") || "Atuação profissional",
+      rotulosCategorias: Object.fromEntries(categories.map(categoria => [categoria, rotuloProfissional(categoria, linha.tratamento)])),
+      role: categories.map(categoria => rotuloProfissional(categoria, linha.tratamento)).join(" · ") || "Atuação profissional",
       city: linha.locationPublic ? linha.city : "",
       handle: linha.handle,
       initials: linha.initials,
@@ -3579,6 +3394,7 @@ export function listarObrasPublicasPerfilCypher(identificador) {
       WHERE u.demonstracao = 0
         AND p.demonstracao = 0
         AND p.perfil_publico = 1
+        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
         AND p.identificador = ? COLLATE NOCASE
         AND o.demonstracao = 0
         AND o.publicada = 1
@@ -3604,7 +3420,7 @@ function creditosDasObras(ids) {
         c.obra_id AS obraId,
         c.usuario_creditado_id AS userId,
         p.identificador AS handle,
-        c.nome_creditado AS name,
+        COALESCE(p.nome,c.nome_creditado) AS name,
         c.funcao AS role,
         c.participacao AS participation,
         c.verificado AS verified
@@ -3734,6 +3550,7 @@ export function listarPerfisParaCreditoCypher(usuarioAtualId) {
       WHERE u.demonstracao = 0
         AND p.demonstracao = 0
         AND p.perfil_publico = 1
+        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
         AND u.id <> ?
       ORDER BY p.nome COLLATE NOCASE, p.identificador COLLATE NOCASE
       `
@@ -3755,6 +3572,7 @@ function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
     FROM usuarios u
     JOIN perfis p ON p.usuario_id = u.id
     WHERE lower(p.identificador) = lower(?)
+      AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
       AND u.demonstracao = 0
       AND p.demonstracao = 0
     `);
@@ -3795,6 +3613,7 @@ function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
   }
 }
 export function criarObraCypher(proprietarioId, dados, creditos) {
+  exigirPublicacao(proprietarioId, "obra", dados.type);
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
     const id = randomUUID();
@@ -3846,6 +3665,10 @@ export function criarObraCypher(proprietarioId, dados, creditos) {
   return salvar();
 }
 export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
+  exigirProfissional(proprietarioId);
+  const anterior = obterObraContaCypher(id, proprietarioId);
+  if (!anterior || !anterior.owned) return false;
+  if (anterior.type !== dados.type) exigirPublicacao(proprietarioId,"obra",dados.type);
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
     const resultado = db
@@ -3914,6 +3737,7 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
   return salvar();
 }
 export function excluirObraCypher(id, proprietarioId) {
+  exigirProfissional(proprietarioId);
   const resultado = bancoAtivo()
     .prepare(
       `

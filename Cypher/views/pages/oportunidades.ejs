@@ -363,6 +363,7 @@ Este evento é um exemplo demonstrativo. Ele não recebe inscrições ou interes
     Quero participar
   </span>
 </button>
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 <button class="button button-outline" type="button" data-share-event>
 <span class="lucide-icon" aria-hidden="true">
@@ -381,6 +382,7 @@ Editar evento
 <button class="button button-outline danger-button" type="submit">
   Excluir evento
 </button>
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 </div>
 <div class="event-interested-list" data-event-interested-list>

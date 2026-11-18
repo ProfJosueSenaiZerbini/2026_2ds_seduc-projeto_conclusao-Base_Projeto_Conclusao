@@ -1,3 +1,5 @@
+import { criarClienteHttp } from "./cliente-http-teste.mjs";
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
@@ -57,6 +59,7 @@ const porta = await new Promise((resolve, reject) => {
   });
 });
 const base = `http://127.0.0.1:${porta}`;
+const fetch = criarClienteHttp(base,{caixaEmail:path.join(diretorio,"emails")});
 const processo = spawn(
   process.execPath,
   ["--import", "tsx", "src/aplicacao.ts"],
@@ -65,6 +68,7 @@ const processo = spawn(
     env: {
       ...process.env,
       CYPHER_DB_PATH: arquivoBanco,
+      CYPHER_EMAIL_DIR: path.join(diretorio,"emails"),
       CYPHER_ADMIN_EMAILS: "admin-ui@example.test",
       NODE_ENV: "test",
       PORT: String(porta),
@@ -163,6 +167,14 @@ try {
   assert.equal(invalidacaoConta.status, 400);
   assert.equal((await invalidacaoConta.json()).field, "name");
   await registrar("admin-ui@example.test", "Admin UI");
+  const criarInterno = spawnSync(process.execPath,["--import","tsx","--input-type=module","-e",`
+    import { inicializarBancoCypher } from './src/app/models/bancoDados.ts';
+    import { criarAdministrador } from './src/app/models/administracao.ts';
+    inicializarBancoCypher();
+    await criarAdministrador({nome:'Equipe de teste',email:'equipe-ui@example.test',senha:'SenhaForteDeTeste2026',papel:'super_admin'});
+  `],{cwd:process.cwd(),env:{...process.env,NODE_ENV:'test',CYPHER_DB_PATH:arquivoBanco},encoding:'utf8'});
+  assert.equal(criarInterno.status,0,criarInterno.stderr);
+
   const emailDuplicado = await fetch(`${base}/register/validate`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -196,11 +208,12 @@ try {
         id,
         `CYP-UI-TAG-${indice}`,
         `Pessoa Teste ${indice}`,
-        `@pessoa-teste-${indice}`
+        `@pessoa_teste_${indice}`
       );
     }
   });
   adicionarContas();
+  banco.exec("UPDATE usuarios SET email_confirmado_em=CURRENT_TIMESTAMP WHERE tipo_conta='profissional'");
   const adminId = banco
     .prepare("SELECT id FROM usuarios WHERE email = ?")
     .get("admin-ui@example.test").id;
@@ -240,6 +253,12 @@ try {
   assert.equal(login.status, 302);
   const cookie = login.headers.get("set-cookie")?.split(";")[0];
   assert.ok(cookie);
+  const loginEquipe = await fetch(`${base}/admin/login`,{method:'POST',redirect:'manual',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({email:'equipe-ui@example.test',password:'SenhaForteDeTeste2026'})});
+  assert.equal(loginEquipe.status,303);
+  const cookieEquipe = loginEquipe.headers.getSetCookie().find(c => c.startsWith('cypher_admin_session='))?.split(';')[0];
+  assert.ok(cookieEquipe);
+  fetch.definirSessoes(cookie,cookieEquipe);
+
 
   const perfilEditorResponse = await fetch(
     `${base}/profile?editar=1&secao=profissional`,
@@ -1183,8 +1202,8 @@ try {
       "UPDATE perfis SET categorias_json = ?, funcao = ? WHERE usuario_id = ?"
     )
     .run(
-      JSON.stringify(["Organizador de eventos"]),
-      "Organizador de eventos",
+      JSON.stringify(["Organizador(a) de eventos"]),
+      "Organizador(a) de eventos",
       adminId
     );
   bancoOrganizador.close();

@@ -1,3 +1,4 @@
+import { podePublicar } from "./permissoes.js";
 export type GrupoProfissional = {
   id: string;
   rotulo: string;
@@ -27,7 +28,7 @@ export const catalogoProfissional: readonly GrupoProfissional[] = [
       { id: "beatmaker", rotulo: "Beatmaker", grupoId: "musica" },
       { id: "produtor", rotulo: "Produtor(a)", grupoId: "musica" },
       { id: "dj", rotulo: "DJ", grupoId: "musica" },
-      { id: "freestyler", rotulo: "Freestyler", grupoId: "musica" },
+      { id: "freestyleiro", rotulo: "Freestyleiro", grupoId: "musica" },
     ],
   },
   {
@@ -45,20 +46,19 @@ export const catalogoProfissional: readonly GrupoProfissional[] = [
     profissoes: [
       { id: "grafiteiro", rotulo: "Grafiteiro(a)", grupoId: "artes-visuais" },
       { id: "ilustrador", rotulo: "Ilustrador(a)", grupoId: "artes-visuais" },
-      { id: "designer-grafico", rotulo: "Designer gráfico", grupoId: "artes-visuais" },
-      { id: "muralista", rotulo: "Muralista", grupoId: "artes-visuais" },
-      { id: "artista-digital", rotulo: "Artista digital", grupoId: "artes-visuais" }
+      {
+        id: "designer-grafico",
+        rotulo: "Designer gráfico",
+        grupoId: "artes-visuais",
+      },
     ],
   },
-  { id: "audiovisual", rotulo: "Audiovisual", profissoes: 
-    [
+  {
+    id: "audiovisual",
+    rotulo: "Audiovisual",
+    profissoes: [
       { id: "fotografo", rotulo: "Fotógrafo(a)", grupoId: "audiovisual" },
       { id: "videomaker", rotulo: "Videomaker", grupoId: "audiovisual" },
-      {
-        id: "diretor-audiovisual",
-        rotulo: "Diretor(a) audiovisual",
-        grupoId: "audiovisual",
-      },
       {
         id: "editor-video",
         rotulo: "Editor(a) de vídeo",
@@ -88,15 +88,9 @@ export const catalogoProfissional: readonly GrupoProfissional[] = [
     rotulo: "Gestão e produção",
     profissoes: [
       { id: "empresario", rotulo: "Empresário(a)", grupoId: "gestao-producao" },
-      { id: "manager", rotulo: "Manager", grupoId: "gestao-producao" },
       {
         id: "produtor-cultural",
         rotulo: "Produtor(a) cultural",
-        grupoId: "gestao-producao",
-      },
-      {
-        id: "produtor-executivo",
-        rotulo: "Produtor(a) executivo(a)",
         grupoId: "gestao-producao",
       },
       {
@@ -121,27 +115,6 @@ export const catalogoProfissional: readonly GrupoProfissional[] = [
         grupoId: "comunicacao-cultura",
       },
       { id: "podcaster", rotulo: "Podcaster", grupoId: "comunicacao-cultura" },
-      {
-        id: "critico-musical",
-        rotulo: "Crítico(a) musical",
-        grupoId: "comunicacao-cultura",
-      },
-      {
-        id: "social-media",
-        rotulo: "Social media",
-        grupoId: "comunicacao-cultura",
-      },
-      { id: "educador", rotulo: "Educador(a)", grupoId: "comunicacao-cultura" },
-      {
-        id: "pesquisador-cultural",
-        rotulo: "Pesquisador(a) cultural",
-        grupoId: "comunicacao-cultura",
-      },
-      {
-        id: "articulador-cultural",
-        rotulo: "Articulador(a) cultural",
-        grupoId: "comunicacao-cultura",
-      },
     ],
   },
 ];
@@ -174,48 +147,9 @@ type StatusComCategorias = OpcaoStatusProfissional & {
   categorias: readonly string[];
 };
 
-export const categoriasGerais = [
-  "Rapper",
-  "MC",
-  "Letrista",
-  "Compositor(a)",
-  "Beatmaker",
-  "Produtor(a)",
-  "DJ",
-  "Freestyler",
-  "B-boy / B-girl",
-  "Dançarino(a)",
-  "Coreógrafo(a)",
-  "Grafiteiro(a)",
-  "Ilustrador(a)",
-  "Designer gráfico",
-  "Muralista",
-  "Artista digital",
-  "Fotógrafo(a)",
-  "Videomaker",
-  "Diretor(a) audiovisual",
-  "Editor(a) de vídeo",
-  "Engenheiro(a) de áudio",
-  "Mixador(a)",
-  "Masterizador(a)",
-  "Empresário(a)",
-  "Manager",
-  "Produtor(a) cultural",
-  "Produtor(a) executivo(a)",
-  "Organizador(a) de eventos",
-  "Criador(a) de conteúdo",
-  "Jornalista cultural",
-  "Podcaster",
-  "Crítico(a) musical",
-  "Social media",
-  "Educador(a)",
-  "Pesquisador(a) cultural",
-  "Articulador(a) cultural",
-  "Compositor",
-  "Empresário",
-  "Organizador de eventos",
-  "Outros",
-];
+export const categoriasGerais = profissoesCatalogo.map(
+  profissao => profissao.rotulo
+);
 
 export type CategoriaProfissional = (typeof categoriasGerais)[number];
 
@@ -227,18 +161,25 @@ export function temCategoria(
 }
 
 export function podeCriarBeat(categorias: readonly string[]): boolean {
-  return temCategoria(categorias, "Beatmaker");
-}
-
-export function podeCriarObra(categorias: readonly string[]): boolean {
-  return ["Rapper", "MC", "Beatmaker", "Produtor(a)", "DJ"].some(categoria =>
-    categorias.includes(categoria)
+  return podePublicar(
+    { tipoConta: "profissional", categories: categorias },
+    "beat"
   );
 }
-
+export function podeCriarObra(
+  categorias: readonly string[],
+  tipo?: string
+): boolean {
+  return podePublicar(
+    { tipoConta: "profissional", categories: categorias },
+    "obra",
+    tipo
+  );
+}
 export function podeCriarEvento(categorias: readonly string[]): boolean {
-  return categorias.some(categoria =>
-    ["Organizador(a) de eventos", "Organizador de eventos"].includes(categoria)
+  return podePublicar(
+    { tipoConta: "profissional", categories: categorias },
+    "evento"
   );
 }
 
@@ -276,17 +217,17 @@ const statusProfissionais: readonly StatusComCategorias[] = [
   {
     value: "buscando-parcerias",
     label: "Buscando parcerias profissionais",
-    categorias: ["Empresário"],
+    categorias: ["Empresário(a)"],
   },
   {
     value: "recebendo-inscricoes",
     label: "Recebendo inscrições para eventos",
-    categorias: ["Organizador de eventos"],
+    categorias: ["Organizador(a) de eventos"],
   },
   {
     value: "buscando-profissionais-eventos",
     label: "Buscando profissionais para eventos",
-    categorias: ["Organizador de eventos"],
+    categorias: ["Organizador(a) de eventos"],
   },
   {
     value: "disponivel-colaboracao",

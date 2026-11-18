@@ -65,7 +65,7 @@ export interface PerguntaAtuacao {
   campo: EixoPerguntaAtuacao;
   pergunta: string;
   tipo: TipoPerguntaAtuacao;
-  obrigatoria: true;
+  obrigatoria: boolean;
   opcoes: readonly string[];
 }
 
@@ -94,35 +94,25 @@ const CONTEXTOS: Readonly<Record<string, string>> = {
   beatmaker: "na criação de beats",
   produtor: "na produção musical",
   dj: "como DJ",
-  freestyler: "no freestyle",
+  freestyleiro: "no freestyle",
   "b-boy-b-girl": "no breaking",
   dancarino: "na dança",
   coreografo: "na criação de coreografias",
   grafiteiro: "no grafite",
   ilustrador: "na ilustração",
   "designer-grafico": "no design gráfico",
-  muralista: "no muralismo",
-  "artista-digital": "na arte digital",
   fotografo: "na fotografia",
   videomaker: "na produção de vídeo",
-  "diretor-audiovisual": "na direção audiovisual",
   "editor-video": "na edição de vídeo",
   "engenheiro-audio": "na engenharia de áudio",
   mixador: "na mixagem",
   masterizador: "na masterização",
   empresario: "na gestão de negócios culturais",
-  manager: "no gerenciamento de artistas",
   "produtor-cultural": "na produção cultural",
-  "produtor-executivo": "na produção executiva",
   "organizador-eventos": "na organização de eventos",
   "criador-conteudo": "na criação de conteúdo",
   "jornalista-cultural": "no jornalismo cultural",
   podcaster: "na produção de podcasts",
-  "critico-musical": "na crítica musical",
-  "social-media": "na gestão de redes sociais",
-  educador: "na educação relacionada à cultura",
-  "pesquisador-cultural": "na pesquisa cultural",
-  "articulador-cultural": "na articulação cultural",
 };
 
 function criarPerguntas(
@@ -146,7 +136,7 @@ function criarPerguntas(
       campo: "etapaProjetos",
       pergunta: `Em que etapa estão seus projetos ou trabalhos ${contexto}?`,
       tipo: "enum",
-      obrigatoria: true,
+      obrigatoria: false,
       opcoes: PROJETOS,
     },
     {
@@ -155,7 +145,7 @@ function criarPerguntas(
       campo: "participacaoColetiva",
       pergunta: `Como tem sido sua participação coletiva ${contexto}?`,
       tipo: "enum",
-      obrigatoria: true,
+      obrigatoria: false,
       opcoes: PARTICIPACAO,
     },
     {
@@ -164,7 +154,7 @@ function criarPerguntas(
       campo: "atividadePratica",
       pergunta: `Como você descreve sua atividade prática ${contexto}?`,
       tipo: "enum",
-      obrigatoria: true,
+      obrigatoria: false,
       opcoes: PRATICA,
     },
   ];
@@ -192,16 +182,7 @@ export function catalogoPerguntasPorProfissao(
 }
 
 export function idProfissaoPorCategoria(categoria: string): string | undefined {
-  const aliases: Record<string, string> = {
-    Compositor: "compositor",
-    Empresário: "empresario",
-    "Organizador de eventos": "organizador-eventos",
-  };
-  return (
-    aliases[categoria] ??
-    listarProfissoesCatalogo().find(profissao => profissao.rotulo === categoria)
-      ?.id
-  );
+  return listarProfissoesCatalogo().find(profissao => profissao.rotulo === categoria)?.id;
 }
 
 /** Compatibilidade de leitura com os controllers que ainda recebem o rótulo visível. */
@@ -210,6 +191,10 @@ export function catalogoPerguntasPorCategoria(
 ): readonly PerguntaAtuacao[] {
   const id = idProfissaoPorCategoria(categoria);
   return id ? catalogoPerguntasPorProfissao(id) : [];
+}
+
+export function perguntasCadastroProfissao(categoria: string): readonly PerguntaAtuacao[] {
+  return catalogoPerguntasPorCategoria(categoria).filter(pergunta => pergunta.eixo === "tempoAtuacao");
 }
 
 export function formatarRespostaAtuacao(valor: unknown): string {
@@ -263,7 +248,7 @@ export function validarRespostasAtuacao(
   for (const pergunta of perguntas) {
     const valor = dados[pergunta.campo];
     if (valor === undefined || valor === null || valor === "") {
-      if (obrigatorias)
+      if (obrigatorias && pergunta.obrigatoria)
         erros.push({
           campo: pergunta.campo,
           codigo: "obrigatorio",

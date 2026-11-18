@@ -1,0 +1,89 @@
+/* Campos compartilhados, nos temas claro e escuro. */
+form label.floating-field {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: .35rem;
+  min-width: 0;
+  padding-top: 1rem;
+  color: var(--text-primary, currentColor);
+}
+form label.floating-field > :is(input, select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: .55rem .25rem;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  box-shadow: none;
+  color: inherit;
+  background: linear-gradient(currentColor,currentColor) center bottom / 0 2px no-repeat;
+  transition: background-size .14s ease;
+  font: inherit;
+  font-size: max(1em, 16px);
+}
+form label.floating-field > :is(input, select, textarea):focus {
+  background-size: 100% 2px;
+  outline: 2px solid transparent;
+}
+form label.floating-field:focus-within { color: var(--field-focus, #456213); }
+.dark form label.floating-field:focus-within { --field-focus: #d4ef93; }
+.floating-field option { background: var(--bg-surface, Canvas); color: var(--text-primary, CanvasText); }
+.field-caption {
+  position: absolute;
+  inset: 0 auto auto .25rem;
+  font-size: .78rem;
+  line-height: 1rem;
+  font-weight: 650;
+  transition: transform .14s ease;
+  transform-origin: left;
+  pointer-events: none;
+}
+.floating-field:has(> :placeholder-shown):not(:focus-within) .field-caption {
+  transform: translateY(1.85rem) scale(1.08);
+}
+form label.floating-field:not(:focus-within) > :placeholder-shown::placeholder { color: transparent; }
+form .floating-field[hidden] { display: none; }
+.gender-field { min-width: 0; }
+.gender-field small, .floating-field small { display: block; line-height: 1.45; }
+.password-control { position: relative; min-width: 0; }
+.password-control .floating-field input { padding-right: 5rem; }
+.password-control .password-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 0;
+  min-height: 44px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+form .button, .tag-panel .button {
+  position: relative;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-primary, inherit);
+  box-shadow: none;
+}
+
+.profile-completion {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border-inline-start: 3px solid #92b333;
+  background: var(--bg-surface, Canvas);
+}
+.profile-completion p { margin: .35rem 0; }
+.profile-completion a { color: inherit; text-decoration: underline; }
+.app-shell, .auth-page { min-height: 100svh; }
+@media (prefers-reduced-motion: reduce) {
+  .floating-field * { transition: none !important; }
+}
+
+/* Evita o segundo controle nativo de revelação no Edge. */
+.tag-panel input[type=password]::-ms-reveal { display: none; }
+.app-shell :is(.form-section, .settings-section, .profile-edit-panel) {
+  background-color: color-mix(in srgb, var(--bg-surface, var(--card)) 91%, transparent);
+  backdrop-filter: blur(8px);
+}

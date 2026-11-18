@@ -1,0 +1,11 @@
+<aside class="sidebar" id="navegacao-principal">
+  <div class="sidebar-top"><a class="logo" href="/admin">CYPHER / EQUIPE</a><button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">×</button></div>
+  <nav class="side-nav" aria-label="Administração">
+    <a class="side-link<%= path === '/admin' ? ' active' : '' %>" href="/admin">Painel interno</a>
+    <% if (usuario.papelAdministrativo === 'super_admin') { %><a class="side-link" href="/admin/revisao">Análises de taxonomia</a><% } %>
+    <% if (['super_admin','moderador'].includes(usuario.papelAdministrativo)) { %><a class="side-link" href="/admin/revisao/excecoes">Exceções profissionais</a><% } %>
+  </nav>
+  <div class="sidebar-bottom"><p><strong><%= usuario.name %></strong></p><p><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[usuario.papelAdministrativo] %></p>
+    <form method="post" action="/admin/logout"><button class="button button-outline" type="submit">Sair da equipe</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+  </div>
+</aside>

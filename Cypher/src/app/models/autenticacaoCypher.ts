@@ -109,13 +109,20 @@ export async function autenticarUsuario(
   if (!credenciais) return undefined;
 
   const senhaValida = await verificarSenha(senha, credenciais.senhaHash);
-  return senhaValida ? credenciais.id : undefined;
+  return senhaValida && (credenciais.tipoConta === "administrativo" || credenciais.emailConfirmado) ? credenciais.id : undefined;
 }
 
 export async function cadastrarUsuario(dados: {
   nome: string;
+  identificador?: string;
+  vulgo?: string;
+  generoPersonalizado?: string;
+  nascimento?: string;
+  tratamento?: string;
+  vertentes?: string[];
   email: string;
   senha: string;
+  tipoConta?: "profissional" | "consumidor";
   categorias: string[];
   outraCategoria: string;
   atuacoes?: import("./bancoDados.js").AtuacaoProfissionalPersistida[];
@@ -143,9 +150,6 @@ export async function cadastrarUsuario(dados: {
   const iniciais = iniciaisBase
     ? (iniciaisBase + (iniciaisBase[1] ?? iniciaisBase[0])).slice(0, 2)
     : "AA";
-  const outrasCategorias = dados.categorias.some(categoria =>
-    ["Organizador(a) de eventos", "Organizador de eventos"].includes(categoria)
-  );
   const funcao = dados.categorias.join(" · ");
 
   try {
@@ -153,10 +157,11 @@ export async function cadastrarUsuario(dados: {
       id,
       email: dados.email,
       senhaHash,
-      tipoConta: outrasCategorias ? "organizador" : "profissional",
-      nome: dados.nome,
+      tipoConta: dados.tipoConta ?? "profissional",
+      nome: dados.nome.trim(),
+      nomeInformado:dados.nome,vulgo:dados.vulgo,usarVulgo:false,generoPersonalizado:dados.generoPersonalizado,nascimento:dados.nascimento,tratamento:dados.tratamento,vertentes:dados.vertentes,
       funcao,
-      identificador,
+      identificador: dados.identificador ?? identificador,
       iniciais,
       cTag: `CYP-${id.replace(/-/g, "").slice(0, 12).toUpperCase()}`,
       categorias: dados.categorias,

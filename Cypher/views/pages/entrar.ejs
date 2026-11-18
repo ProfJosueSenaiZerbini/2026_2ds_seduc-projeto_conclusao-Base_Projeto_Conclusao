@@ -1,65 +1,5 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="auth-page">
-<div class="auth-art">
-  <div class="auth-brand">
-    <div class="logo">
-      <span class="logo-mark" aria-hidden="true">
-        <span>
-        </span>
-        <span>
-        </span>
-        <span>
-        </span>
-      </span>
-      <span class="logo-word">
-        CYPHER
-      </span>
-    </div>
-    <span>
-      ECOSSISTEMA PROFISSIONAL DA CENA UNDERGROUND
-    </span>
-  </div>
-  <div class="auth-quote">
-    <span>
-      01 — CONECTAR
-    </span>
-    <h1>
-      Seu próximo
-      <br>
-      <em>
-        passo começa aqui.
-      </em>
-    </h1>
-    <p>
-      Encontre profissionais. Organize suas obras. Faça a cena avançar.
-    </p>
-  </div>
-</div>
-<div class="auth-panel">
-  <div class="auth-panel-inner">
-    <div class="auth-mobile-logo logo">
-      <span class="logo-mark" aria-hidden="true">
-        <span>
-        </span>
-        <span>
-        </span>
-        <span>
-        </span>
-      </span>
-      <span class="logo-word">
-        CYPHER
-      </span>
-    </div>
-    <div class="eyebrow">
-      BEM-VINDO DE VOLTA
-    </div>
-    <h2>
-      Entre no seu espaço.
-    </h2>
-    <p class="auth-description">
-      A cena continua se movendo enquanto você não para.
-    </p>
-    <% if (mensagem) { %>
+<link rel="stylesheet" href="/css/entrada.css"><main class="tag-page"><a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell"><section class="tag-panel auth-panel"><h1>Vamo movimentar essa <em class="login-cena">cena</em></h1><%- include('../partials/componentes/olhos-senha') %><% if (mensagem) { %>
       <p class="auth-message auth-message-success" role="status">
         <%= mensagem %>
       </p>
@@ -84,14 +24,8 @@
           <%- icones.arrowUpRight %>
         </span>
       </button>
-    </form>
-    <p class="auth-switch">
-      Ainda não está no Cypher?
-      <a href="/register">
-        Criar conta
-      </a>
-    </p>
-  </div>
-</div>
-</div>
-<%- include('../partials/fim-pagina') %>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
+    <p class="auth-switch"><a href="/email/pendente">Ainda não confirmou seu e-mail?</a></p>
+    <p class="join-cypher">Chega junto. <a href="/register">Crie sua conta <span aria-hidden="true"><%- icones.arrowUpRight %></span></a></p>
+  </section></div></div></main><%- include('../partials/fim-pagina') %>

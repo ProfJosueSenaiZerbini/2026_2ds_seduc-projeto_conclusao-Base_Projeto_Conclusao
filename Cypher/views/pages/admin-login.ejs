@@ -1,0 +1,17 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<main class="auth-page">
+  <section class="auth-art"><div class="auth-brand"><span class="logo">CYPHER / EQUIPE</span></div><div class="auth-quote"><h1>Administração<br>da comunidade.</h1><p>Área interna da Cypher.</p></div></section>
+  <section class="auth-panel"><div class="auth-panel-inner">
+    <span class="eyebrow">ACESSO INTERNO</span><h2>Entrar na administração</h2>
+    <p class="auth-description">Use seu acesso de equipe.</p>
+    <% if (erro) { %><p class="auth-message auth-message-error" role="alert"><%= erro %></p><% } %>
+    <form method="post" action="/admin/login">
+      <label>E-mail<input type="email" name="email" value="<%= email %>" maxlength="254" autocomplete="username" required></label>
+      <label>Senha<input type="password" name="password" maxlength="128" autocomplete="current-password" required></label>
+      <button class="button button-lime full" type="submit">Entrar</button>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    </form>
+    <p class="auth-switch"><a href="/login">Voltar para a Cypher</a></p>
+  </div></section>
+</main>
+<%- include('../partials/fim-pagina') %>

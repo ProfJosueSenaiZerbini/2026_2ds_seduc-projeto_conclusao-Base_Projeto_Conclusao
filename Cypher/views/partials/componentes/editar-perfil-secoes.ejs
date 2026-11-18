@@ -10,6 +10,7 @@
 
   <nav class="profile-edit-navigation" aria-label="Áreas de edição do perfil" role="tablist" data-profile-edit-nav>
     <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-pessoal" aria-controls="edit-panel-pessoal" data-profile-edit-tab="pessoal">Informações pessoais</button>
+    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-identidade" aria-controls="edit-panel-identidade" data-profile-edit-tab="identidade">Identidade pública</button>
     <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-profissional" aria-controls="edit-panel-profissional" data-profile-edit-tab="profissional">Atuação profissional</button>
     <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-portfolio" aria-controls="edit-panel-portfolio" data-profile-edit-tab="portfolio">Portfólio e experiência</button>
     <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-privacidade" aria-controls="edit-panel-privacidade" data-profile-edit-tab="privacidade">Privacidade e contato</button>
@@ -24,11 +25,11 @@
         <h3>Informações pessoais</h3>
         <p>Edite o nome artístico e a apresentação que compõem seu perfil profissional.</p>
       </div>
-      <p class="profile-field-note">A edição existente não separa nome civil de nome artístico e ainda não oferece envio de foto ou imagem de capa; nenhum campo ou controle fictício foi incluído.</p>
+      <p class="profile-field-note">Nome Completo e vulgo são separados. Configure a apresentação pública na seção Identidade pública. Fotos e capas serão integradas com o módulo de mídia.</p>
       <form method="post" action="/profile/secoes/pessoal" class="profile-edit-form" data-profile-section-form data-profile-section="pessoal">
         <div class="form-grid">
           <label>
-            Nome artístico
+            Nome Completo
             <input name="nome" value="<%= valores.nome %>" minlength="2" maxlength="80" autocomplete="nickname" required>
           </label>
           <label>
@@ -44,9 +45,15 @@
         <div class="profile-edit-actions">
           <button class="button button-lime" type="submit">Salvar informações pessoais</button>
         </div>
-      </form>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
     </section>
 
+    <section class="profile-edit-section" id="edit-panel-identidade" role="tabpanel" aria-labelledby="edit-tab-identidade" data-profile-edit-panel="identidade"<%= secaoEdicao === 'identidade' ? '' : ' hidden' %>>
+      <h3>Identidade pública</h3><p>Seu nome informado fica privado quando você usa o vulgo como nome público.</p>
+      <%- include('formulario-identidade',{usuario}) %>
+      <p><a href="/settings#identidade">Gerenciar identificador @ e histórico</a></p>
+    </section>
     <section class="profile-edit-section" id="edit-panel-profissional" role="tabpanel" aria-labelledby="edit-tab-profissional" data-profile-edit-panel="profissional"<%= secaoEdicao === 'profissional' ? '' : ' hidden' %>>
       <div class="profile-edit-section-heading">
         <div class="eyebrow">CATEGORIAS · ESPECIALIDADES · FERRAMENTAS</div>
@@ -59,6 +66,7 @@
         <p class="profile-policy-notice" role="status">A equipe autorizou uma alteração excepcional de categorias. A autorização será consumida somente quando a mudança for salva; ao concluir, inicia-se um novo prazo de 60 dias.</p>
       <% } %>
       <form method="post" action="/profile/secoes/profissional" class="profile-edit-form" data-atuacao-form data-profile-section-form data-profile-section="profissional">
+          <%- include('vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
           <fieldset class="profile-category-fieldset category-fieldset"<%= categoriasBloqueadas ? ' disabled' : '' %>>
             <legend>Categorias profissionais atuais</legend>
           <p class="category-selection-summary" data-category-summary>Nenhuma profissão selecionada</p>
@@ -80,7 +88,7 @@
                   <% grupo.profissoes.forEach(profissao => { %>
                     <label class="profile-category-option category-option">
                       <input type="checkbox" name="categorias" value="<%= profissao.rotulo %>"<%= (categoriasBloqueadas ? usuario.categories : valores.categorias).includes(profissao.rotulo) ? ' checked' : '' %>>
-                      <span><%= profissao.rotulo %></span>
+                      <span><%= rotuloProfissional(profissao.rotulo,usuario.tratamento) %></span>
                     </label>
                   <% }) %>
                 </div>
@@ -158,7 +166,8 @@
         <div class="profile-edit-actions">
           <button class="button button-lime" type="submit">Salvar atuação profissional</button>
         </div>
-      </form>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
 
       <% if (categoriasBloqueadas && !excecaoCategoriaDisponivel) { %>
         <section class="profile-category-request profile-exception-request" aria-labelledby="profile-exception-title">
@@ -188,7 +197,8 @@
                     <textarea id="profile-exception-reply" name="mensagem" minlength="5" maxlength="1000" rows="3" required></textarea>
                   </label>
                   <button class="button button-lime" type="submit">Enviar resposta</button>
-                </form>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
               <% } %>
             <% } %>
           <% } else { %>
@@ -208,7 +218,7 @@
                         <% grupo.profissoes.forEach(profissao => { %>
                           <label class="profile-category-option">
                             <input type="checkbox" name="categorias" value="<%= profissao.rotulo %>"<%= categoriasSolicitadas.includes(profissao.rotulo) ? ' checked' : '' %>>
-                            <span><%= profissao.rotulo %></span>
+                            <span><%= rotuloProfissional(profissao.rotulo,usuario.tratamento) %></span>
                           </label>
                         <% }) %>
                       </div>
@@ -252,22 +262,24 @@
                 </label>
               </div>
               <button class="button button-lime" type="submit">Enviar para análise</button>
-            </form>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
           <% } %>
         </section>
       <% } %>
-      <button class="button button-outline" type="button" data-category-suggestion-toggle aria-expanded="<%= valores.categorias.includes('Outros') || categoriasSolicitadas.includes('Outros') ? 'true' : 'false' %>"<%= valores.categorias.includes('Outros') || categoriasSolicitadas.includes('Outros') ? ' hidden' : '' %>>Sugerir uma categoria profissional</button>
-      <form id="profile-category-suggestion-form" method="post" action="/profile/categorias/sugerir" class="profile-category-request" data-profile-section-form data-profile-section="profissional" data-category-other-suggestion<%= valores.categorias.includes('Outros') || categoriasSolicitadas.includes('Outros') ? '' : ' hidden' %>>
+      <button class="button button-outline" type="button" data-category-suggestion-toggle aria-expanded="false">Sugerir uma categoria profissional</button>
+      <form id="profile-category-suggestion-form" method="post" action="/profile/categorias/sugerir" class="profile-category-request" data-profile-section-form data-profile-section="profissional" data-category-other-suggestion hidden>
         <div>
           <h4 data-category-suggestion-heading>Sugerir nova categoria profissional</h4>
-          <p>Informe a atuação que “Outros” representa. A sugestão será analisada separadamente; não altera suas categorias atuais, não entra no pedido de exceção e não fica ativa antes da aprovação.</p>
+          <p>Informe a atuação que deseja sugerir. A sugestão será analisada separadamente; ela não altera suas profissões nem as permissões atuais. A inclusão depende da integração ao catálogo da Cypher.</p>
         </div>
         <label>
           Qual atuação profissional deseja sugerir?
           <input name="categoria" minlength="2" maxlength="60" required placeholder="Ex.: engenheiro de áudio">
         </label>
         <button class="button button-outline" type="submit">Enviar para análise</button>
-      </form>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
     </section>
 
     <section class="profile-edit-section" id="edit-panel-portfolio" role="tabpanel" aria-labelledby="edit-tab-portfolio" data-profile-edit-panel="portfolio"<%= secaoEdicao === 'portfolio' ? '' : ' hidden' %>>
@@ -300,7 +312,8 @@
           <small>Seu e-mail de acesso não é publicado por este campo.</small>
         </label>
         <button class="button button-lime" type="submit">Salvar contato profissional</button>
-      </form>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
       <div class="profile-privacy-card">
         <h4>Preferências de visibilidade</h4>
         <p>Estas preferências são aplicadas pelo servidor na página pública. A visibilidade de cada resposta profissional é configurada separadamente em Atuação profissional.</p>

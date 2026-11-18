@@ -240,6 +240,7 @@ Escolha um formato para abrir um cadastro focado no que você precisa organizar.
 </div>
 <div class="work-type-dialog-options" aria-label="Tipos de obra disponíveis">
 <% [
+      { value: 'Obra', description: 'Composição ou obra musical autoral.', icon: icones.fileMusic },
       { value: 'Instrumental', description: 'Material instrumental sem estrutura de faixa tradicional.', icon: icones.headphones },
       { value: 'Música', description: 'Faixa com letra, créditos e dados técnicos.', icon: icones.fileMusic },
       { value: 'Single', description: 'Lançamento individual pronto para organizar.', icon: icones.disc },
@@ -247,7 +248,7 @@ Escolha um formato para abrir um cadastro focado no que você precisa organizar.
       { value: 'Álbum', description: 'Lançamento completo com tracklist posterior.', icon: icones.music2 },
       { value: 'Beat', description: 'Abra o cadastro completo do Banco de Beats.', icon: icones.headphones, beat: true },
       { value: 'Outro', description: 'Projeto musical ou material relacionado.', icon: icones.sparkles },
-    ].filter(opcao => !opcao.beat || podeCadastrarBeat).forEach(opcao => { %>
+    ].filter(opcao => opcao.beat ? podeCadastrarBeat : tiposPermitidos.includes(opcao.value)).forEach(opcao => { %>
 <a class="work-type-dialog-option<%= opcao.beat ? ' work-type-dialog-option-beat' : '' %>" href="<%= opcao.beat ? '/beats/new' : `/works/new?tipo=${encodeURIComponent(opcao.value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))}` %>">
 <span class="work-type-dialog-option-icon lucide-icon" aria-hidden="true">
 <%- opcao.icon %>
@@ -358,6 +359,7 @@ Editar obra
 <button class="button button-outline danger-button" type="submit">
 Excluir obra
 </button>
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 </div>
 </dialog>

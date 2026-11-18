@@ -1,3 +1,6 @@
+import { rotuloProfissional } from "./app/models/tratamentoProfissional.js";
+import { protegerEscrita } from "./app/middlewares/seguranca.js";
+import { prepararSuperAdminLocal } from "./app/models/administracao.js";
 import express from "express";
 import path from "node:path";
 import routes from "./app/routes/rotasCypher.js";
@@ -20,6 +23,8 @@ import {
   CircleUserRound,
   Clock3,
   Disc3,
+  Eye,
+  EyeOff,
   ExternalLink,
   FileMusic,
   Headphones,
@@ -29,6 +34,8 @@ import {
   MapPin,
   Menu,
   MicVocal,
+  Sun,
+  Moon,
   MoreHorizontal,
   Music,
   Music2,
@@ -47,11 +54,12 @@ import {
 } from "lucide-static";
 
 inicializarAplicacaoCypher();
+await prepararSuperAdminLocal();
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
 
-app.set("trust proxy", 1);
+app.set("trust proxy", process.env.CYPHER_TRUST_PROXY === "1" ? 1 : false);
 
 const icones = {
   arrowLeft: ArrowLeft,
@@ -71,6 +79,10 @@ const icones = {
   circleUser: CircleUserRound,
   clock: Clock3,
   disc: Disc3,
+  eye: Eye,
+  eyeOff: EyeOff,
+  sun: Sun,
+  moon: Moon,
   externalLink: ExternalLink,
   fileMusic: FileMusic,
   headphones: Headphones,
@@ -100,8 +112,10 @@ const icones = {
 app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), "views"));
 app.locals.icones = icones;
+app.locals.rotuloProfissional = rotuloProfissional;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(protegerEscrita);
 app.use(express.static(path.resolve(process.cwd(), "public")));
 app.use(routes);
 app.use((_req, res) =>

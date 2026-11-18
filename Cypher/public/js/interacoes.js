@@ -804,6 +804,12 @@
 
   const aplicarTema = tema => {
     document.documentElement.classList.toggle("dark", tema === "dark");
+    document.querySelectorAll("[data-theme-toggle]").forEach(botao => {
+      const escuro = tema === "dark";
+      const destino = escuro ? "claro" : "escuro";
+      botao.setAttribute("aria-label", `Ativar tema ${destino}`);
+      botao.title = `Ativar tema ${destino}`;
+    });
     document.querySelectorAll("[data-theme-mode]").forEach(botao => {
       botao.setAttribute(
         "aria-pressed",
@@ -816,14 +822,28 @@
       /* armazenamento pode estar bloqueado */
     }
   };
-  let temaSalvo = "light";
+  const temaServidor=document.querySelector('meta[name="cypher-theme"]')?.content;
+  let temaSalvo = temaServidor || "dark";
   try {
     temaSalvo =
-      window.localStorage.getItem("cypher-tema") === "dark" ? "dark" : "light";
+      temaServidor || (window.localStorage.getItem("cypher-tema") === "light" ? "light" : "dark");
   } catch {
-    /* usa o tema claro padrão */
+    /* usa o tema escuro padrão */
   }
   aplicarTema(temaSalvo);
+  document.querySelectorAll("[data-theme-toggle]").forEach(botao => {
+    let alternando = false;
+    botao.addEventListener("click", async () => {
+      if (alternando) return;
+      const trocar = () => aplicarTema(document.documentElement.classList.contains("dark") ? "light" : "dark");
+      if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        alternando = true;
+        try { await document.startViewTransition(trocar).finished; }
+        catch { /* A troca já aplicada permanece se a animação for interrompida. */ }
+        finally { alternando = false; }
+      } else trocar();
+    });
+  });
   document.querySelectorAll("[data-theme-mode]").forEach(botao => {
     botao.addEventListener("click", () => aplicarTema(botao.dataset.themeMode));
   });
@@ -1141,25 +1161,6 @@
       campo.addEventListener("change", atualizarStatusPerfil);
     });
   atualizarStatusPerfil();
-
-  document
-    .querySelector("[data-register-form]")
-    ?.addEventListener("submit", evento => {
-      const selecionadas = [
-        ...document.querySelectorAll('.category-option input[type="checkbox"]'),
-      ].some(campo => campo.checked);
-      const aviso = document.querySelector("[data-category-validation]");
-      if (aviso) aviso.hidden = selecionadas;
-      if (!selecionadas) {
-        evento.preventDefault();
-        document
-          .querySelector(".category-fieldset")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-        document
-          .querySelector('.category-option input[type="checkbox"]')
-          ?.focus();
-      }
-    });
 
   const listaPerfisCredito = document.querySelector(
     "[data-profile-credit-list]"

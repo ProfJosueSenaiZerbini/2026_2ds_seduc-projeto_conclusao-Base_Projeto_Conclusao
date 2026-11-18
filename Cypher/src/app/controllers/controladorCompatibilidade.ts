@@ -1,4 +1,12 @@
 // @ts-nocheck
+import { rotuloProfissional } from "../models/tratamentoProfissional.js";
+import { resolverPerfilPublico, obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
+import { normalizarIdentificador } from "../validators/validarIdentidade.js";
+import { listaTextual } from "../validators/validarAtuacao.js";
+import { salvarVertentesProfissionaisUsuarioCypher } from "../models/bancoDados.js";
+import { vertentesProfissionais } from "../models/modeloProfissionalPersistido.js";
+import { podeAdministrar, podePublicar, tiposObraPermitidos } from "../models/permissoes.js";
+
 import type { NextFunction, Request, Response } from "express";
 import {
   CypherModel,
@@ -104,7 +112,7 @@ const caminhosProtegidos = new Set([
 
 function caminhoProtegido(caminho: string): boolean {
   return (
-    caminhosProtegidos.has(caminho) ||
+    caminhosProtegidos.has(caminho) || caminho.startsWith("/profile/") || caminho.startsWith("/settings/") || caminho.startsWith("/admin/") || caminho === "/admin" ||
     /^\/(?:works|events|beats)\/[^/]+\/(?:edit|delete)$/.test(caminho) ||
     /^\/events\/[^/]+\/(?:interest|interest\/cancel|interests\/[^/]+\/status)$/.test(
       caminho
@@ -117,11 +125,12 @@ function caminhoProtegido(caminho: string): boolean {
 }
 
 function tokenDaRequisicao(req: Request): string | undefined {
+  const nomeCookie = req.path.startsWith("/admin") ? "cypher_admin_session" : nomeCookieSessao;
   const cookie = req.headers.cookie
     ?.split(";")
     .map(valor => valor.trim())
-    .find(valor => valor.startsWith(`${nomeCookieSessao}=`));
-  return cookie?.slice(nomeCookieSessao.length + 1);
+    .find(valor => valor.startsWith(`${nomeCookie}=`));
+  return cookie?.slice(nomeCookie.length + 1);
 }
 
 function usuarioDaRequisicao(req: Request): UsuarioDaSessao | undefined {
@@ -140,20 +149,15 @@ function exigeAcesso(req: Request, res: Response): UsuarioDaSessao | undefined {
   return usuario;
 }
 
-function ehAdministrador(email: string | null): boolean {
-  const autorizados = (process.env.CYPHER_ADMIN_EMAILS ?? "")
-    .split(",")
-    .map(valor => valor.trim().toLocaleLowerCase("pt-BR"))
-    .filter(Boolean);
-  return Boolean(
-    email && autorizados.includes(email.toLocaleLowerCase("pt-BR"))
-  );
+function ehAdministrador(usuario: UsuarioDaSessao): boolean {
+  return usuario.tipoConta === "administrativo" && Boolean(usuario.papelAdministrativo);
 }
 
 function usuarioParaView(usuario: UsuarioDaSessao) {
   return {
     ...usuario,
-    ehAdministrador: ehAdministrador(usuario.email),
+    ehAdministrador: ehAdministrador(usuario),
+    role: usuario.tipoConta === "consumidor" ? "Público" : usuario.categories.map(categoria=>rotuloProfissional(categoria,usuario.tratamento)).join(" · ") || usuario.role,
     availabilityLabel: rotuloStatusProfissional(
       usuario.availability,
       usuario.categories
@@ -259,14 +263,24 @@ export function middlewareAutorizacao(
   res: Response,
   next: NextFunction
 ) {
+  if (req.path === "/admin/login") return next();
   if (!caminhoProtegido(req.path)) return next();
-
+  const interno = req.path === "/admin" || req.path.startsWith("/admin/");
   const usuario = usuarioDaRequisicao(req);
-  if (!usuario) return res.redirect("/login");
-
+  if (!usuario) {
+    if (interno && req.headers.cookie?.split(";").some(item => item.trim().startsWith("cypher_session="))) return res.sendStatus(403);
+    return res.redirect(interno ? "/admin/login" : "/login");
+  }
+  if (interno && !ehAdministrador(usuario)) return res.sendStatus(403);
+  if (!interno && usuario.tipoConta === "administrativo") return res.sendStatus(403);
+  if (interno && req.path.startsWith("/admin/revisao")) {
+    const acao = req.path.includes("excecoes") || req.path.includes("solicitacoes-excecao") ? "excecoes" : "taxonomia";
+    if (!podeAdministrar(usuario,acao)) return res.sendStatus(403);
+  }
   res.locals.usuario = usuarioParaView(usuario);
-  res.locals.notificacoesRecentes = CypherModel.notificacoes(usuario.id, 5);
-  res.locals.quantidadeNaoLidas = CypherModel.notificacoesNaoLidas(usuario.id);
+  res.locals.temaPreferido = interno ? "light" : obterPreferenciasUsuario(usuario.id).tema;
+  res.locals.notificacoesRecentes = interno ? [] : CypherModel.notificacoes(usuario.id, 5);
+  res.locals.quantidadeNaoLidas = interno ? 0 : CypherModel.notificacoesNaoLidas(usuario.id);
   return next();
 }
 
@@ -274,7 +288,7 @@ function definirCookieSessao(req: Request, res: Response, token: string): void {
   const seguro = req.secure;
   res.cookie(nomeCookieSessao, token, {
     httpOnly: true,
-    sameSite: seguro ? "none" : "lax",
+    sameSite: "lax",
     secure: seguro,
     path: "/",
     maxAge: duracaoSessaoMs,
@@ -578,6 +592,10 @@ export async function login(req: Request, res: Response) {
       });
     }
 
+    const tokenVerificacao = iniciarSessao(usuarioId);
+    const contaVerificacao = usuarioDaSessao(tokenVerificacao);
+    encerrarSessao(tokenVerificacao);
+    if (contaVerificacao?.tipoConta === "administrativo") return res.status(401).render("pages/entrar", { title:"Entrar",path:"/login",stylesheet:"autenticacao",authenticated:false,erro:"E-mail ou senha inválidos.",mensagem:null,email });
     substituirSessao(req, res, usuarioId);
     return res.redirect("/dashboard");
   } catch (erro) {
@@ -620,6 +638,7 @@ export function validarDadosCadastro(req: Request, res: Response) {
 }
 
 export async function register(req: Request, res: Response) {
+  if (req.body.tipoConta !== undefined && req.body.tipoConta !== "profissional") return res.status(400).send("Este fluxo aceita somente contas profissionais. O acesso administrativo é interno.");
   const nome = String(req.body.name ?? "").trim();
   const email = String(req.body.email ?? "")
     .trim()
@@ -680,65 +699,10 @@ export async function register(req: Request, res: Response) {
       "categorias"
     );
   }
-  if (categorias.includes("Outros")) {
-    return renderizarCadastro(
-      res,
-      400,
-      "Escolha uma profissão disponível no catálogo. Para solicitar uma nova atuação, entre em contato com a equipe Cypher.",
-      dadosFormulario,
-      "categorias"
-    );
-  }
-  if (
-    categorias.includes("Outros") &&
-    (outrasCategorias.length < 2 || outrasCategorias.length > 60)
-  ) {
-    return renderizarCadastro(
-      res,
-      400,
-      "Descreva a outra categoria em até 60 caracteres.",
-      dadosFormulario,
-      "categorias"
-    );
-  }
-
   try {
-    const categoriasAtivas = listarCategoriasProfissionaisCypher();
-    const categoriaJaAprovada =
-      categorias.includes("Outros") &&
-      categoriasAtivas.some(
-        categoria =>
-          normalizarCategoriaFormulario(categoria) ===
-          normalizarCategoriaFormulario(outrasCategorias)
-      );
-    const categoriasDaConta = categoriaJaAprovada
-      ? [
-          ...categorias.filter(categoria => categoria !== "Outros"),
-          outrasCategorias,
-        ]
-      : categorias;
-    let respostasAtuacoesJson = req.body.respostasAtuacoesJson;
-    let visibilidadesAtuacoesJson = req.body.visibilidadesAtuacoesJson;
-    if (categoriaJaAprovada) {
-      const respostas = objetoJsonRecebido(respostasAtuacoesJson);
-      const visibilidades = objetoJsonRecebido(visibilidadesAtuacoesJson);
-      if (
-        respostas &&
-        Object.prototype.hasOwnProperty.call(respostas, "Outros")
-      ) {
-        respostas[outrasCategorias] = respostas.Outros;
-        delete respostas.Outros;
-        respostasAtuacoesJson = JSON.stringify(respostas);
-      }
-      if (
-        visibilidades &&
-        Object.prototype.hasOwnProperty.call(visibilidades, "Outros")
-      ) {
-        visibilidades[outrasCategorias] = visibilidades.Outros;
-        delete visibilidades.Outros;
-        visibilidadesAtuacoesJson = JSON.stringify(visibilidades);
-      }
-    }
+    const categoriasDaConta = categorias;
+    const respostasAtuacoesJson = req.body.respostasAtuacoesJson;
+    const visibilidadesAtuacoesJson = req.body.visibilidadesAtuacoesJson;
     const atuacoes = atuacoesRecebidas(
       categoriasDaConta,
       respostasAtuacoesJson,
@@ -767,18 +731,10 @@ export async function register(req: Request, res: Response) {
       email,
       senha,
       categorias: categoriasDaConta,
-      outraCategoria:
-        categorias.includes("Outros") && !categoriaJaAprovada
-          ? outrasCategorias
-          : "",
+      outraCategoria: "",
       atuacoes,
     });
-    const categoriaPendente =
-      categorias.includes("Outros") && !categoriaJaAprovada;
-    return res.redirect(
-      303,
-      `/login?cadastro=sucesso${categoriaPendente ? "&categoria=analise" : ""}`
-    );
+    return res.redirect(303, "/login?cadastro=sucesso");
   } catch (erro) {
     const mensagemErro = erro instanceof Error ? erro.message : "";
     if (mensagemErro === "EMAIL_DUPLICADO") {
@@ -808,7 +764,7 @@ export function logout(req: Request, res: Response) {
   res.clearCookie(nomeCookieSessao, {
     path: "/",
     httpOnly: true,
-    sameSite: req.secure ? "none" : "lax",
+    sameSite: "lax",
     secure: req.secure,
   });
   return res.redirect("/login");
@@ -881,7 +837,7 @@ export const buscarPessoas = (req: Request, res: Response) => {
         pessoa.categories
       ),
       statusClass: classeStatusBusca(pessoa.availability),
-      categoryLabels: categories,
+      categoryLabels: categories.map(categoria => pessoa.rotulosCategorias[categoria] ?? categoria),
       publicSlug: pessoa.handle.replace(/^@/, ""),
     };
   });
@@ -1084,11 +1040,11 @@ function renderizarFormularioObra(
     tipoOutroLegadoVazio: opcoes.tipoOutroLegadoVazio ?? false,
     generoOutroLegadoVazio: opcoes.generoOutroLegadoVazio ?? false,
     papelOutroLegadoVazio: opcoes.papelOutroLegadoVazio ?? false,
-    tiposObra,
+    tiposObra: editando ? [...new Set([...tiposObraPermitidos(usuario.categories), opcoes.valores?.tipo].filter(Boolean))] : tiposObraPermitidos(usuario.categories),
     generosObra,
     statusObra,
     papeisObra,
-    podeCadastrarBeat: podeCriarBeat(usuario.categories),
+    podeCadastrarBeat: podePublicar(usuario, "beat"),
     perfisParaCredito: CypherModel.perfisParaCredito(usuario.id),
     creditosPerfil: opcoes.creditosPerfil ?? [],
     mencoesFantasma: opcoes.mencoesFantasma ?? [],
@@ -1295,8 +1251,9 @@ export const obras = (req: Request, res: Response) => {
     stylesheet: "obras",
     authenticated: true,
     usuario: usuarioParaView(usuario),
-    podeCadastrarBeat: podeCriarBeat(usuario.categories),
-    podeCadastrarObra: podeCriarObra(usuario.categories),
+    podeCadastrarBeat: podePublicar(usuario, "beat"),
+    podeCadastrarObra: podePublicar(usuario, "obra"),
+    tiposPermitidos: tiposObraPermitidos(usuario.categories),
     obras: obrasDoCatalogo,
     catalogoGrupos: gruposCatalogo(obrasDoCatalogo),
     filtrosCatalogo: {
@@ -1336,7 +1293,7 @@ export const obras = (req: Request, res: Response) => {
 export const novaObra = (req: Request, res: Response) => {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (usuario.demonstracao || !podeCriarObra(usuario.categories)) {
+  if (usuario.demonstracao || !podePublicar(usuario, "obra")) {
     return res.redirect(303, "/works?erro=permissao");
   }
   const tipoRecebido = parametroTexto(req, "tipo");
@@ -1345,11 +1302,12 @@ export const novaObra = (req: Request, res: Response) => {
     valorCatalogo(tiposObra, tipoRecebido);
   if (!tipo) return res.redirect(303, "/works#cadastro-obra");
   if (tipo === "Beat") {
-    if (!podeCriarBeat(usuario.categories)) {
+    if (!podePublicar(usuario, "beat")) {
       return res.redirect(303, "/works?erro=permissao");
     }
     return res.redirect(303, "/beats/new");
   }
+  if (!podePublicar(usuario,"obra",tipo)) return res.sendStatus(403);
   return renderizarFormularioObra(res, usuario, {
     valores: { ...formularioObraVazio, tipo },
   });
@@ -1358,7 +1316,7 @@ export const novaObra = (req: Request, res: Response) => {
 export const editarObra = (req: Request, res: Response) => {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (usuario.demonstracao || !podeCriarObra(usuario.categories)) {
+  if (usuario.demonstracao || usuario.tipoConta !== "profissional") {
     return res.redirect(303, "/works?erro=permissao");
   }
   const obra = CypherModel.obraDoUsuario(req.params.id ?? "", usuario.id);
@@ -1379,13 +1337,14 @@ export const editarObra = (req: Request, res: Response) => {
 function processarFormularioObra(req: Request, res: Response, editar: boolean) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (usuario.demonstracao || !podeCriarObra(usuario.categories)) {
+  if (usuario.demonstracao || usuario.tipoConta !== "profissional") {
     return res.redirect(303, "/works?erro=permissao");
   }
 
   const valores = formularioObraRecebido(req);
+  if (!editar && !podePublicar(usuario,"obra",valores.tipo)) return res.sendStatus(403);
   if (valores.tipo === "Beat") {
-    if (!podeCriarBeat(usuario.categories)) {
+    if (!podePublicar(usuario, "beat")) {
       return res.redirect(303, "/works?erro=permissao");
     }
     return res.redirect(303, "/beats/new");
@@ -1396,6 +1355,7 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
     ? CypherModel.obraDoUsuario(obraId, usuario.id)
     : undefined;
   if (editar && !obraExistente) return res.sendStatus(404);
+  if (editar && obraExistente.type !== valores.tipo && !podePublicar(usuario,"obra",valores.tipo)) return res.sendStatus(403);
   const tipoOutroLegadoVazio = Boolean(
     obraExistente?.type === "Outro" && !obraExistente.typeDetail
   );
@@ -1521,7 +1481,7 @@ export const atualizarObra = (req: Request, res: Response) =>
 export const excluirObra = (req: Request, res: Response) => {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (usuario.demonstracao || !podeCriarObra(usuario.categories)) {
+  if (usuario.demonstracao || usuario.tipoConta !== "profissional") {
     return res.redirect(303, "/works?erro=permissao");
   }
   const excluida = CypherModel.excluirObra(req.params.id ?? "", usuario.id);
@@ -1541,7 +1501,7 @@ export const central = renderizarPagina("pages/central", "Cypher Central", {
 function valoresPerfil(usuario: UsuarioDaSessao) {
   const generosConhecidos = generosObra.filter(genero => genero !== "Outro");
   return {
-    nome: usuario.name,
+    nome: usuario.nomeInformado || usuario.name,
     cidade: usuario.city,
     biografia: usuario.biography,
     contato: usuario.contact,
@@ -1558,6 +1518,7 @@ function valoresPerfil(usuario: UsuarioDaSessao) {
 
 const secoesEdicaoPerfil = new Set([
   "pessoal",
+  "identidade",
   "profissional",
   "portfolio",
   "privacidade",
@@ -1626,6 +1587,8 @@ function renderizarPerfil(
     atuacoesExistentes,
     profissoesPersistidas,
     vertentesProfissionaisPersistidas,
+    vertentesDisponiveis: vertentesProfissionais,
+    vertentesSelecionadas: vertentesProfissionaisPersistidas.filter(v=>v.ativa && v.associacaoAtiva).map(v=>v.vertenteId),
     atuacoesSolicitadas: opcoes.atuacoesSolicitadas ?? atuacoesExistentes,
     categoriasSolicitadas: opcoes.categoriasSolicitadas ?? usuario.categories,
     formatarRespostaAtuacao,
@@ -1679,6 +1642,7 @@ export const perfil = (req: Request, res: Response) => {
     erroSolicitado.startsWith("excecao_")
   );
   const erros: Record<string, string> = {
+    catalogo: "O catálogo vigente tem 26 profissões. Uma nova profissão exige integração de atuação, questionário e permissões antes de ser disponibilizada.",
     excecao_justificativa:
       "Informe o motivo da solicitação em 10 a 500 caracteres.",
     excecao_nao_necessaria:
@@ -1868,7 +1832,7 @@ export const configuracoes = (req: Request, res: Response) => {
 export const perfilPublico = (req: Request, res: Response) => {
   const slug = String(req.params.identificador ?? "").trim();
   const visitante = usuarioDaRequisicao(req);
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug)) {
+  if (!/^[a-z0-9_.]{3,24}$/i.test(slug)) {
     return res.status(404).render("pages/perfil-publico", {
       title: "Perfil indisponível",
       stylesheet: "perfil",
@@ -1878,6 +1842,8 @@ export const perfilPublico = (req: Request, res: Response) => {
     });
   }
 
+  const destino = resolverPerfilPublico(slug);
+  if (destino && destino !== normalizarIdentificador(slug)) return res.redirect(308, `/p/${encodeURIComponent(destino.slice(1))}`);
   const perfilPublico = obterPerfilPublicoCypher(`@${slug}`, visitante?.id);
   if (!perfilPublico) {
     return res.status(404).render("pages/perfil-publico", {
@@ -2043,14 +2009,11 @@ export function atualizarPerfil(req: Request, res: Response) {
       propostaGenero,
       categories: categorias,
       atuacoes,
+      vertentes: req.body.vertentesPresentes === "1" ? listaTextual(req.body.vertentes) : undefined,
       otherCategory: "",
       equipment: equipamentos.itens,
       initials: iniciais,
-      tipoConta: ["Organizador(a) de eventos", "Organizador de eventos"].some(
-        categoria => categorias.includes(categoria)
-      )
-        ? "organizador"
-        : "profissional",
+      tipoConta: usuario.tipoConta,
     });
     if (!atualizado) return res.sendStatus(404);
     const destino = new URLSearchParams();
@@ -2104,7 +2067,7 @@ export function atualizarPerfilPorSecao(req: Request, res: Response) {
   const atuacoesAtuais = listarAtuacoesUsuarioCypher(usuario.id);
   const bodyRecebido = (req.body ?? {}) as Record<string, unknown>;
   const corpoCompleto: Record<string, unknown> = {
-    nome: usuario.name,
+    nome: usuario.nomeInformado || usuario.name,
     cidade: usuario.city,
     biografia: usuario.biography,
     contato: usuario.contact,
@@ -2135,6 +2098,8 @@ export function atualizarPerfilPorSecao(req: Request, res: Response) {
       "equipamentos",
       "respostasAtuacoesJson",
       "visibilidadesAtuacoesJson",
+      "vertentes",
+      "vertentesPresentes",
     ],
   };
   for (const campo of camposPermitidos[secao]) {
@@ -2168,13 +2133,13 @@ export function atualizarPerfilPorSecao(req: Request, res: Response) {
 export function revisaoAdministrativa(req: Request, res: Response) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const resultado = String(req.query.resultado ?? "");
   const mensagens: Record<string, string> = {
     genero_aprovado: "Gênero aprovado e adicionado ao perfil.",
     genero_rejeitado: "Proposta de gênero rejeitada; a decisão foi registrada.",
     categoria_aprovada:
-      "Categoria aprovada e adicionada às opções profissionais disponíveis.",
+      "Decisão registrada para a categoria profissional.",
     categoria_rejeitada:
       "Proposta de categoria rejeitada; a decisão foi registrada.",
     excecao_concedida:
@@ -2299,7 +2264,7 @@ function prepararPerfisExcecao(
 export function buscarPerfisExcecaoAdministrativa(req: Request, res: Response) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const consulta = String(req.query.q ?? "")
     .trim()
     .slice(0, 100);
@@ -2320,8 +2285,9 @@ export function revisarCategoriaProfissionalAdministrativamente(
 ) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const acao = String(req.body.acao ?? "");
+  if (acao === "aprovar") return res.redirect(303,"/admin/revisao?erro=catalogo");
   const motivo = String(req.body.motivo ?? "").trim();
   if (
     !["aprovar", "rejeitar"].includes(acao) ||
@@ -2347,7 +2313,7 @@ export function revisarCategoriaProfissionalAdministrativamente(
 export function revisarGeneroAdministrativamente(req: Request, res: Response) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const acao = String(req.body.acao ?? "");
   const motivo = String(req.body.motivo ?? "").trim();
   if (
@@ -2373,7 +2339,7 @@ export function revisarGeneroAdministrativamente(req: Request, res: Response) {
 export function autorizarExcecaoCategoria(req: Request, res: Response) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const motivo = String(req.body.motivo ?? "").trim();
   if (motivo.length < 10 || motivo.length > 500) {
     return res.redirect(303, "/admin/revisao/excecoes?erro=justificativa");
@@ -2403,7 +2369,7 @@ export function revisarSolicitacaoExcecaoCategoria(
 ) {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
-  if (!ehAdministrador(usuario.email)) return res.sendStatus(403);
+  if (!ehAdministrador(usuario)) return res.sendStatus(403);
   const acao = String(req.body.acao ?? "");
   const motivo = String(req.body.motivo ?? "").trim();
   if (
@@ -2445,7 +2411,7 @@ export function solicitarInformacaoSolicitacaoCategoria(
 ) {
   const administrador = exigeAcesso(req, res);
   if (!administrador) return;
-  if (!ehAdministrador(administrador.email)) return res.sendStatus(403);
+  if (!ehAdministrador(administrador)) return res.sendStatus(403);
   const mensagem = String(req.body.mensagem ?? "").trim();
   if (mensagem.length < 5 || mensagem.length > 500) {
     return res.redirect(
@@ -2533,7 +2499,7 @@ export async function excluirConta(req: Request, res: Response) {
     res.clearCookie(nomeCookieSessao, {
       path: "/",
       httpOnly: true,
-      sameSite: req.secure ? "none" : "lax",
+      sameSite: "lax",
       secure: req.secure,
     });
     return res.redirect(303, "/login?conta=excluida");
@@ -2542,3 +2508,4 @@ export async function excluirConta(req: Request, res: Response) {
     return res.redirect(303, "/settings?erro=indisponivel");
   }
 }
+

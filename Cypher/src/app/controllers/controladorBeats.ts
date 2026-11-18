@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { podePublicar } from "../models/permissoes.js";
+
 import type { Request, Response } from "express";
 import { CypherModel, type DadosBeatCypher } from "../models/modeloCypher.js";
 import type { UsuarioDaSessao } from "../models/bancoDados.js";
@@ -39,7 +41,7 @@ function exigirCapacidadeBeat(
   res: Response,
   usuario: UsuarioDaSessao | undefined
 ): usuario is UsuarioDaSessao {
-  if (!usuario || usuario.demonstracao || !podeCriarBeat(usuario.categories)) {
+  if (!usuario || usuario.demonstracao || !podePublicar(usuario,"beat")) {
     res.redirect("/beats?erro=permissao");
     return false;
   }
@@ -167,7 +169,7 @@ export function bancoBeats(req: Request, res: Response) {
     authenticated: Boolean(usuario),
     beats: CypherModel.beats(usuario?.id),
     podeCadastrarBeat: Boolean(
-      usuario && !usuario.demonstracao && podeCriarBeat(usuario.categories)
+      usuario && !usuario.demonstracao && podePublicar(usuario,"beat")
     ),
     resultado:
       typeof req.query.resultado === "string"
@@ -273,3 +275,4 @@ export function excluirBeat(req: Request, res: Response) {
 
 export { licencasBeat };
 export { central } from "./controladorCompatibilidade.js";
+

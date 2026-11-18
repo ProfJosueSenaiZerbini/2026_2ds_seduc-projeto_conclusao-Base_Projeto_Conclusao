@@ -28,23 +28,21 @@
   const progressBar = form?.querySelector("[data-question-progress-bar]");
   const progressPercent = form?.querySelector("[data-question-percent]");
   const categoryContext = form?.querySelector("[data-question-category]");
+  const page = form?.closest("[data-tag-page]");
+  const savedStage = { profissional: "conta", consumidor: "conta" };
+  let sending = false;
   let stage = "conta";
   let questionIndex = 0;
   let questions = [];
   let pendingQuestion = null;
   const pageByStage = {
-    conta: [
-      "Crie seu espaço.",
-      "Vamos começar pelos dados essenciais da sua conta.",
-    ],
-    categorias: [
-      "Sua atuação, do seu jeito.",
-      "Selecione as categorias que representam sua participação na cena.",
-    ],
-    questionarios: [
-      "Conte sua trajetória.",
-      "Perguntas objetivas, uma de cada vez — suas respostas ficam organizadas por categoria.",
-    ],
+    conta: ["Como você se chama?", "Seu nome completo aparece no perfil. Você pode escolher seu vulgo depois."],
+    contato: ["Como te encontrar?", "Escolha seu @ e informe seu e-mail."],
+    acesso: ["Crie seu acesso", "Informe sua data de nascimento e escolha sua senha."],
+    categorias: ["Como você movimenta a cena?", "Abra uma área e marque o que você faz. Pode escolher mais de uma."],
+    vertentes: ["Qual é a sua sonoridade?", "Marque as vertentes que fazem parte da sua identidade no rap."],
+    questionarios: ["Conte sua trajetória", "Cada caminho conta. Conte um pouco do seu tempo na cena."],
+
   };
 
   const selectedCategories = (targetForm = form) =>
@@ -71,7 +69,7 @@
   }
 
   function showStage(nextStage) {
-    if (stage === "questionarios" && nextStage === "categorias") {
+    if (stage === "questionarios" && ["categorias", "vertentes"].includes(nextStage)) {
       pendingQuestion = questions[questionIndex] ?? null;
     }
     stage = nextStage;
@@ -79,6 +77,7 @@
     stages.forEach(section => {
       section.hidden = section.dataset.registerStage !== stage;
     });
+    syncBranch();
     indicators.forEach(item => {
       const active = item.dataset.stepIndicator === stage;
       const current = indicators.findIndex(
@@ -104,13 +103,12 @@
       }
       showQuestion();
     }
-    const focusTarget =
-      stage === "conta"
-        ? form.querySelector("#register-name")
-        : stage === "categorias"
-          ? form.querySelector("[data-category-area]")
-          : form.querySelector("[data-resposta-atuacao]:not(:disabled)");
-    window.setTimeout(() => focusTarget?.focus({ preventScroll: true }), 0);
+    if (page.dataset.active) {
+      const target = form.querySelector(`[data-register-stage="${stage}"] :is(input:not([type=hidden]),select,button):not(:disabled)`);
+      requestAnimationFrame(() => {
+        if (!form.querySelector("[aria-invalid=true]:focus")) target?.focus({preventScroll:true});
+      });
+    }
   }
 
   function isAnswered(fieldset) {
@@ -199,9 +197,9 @@
     const current = Math.min(questionIndex + 1, Math.max(total, 1));
     const percent = total ? Math.round((answered / total) * 100) : 100;
     if (questionCurrent)
-      questionCurrent.textContent = `Pergunta ${current} de ${total}`;
+      questionCurrent.textContent = `Profissão ${current} de ${total}`;
     if (questionAnswered)
-      questionAnswered.textContent = `${answered} respondidas · faltam ${Math.max(0, total - answered)}`;
+      questionAnswered.textContent = `${answered} de ${total} preenchidas`;
     if (progress) progress.setAttribute("aria-valuenow", String(percent));
     if (progressBar) progressBar.style.width = `${percent}%`;
     if (progressPercent) progressPercent.textContent = `${percent}%`;
@@ -232,9 +230,7 @@
     }
     active.fieldset.hidden = false;
     if (categoryContext) {
-      const categorias = [...new Set(questions.map(item => item.category))];
-      const categoriaAtual = categorias.indexOf(active.category) + 1;
-      categoryContext.textContent = `${active.category.toLocaleUpperCase("pt-BR")} · CATEGORIA ${categoriaAtual} DE ${categorias.length} → ${active.fieldset.querySelector("legend")?.textContent.trim() ?? "PERGUNTA"}`;
+      categoryContext.textContent = (form.querySelector(`[data-profissao="${CSS.escape(active.category)}"]`)?.textContent || active.category).trim();
     }
     refreshProgress();
   }
@@ -249,7 +245,7 @@
     const summary = targetForm.querySelector("[data-category-summary]");
     if (summary) {
       summary.textContent = selected.size
-        ? `${selected.size} profissão${selected.size === 1 ? " selecionada" : " selecionadas"}`
+        ? `${selected.size} ${selected.size === 1 ? "profissão selecionada" : "profissões selecionadas"}`
         : "Nenhuma profissão selecionada";
     }
     targetForm.querySelectorAll("[data-category-count]").forEach(counter => {
@@ -498,16 +494,7 @@
   }
 
   async function validateAccount() {
-    const name = form.querySelector('[name="name"]');
-    const email = form.querySelector('[name="email"]');
-    const password = form.querySelector('[name="password"]');
-    for (const input of [name, email, password]) {
-      input.setCustomValidity("");
-      if (!input.checkValidity()) {
-        input.reportValidity();
-        return false;
-      }
-    }
+    if (!validStep(stage)) return false;
     accountNext.disabled = true;
     accountNext.setAttribute("aria-busy", "true");
     const originalText = accountNext.innerHTML;
@@ -517,34 +504,39 @@
         method: "POST",
         headers: {
           "content-type": "application/json",
+          "x-csrf-token": document.querySelector('meta[name="csrf-token"]')?.content ?? "",
           accept: "application/json",
         },
-        body: JSON.stringify({
-          name: name.value,
-          email: email.value,
-          password: password.value,
-        }),
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
       });
       const result = await response.json();
       if (!response.ok) {
-        showError(
-          result.message || "Confira os dados e tente novamente.",
-          "conta"
-        );
-        const invalid =
-          result.field === "email"
-            ? email
-            : result.field === "password"
-              ? password
-              : name;
-        invalid.focus();
+        const field = form.elements.namedItem(result.field);
+        const fieldStage = field?.closest("[data-register-stage]")?.dataset.registerStage || "acesso";
+        showStage(fieldStage);
+        showError(result.message || "Confira os dados e tente novamente.", fieldStage);
+        if (field?.focus) {
+          const error = form.querySelector(`[data-register-stage="${fieldStage}"] [data-stage-error]`);
+          error.id = "cadastro-erro-campo";
+          field.closest("label")?.after(error);
+          field.setAttribute("aria-invalid","true");
+          const original = field.getAttribute("aria-describedby");
+          field.setAttribute("aria-describedby", [original,error.id].filter(Boolean).join(" "));
+          field.addEventListener("input", () => {
+            field.removeAttribute("aria-invalid");
+            if (original) field.setAttribute("aria-describedby",original);
+            else field.removeAttribute("aria-describedby");
+            error.hidden = true;
+          }, {once:true});
+          field.focus();
+        }
         return false;
       }
       return true;
     } catch {
       showError(
         "Não foi possível verificar os dados agora. Confira sua conexão e tente novamente.",
-        "conta"
+        "acesso"
       );
       return false;
     } finally {
@@ -555,7 +547,11 @@
   }
 
   async function nextFromAccount() {
-    if (await validateAccount()) showStage("categorias");
+    const tipo = page?.dataset.active;
+    if (tipo && await validateAccount() && page.dataset.active === tipo) {
+      if(form.querySelector('[name="tipoConta"]:checked')?.value === 'consumidor') form.requestSubmit();
+      else showStage("categorias");
+    }
   }
 
   function nextFromCategories() {
@@ -568,7 +564,7 @@
     }
     categoryValidation.hidden = true;
     questionIndex = 0;
-    showStage("questionarios");
+    showStage(selected.has("Rapper") ? "vertentes" : "questionarios");
   }
 
   function currentQuestionValid() {
@@ -598,6 +594,7 @@
   form.addEventListener("change", event => {
     if (event.target.matches('[name="categorias"]')) {
       updateCategoryCards();
+      syncBranch();
       categoryValidation.hidden = true;
       if (stage === "questionarios") {
         rebuildQuestions();
@@ -628,18 +625,100 @@
 
   bindCategoryAreaNavigation(form);
 
+  form.addEventListener("invalid", event => {
+    event.preventDefault();
+    const field = event.target;
+    const fieldStage = field.closest("[data-register-stage]")?.dataset.registerStage;
+    if (!fieldStage) return;
+    if (stage !== fieldStage) showStage(fieldStage);
+    showError(field.validationMessage, fieldStage);
+    field.setAttribute("aria-invalid", "true");
+    const error = form.querySelector(`[data-register-stage="${fieldStage}"] [data-stage-error]`);
+    error.id ||= "aviso-" + fieldStage;
+    const previous = field.getAttribute("aria-describedby");
+    field.setAttribute("aria-describedby", [...new Set([...(previous || "").split(" ").filter(Boolean), error.id])].join(" "));
+    field.focus({preventScroll:true});
+    field.addEventListener("input", () => {
+      field.removeAttribute("aria-invalid");
+      if (previous) field.setAttribute("aria-describedby", previous);
+      else field.removeAttribute("aria-describedby");
+      error.hidden = true;
+    }, {once:true});
+  }, true);
+
+  function syncBranch() {
+    const enabled = selectedCategories().has("Rapper") && form.querySelector('[name="tipoConta"]:checked')?.value === "profissional";
+    form.querySelector('[data-step-indicator="vertentes"]').hidden = !enabled;
+    form.querySelector('.register-steps').classList.toggle('has-rap-branch', enabled);
+    const count = form.querySelectorAll('[name="vertentes"]:checked').length;
+    form.querySelector('[data-branches-status]').textContent = count
+      ? `${count} ${count === 1 ? 'vertente selecionada' : 'vertentes selecionadas'} · Você pode mudar depois.`
+      : 'Escolha quantas quiser — ou continue sem selecionar.';
+  }
+  form.addEventListener('change', event => {
+    if (event.target.matches('[name="vertentes"]')) syncBranch();
+  });
+  const stepOrder = Object.keys(pageByStage);
+  function validStep(id) {
+    const fields = form.querySelectorAll(`[data-register-stage="${id}"] :is(input,select):not(:disabled)`);
+    for (const field of fields) {
+      if (!field.reportValidity()) return false;
+    }
+    return true;
+  }
+  function advance() {
+    if (validStep(stage)) showStage(stepOrder[stepOrder.indexOf(stage) + 1]);
+  }
+  form.querySelectorAll("[data-continue]").forEach(button => button.addEventListener("click", advance));
   form.querySelectorAll("[data-register-back]").forEach(button => {
     button.addEventListener("click", () => {
-      if (stage === "questionarios") showStage("categorias");
-      else if (stage === "categorias") showStage("conta");
+      if (!accountNext.disabled) {
+        const previous = stepOrder[stepOrder.indexOf(stage) - 1];
+        showStage(previous === "vertentes" && !selectedCategories().has("Rapper") ? "categorias" : previous);
+      }
     });
+  });
+  form.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || event.isComposing || !event.target.matches("input:not([type=checkbox]):not([type=radio])")) return;
+    if (!["conta","contato","acesso"].includes(stage)) return;
+    event.preventDefault();
+    if (stage === "acesso") {
+      if (!accountNext.disabled) nextFromAccount();
+    } else advance();
   });
   accountNext?.addEventListener("click", nextFromAccount);
   categoriesNext?.addEventListener("click", nextFromCategories);
   questionNext?.addEventListener("click", () => moveQuestion(1));
   questionPrevious?.addEventListener("click", () => moveQuestion(-1));
 
+  window.addEventListener("pageshow", event => {
+    if (event.persisted && sending) {
+      sending = false;
+      const button = page.dataset.active === "consumidor" ? accountNext : finishButton;
+      button.disabled = false;
+      button.removeAttribute("aria-busy");
+      button.textContent = page.dataset.active === "consumidor" ? "Finalizar cadastro" : "Finalizar cadastro →";
+    }
+  });
+
+  function lockSubmission(button) {
+    sending = true;
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    button.textContent = "Criando conta…";
+  }
+
   form.addEventListener("submit", event => {
+    if (sending || !page?.dataset.active) {
+      event.preventDefault();
+      return;
+    }
+    if(form.querySelector('[name="tipoConta"]:checked')?.value === 'consumidor') {
+      form.querySelector('[data-respostas-atuacoes-json]').value='{}';
+      form.querySelector('[data-visibilidades-atuacoes-json]').value='{}';
+      lockSubmission(accountNext);
+      return;
+    }
     if (stage !== "questionarios") {
       event.preventDefault();
       return;
@@ -649,11 +728,7 @@
       return;
     }
     serialize();
-    if (finishButton) {
-      finishButton.disabled = true;
-      finishButton.setAttribute("aria-busy", "true");
-      finishButton.textContent = "Finalizando…";
-    }
+    lockSubmission(finishButton);
   });
 
   form.addEventListener("input", event => {
@@ -664,11 +739,46 @@
       refreshProgress();
   });
 
+  function switchTag(next, sticker) {
+    if (sending || accountNext.disabled) return;
+    const previous = page.dataset.active;
+    if (previous) savedStage[previous] = stage;
+    const before = sticker.getBoundingClientRect();
+    page.dataset.active = next;
+    if (next) {
+      const radio = form.querySelector('[name="tipoConta"][value="' + next + '"]');
+      radio.checked = true;
+      radio.dispatchEvent(new Event("change", {bubbles:true}));
+      showStage(savedStage[next]);
+    } else {
+      sticker.focus();
+    }
+    for (const link of page.querySelectorAll("[data-sticker]")) {
+      const active = link.dataset.sticker === next;
+      const name = link.querySelector("strong").textContent;
+      link.setAttribute("aria-label", active ? name + " selecionado. Trocar tipo de conta" : "Selecionar " + name + ". " + link.querySelector("small").textContent);
+      link.href = active ? "/register" : "/register?tipo=" + link.dataset.sticker;
+    }
+    const after = sticker.getBoundingClientRect();
+    if (sticker.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      sticker.animate([
+        {translate: (before.left-after.left)+"px "+(before.top-after.top)+"px", scale:String(before.width/after.width)},
+        {translate:"0 0",scale:"1"}
+      ], {duration:400,easing:"cubic-bezier(.2,.8,.2,1)"});
+    }
+  }
+  page.querySelectorAll("[data-sticker]").forEach(sticker => {
+    sticker.addEventListener("click", event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+      event.preventDefault();
+      switchTag(page.dataset.active === sticker.dataset.sticker ? "" : sticker.dataset.sticker, sticker);
+    });
+  });
   updateCategoryCards();
   form
     .querySelectorAll("[data-atuacao-questionario]")
     .forEach(panel => updateDependencies(panel));
-  const initialStage = ["conta", "categorias", "questionarios"].includes(
+  const initialStage = stepOrder.includes(
     form.dataset.startStage
   )
     ? form.dataset.startStage

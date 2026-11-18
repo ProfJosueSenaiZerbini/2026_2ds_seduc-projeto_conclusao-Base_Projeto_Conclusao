@@ -19,11 +19,7 @@ export const vertentesProfissionais = [
 
 export type VertenteProfissional = (typeof vertentesProfissionais)[number];
 
-export const profissoesElegiveisParaVertentes = [
-  "rapper",
-  "mc",
-  "freestyler",
-] as const;
+export const profissoesElegiveisParaVertentes = ["rapper"] as const;
 
 export type ProfissaoElegivelParaVertente =
   (typeof profissoesElegiveisParaVertentes)[number];

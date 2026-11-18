@@ -1,3 +1,6 @@
+<% if (usuario.tipoConta === 'administrativo') { %>
+<header class="topbar"><button class="icon-button mobile-menu" type="button" data-sidebar-open aria-label="Abrir menu">☰</button><div class="breadcrumbs"><span>Equipe</span><strong><%= breadcrumb %></strong></div><a href="/admin">Painel interno</a></header>
+<% } else { %>
 <header class="topbar">
   <button class="icon-button mobile-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação">
     <span class="lucide-icon" aria-hidden="true">
@@ -61,7 +64,8 @@
                     <button type="submit" aria-label="Marcar como lida">
                       Lida
                     </button>
-                  </form>
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
                 <% } %>
               </article>
             <% }) %>
@@ -78,3 +82,5 @@
     </a>
   </div>
 </header>
+
+<% } %>

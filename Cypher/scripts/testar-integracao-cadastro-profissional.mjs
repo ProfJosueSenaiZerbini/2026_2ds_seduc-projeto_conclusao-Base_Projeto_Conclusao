@@ -26,20 +26,19 @@ const codigo = `
     senhaHash: "hash-de-teste",
     tipoConta: "profissional",
     nome: "Conta Integração",
-    funcao: "Rapper · Produtor(a) · Outros",
+    funcao: "Rapper · Produtor(a)",
     identificador: "conta-integracao-" + id.slice(0, 8),
     iniciais: "CI",
     cTag: "CYP-TESTE-" + id.slice(0, 8),
-    categorias: ["Rapper", "Produtor(a)", "Outros"],
+    categorias: ["Rapper", "Produtor(a)"],
     outraCategoria: "Artista independente",
     atuacoes: [],
   });
 
   const criadas = listarProfissoesUsuarioCypher(id, { incluirInativas: true });
-  assert.equal(criadas.length, 3);
+  assert.equal(criadas.length, 2);
   assert.equal(criadas.find(item => item.valorOriginal === "Rapper")?.profissaoId, "rapper");
   assert.equal(criadas.find(item => item.valorOriginal === "Produtor(a)")?.profissaoId, "produtor");
-  assert.equal(criadas.find(item => item.valorOriginal === "Outros")?.origem, "personalizado");
 
   assert.equal(
     atualizarPerfilCypher({
@@ -70,7 +69,6 @@ const codigo = `
   );
   assert.ok(editadas.some(item => item.valorOriginal === "Rapper" && item.estado === "inativa"));
   assert.ok(editadas.some(item => item.valorOriginal === "Produtor(a)" && item.estado === "inativa"));
-  assert.ok(editadas.some(item => item.valorOriginal === "Outros" && item.estado === "inativa"));
   console.log("OK: cadastro e edição usam somente relações profissionais canônicas.");
 `;
 

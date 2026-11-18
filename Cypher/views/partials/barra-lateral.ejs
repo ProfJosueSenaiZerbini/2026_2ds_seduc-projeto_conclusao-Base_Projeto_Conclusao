@@ -1,3 +1,6 @@
+<% if (usuario.tipoConta === 'administrativo') { %>
+<%- include('navegacao-administrativa',{path,usuario}) %>
+<% } else { %>
 <aside class="sidebar" id="navegacao-principal">
   <div class="sidebar-top">
     <div class="sidebar-brand-row">
@@ -20,13 +23,14 @@
         </span>
       </button>
     </div>
-    <div class="workspace-chip">
+    <% if (usuario.tipoConta === 'profissional') { %><div class="workspace-chip">
       <span class="status-dot" aria-hidden="true">
       </span>
       <span>
         <%= usuario.availabilityLabel %>
       </span>
     </div>
+    <% } %>
   </div>
   <nav class="side-nav" aria-label="Navegação principal">
     <div class="nav-label">
@@ -116,7 +120,7 @@
     </div>
   </nav>
   <div class="sidebar-bottom">
-    <a class="reputation-mini reputation-link" href="/profile" aria-label="Ver reputação profissional de<%= usuario.name %>">
+    <% if (usuario.tipoConta === 'profissional') { %><a class="reputation-mini reputation-link" href="/profile" aria-label="Ver reputação profissional de<%= usuario.name %>">
       <div class="mini-heading">
         <span>
           REPUTAÇÃO
@@ -139,7 +143,7 @@
         Você está construindo presença.
       </p>
     </a>
-    <a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
+    <% } %><a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
       <div class="avatar avatar-yellow">
         <%= usuario.initials %>
       </div>
@@ -157,3 +161,5 @@
     </a>
   </div>
 </aside>
+
+<% } %>

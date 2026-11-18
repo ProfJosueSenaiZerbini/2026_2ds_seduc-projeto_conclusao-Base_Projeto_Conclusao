@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 960" preserveAspectRatio="none">
+  <defs>
+    <filter id="cimento" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".012 .019" numOctaves="5" seed="31"/>
+      <feColorMatrix type="matrix" values=".19 0 0 0 .025  .18 0 0 0 .035  .15 0 0 0 .028  0 0 0 0 1"/>
+    </filter>
+    <filter id="spray" x="-15%" y="-20%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".18" numOctaves="2" seed="8" result="po"/>
+      <feDisplacementMap in="SourceGraphic" in2="po" scale="18" xChannelSelector="R" yChannelSelector="G" result="tinta"/>
+      <feColorMatrix in="po" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  5 0 0 0 -1.8"/>
+      <feComposite in="tinta" operator="in"/>
+    </filter>
+  </defs>
+  <path fill="#20241f" d="M0 0h1440v960H0z"/>
+  <path filter="url(#cimento)" d="M0 0h1440v960H0z"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#spray)">
+    <g stroke="#aab397" opacity=".27" stroke-width="9">
+      <path d="M-72 350Q64 252 190 201L83 322l145-74-72 100 176-114M-25 394l278-108"/>
+      <path d="M1203 785q86-191 167-209l-97 176 102-84-53 98 153-119"/>
+    </g>
+    <path stroke="#aa8c36" opacity=".56" stroke-width="30" d="M-60 681Q187 570 354 465T729 312Q552 425 469 507"/>
+    <path stroke="#cfb250" opacity=".57" stroke-width="4" d="M-18 705Q289 565 462 409T711 314"/>
+    <path stroke="#7a9b3e" opacity=".67" stroke-width="22" d="M1139 514q76-123 151-184l-54 131 95-69-21 70 167-121"/>
+    <path stroke="#9dc15e" opacity=".5" stroke-width="5" d="M1179 516l296-146m-194 90-3 82m-37-68-2 38"/>
+  </g>
+</svg>

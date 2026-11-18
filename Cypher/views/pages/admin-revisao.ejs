@@ -26,7 +26,7 @@
   </div>
 </header>
 <nav class="admin-tabs" aria-label="Seções do administrador">
-  <a href="/admin/revisao" class="<%= secaoAdmin === 'analises' ? 'active' : '' %>"<%= secaoAdmin === 'analises' ? 'aria-current="page"' : '' %>>
+  <% if (usuario.papelAdministrativo === 'super_admin') { %><a href="/admin/revisao" class="<%= secaoAdmin === 'analises' ? 'active' : '' %>"<%= secaoAdmin === 'analises' ? 'aria-current="page"' : '' %>>
     <span>
       Análises
     </span>
@@ -34,7 +34,7 @@
       <%= propostas.length + propostasCategorias.length %>
     </span>
   </a>
-  <a href="/admin/revisao/excecoes" class="<%= secaoAdmin === 'excecoes' ? 'active' : '' %>"<%= secaoAdmin === 'excecoes' ? 'aria-current="page"' : '' %>>
+  <% } %><a href="/admin/revisao/excecoes" class="<%= secaoAdmin === 'excecoes' ? 'active' : '' %>"<%= secaoAdmin === 'excecoes' ? 'aria-current="page"' : '' %>>
     <span>
       Exceções de categorias
     </span>
@@ -129,7 +129,8 @@
                       Rejeitar
                     </button>
                   </div>
-                </form>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
               </div>
             </article>
           <% }) %>
@@ -153,7 +154,7 @@
             Novas categorias
           </h3>
           <p>
-            Aprovar adiciona a opção para todos, sem conceder capacidades especiais.
+            O catálogo atual tem 26 profissões. Novas sugestões precisam de definição de atuação e integração ao sistema antes de serem disponibilizadas.
           </p>
         </div>
         <span class="admin-count-pill">
@@ -186,14 +187,12 @@
                     <input name="motivo" minlength="5" maxlength="500" required placeholder="Critério usado na análise">
                   </label>
                   <div class="admin-review-buttons">
-                    <button class="button button-lime" name="acao" value="aprovar">
-                      Aprovar e disponibilizar
-                    </button>
                     <button class="button button-outline" name="acao" value="rejeitar">
                       Rejeitar
                     </button>
                   </div>
-                </form>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
               </div>
             </article>
           <% }) %>
@@ -356,7 +355,8 @@
                         <textarea id="exception-question-<%= solicitacao.id %>" name="mensagem" minlength="5" maxlength="500" rows="3" required placeholder="Pergunta objetiva sobre o pedido"></textarea>
                       </label>
                       <button class="button button-outline" type="submit">Pedir mais informações</button>
-                    </form>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
                   <% } %>
                   <% if (ultimaMensagemSolicitacao?.autorTipo !== 'administrador') { %>
                   <form method="post" action="/admin/revisao/solicitacoes-excecao/<%= solicitacao.id %>">
@@ -372,7 +372,8 @@
                         Recusar solicitação
                       </button>
                     </div>
-                  </form>
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
                   <% } %>
                 </div>
               </article>
@@ -494,7 +495,8 @@
                 <button class="button button-outline" type="submit"<%= !perfil.bloqueada || perfil.excecaoPendente || perfil.solicitacaoPendente ? ' disabled' : '' %>>
                   Autorizar uma alteração
                 </button>
-              </form>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
             </article>
           <% }) %>
         </div>

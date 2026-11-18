@@ -32,11 +32,10 @@ const roteiro = `
   import { validarRespostasAtuacao } from "./src/app/models/questionarioAtuacao.ts";
 
   const respostaIncompleta = validarRespostasAtuacao("Rapper", {
-    tempoAtuacao: "1-3a",
     etapaProjetos: "em-desenvolvimento",
   }, true);
   assert.equal(respostaIncompleta.valido, false);
-  assert.ok(respostaIncompleta.erros.some(erro => erro.campo === "participacaoColetiva"));
+  assert.ok(respostaIncompleta.erros.some(erro => erro.campo === "tempoAtuacao"));
   assert.equal(validarRespostasAtuacao("Rapper", {
     tempoAtuacao: "1-3a",
     etapaProjetos: "em-desenvolvimento",
@@ -64,6 +63,10 @@ const roteiro = `
     inserirUsuario.run(conta.id, conta.email, conta.codigo, conta.numero);
     inserirPerfil.run(conta.id, conta.tag, conta.nome, "Rapper", "@" + conta.id, "TP", JSON.stringify(["Rapper"]));
   }
+  db.exec("UPDATE usuarios SET email_confirmado_em = CURRENT_TIMESTAMP");
+  db.prepare("DELETE FROM perfis WHERE usuario_id = ?").run(admin.id);
+  db.prepare("UPDATE usuarios SET tipo_conta = 'administrativo' WHERE id = ?").run(admin.id);
+  db.prepare("INSERT INTO administradores (usuario_id,nome,papel) VALUES (?,?,'super_admin')").run(admin.id,admin.nome);
   db.prepare("UPDATE perfis SET ultima_alteracao_categorias_em = datetime('now', '-10 days') WHERE usuario_id = ?").run(solicitante.id);
   const inserirAuditoriaAnterior = db.prepare(
     "INSERT INTO auditoria_categorias (id, usuario_id, administrador_id, categorias_antes_json, categorias_depois_json, motivo) VALUES (?, ?, ?, ?, ?, ?)"
@@ -176,27 +179,16 @@ const roteiro = `
     categorias: ["Outros"],
     outraCategoria: "Engenheiro de palco",
   };
-  criarContaCypher(contaComSugestao);
-  const perfilPendente = db.prepare("SELECT funcao, outra_categoria, categorias_json FROM perfis WHERE usuario_id = ?").get(contaComSugestao.id);
-  assert.equal(perfilPendente.funcao, "Outros");
-  assert.equal(perfilPendente.outra_categoria, "");
-  assert.deepEqual(JSON.parse(perfilPendente.categorias_json), ["Outros"]);
-  assert.equal(listarCategoriasProfissionaisCypher().includes("Engenheiro de palco"), false);
-  assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "Engenheiro de palco"), "ja_pendente");
-  assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, " engenheiro  DE PALCO "), "ja_pendente");
-  const propostaCategoria = listarPropostasCategoriasPendentesCypher().find(item => item.usuarioId === contaComSugestao.id);
+  assert.throws(() => criarContaCypher(contaComSugestao), /CATEGORIA_PROFISSIONAL_INVALIDA/);
+  assert.equal(listarCategoriasProfissionaisCypher().length, 26);
+  assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "Engenheiro de palco"), "criada");
+  const propostaCategoria = listarPropostasCategoriasPendentesCypher().find(item => item.categoria === "Engenheiro de palco");
   assert.ok(propostaCategoria);
-  assert.equal(revisarPropostaCategoriaCypher(propostaCategoria.id, admin.id, admin.email, true, "Categoria profissional válida para o ecossistema."), true);
-  assert.equal(listarCategoriasProfissionaisCypher().includes("Engenheiro de palco"), true);
-  assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "ENGENHEIRO DE PALCO"), "ja_aprovada");
-  db.prepare("DELETE FROM usuarios WHERE id = ?").run(contaComSugestao.id);
-  assert.equal(listarCategoriasProfissionaisCypher().includes("Engenheiro de palco"), true);
-  assert.equal(podeCriarBeat(["Engenheiro de palco"]), false);
-  assert.equal(podeCriarObra(["Engenheiro de palco"]), false);
-  assert.equal(podeCriarEvento(["Engenheiro de palco"]), false);
-  const statusCategoria = opcoesStatusPorCategoria(["Engenheiro de palco"]);
-  assert.ok(statusCategoria.some(opcao => opcao.value === "disponivel-colaboracao" && opcao.categorias.includes("Engenheiro de palco")));
-
+  assert.equal(revisarPropostaCategoriaCypher(propostaCategoria.id, admin.id, admin.email, true, "Proposta fora do catálogo canônico."), false);
+  assert.equal(listarCategoriasProfissionaisCypher().includes("Engenheiro de palco"), false);
+  assert.equal(podeCriarObra(["Letrista"]), false);
+  assert.equal(podeCriarObra(["MC"]), false);
+  assert.equal(podeCriarObra(["Compositor(a)"]), true);
   assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "Diretor de palco"), "criada");
   const propostaRejeitada = listarPropostasCategoriasPendentesCypher().find(item => item.categoria === "Diretor de palco");
   assert.ok(propostaRejeitada);
@@ -238,6 +230,9 @@ const roteiro = `
       "VALUES ('credito-colaborador-privacidade', 'obra-creditada-privacidade', ?, 'Colaborador', 'MC', 0)"
   ).run(solicitante.id);
 
+  const antesConfirmacao = obterPerfilPublicoCypher("@usuario-teste-politica", solicitante.id);
+  assert.deepEqual(antesConfirmacao.atuacoes[0].respostas, {tempoAtuacao:"1-3a"});
+  db.exec("UPDATE creditos SET verificado=1");
   const perfilDoTitular = obterPerfilPublicoCypher("@usuario-teste-politica", usuario.id);
   const perfilDoColaborador = obterPerfilPublicoCypher("@usuario-teste-politica", solicitante.id);
   const perfilDoVisitante = obterPerfilPublicoCypher("@usuario-teste-politica", admin.id);

@@ -34,10 +34,10 @@
     <div class="profile-hero-copy">
       <p class="profile-hero-eyebrow">CYPHER · PERFIL PROFISSIONAL</p>
       <h1 id="public-profile-name"><%= perfil.name %></h1>
-      <p class="profile-hero-meta"><%= perfil.categories.join(' · ') || perfil.role %></p>
+      <p class="profile-hero-meta"><%= perfil.role %></p>
       <p class="profile-hero-handle"><%= perfil.handle %><%= perfil.city ? ` · ${perfil.city}` : '' %></p>
       <div class="profile-hero-tags" aria-label="Categorias profissionais">
-        <% perfil.categories.forEach((categoria, indice) => { %><span class="profile-category-chip<%= indice % 2 ? ' is-muted' : '' %>"><%= categoria %></span><% }) %>
+        <% perfil.categories.forEach((categoria, indice) => { %><span class="profile-category-chip<%= indice % 2 ? ' is-muted' : '' %>"><%= perfil.rotulosCategorias?.[categoria] || categoria %></span><% }) %>
         <% if (!perfil.categories.length) { %><span class="profile-category-chip is-muted">Nenhuma categoria compartilhada</span><% } %>
       </div>
       <p class="profile-kicker<%= perfil.availability ? (perfil.availability === 'indisponivel' ? ' is-unavailable' : ' is-available') : ' is-unknown' %>"><% if (perfil.availability) { %><span class="status-dot" aria-hidden="true"></span><% } %><%= perfil.availabilityLabel %></p>
@@ -196,7 +196,7 @@
             <% categoriasDoGrupo.forEach(categoria => { %>
               <a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>">
                 <span>Profissão compartilhada</span>
-                <strong><%= categoria %></strong>
+                <strong><%= perfil.rotulosCategorias?.[categoria] || categoria %></strong>
                 <span>Ver trajetória</span>
               </a>
             <% }) %>
@@ -204,7 +204,7 @@
         </section>
       <% } }) %>
       <% const categoriasForaDoCatalogo = perfil.categories.filter(categoria => !gruposProfissionais.some(grupo => grupo.profissoes.some(profissao => profissao.rotulo === categoria))); if (categoriasForaDoCatalogo.length) { %>
-        <section class="professional-category-group" aria-labelledby="public-group-other"><h4 id="public-group-other">Outras atuações compartilhadas</h4><div class="professional-category-cards"><% categoriasForaDoCatalogo.forEach(categoria => { %><a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>"><span>Atuação compartilhada</span><strong><%= categoria %></strong><span>Ver trajetória</span></a><% }) %></div></section>
+        <section class="professional-category-group" aria-labelledby="public-group-other"><h4 id="public-group-other">Outras atuações compartilhadas</h4><div class="professional-category-cards"><% categoriasForaDoCatalogo.forEach(categoria => { %><a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>"><span>Atuação compartilhada</span><strong><%= perfil.rotulosCategorias?.[categoria] || categoria %></strong><span>Ver trajetória</span></a><% }) %></div></section>
       <% } %>
     </div>
   <% } else { %>
@@ -215,7 +215,7 @@
     let temRespostaVisivel = false;
   %>
     <article class="professional-category-detail" aria-labelledby="public-category-detail-title">
-      <h4 id="public-category-detail-title"><%= atuacaoSelecionada.categoria %></h4>
+      <h4 id="public-category-detail-title"><%= perfil.rotulosCategorias?.[atuacaoSelecionada.categoria] || atuacaoSelecionada.categoria %></h4>
       <% (questionarioSelecionado?.perguntas ?? []).forEach(pergunta => {
         const valor = atuacaoSelecionada.respostas[pergunta.campo];
         if (valor !== undefined && valor !== '') {

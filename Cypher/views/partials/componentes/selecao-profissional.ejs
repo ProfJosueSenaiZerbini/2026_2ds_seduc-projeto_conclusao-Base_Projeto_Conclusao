@@ -1,0 +1,17 @@
+<fieldset class="category-fieldset">
+  <legend>Quais profissões representam sua atuação?</legend>
+  <p class="category-selection-summary" data-category-summary>Nenhuma profissão selecionada</p>
+  <div class="professional-area-picker" data-category-area-picker aria-label="Áreas profissionais">
+    <% const iconesArea={musica:icones.mic,danca:icones.users,'artes-visuais':icones.sparkles,audiovisual:icones.disc,'producao-tecnica':icones.headphones,'gestao-producao':icones.calendarDays,'comunicacao-cultura':icones.radio}; %>
+    <% gruposProfissionais.forEach(grupo => { %><button type="button" class="professional-area-choice" data-category-area="<%= grupo.id %>" aria-pressed="false"><span class="lucide-icon" aria-hidden="true"><%- iconesArea[grupo.id] %></span><span><%= grupo.rotulo %></span><small data-category-area-count hidden>0</small></button><% }) %>
+  </div>
+  <div class="professional-category-browser" data-category-browser hidden>
+    <button class="professional-category-back" type="button" data-category-back-to-areas>← Escolher outra área</button>
+    <div class="professional-catalog-groups category-grid category-grid--cards">
+    <% gruposProfissionais.forEach(grupo => { %><section class="professional-catalog-group" data-professional-group="<%= grupo.id %>" data-category-area-panel="<%= grupo.id %>" hidden><h4><%= grupo.rotulo %> <span data-category-count hidden>0</span></h4><div class="professional-catalog-group__options">
+      <% grupo.profissoes.forEach(profissao => { %><label class="category-option category-option--card<%= categoriasSelecionadas.includes(profissao.rotulo) ? ' selected' : '' %>"><input type="checkbox" name="categorias" value="<%= profissao.rotulo %>" <%= categoriasSelecionadas.includes(profissao.rotulo) ? 'checked' : '' %>><span class="lucide-icon" aria-hidden="true"><%- iconesArea[grupo.id] %></span><span class="category-option-copy"><strong data-profissao="<%= profissao.rotulo %>" data-feminino="<%= rotuloProfissional(profissao.rotulo,'feminino') %>" data-masculino="<%= rotuloProfissional(profissao.rotulo,'masculino') %>" data-neutro="<%= rotuloProfissional(profissao.rotulo) %>"><%= rotuloProfissional(profissao.rotulo, typeof dados !== 'undefined' ? dados.tratamento : typeof usuario !== 'undefined' ? usuario?.tratamento : '') %></strong></span><span class="category-check lucide-icon" aria-hidden="true"><%- icones.check %></span></label><% }) %>
+    </div></section><% }) %></div>
+  </div>
+  <p class="category-validation" data-category-validation role="alert" hidden>Selecione pelo menos uma profissão.</p>
+</fieldset>
+<% if(typeof mostrarVertentes === 'undefined' || mostrarVertentes){ %><%- include('vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %><% } %>

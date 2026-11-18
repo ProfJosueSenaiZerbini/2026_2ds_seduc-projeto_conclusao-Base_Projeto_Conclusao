@@ -1,14 +1,15 @@
 <%
+  const rotulo = rotuloProfissional(categoriaAtuacao, typeof dados !== "undefined" ? dados.tratamento : typeof usuario !== "undefined" ? usuario?.tratamento : "");
   const atual = atuacoesExistentes?.find(item => item.categoria === categoriaAtuacao);
   const respostasAtuais = atual?.respostas ?? {};
   const visibilidadesAtuais = atual?.visibilidades ?? {};
   const valorResposta = pergunta => respostasAtuais[pergunta.campo];
   const valorVisibilidade = pergunta => visibilidadesAtuais[pergunta.campo] ?? 'privado';
 %>
-<section class="professional-questionnaire" id="<%= idQuestionario %>" data-atuacao-questionario data-categoria="<%= categoriaAtuacao %>"<% if (legada) { %> data-categoria-legada<% } %> aria-label="Questionário de atuação: <%= categoriaAtuacao %>">
+<section class="professional-questionnaire" id="<%= idQuestionario %>" data-atuacao-questionario data-categoria="<%= categoriaAtuacao %>"<% if (legada) { %> data-categoria-legada<% } %> aria-label="Questionário de atuação: <%= rotulo %>">
   <header class="professional-questionnaire__header">
     <div>
-      <h3><%= categoriaAtuacao %></h3>
+      <h3><%= rotulo %></h3>
       <% if (legada) { %>
         <p>Categoria mantida de um cadastro anterior. Ela não será convertida automaticamente em Rapper nem em MC.</p>
       <% } else { %>
@@ -18,7 +19,7 @@
     <% if (!legada) { %>
       <label class="professional-questionnaire__category-visibility">
         <span>Quem pode ver esta categoria?</span>
-        <select data-visibilidade-categoria="__categoria__" aria-label="Visibilidade da categoria <%= categoriaAtuacao %>">
+        <select data-visibilidade-categoria="__categoria__" aria-label="Visibilidade da categoria <%= rotulo %>">
           <option value="publico" <%= visibilidadesAtuais.__categoria__ === 'publico' || !visibilidadesAtuais.__categoria__ ? 'selected' : '' %>>Público</option>
           <option value="colaboradores" <%= visibilidadesAtuais.__categoria__ === 'colaboradores' ? 'selected' : '' %>>Somente colaboradores</option>
           <option value="privado" <%= visibilidadesAtuais.__categoria__ === 'privado' ? 'selected' : '' %>>Privado</option>
@@ -36,8 +37,19 @@
           <legend><%= pergunta.pergunta %><% if (pergunta.obrigatoria) { %> <span>(obrigatória)</span><% } else if (dependente) { %> <span>(obrigatória se selecionar “Outro”)</span><% } else { %> <span>(opcional)</span><% } %></legend>
           <% if (pergunta.tipo === 'texto') { %>
             <textarea data-resposta-atuacao="<%= pergunta.campo %>" maxlength="<%= pergunta.maximoCaracteres ?? 500 %>" rows="3"><%= typeof valor === 'string' ? valor : '' %></textarea>
+          <% } else if (pergunta.tipo === 'enum' && typeof cadastro !== 'undefined' && cadastro && pergunta.campo === 'tempoAtuacao') { %>
+            <p class="trajectory-hint">Toda trajetória tem um começo. Escolha o tempo que melhor representa o seu momento.</p>
+            <div class="trajectory-options">
+              <% (pergunta.opcoes ?? []).forEach(opcao => { %>
+                <label class="trajectory-option">
+                  <input type="radio" name="respostas[<%= pergunta.profissaoId %>][<%= pergunta.campo %>]" value="<%= opcao %>" data-resposta-atuacao="<%= pergunta.campo %>" <%= valor === opcao ? 'checked' : '' %>>
+                  <span><%= formatarRespostaAtuacao(opcao) %></span>
+                  <span class="trajectory-option-mark" aria-hidden="true"></span>
+                </label>
+              <% }) %>
+            </div>
           <% } else if (pergunta.tipo === 'enum') { %>
-            <select data-resposta-atuacao="<%= pergunta.campo %>"<% if (pergunta.obrigatoria) { %> aria-required="true"<% } %>>
+            <select name="respostas[<%= pergunta.profissaoId %>][<%= pergunta.campo %>]" data-resposta-atuacao="<%= pergunta.campo %>"<% if (pergunta.obrigatoria) { %> aria-required="true"<% } %>>
               <option value="">Selecione uma opção</option>
               <% (pergunta.opcoes ?? []).forEach(opcao => { %>
                 <option value="<%= opcao %>" <%= valor === opcao ? 'selected' : '' %>><%= formatarRespostaAtuacao(opcao) %></option>

@@ -18,13 +18,15 @@ assert.equal(
 );
 assert.deepEqual(
   [...profissoesElegiveisParaVertentes],
-  ["rapper", "mc", "freestyler"]
+  ["rapper"]
 );
 
 for (const profissao of profissoesElegiveisParaVertentes) {
   assert.equal(profissaoPodeSelecionarVertentes(profissao), true);
 }
 for (const profissao of [
+  "mc",
+  "freestyleiro",
   "beatmaker",
   "produtor",
   "organizador-eventos",
@@ -39,5 +41,5 @@ assert.equal(vertenteProfissionalPermitida("Rap"), false);
 assert.equal(vertenteProfissionalPermitida("Outro"), false);
 
 console.log(
-  "OK: persistência profissional define 16 vertentes e elegibilidade exclusiva de Rapper, MC e Freestyler."
+  "OK: persistência profissional define 16 vertentes e elegibilidade exclusiva de Rapper."
 );

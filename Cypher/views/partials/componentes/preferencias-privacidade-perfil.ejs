@@ -25,7 +25,8 @@
       <input type="checkbox" name="contatoPublico"<%= usuario.contactPublic ? ' checked' : '' %>>
     </label>
     <button class="button button-lime" type="submit">Salvar visibilidade</button>
-  </form>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
   <% if (usuario.profilePublic) { %>
     <p class="public-profile-link">
       Link do perfil:

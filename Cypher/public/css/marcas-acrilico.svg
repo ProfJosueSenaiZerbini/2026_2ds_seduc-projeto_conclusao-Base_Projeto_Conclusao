@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="208" height="60" viewBox="0 0 208 60">
+  <defs>
+    <filter id="pigmento" x="-10%" y="-20%" width="120%" height="140%">
+      <feTurbulence baseFrequency=".38 .55" numOctaves="2" seed="13" result="po"/>
+      <feColorMatrix in="po" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  7 0 0 0 -2.9"/>
+      <feComposite in="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <g filter="url(#pigmento)" fill="#bccb88">
+    <path d="M-9 3l134-4-23 5-73 5 34-1-38 6-31 2z"/>
+    <path d="M1 8l8-3-4 26-3 17-1-22z"/>
+    <path d="M73 9l63-7-17 4zM13 19l28-5-15 6z"/>
+  </g>
+  <g fill="none" stroke="#f3f2cf" opacity=".48" stroke-linecap="round">
+    <path d="M7 31l8-7m2-2 8-5M3 38l9-6m41-19 10-3m-6 5 16-5m63-5 26-3"/>
+  </g>
+</svg>

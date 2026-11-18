@@ -17,10 +17,11 @@
       </em>
     </h1>
     <p>
-      Bom te ver,<%= usuario.name %>. Aqui está o que acontece no seu espaço.
+      <%= usuario.tratamento === 'feminino' ? 'Bem-vinda' : usuario.tratamento === 'masculino' ? 'Bem-vindo' : 'Boas-vindas' %>, <%= usuario.name %>. Aqui está o que acontece no seu espaço.
     </p>
   </div>
 </div>
+<%- include('../partials/componentes/completar-identidade', {usuario}) %>
 <section class="hero-grid">
   <div class="hero-card lime-card">
     <span class="pill pill-dark">

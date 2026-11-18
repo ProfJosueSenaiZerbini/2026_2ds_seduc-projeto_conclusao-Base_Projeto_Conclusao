@@ -4,6 +4,7 @@
 <main class="main-shell">
 <%- include('../partials/barra-superior', { breadcrumb: 'Meu perfil' }) %>
 <div class="page-content profile-page-content">
+<%- include('../partials/componentes/completar-identidade', {usuario}) %>
 <% if (privacidadeSalva) { %>
   <p class="profile-message profile-message-success" role="status">
     Preferências de visibilidade atualizadas.
@@ -39,11 +40,11 @@
     <div class="profile-hero-copy">
       <p class="profile-hero-eyebrow">CYPHER · ESPAÇO PROFISSIONAL</p>
       <h1 id="profile-hero-name"><%= usuario.name %></h1>
-      <p class="profile-hero-meta"><%= usuario.categories.join(' · ') || usuario.role %></p>
+      <p class="profile-hero-meta"><%= usuario.categories.map(categoria => rotuloProfissional(categoria,usuario.tratamento)).join(' · ') || usuario.role %></p>
       <p class="profile-hero-handle"><%= usuario.handle %><%= usuario.city ? ` · ${usuario.city}` : '' %></p>
       <div class="profile-hero-tags" aria-label="Categorias profissionais">
         <% usuario.categories.forEach((categoria, indice) => { %>
-          <span class="profile-category-chip<%= indice % 2 ? ' is-muted' : '' %>"><%= categoria %></span>
+          <span class="profile-category-chip<%= indice % 2 ? ' is-muted' : '' %>"><%= rotuloProfissional(categoria,usuario.tratamento) %></span>
         <% }) %>
         <% if (!usuario.categories.length) { %><span class="profile-category-chip is-muted">Nenhuma categoria informada</span><% } %>
       </div>
@@ -223,7 +224,7 @@
             <% categoriasDoGrupo.forEach(categoria => { %>
               <a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="/profile?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>">
                 <span>Profissão</span>
-                <strong><%= categoria %></strong>
+                <strong><%= rotuloProfissional(categoria,usuario.tratamento) %></strong>
                 <span>Ver trajetória</span>
               </a>
             <% }) %>
@@ -231,7 +232,7 @@
         </section>
       <% } }) %>
       <% const categoriasForaDoCatalogo = usuario.categories.filter(categoria => !gruposProfissionais.some(grupo => grupo.profissoes.some(profissao => profissao.rotulo === categoria))); if (categoriasForaDoCatalogo.length) { %>
-        <section class="professional-category-group" aria-labelledby="profile-group-other"><h4 id="profile-group-other">Outras atuações</h4><div class="professional-category-cards"><% categoriasForaDoCatalogo.forEach(categoria => { %><a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="/profile?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>"><span>Atuação profissional</span><strong><%= categoria %></strong><span>Ver trajetória</span></a><% }) %></div></section>
+        <section class="professional-category-group" aria-labelledby="profile-group-other"><h4 id="profile-group-other">Outras atuações</h4><div class="professional-category-cards"><% categoriasForaDoCatalogo.forEach(categoria => { %><a class="professional-category-card<%= atuacaoSelecionada?.categoria === categoria ? ' is-selected' : '' %>" href="/profile?atuacao=<%= encodeURIComponent(categoria) %>" aria-current="<%= atuacaoSelecionada?.categoria === categoria ? 'page' : 'false' %>"><span>Atuação profissional</span><strong><%= rotuloProfissional(categoria,usuario.tratamento) %></strong><span>Ver trajetória</span></a><% }) %></div></section>
       <% } %>
     </div>
   <% } else { %>
@@ -242,7 +243,7 @@
     const respostasSelecionadas = atuacaoSelecionada.respostas;
   %>
     <article class="professional-category-detail" aria-labelledby="professional-category-detail-title">
-      <h4 id="professional-category-detail-title"><%= atuacaoSelecionada.categoria %></h4>
+      <h4 id="professional-category-detail-title"><%= rotuloProfissional(atuacaoSelecionada.categoria,usuario.tratamento) %></h4>
       <% let temRespostaVisivel = false; %>
       <% (questionarioSelecionado?.perguntas ?? []).forEach(pergunta => {
         const valor = respostasSelecionadas[pergunta.campo];

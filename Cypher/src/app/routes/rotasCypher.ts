@@ -1,3 +1,6 @@
+import * as administracao from "../controllers/controladorAdministracao.js";
+import * as identidade from "../controllers/controladorIdentidade.js";
+import { limitarAutenticacao } from "../middlewares/seguranca.js";
 import { Router } from "express";
 import * as autenticacao from "../controllers/controladorAutenticacao.js";
 import * as beats from "../controllers/controladorBeats.js";
@@ -12,10 +15,22 @@ import { middlewareAutorizacao } from "../controllers/controladorCompartilhado.j
 const router = Router();
 
 router.use(middlewareAutorizacao);
-router.get(["/login", "/register"], autenticacao.paginaAutenticacao);
-router.post("/login", autenticacao.login);
-router.post("/register/validate", autenticacao.validarDadosCadastro);
-router.post("/register", autenticacao.register);
+router.get("/admin/login", administracao.paginaLoginAdministrativo);
+router.post("/admin/login", limitarAutenticacao, administracao.loginAdministrativo);
+router.post("/admin/logout", administracao.logoutAdministrativo);
+router.get("/admin", administracao.painelAdministrativo);
+router.post("/admin/equipe", administracao.adicionarAdministrador);
+router.post("/admin/equipe/:id", administracao.editarAdministrador);
+router.get("/login", autenticacao.paginaAutenticacao);
+router.get("/register", identidade.paginaCadastro);
+router.post("/login", limitarAutenticacao, autenticacao.login);
+router.post("/register/validate", identidade.validarCadastro);
+router.post("/register/identificador", identidade.disponibilidadeIdentificador);
+router.post("/register", identidade.registrarConta);
+router.get("/email/pendente", identidade.paginaEmailPendente);
+router.post("/email/reenviar", limitarAutenticacao, identidade.reenviarConfirmacao);
+router.get("/confirmar-email", identidade.paginaConfirmacao);
+router.post("/confirmar-email", identidade.confirmarEmail);
 router.post("/logout", autenticacao.logout);
 router.get("/notificacoes", notificacoes.notificacoes);
 router.post("/notificacoes/marcar-todas-lidas", notificacoes.marcarTodasLidas);
@@ -48,7 +63,10 @@ router.get("/beats/:id/edit", beats.editarBeat);
 router.post("/beats/:id/edit", beats.atualizarBeat);
 router.post("/beats/:id/delete", beats.excluirBeat);
 router.get("/central", beats.central);
-router.get("/profile", perfis.perfil);
+router.get("/profile", identidade.meuPerfil);
+router.get("/profile/profissionalizar", identidade.ativarProfissional);
+router.post("/profile/profissionalizar", identidade.confirmarProfissionalizacao);
+router.post("/profile/apresentacao", identidade.salvarApresentacao);
 router.post("/profile", perfis.atualizarPerfil);
 router.post("/profile/secoes/:secao", perfis.atualizarPerfilPorSecao);
 router.post(
@@ -63,7 +81,12 @@ router.post(
   "/profile/categorias/solicitacoes/:id/responder",
   perfis.responderSolicitacaoCategoria
 );
-router.get("/settings", configuracoes.configuracoes);
+router.get("/settings", identidade.configuracoesIdentidade);
+router.post("/settings/identidade", identidade.salvarIdentidade);
+router.post("/settings/identificador", identidade.salvarIdentificador);
+router.post("/settings/preferencias", identidade.salvarPreferencias);
+router.post("/settings/email", identidade.solicitarTrocaEmail);
+router.post("/admin/identificador", identidade.excecaoIdentificador);
 router.post("/settings/privacy", configuracoes.atualizarPrivacidade);
 router.post("/settings/delete-account", configuracoes.excluirConta);
 router.get("/admin/revisao", configuracoes.revisaoAdministrativa);

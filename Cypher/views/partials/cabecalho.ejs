@@ -2,6 +2,9 @@
   <html lang="pt-BR">
     <head>
       <meta charset="UTF-8" />
+      <meta name="cypher-theme" content="<%= typeof temaPreferido !== 'undefined' ? temaPreferido : '' %>">
+      <script>try{const preferido=document.querySelector('meta[name="cypher-theme"]').content||localStorage.getItem('cypher-tema')||'dark';document.documentElement.classList.toggle('dark',preferido==='dark');}catch{document.documentElement.classList.add('dark');}</script>
+      <meta name="csrf-token" content="<%= csrfToken %>">
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#10140f" />
       <title>
@@ -16,5 +19,6 @@
       <% } %>
       <link rel="stylesheet" href="/css/tema.css">
       <link rel="stylesheet" href="/css/responsivo.css">
+      <link rel="stylesheet" href="/css/formularios.css">
     </head>
     <body>

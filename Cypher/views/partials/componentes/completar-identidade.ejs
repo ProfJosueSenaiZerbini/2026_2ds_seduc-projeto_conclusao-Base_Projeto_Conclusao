@@ -1,0 +1,7 @@
+<% if (usuario.tipoConta !== 'administrativo' && !usuario.identidadeRevisada) { %>
+  <aside class="profile-completion">
+    <strong>Complete seu perfil</strong>
+    <p>Você aparece como <b><%= usuario.name %></b>. Escolha se prefere usar seu nome ou vulgo.</p>
+    <a href="/settings#identidade">Revisar identidade pública →</a>
+  </aside>
+<% } %>

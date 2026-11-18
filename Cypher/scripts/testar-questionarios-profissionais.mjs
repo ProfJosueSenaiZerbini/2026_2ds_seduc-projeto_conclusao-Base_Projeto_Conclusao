@@ -26,7 +26,7 @@ db.prepare(
 ).run(usuarioId, "CTAG-TESTE-QUESTIONARIOS", "Teste", "Rapper", "teste");
 
 const profissoes = listarProfissoesCatalogo();
-assert.equal(profissoes.length, 36);
+assert.equal(profissoes.length, 26);
 for (const profissao of profissoes) {
   const perguntas = questionarios.catalogoPerguntasPorProfissao(profissao.id);
   assert.equal(
@@ -125,7 +125,7 @@ assert.throws(
   () => banco.listarRespostasAtuacaoProfissaoCypher("usuario-que-nao-existe"),
   /USUARIO_NAO_ENCONTRADO/
 );
-assert.equal(db.pragma("user_version", { simple: true }), 20);
+assert.equal(db.pragma("user_version", { simple: true }), 24);
 console.log(
-  "OK: 36 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional."
+  "OK: 26 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional."
 );

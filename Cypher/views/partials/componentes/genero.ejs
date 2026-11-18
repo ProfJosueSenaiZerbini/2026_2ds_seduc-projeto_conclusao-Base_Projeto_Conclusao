@@ -1,0 +1,13 @@
+<div class="gender-field">
+  <label>Gênero
+    <select name="tratamento" aria-describedby="genero-ajuda">
+      <% for (const [valor, nome] of [['','Prefiro não informar'], ['feminino','Feminino'], ['masculino','Masculino'], ['outro','Personalizado']]) { %>
+        <option value="<%= valor %>" <%= identidade.tratamento === valor ? 'selected' : '' %>><%= nome %></option>
+      <% } %>
+    </select>
+  </label>
+  <label data-custom-gender>Como você descreve seu gênero?
+    <input name="generoPersonalizado" maxlength="80" value="<%= identidade.generoPersonalizado || '' %>">
+  </label>
+  <small id="genero-ajuda">Privado. Essa escolha orienta como a Cypher se refere a você.</small>
+</div>

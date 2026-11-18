@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
+import { podePublicar } from "../models/permissoes.js";
+
 import type { Request, Response } from "express";
 import {
   CypherModel,
@@ -64,7 +67,7 @@ function normalizarFiltros(req: Request): FiltrosEventos {
   const ordem = textoQuery(req, "ordem");
   return {
     categoria: textoQuery(req, "categoria"),
-    localizacao: textoQuery(req, "localizacao").slice(0, 100),
+    localizacao: (req.query.localizacao === undefined ? obterPreferenciasUsuario(req.res!.locals.usuario.id).regiao : textoQuery(req,"localizacao")).slice(0,100),
     formato: textoQuery(req, "formato"),
     periodo:
       periodo === "passados" || periodo === "proximos" ? periodo : "todos",
@@ -196,7 +199,7 @@ function exigirOrganizador(
   res: Response
 ): UsuarioDaSessao | undefined {
   const usuario = usuarioAtual(res);
-  if (!podeCriarEvento(usuario.categories)) {
+  if (!podePublicar(usuario,"evento")) {
     res.redirect("/events?erro=permissao");
     return undefined;
   }
@@ -248,7 +251,7 @@ export function oportunidades(req: Request, res: Response) {
     opcoesFormatos: [
       ...new Set(todos.map(evento => evento.format).filter(Boolean)),
     ],
-    podeGerenciar: podeCriarEvento(usuario.categories),
+    podeGerenciar: podePublicar(usuario,"evento"),
     erro,
     mensagem,
   });
@@ -437,3 +440,4 @@ export function excluirEvento(req: Request, res: Response) {
     excluido ? "/events?mensagem=Evento excluído." : "/events?erro=evento"
   );
 }
+
