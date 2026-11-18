@@ -18,7 +18,7 @@
 
 
 ### Mapa De Empatia e Personas
-<img width="425" height="231" alt="https://classroom.google.com/c/Njg4NTAzODc1MzEy/p/OTAwMzA5OTkzNDA0/details" />
+<img width="1384" height="752" alt="Gemini_Generated_Image_mst5nbmst5nbmst5" src="https://github.com/user-attachments/assets/0dd3cabd-805a-4e36-9cf9-b1dcd8fe2276" />
 
 
 ### Mapa de Empatia e Personas
