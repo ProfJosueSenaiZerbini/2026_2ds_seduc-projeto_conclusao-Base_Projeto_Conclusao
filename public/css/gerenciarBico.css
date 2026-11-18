@@ -1,6 +1,6 @@
 /* Fundo da página no padrão das telas do contratante (global.css). */
 body {
-  background: var(--contractor-page-bg);
+  background: var(--contratante-fundo);
 }
 
 .manage-job {

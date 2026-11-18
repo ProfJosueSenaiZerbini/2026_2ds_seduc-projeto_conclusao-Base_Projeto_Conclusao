@@ -31,9 +31,9 @@
 /* Quem vê é o contratante: fundo, cards e bordas no padrão das telas do contratante (global.css).
    As cores de destaque continuam as mesmas. */
 body.chat--contratante {
-  --color-bg: var(--contractor-page-bg);
-  --color-card: var(--contractor-surface);
-  --color-border: var(--contractor-border);
+  --color-bg: var(--contratante-fundo);
+  --color-card: var(--cor-branco);
+  --color-border: var(--cor-borda);
 }
 
 body.theme-contratante {

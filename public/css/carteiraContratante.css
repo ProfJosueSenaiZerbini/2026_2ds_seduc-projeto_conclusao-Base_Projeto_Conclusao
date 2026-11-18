@@ -3,12 +3,12 @@
    ========================================================= */
 
 :root {
-  --contractor-wallet-bg: var(--contractor-page-bg);
+  --contractor-wallet-bg: var(--contratante-fundo);
   --contractor-wallet-white: #fff;
   --contractor-wallet-ink: #14213d;
   --contractor-wallet-ink-soft: #4b5563;
   --contractor-wallet-muted: #6b7280;
-  --contractor-wallet-line: var(--contractor-border);
+  --contractor-wallet-line: var(--cor-borda);
   --contractor-wallet-brand-green: #12372a;
   --contractor-wallet-brand-green-hover: #0c2a20;
   --contractor-wallet-brand-green-light: #e7f6ec;

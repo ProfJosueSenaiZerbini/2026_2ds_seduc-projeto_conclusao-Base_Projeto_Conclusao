@@ -2,9 +2,9 @@
   --publish-primary: #10251f;
   --publish-primary-hover: #1c3029;
   --publish-ink: #10251f;
-  --publish-page-bg: var(--contractor-page-bg);
-  --publish-border: var(--contractor-border);
-  --publish-surface-soft: var(--contractor-surface);
+  --publish-page-bg: var(--contratante-fundo);
+  --publish-border: var(--cor-borda);
+  --publish-surface-soft: var(--cor-branco);
   --publish-green-muted: #68766f;
   --publish-green-light: #e7f0e8;
 }
@@ -537,7 +537,7 @@ textarea {
   padding: 20px 20px 0;
   border: 1px solid var(--publish-border);
   border-radius: 12px;
-  background: var(--contractor-surface);
+  background: var(--cor-branco);
   min-width: 0;
 }
 

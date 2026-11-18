@@ -2,8 +2,53 @@
    IBICO — Estilos Globais (Header e Footer Partials)
    ========================================================= */
 
-/* VARIÁVEIS GLOBAIS DE COR */
+/* =========================================================
+   PALETA OFICIAL DO IBICO
+   Única fonte das cores do projeto: os demais arquivos usam var(--...).
+   ========================================================= */
 :root {
+  /* Neutros */
+  --cor-branco: #fff;
+  --cor-fundo: #f8fafc;
+  --cor-fundo-sutil: #f1f5f9;
+  --cor-borda: #e2e8f0;
+  --cor-texto-mudo: #64748b;
+  --cor-texto-suave: #475569;
+  --cor-texto: #0f172a;
+
+  /* Contratante */
+  --contratante-fundo: #f3f7f4;
+  --contratante-verde-suave: #e8efe9;
+  --contratante-verde-claro: #a8c5b4;
+  --contratante-verde-medio: #315f45;
+  --contratante-verde: #0b5c37;
+  --contratante-verde-hover: #08472a;
+  --contratante-musgo: #1c3029;
+  --contratante-noite: #10251f;
+
+  /* Trabalhador */
+  --trabalhador-creme-claro: #faf8f4;
+  --trabalhador-creme: #f5f2eb;
+  --trabalhador-rosa-suave: #f2e5e3;
+  --trabalhador-borda: #e5ded3;
+  --trabalhador-texto-suave: #625e58;
+  --trabalhador-vermelho: #8b1728;
+  --trabalhador-vermelho-escuro: #68101e;
+  --trabalhador-grafite: #191919;
+
+  /* Estados */
+  --sucesso-fundo: #dcfce7;
+  --sucesso: #15803d;
+  --aviso-fundo: #fef3c7;
+  --aviso-estrela: #f59e0b;
+  --aviso: #b45309;
+  --erro-fundo: #fdecec;
+  --erro: #b91c1c;
+  --info-fundo: #e0f2fe;
+  --info: #0369a1;
+  --marca-ibico: #0d9488;
+
+  /* Variáveis globais anteriores (passam a apontar para a paleta) */
   --global-ibico-brand: #0d9488;
   --global-ibico-brand-hover: #0a7a6f;
   --global-ibico-green: #16a34a;
@@ -74,11 +119,6 @@ body {
   --contractor-sidebar-secondary: #1c3029;
   --contractor-sidebar-accent: #a8c5b4;
   --contractor-sidebar-white: #f3f4ef;
-
-  /* Fundo, superfícies e bordas das telas do contratante (padrão da aba Bicos Ativos). */
-  --contractor-page-bg: #f3f7f4;
-  --contractor-surface: #fff;
-  --contractor-border: #e2e8f0;
 }
 
 body:has(.contractor-sidebar) {

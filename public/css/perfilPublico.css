@@ -18,9 +18,9 @@
 }
 
 .perfil-publico.tema-contratante {
-  --pp-bg: var(--contractor-page-bg);
-  --pp-surface: var(--contractor-surface);
-  --pp-border: var(--contractor-border);
+  --pp-bg: var(--contratante-fundo);
+  --pp-surface: var(--cor-branco);
+  --pp-border: var(--cor-borda);
   --pp-ink: #14332b;
   --pp-muted: #5f6f66;
   --pp-accent: #1f5a46;
@@ -28,7 +28,7 @@
   --pp-hero: #14332b;
   --pp-hero-ink: #f2ebdf;
   --pp-hero-muted: #b9cfc2;
-  --pp-bar-track: var(--contractor-border);
+  --pp-bar-track: var(--cor-borda);
   --pp-star: #b8860b;
 }
 
