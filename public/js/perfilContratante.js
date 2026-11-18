@@ -19,10 +19,18 @@
     }
 
     // Funções globais (compatibilidade com onclick antigos)
-    window.abrirModal = function () { abrir('modalEditarPerfil'); };
-    window.fecharModal = function () { fechar('modalEditarPerfil'); };
-    window.abrirModalSenha = function () { abrir('modalAlterarSenha'); };
-    window.fecharModalSenha = function () { fechar('modalAlterarSenha'); };
+    window.abrirModal = function () {
+        abrir('modalEditarPerfil');
+    };
+    window.fecharModal = function () {
+        fechar('modalEditarPerfil');
+    };
+    window.abrirModalSenha = function () {
+        abrir('modalAlterarSenha');
+    };
+    window.fecharModalSenha = function () {
+        fechar('modalAlterarSenha');
+    };
 
     // Botões que abrem modais
     var aberturas = {
@@ -32,12 +40,17 @@
     };
     Object.keys(aberturas).forEach(function (btnId) {
         var btn = document.getElementById(btnId);
-        if (btn) btn.addEventListener('click', function () { abrir(aberturas[btnId]); });
+        if (btn)
+            btn.addEventListener('click', function () {
+                abrir(aberturas[btnId]);
+            });
     });
 
     // Botões de fechar / cancelar
     document.querySelectorAll('[data-fechar]').forEach(function (el) {
-        el.addEventListener('click', function () { fechar(el.getAttribute('data-fechar')); });
+        el.addEventListener('click', function () {
+            fechar(el.getAttribute('data-fechar'));
+        });
     });
 
     // Clique no fundo escuro fecha o modal
@@ -50,7 +63,9 @@
     // ESC fecha qualquer modal aberto
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape') return;
-        document.querySelectorAll('.modal-overlay.aberto').forEach(function (m) { fechar(m.id); });
+        document.querySelectorAll('.modal-overlay.aberto').forEach(function (m) {
+            fechar(m.id);
+        });
     });
 
     // ---------- Mostrar / ocultar CPF ----------

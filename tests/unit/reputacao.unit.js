@@ -3,12 +3,8 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
-const {
-    calcularTaxaConclusao,
-    montarDistribuicao,
-    montarReputacao,
-    buscarReputacao
-} = await import('../../controllers/reputacao.js');
+const { calcularTaxaConclusao, montarDistribuicao, montarReputacao, buscarReputacao } =
+    await import('../../controllers/reputacao.js');
 
 describe('taxa de conclusão', () => {
     test('concluídos ÷ (concluídos + cancelados depois do aceite), arredondada', () => {
@@ -33,16 +29,33 @@ describe('taxa de conclusão', () => {
 
 describe('distribuição das notas', () => {
     test('barras de 5★ a 1★ com quantidade e percentual; média com 1 casa', () => {
-        const d = montarDistribuicao([{ nota: 5, total: 3n }, { nota: 4, total: 1n }, { nota: 1, total: 0 }]);
+        const d = montarDistribuicao([
+            { nota: 5, total: 3n },
+            { nota: 4, total: 1n },
+            { nota: 1, total: 0 }
+        ]);
         assert.equal(d.total, 4);
         assert.equal(d.media, 4.8); // (15 + 4) / 4 = 4,75 → 4,8
-        assert.deepEqual(d.barras.map((b) => [b.estrelas, b.quantidade, b.percentual]), [
-            [5, 3, 75], [4, 1, 25], [3, 0, 0], [2, 0, 0], [1, 0, 0]
-        ]);
+        assert.deepEqual(
+            d.barras.map((b) => [b.estrelas, b.quantidade, b.percentual]),
+            [
+                [5, 3, 75],
+                [4, 1, 25],
+                [3, 0, 0],
+                [2, 0, 0],
+                [1, 0, 0]
+            ]
+        );
     });
 
     test('notas 4 e 5 dão média 4,5', () => {
-        assert.equal(montarDistribuicao([{ nota: 5, total: 1 }, { nota: 4, total: 1 }]).media, 4.5);
+        assert.equal(
+            montarDistribuicao([
+                { nota: 5, total: 1 },
+                { nota: 4, total: 1 }
+            ]).media,
+            4.5
+        );
     });
 
     test('sem avaliações: média nula, total 0 e todas as barras zeradas (não parece "ruim")', () => {
@@ -56,7 +69,10 @@ describe('distribuição das notas', () => {
 
 describe('montarReputacao', () => {
     const contratante = {
-        publicados: 6n, concluidos: '2', cancelados_apos_aceite: '1', cancelados_antes: '1',
+        publicados: 6n,
+        concluidos: '2',
+        cancelados_apos_aceite: '1',
+        cancelados_antes: '1',
         ultimo_servico: new Date('2026-11-17T12:00:00')
     };
 
@@ -75,7 +91,15 @@ describe('montarReputacao', () => {
     test('contratante novo (sem nada): zeros, sem taxa, sem último serviço e sem média', () => {
         const r = montarReputacao('contratante', [], {});
         assert.deepEqual(
-            [r.publicados, r.concluidos, r.canceladosAposAceite, r.canceladosAntesDoAceite, r.taxaConclusao, r.ultimoServico, r.media],
+            [
+                r.publicados,
+                r.concluidos,
+                r.canceladosAposAceite,
+                r.canceladosAntesDoAceite,
+                r.taxaConclusao,
+                r.ultimoServico,
+                r.media
+            ],
             [0, 0, 0, 0, null, null, null]
         );
     });
@@ -87,9 +111,18 @@ describe('montarReputacao', () => {
     });
 
     test('trabalhador: concluídos e em andamento; cancelamentos (feitos só pelo contratante) não entram', () => {
-        const r = montarReputacao('trabalhador', [{ nota: 5, total: 1 }, { nota: 4, total: 1 }], {
-            concluidos: 2, em_andamento: 1, ultimo_servico: new Date('2026-11-10T09:00:00')
-        });
+        const r = montarReputacao(
+            'trabalhador',
+            [
+                { nota: 5, total: 1 },
+                { nota: 4, total: 1 }
+            ],
+            {
+                concluidos: 2,
+                em_andamento: 1,
+                ultimo_servico: new Date('2026-11-10T09:00:00')
+            }
+        );
         assert.equal(r.concluidos, 2);
         assert.equal(r.emAndamento, 1);
         assert.equal(r.taxaConclusao, null);
@@ -100,7 +133,10 @@ describe('montarReputacao', () => {
 
     test('trabalhador novo: zeros e "Nenhum serviço" (ultimoServico nulo)', () => {
         const r = montarReputacao('trabalhador', [], { concluidos: null, em_andamento: null, ultimo_servico: null });
-        assert.deepEqual([r.concluidos, r.emAndamento, r.ultimoServico, r.media, r.totalAvaliacoes], [0, 0, null, null, 0]);
+        assert.deepEqual(
+            [r.concluidos, r.emAndamento, r.ultimoServico, r.media, r.totalAvaliacoes],
+            [0, 0, null, null, 0]
+        );
     });
 });
 
@@ -126,7 +162,10 @@ describe('buscarReputacao (poucas consultas, sem N+1)', () => {
         assert.match(banco.consultas[0].sql, /GROUP BY nota/);
         assert.match(banco.consultas[1].sql, /ESTORNO/);
         assert.match(banco.consultas[1].sql, /b\.contratante_id = \?/);
-        assert.deepEqual(banco.consultas.map((c) => c.params), [[42], [42]]);
+        assert.deepEqual(
+            banco.consultas.map((c) => c.params),
+            [[42], [42]]
+        );
         assert.equal(r.taxaConclusao, 50);
     });
 

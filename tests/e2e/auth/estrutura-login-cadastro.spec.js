@@ -1,21 +1,14 @@
 import { test, expect } from '@playwright/test';
 test.describe('Testes Unitários e de Estrutura — Ibico', () => {
-
     test('deve abrir a página de login e validar elementos estáticos', async ({ page }) => {
         await page.goto('http://localhost:3000/login');
 
         await expect(page).toHaveTitle(/Login/i);
-        
-        // Valida se existe qualquer cabeçalho (h1 ou h2) na página de login
-        await expect(
-            page.locator('h1, h2').first()
-        ).toBeVisible();
 
-        const elementos = [
-            'input[name="email"]',
-            'input[name="senha"]',
-            '#submitBtn'
-        ];
+        // Valida se existe qualquer cabeçalho (h1 ou h2) na página de login
+        await expect(page.locator('h1, h2').first()).toBeVisible();
+
+        const elementos = ['input[name="email"]', 'input[name="senha"]', '#submitBtn'];
 
         for (const elemento of elementos) {
             await expect(page.locator(elemento)).toBeVisible();
@@ -28,9 +21,7 @@ test.describe('Testes Unitários e de Estrutura — Ibico', () => {
         const campos = ['email', 'senha'];
 
         for (const campo of campos) {
-            await expect(
-                page.locator(`input[name="${campo}"]`)
-            ).toHaveAttribute('required', '');
+            await expect(page.locator(`input[name="${campo}"]`)).toHaveAttribute('required', '');
         }
 
         await page.locator('#submitBtn').click();
@@ -42,19 +33,9 @@ test.describe('Testes Unitários e de Estrutura — Ibico', () => {
 
         await expect(page).toHaveTitle(/Criar Conta|Cadastro/i);
 
-        await expect(
-            page.locator('h1, h2').first()
-        ).toBeVisible();
+        await expect(page.locator('h1, h2').first()).toBeVisible();
 
-        const campos = [
-            '#nome',
-            '#cEmail',
-            '#cpf',
-            '#cIdade',
-            '#cSenha',
-            '#cConfirma',
-            '#btnSubmit'
-        ];
+        const campos = ['#nome', '#cEmail', '#cpf', '#cIdade', '#cSenha', '#cConfirma', '#btnSubmit'];
 
         for (const campo of campos) {
             await expect(page.locator(campo)).toBeVisible();
@@ -64,20 +45,10 @@ test.describe('Testes Unitários e de Estrutura — Ibico', () => {
     test('deve verificar os campos obrigatórios do cadastro', async ({ page }) => {
         await page.goto('http://localhost:3000/cadastrar');
 
-        const campos = [
-            '#nome',
-            '#cEmail',
-            '#cpf',
-            '#cIdade',
-            '#cSenha',
-            '#cConfirma',
-            '#termos',
-            '#idade'
-        ];
+        const campos = ['#nome', '#cEmail', '#cpf', '#cIdade', '#cSenha', '#cConfirma', '#termos', '#idade'];
 
         for (const campo of campos) {
             await expect(page.locator(campo)).toHaveAttribute('required', '');
         }
     });
-
 });

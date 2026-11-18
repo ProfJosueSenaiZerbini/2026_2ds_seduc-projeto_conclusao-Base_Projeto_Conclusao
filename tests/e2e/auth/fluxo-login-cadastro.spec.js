@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { gerarCpfDeUmNove } from '../support/gerarCpf.js';
 
 test.describe('Testes Funcionais e de Fluxo — Ibico', () => {
-
     test('deve alternar entre trabalhador e contratante na tela de login', async ({ page }) => {
         await page.goto('http://localhost:3000/login');
 
@@ -22,9 +21,11 @@ test.describe('Testes Funcionais e de Fluxo — Ibico', () => {
     test('deve abrir a página de cadastro pelo link do login', async ({ page }) => {
         await page.goto('http://localhost:3000/login');
 
-        await page.getByRole('link', {
-            name: /criar uma conta|cadastrar/i
-        }).click();
+        await page
+            .getByRole('link', {
+                name: /criar uma conta|cadastrar/i
+            })
+            .click();
 
         await expect(page).toHaveURL('http://localhost:3000/cadastrar');
     });
@@ -77,12 +78,16 @@ test.describe('Testes Funcionais e de Fluxo — Ibico', () => {
         await expect(campoIdade).toHaveAttribute('min', '18');
         await expect(campoIdade).toHaveAttribute('max', '90');
 
-        for (const [idade, valida] of [['17', false], ['18', true], ['90', true], ['91', false]]) {
+        for (const [idade, valida] of [
+            ['17', false],
+            ['18', true],
+            ['90', true],
+            ['91', false]
+        ]) {
             await campoIdade.fill(idade);
             expect(await campoIdade.evaluate((el) => el.checkValidity()), `idade ${idade}`).toBe(valida);
         }
     });
-
 });
 
 test('deve realizar o cadastro e o login com sucesso como Contratante', async ({ page }) => {

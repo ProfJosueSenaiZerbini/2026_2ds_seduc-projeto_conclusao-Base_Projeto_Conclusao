@@ -1,25 +1,14 @@
-export const validarTituloBico = (titulo) => (
-    typeof titulo === 'string' &&
-    titulo.trim().length >= 3 &&
-    titulo.trim().length <= 100
-);
+export const validarTituloBico = (titulo) =>
+    typeof titulo === 'string' && titulo.trim().length >= 3 && titulo.trim().length <= 100;
 
-export const validarDescricaoBico = (descricao) => (
-    typeof descricao === 'string' &&
-    descricao.trim().length >= 10 &&
-    descricao.trim().length <= 500
-);
+export const validarDescricaoBico = (descricao) =>
+    typeof descricao === 'string' && descricao.trim().length >= 10 && descricao.trim().length <= 500;
 
-export const validarBairroBico = (bairro) => (
-    typeof bairro === 'string' &&
-    bairro.trim().length >= 2 &&
-    bairro.trim().length <= 100
-);
+export const validarBairroBico = (bairro) =>
+    typeof bairro === 'string' && bairro.trim().length >= 2 && bairro.trim().length <= 100;
 
 // Endereço do bico. O CEP é aceito com ou sem traço ("01310-100" ou "01310100") e gravado só com os dígitos.
-export const normalizarCep = (cep) => (
-    typeof cep === 'string' ? cep.trim().replace(/-/g, '') : ''
-);
+export const normalizarCep = (cep) => (typeof cep === 'string' ? cep.trim().replace(/-/g, '') : '');
 
 export const validarCep = (cep) => /^\d{8}$/.test(normalizarCep(cep));
 
@@ -41,32 +30,27 @@ export const validarNumeroEndereco = (numero) => {
 };
 
 // Complemento é opcional: ausente ou vazio é válido; preenchido, até 60 caracteres.
-export const validarComplemento = (complemento) => (
+export const validarComplemento = (complemento) =>
     complemento === undefined ||
     complemento === null ||
-    (typeof complemento === 'string' && complemento.trim().length <= 60)
-);
+    (typeof complemento === 'string' && complemento.trim().length <= 60);
 
 // Usada apenas no CEP geral (cidade pequena), quando a consulta não devolve a rua.
-export const validarLogradouro = (logradouro) => (
-    typeof logradouro === 'string' &&
-    logradouro.trim().length >= 2 &&
-    logradouro.trim().length <= 150
-);
+export const validarLogradouro = (logradouro) =>
+    typeof logradouro === 'string' && logradouro.trim().length >= 2 && logradouro.trim().length <= 150;
 
-export const validarDataServico = (data) => (
+export const validarDataServico = (data) =>
     typeof data === 'string' &&
     /^\d{4}-\d{2}-\d{2}$/.test(data) &&
     (() => {
         const [ano, mes, dia] = data.split('-').map(Number);
         const dataValidada = new Date(Date.UTC(ano, mes - 1, dia));
-        return dataValidada.getUTCFullYear() === ano &&
+        return (
+            dataValidada.getUTCFullYear() === ano &&
             dataValidada.getUTCMonth() === mes - 1 &&
-            dataValidada.getUTCDate() === dia;
-    })()
-);
+            dataValidada.getUTCDate() === dia
+        );
+    })();
 
-export const validarHorarioServico = (horario) => (
-    typeof horario === 'string' &&
-    /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(horario)
-);
+export const validarHorarioServico = (horario) =>
+    typeof horario === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(horario);

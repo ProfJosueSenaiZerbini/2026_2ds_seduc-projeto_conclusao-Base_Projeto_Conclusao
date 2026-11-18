@@ -41,7 +41,7 @@
   font-size: clamp(30px, 3vw, 38px);
   font-weight: 750;
   line-height: 1.15;
-  letter-spacing: -.035em;
+  letter-spacing: -0.035em;
 }
 
 .pt-topo p {
@@ -68,9 +68,16 @@
   border: 1px solid transparent;
   border-radius: 9px;
   cursor: pointer;
-  font: 600 13px/1.3 Inter, system-ui, sans-serif;
+  font:
+    600 13px/1.3 Inter,
+    system-ui,
+    sans-serif;
   text-decoration: none;
-  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .pt-btn .ph,
@@ -82,13 +89,13 @@
   border-color: var(--pt-brand);
   background: var(--pt-brand);
   color: var(--pt-white);
-  box-shadow: 0 3px 8px rgba(139, 23, 40, .15);
+  box-shadow: 0 3px 8px rgba(139, 23, 40, 0.15);
 }
 
 .pt-btn-primary:hover {
   border-color: var(--pt-brand-dark);
   background: var(--pt-brand-dark);
-  box-shadow: 0 4px 12px rgba(139, 23, 40, .19);
+  box-shadow: 0 4px 12px rgba(139, 23, 40, 0.19);
 }
 
 .pt-btn-outline {
@@ -108,7 +115,7 @@
   border: 1px solid var(--pt-border);
   border-radius: 16px;
   background: var(--pt-white);
-  box-shadow: 0 3px 14px rgba(25, 25, 25, .045);
+  box-shadow: 0 3px 14px rgba(25, 25, 25, 0.045);
 }
 
 .pt-banner {
@@ -129,13 +136,13 @@
   flex: 0 0 112px;
   align-items: center;
   justify-content: center;
-  border: 3px solid rgba(255, 255, 255, .86);
+  border: 3px solid rgba(255, 255, 255, 0.86);
   border-radius: 22px;
   background: var(--pt-brand);
   color: var(--pt-white);
   font-size: 38px;
   font-weight: 800;
-  letter-spacing: -.04em;
+  letter-spacing: -0.04em;
 }
 
 .pt-avatar-status {
@@ -168,7 +175,7 @@
   font-size: clamp(24px, 3vw, 32px);
   font-weight: 750;
   line-height: 1.2;
-  letter-spacing: -.025em;
+  letter-spacing: -0.025em;
   overflow-wrap: anywhere;
 }
 
@@ -187,7 +194,7 @@
   align-items: center;
   gap: 6px;
   padding: 5px 9px;
-  border: 1px solid rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   font-size: 11px;
   font-weight: 650;
@@ -196,7 +203,7 @@
 }
 
 .pt-pill-role {
-  background: rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, 0.08);
   color: #f5f2eb;
 }
 
@@ -210,7 +217,7 @@
 }
 
 .pt-pill-verificado {
-  background: rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, 0.08);
   color: #f5f2eb;
 }
 
@@ -241,7 +248,7 @@
   color: var(--pt-muted);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .055em;
+  letter-spacing: 0.055em;
   line-height: 1.4;
   text-transform: uppercase;
 }
@@ -343,7 +350,7 @@
   color: var(--pt-muted);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .055em;
+  letter-spacing: 0.055em;
   line-height: 1.4;
   text-transform: uppercase;
 }
@@ -371,7 +378,7 @@
 }
 
 .pt-mono {
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   overflow-wrap: anywhere;
@@ -419,10 +426,16 @@
   background: transparent;
   color: var(--pt-brand);
   cursor: pointer;
-  font: 600 12px/1.3 Inter, system-ui, sans-serif;
+  font:
+    600 12px/1.3 Inter,
+    system-ui,
+    sans-serif;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .pt-btn-link:hover {
@@ -483,7 +496,10 @@
   color: var(--pt-muted);
   cursor: pointer;
   font-family: inherit;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .pt-chip-add:hover {
@@ -539,7 +555,7 @@
   justify-content: center;
   overflow-y: auto;
   padding: 22px;
-  background: rgba(25, 25, 25, .58);
+  background: rgba(25, 25, 25, 0.58);
   backdrop-filter: blur(3px);
 }
 
@@ -556,7 +572,7 @@
   border: 1px solid var(--pt-border);
   border-radius: 15px;
   background: var(--pt-white);
-  box-shadow: 0 18px 48px rgba(25, 25, 25, .22);
+  box-shadow: 0 18px 48px rgba(25, 25, 25, 0.22);
 }
 
 .pt-modal-header {
@@ -589,7 +605,10 @@
   color: var(--pt-muted);
   cursor: pointer;
   font-size: 16px;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .pt-modal-x:hover {
@@ -619,15 +638,21 @@
   border-radius: 8px;
   background: #fff;
   color: var(--pt-text);
-  font: 14px Inter, system-ui, sans-serif;
-  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  font:
+    14px Inter,
+    system-ui,
+    sans-serif;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .pt-modal-grupo input:focus-visible {
   border-color: var(--pt-brand);
-  outline: 2px solid rgba(139, 23, 40, .2);
+  outline: 2px solid rgba(139, 23, 40, 0.2);
   outline-offset: 1px;
-  box-shadow: 0 0 0 3px rgba(139, 23, 40, .1);
+  box-shadow: 0 0 0 3px rgba(139, 23, 40, 0.1);
 }
 
 .pt-modal-grupo input:disabled {
@@ -668,8 +693,14 @@
   border: 1px solid var(--pt-border);
   border-radius: 8px;
   cursor: pointer;
-  font: 600 12px/1.3 Inter, system-ui, sans-serif;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  font:
+    600 12px/1.3 Inter,
+    system-ui,
+    sans-serif;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .pt-modal-cancelar {
@@ -1043,6 +1074,15 @@
   }
 }
 
-.pt-stat-texto { font-size: 1.05rem; }
-.pt-ver-publico { padding: 14px 32px; border-bottom: 1px solid var(--pt-border); }
-.pt-ver-publico .pt-btn-link { display: inline-flex; align-items: center; gap: 6px; }
+.pt-stat-texto {
+  font-size: 1.05rem;
+}
+.pt-ver-publico {
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--pt-border);
+}
+.pt-ver-publico .pt-btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

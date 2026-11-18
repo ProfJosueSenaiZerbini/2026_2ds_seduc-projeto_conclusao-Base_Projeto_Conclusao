@@ -1,11 +1,6 @@
 import express from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { 
-    exibirPerfil, 
-    atualizarPerfil, 
-    atualizarSenha,
-    exibirPerfilPublico
-} from '../controllers/perfilController.js';
+import { exibirPerfil, atualizarPerfil, atualizarSenha, exibirPerfilPublico } from '../controllers/perfilController.js';
 
 const router = express.Router();
 

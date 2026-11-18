@@ -43,11 +43,8 @@ export const normalizarCPF = (cpf) => {
 
 export const validarCPF = (cpf) => normalizarCPF(cpf) !== null;
 
-export const validarEmail = (email) => (
-    typeof email === 'string' &&
-    [...email].length <= 100 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-);
+export const validarEmail = (email) =>
+    typeof email === 'string' && [...email].length <= 100 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export const validarNome = (nome, tamanhoMinimo = 1) => {
     if (typeof nome !== 'string') {
@@ -58,17 +55,11 @@ export const validarNome = (nome, tamanhoMinimo = 1) => {
     return tamanho >= tamanhoMinimo && tamanho <= 100;
 };
 
-export const validarSenha = (senha) => (
-    typeof senha === 'string' &&
-    [...senha].length >= 6 &&
-    Buffer.byteLength(senha, 'utf8') <= 72
-);
+export const validarSenha = (senha) =>
+    typeof senha === 'string' && [...senha].length >= 6 && Buffer.byteLength(senha, 'utf8') <= 72;
 
-export const validarConfirmacaoSenha = (senha, confirmarSenha) => (
-    typeof senha === 'string' &&
-    typeof confirmarSenha === 'string' &&
-    senha === confirmarSenha
-);
+export const validarConfirmacaoSenha = (senha, confirmarSenha) =>
+    typeof senha === 'string' && typeof confirmarSenha === 'string' && senha === confirmarSenha;
 
 // Mesmo intervalo do CHECK chk_usuarios_idade do schema.sql (BETWEEN 18 AND 90).
 export const IDADE_MINIMA = 18;

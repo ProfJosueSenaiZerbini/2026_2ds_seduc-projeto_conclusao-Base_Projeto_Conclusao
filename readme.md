@@ -130,14 +130,14 @@ Com o MariaDB ligado, execute `node scripts/prints-tcc.js`. O script cria dados 
 
 O projeto usa **Prettier** (formatação), **ESLint** (JavaScript) e **Stylelint** (CSS), todos instalados como dependências de desenvolvimento pelo `npm install`.
 
-| Comando | O que faz |
-| --- | --- |
-| `npm run format` | Formata o projeto com o Prettier (grava as mudanças). |
-| `npm run format:check` | Só confere a formatação, sem alterar nada (usado no GitHub Actions). |
-| `npm run lint` | Analisa o JavaScript com o ESLint. |
-| `npm run lint:css` | Analisa o CSS de `public/css` com o Stylelint. |
-| `npm run test:unit` | Testes unitários. |
-| `npm test` | Testes E2E (Playwright). O próprio Playwright sobe o servidor com `CEP_FAKE=1`, então a porta 3000 precisa estar livre. |
+| Comando                | O que faz                                                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `npm run format`       | Formata o projeto com o Prettier (grava as mudanças).                                                                   |
+| `npm run format:check` | Só confere a formatação, sem alterar nada (usado no GitHub Actions).                                                    |
+| `npm run lint`         | Analisa o JavaScript com o ESLint.                                                                                      |
+| `npm run lint:css`     | Analisa o CSS de `public/css` com o Stylelint.                                                                          |
+| `npm run test:unit`    | Testes unitários.                                                                                                       |
+| `npm test`             | Testes E2E (Playwright). O próprio Playwright sobe o servidor com `CEP_FAKE=1`, então a porta 3000 precisa estar livre. |
 
 **Regras principais**
 

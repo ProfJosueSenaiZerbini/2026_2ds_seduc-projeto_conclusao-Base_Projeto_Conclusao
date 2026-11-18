@@ -25,12 +25,17 @@
     };
     Object.keys(aberturas).forEach(function (btnId) {
         var btn = document.getElementById(btnId);
-        if (btn) btn.addEventListener('click', function () { abrir(aberturas[btnId]); });
+        if (btn)
+            btn.addEventListener('click', function () {
+                abrir(aberturas[btnId]);
+            });
     });
 
     // Botões de fechar / cancelar
     document.querySelectorAll('[data-pt-fechar]').forEach(function (el) {
-        el.addEventListener('click', function () { fechar(el.getAttribute('data-pt-fechar')); });
+        el.addEventListener('click', function () {
+            fechar(el.getAttribute('data-pt-fechar'));
+        });
     });
 
     // Clique no fundo escuro fecha o modal
@@ -43,7 +48,9 @@
     // ESC fecha qualquer modal aberto
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape') return;
-        document.querySelectorAll('.pt-modal-overlay.pt-aberto').forEach(function (m) { fechar(m.id); });
+        document.querySelectorAll('.pt-modal-overlay.pt-aberto').forEach(function (m) {
+            fechar(m.id);
+        });
     });
 
     // ---------- Mostrar / ocultar CPF ----------

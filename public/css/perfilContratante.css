@@ -55,17 +55,22 @@ body {
   gap: 8px;
   padding: 12px 22px;
   border-radius: 12px;
-  font: 600 1rem 'Inter', sans-serif;
+  font:
+    600 1rem 'Inter',
+    sans-serif;
   cursor: pointer;
   text-decoration: none;
-  transition: transform .15s, box-shadow .15s, background .15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
 }
 
 .btn-primary {
   background: var(--contractor-profile-green-dark);
   color: #fff;
   border: none;
-  box-shadow: 0 6px 16px rgba(15, 59, 42, .25);
+  box-shadow: 0 6px 16px rgba(15, 59, 42, 0.25);
 }
 
 .btn-primary:hover {
@@ -88,7 +93,7 @@ body {
   background: #fff;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(15, 42, 34, .08);
+  box-shadow: 0 8px 30px rgba(15, 42, 34, 0.08);
 }
 
 .perfil-banner {
@@ -105,7 +110,7 @@ body {
   height: 110px;
   flex-shrink: 0;
   border-radius: 28px;
-  border: 4px solid rgba(255, 255, 255, .85);
+  border: 4px solid rgba(255, 255, 255, 0.85);
   background: linear-gradient(145deg, #1f5a40, #143a2b);
   display: flex;
   align-items: center;
@@ -148,7 +153,7 @@ body {
 
 .banner-bio {
   margin: 10px 0 0;
-  color: rgba(255, 255, 255, .85);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 1.1rem;
 }
 
@@ -158,13 +163,13 @@ body {
   gap: 8px;
   padding: 6px 16px;
   border-radius: 999px;
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .pill-role {
-  background: rgba(31, 201, 138, .2);
+  background: rgba(31, 201, 138, 0.2);
   color: #7ff0c0;
 }
 
@@ -176,9 +181,9 @@ body {
 }
 
 .pill-conta {
-  background: rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, .25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .pill-conta svg {
@@ -205,8 +210,8 @@ body {
 .stat-label {
   display: block;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  font-size: .85rem;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--contractor-profile-text-muted);
   margin-bottom: 8px;
@@ -218,7 +223,7 @@ body {
 }
 
 .stat-valor small {
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-weight: 400;
   color: var(--contractor-profile-text-muted);
   margin-left: 4px;
@@ -270,7 +275,7 @@ body {
 
 .secao-titulo span {
   color: var(--contractor-profile-text-muted);
-  font-size: .95rem;
+  font-size: 0.95rem;
 }
 
 .grid-dados {
@@ -293,8 +298,8 @@ body {
 .campo label {
   display: block;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  font-size: .85rem;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--contractor-profile-text-muted);
   margin-bottom: 8px;
@@ -329,14 +334,14 @@ body {
 
 .campo-nota {
   color: var(--contractor-profile-text-muted);
-  font-size: .95rem;
+  font-size: 0.95rem;
   white-space: nowrap;
 }
 
 .tag-verde {
   background: var(--contractor-profile-green-light);
   color: #0b7d4f;
-  font-size: .95rem;
+  font-size: 0.95rem;
   padding: 4px 12px;
   border-radius: 8px;
   white-space: nowrap;
@@ -346,7 +351,7 @@ body {
   background: #fff;
   border: 1px solid var(--contractor-profile-border);
   color: var(--contractor-profile-text-muted);
-  font-size: .95rem;
+  font-size: 0.95rem;
   padding: 6px 14px;
   border-radius: 8px;
   white-space: nowrap;
@@ -359,7 +364,9 @@ body {
   background: none;
   border: none;
   color: var(--contractor-profile-text);
-  font: 500 1rem 'Inter', sans-serif;
+  font:
+    500 1rem 'Inter',
+    sans-serif;
   cursor: pointer;
   padding: 4px 0;
   white-space: nowrap;
@@ -464,7 +471,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 25, 20, .55);
+  background: rgba(10, 25, 20, 0.55);
   display: none;
   align-items: center;
   justify-content: center;
@@ -482,7 +489,7 @@ body {
   max-width: 480px;
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
   max-height: 92vh;
   overflow-y: auto;
 }
@@ -514,7 +521,7 @@ body {
 
 .modal-group label {
   display: block;
-  font-size: .9rem;
+  font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 6px;
 }
@@ -525,13 +532,15 @@ body {
   padding: 11px 14px;
   border: 1px solid #cdd5db;
   border-radius: 10px;
-  font: 1rem 'Inter', sans-serif;
+  font:
+    1rem 'Inter',
+    sans-serif;
 }
 
 .modal-group input:focus {
   outline: none;
   border-color: var(--contractor-profile-green);
-  box-shadow: 0 0 0 3px rgba(18, 165, 107, .15);
+  box-shadow: 0 0 0 3px rgba(18, 165, 107, 0.15);
 }
 
 .input-disabled {
@@ -542,7 +551,7 @@ body {
 
 .erro-form {
   color: #d63b3b;
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
 
 .modal-actions {
@@ -557,7 +566,9 @@ body {
   border: 1px solid var(--contractor-profile-border);
   padding: 10px 18px;
   border-radius: 10px;
-  font: 600 .95rem 'Inter', sans-serif;
+  font:
+    600 0.95rem 'Inter',
+    sans-serif;
   cursor: pointer;
 }
 
@@ -567,7 +578,9 @@ body {
   border: none;
   padding: 10px 18px;
   border-radius: 10px;
-  font: 600 .95rem 'Inter', sans-serif;
+  font:
+    600 0.95rem 'Inter',
+    sans-serif;
   cursor: pointer;
 }
 
@@ -614,5 +627,10 @@ body {
     font-size: 1.8rem;
   }
 }
-.stat-texto { font-size: 1.05rem; }
-.ver-publico { padding: 14px 32px; border-bottom: 1px solid var(--contractor-profile-border); }
+.stat-texto {
+  font-size: 1.05rem;
+}
+.ver-publico {
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--contractor-profile-border);
+}

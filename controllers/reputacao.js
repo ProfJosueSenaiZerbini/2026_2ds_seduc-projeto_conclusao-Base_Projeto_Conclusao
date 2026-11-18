@@ -80,25 +80,26 @@ export const buscarReputacao = async (banco, usuarioId, tipo) => {
         [usuarioId]
     );
 
-    const [contadores] = tipo === 'contratante'
-        ? await banco.query(
-            `SELECT COUNT(*) AS publicados,
+    const [contadores] =
+        tipo === 'contratante'
+            ? await banco.query(
+                  `SELECT COUNT(*) AS publicados,
                     SUM(b.status = 'Finalizado') AS concluidos,
                     SUM(b.status = 'Cancelado' AND ${SQL_TEM_ESTORNO}) AS cancelados_apos_aceite,
                     SUM(b.status = 'Cancelado' AND NOT ${SQL_TEM_ESTORNO}) AS cancelados_antes,
                     MAX(CASE WHEN b.status = 'Finalizado' THEN ${SQL_FINALIZADO_EM} END) AS ultimo_servico
              FROM bicos b
              WHERE b.contratante_id = ?`,
-            [usuarioId]
-        )
-        : await banco.query(
-            `SELECT SUM(b.status = 'Finalizado') AS concluidos,
+                  [usuarioId]
+              )
+            : await banco.query(
+                  `SELECT SUM(b.status = 'Finalizado') AS concluidos,
                     SUM(b.status = 'Em andamento') AS em_andamento,
                     MAX(CASE WHEN b.status = 'Finalizado' THEN ${SQL_FINALIZADO_EM} END) AS ultimo_servico
              FROM bicos b
              WHERE b.trabalhador_id = ?`,
-            [usuarioId]
-        );
+                  [usuarioId]
+              );
 
     return montarReputacao(tipo, linhasNotas, contadores || {});
 };

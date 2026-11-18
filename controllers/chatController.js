@@ -4,9 +4,7 @@ export const exibirChatCandidatura = async (req, res) => {
     const candidaturaId = Number(req.params.candidatura_id);
     const usuario = req.session?.usuario;
     const usuarioId = Number(usuario?.id);
-    const perfil = typeof usuario?.tipo_perfil === 'string'
-        ? usuario.tipo_perfil.trim().toLowerCase()
-        : '';
+    const perfil = typeof usuario?.tipo_perfil === 'string' ? usuario.tipo_perfil.trim().toLowerCase() : '';
 
     if (!Number.isInteger(candidaturaId) || candidaturaId <= 0) {
         return res.status(400).send('Identificador de candidatura inválido.');
@@ -53,15 +51,16 @@ export const exibirChatCandidatura = async (req, res) => {
             return res.status(404).send('Conversa não encontrada.');
         }
 
-        const contato = perfil === 'contratante'
-            ? {
-                id: candidatura.trabalhador_id,
-                nome: candidatura.trabalhador_nome
-            }
-            : {
-                id: candidatura.contratante_id,
-                nome: candidatura.contratante_nome
-            };
+        const contato =
+            perfil === 'contratante'
+                ? {
+                      id: candidatura.trabalhador_id,
+                      nome: candidatura.trabalhador_nome
+                  }
+                : {
+                      id: candidatura.contratante_id,
+                      nome: candidatura.contratante_nome
+                  };
 
         const bico = {
             id: candidatura.bico_id,
@@ -105,9 +104,7 @@ export const listarNovasMensagensChat = async (req, res) => {
     const depoisDoId = Number(req.query.depoisDoId);
     const usuario = req.session?.usuario;
     const usuarioId = Number(usuario?.id);
-    const perfil = typeof usuario?.tipo_perfil === 'string'
-        ? usuario.tipo_perfil.trim().toLowerCase()
-        : '';
+    const perfil = typeof usuario?.tipo_perfil === 'string' ? usuario.tipo_perfil.trim().toLowerCase() : '';
 
     if (!Number.isInteger(candidaturaId) || candidaturaId <= 0) {
         return res.status(400).json({ sucesso: false, erro: 'Identificador de candidatura inválido.' });
@@ -170,9 +167,7 @@ export const enviarMensagemChat = async (req, res) => {
     const candidaturaId = Number(req.params.candidatura_id);
     const usuario = req.session?.usuario;
     const usuarioId = Number(usuario?.id);
-    const perfil = typeof usuario?.tipo_perfil === 'string'
-        ? usuario.tipo_perfil.trim().toLowerCase()
-        : '';
+    const perfil = typeof usuario?.tipo_perfil === 'string' ? usuario.tipo_perfil.trim().toLowerCase() : '';
     const textoRecebido = req.body?.texto;
 
     if (!Number.isInteger(candidaturaId) || candidaturaId <= 0) {

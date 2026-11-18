@@ -21,15 +21,19 @@ export class CepIndisponivelError extends Error {
 
 // CEPs conhecidos pelo provedor falso (CEP_FAKE=1). Qualquer outro CEP é tratado como inexistente.
 export const CEPS_FALSOS = Object.freeze({
-    '01310100': { cep: '01310100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP' },
+    '01310100': {
+        cep: '01310100',
+        logradouro: 'Avenida Paulista',
+        bairro: 'Bela Vista',
+        cidade: 'São Paulo',
+        uf: 'SP'
+    },
     // CEP geral de cidade pequena: a consulta não traz rua nem bairro.
-    '13690000': { cep: '13690000', logradouro: '', bairro: '', cidade: 'Descalvado', uf: 'SP' }
+    13690000: { cep: '13690000', logradouro: '', bairro: '', cidade: 'Descalvado', uf: 'SP' }
     // '99999999' fica de fora de propósito: é o CEP inexistente dos testes.
 });
 
-export const modoCepFalso = () => (
-    process.env.CEP_FAKE === '1' && process.env.NODE_ENV !== 'production'
-);
+export const modoCepFalso = () => process.env.CEP_FAKE === '1' && process.env.NODE_ENV !== 'production';
 
 const texto = (valor) => (typeof valor === 'string' ? valor.trim() : '');
 
@@ -122,7 +126,12 @@ export const buscarEnderecoPorCep = async (cep, opcoes = {}) => {
         const brasilApi = await consultarBrasilApi(digitos, config);
         return brasilApi.encontrado || null;
     } catch (erro) {
-        console.error('❌ Consulta de CEP indisponível:', falhaViaCep?.message || 'ViaCEP: CEP não encontrado', '|', erro.message);
+        console.error(
+            '❌ Consulta de CEP indisponível:',
+            falhaViaCep?.message || 'ViaCEP: CEP não encontrado',
+            '|',
+            erro.message
+        );
         throw new CepIndisponivelError(undefined, { cause: erro });
     }
 };

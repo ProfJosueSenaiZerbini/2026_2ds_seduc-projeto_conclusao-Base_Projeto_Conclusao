@@ -10,10 +10,11 @@ export const carregarDadosDaSessao = async (req, res, next) => {
     res.locals.alerta = null;
 
     // Só uma página (GET) consome o alerta: não conta JSON/polling do chat nem arquivos como /favicon.ico.
-    const pedePaginaHtml = req.method === 'GET'
-        && !String(req.headers.accept || '').includes('application/json')
-        && !req.path.endsWith('/mensagens')
-        && !/\.[a-z0-9]+$/i.test(req.path);
+    const pedePaginaHtml =
+        req.method === 'GET' &&
+        !String(req.headers.accept || '').includes('application/json') &&
+        !req.path.endsWith('/mensagens') &&
+        !/\.[a-z0-9]+$/i.test(req.path);
     if (pedePaginaHtml && req.session?.alerta) {
         res.locals.alerta = req.session.alerta;
         delete req.session.alerta;
