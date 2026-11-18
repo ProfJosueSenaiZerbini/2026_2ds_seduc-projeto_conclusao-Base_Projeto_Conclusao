@@ -6,6 +6,9 @@ export default defineConfig({
   // Com o paralelismo padrão o Firefox cai e há timeouts por sobrecarga; 2 workers rodam a suíte estável.
   workers: 2,
 
+  // No GitHub Actions também gera o relatório HTML (playwright-report/), publicado como artifact se falhar.
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+
   // O próprio Playwright sobe o servidor com o CEP falso (CEP_FAKE=1): a publicação de bicos verifica o
   // endereço pelo CEP e, assim, os testes não dependem da ViaCEP/BrasilAPI nem de internet.
   // reuseExistingServer: false garante esse modo — se já houver um servidor na porta 3000 (ex.: npm run dev),
