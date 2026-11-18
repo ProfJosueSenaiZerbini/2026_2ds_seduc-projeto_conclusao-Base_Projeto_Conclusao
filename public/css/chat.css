@@ -31,6 +31,14 @@
 }
 
 /* Tema Contratante — mesma regra usada em perfil.css */
+/* Quem vê é o contratante: fundo, cards e bordas no padrão das telas do contratante (global.css).
+   As cores de destaque continuam as mesmas. */
+body.chat--contratante {
+  --color-bg: var(--contractor-page-bg);
+  --color-card: var(--contractor-surface);
+  --color-border: var(--contractor-border);
+}
+
 body.theme-contratante {
   --color-teal: var(--color-finalizar-red);
   --color-teal-dark: var(--color-finalizar-red-dark);

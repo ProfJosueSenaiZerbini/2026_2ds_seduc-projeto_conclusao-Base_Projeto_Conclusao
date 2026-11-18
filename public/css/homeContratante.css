@@ -3,9 +3,9 @@
   --home-secondary: #1C3029;
   --home-accent: #A8C5B4;
   --home-white: #F3F4EF;
-  --home-cream: #F5F4EE;
+  --home-cream: var(--contractor-page-bg);
   --home-muted: #68766F;
-  --home-border: #E2E7E1;
+  --home-border: var(--contractor-border);
   --home-shadow: 0 8px 24px rgba(16, 37, 31, 0.055);
 }
 

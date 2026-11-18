@@ -1,11 +1,11 @@
 :root {
   --active-primary-green: #0b5c37;
   --active-primary-green-hover: #08472a;
-  --active-page-bg: #f3f7f4;
-  --active-card-bg: #ffffff;
+  --active-page-bg: var(--contractor-page-bg);
+  --active-card-bg: var(--contractor-surface);
   --active-text-dark: #0f172a;
   --active-muted: #64748b;
-  --active-border-color: #e2e8f0;
+  --active-border-color: var(--contractor-border);
 }
 
 body {
