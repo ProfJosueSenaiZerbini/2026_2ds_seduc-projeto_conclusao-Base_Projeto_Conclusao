@@ -58,14 +58,32 @@ export const adicionarSaldo = async (ctx, valor) => {
   expect(resposta.status()).toBe(302);
 };
 
-export const publicarBico = async (ctx, titulo, valor = 150) => {
+// CEPs do provedor falso (o servidor dos testes roda com CEP_FAKE=1; ver services/cepService.js).
+export const CEP_TESTE = '01310-100'; // Avenida Paulista, Bela Vista, São Paulo/SP
+export const CEP_GERAL_TESTE = '13690-000'; // CEP geral de Descalvado/SP (sem rua e bairro)
+export const CEP_INEXISTENTE_TESTE = '99999-999';
+export const ENDERECO_TESTE = { logradouro: 'Avenida Paulista', bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP' };
+
+// Campos de endereço válidos para publicar um bico pelas rotas (POST /bicos/novo).
+export const enderecoBico = (extra = {}) => ({ cep: CEP_TESTE, numero: '1000', ...extra });
+
+// Pela tela: digita o CEP, espera a consulta preencher a rua e informa o número.
+export const preencherEnderecoNaTela = async (page, { cep = CEP_TESTE, numero = '1000' } = {}) => {
+  await page.locator('input[name="cep"]').fill(cep);
+  await expect(page.locator('#cep-status')).toHaveClass(/cep-status--(ok|aviso)/);
+  await page.locator('input[name="numero"]').fill(numero);
+};
+
+// `extra` sobrescreve/acrescenta campos do formulário (ex.: tentar enviar logradouro e bairro forjados).
+export const publicarBico = async (ctx, titulo, valor = 150, extra = {}) => {
   const resposta = await ctx.request.post(`${BASE}/bicos/novo`, formulario({
     titulo,
     descricao: 'Bico criado pelo teste automatizado do roteiro.',
     valor: valor.toFixed(2),
-    bairro: 'Centro',
+    ...enderecoBico(),
     data_servico: dataFutura(),
-    horario: '10:00'
+    horario: '10:00',
+    ...extra
   }));
   expect(resposta.status(), 'publicação do bico').toBe(302);
 

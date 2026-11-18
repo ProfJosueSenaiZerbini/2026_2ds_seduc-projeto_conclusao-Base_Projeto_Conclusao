@@ -1,7 +1,7 @@
 // Mascotes únicos (araponga = contratante, tiê-sangue = trabalhador): imagens, seletor de perfil,
 // alertas com mascote triste, dica do histórico, movimento reduzido e comemoração.
 import { test, expect } from '@playwright/test';
-import { BASE, criarConta, sufixoUnico, dataFutura } from '../support/cenario.js';
+import { BASE, criarConta, sufixoUnico, dataFutura, preencherEnderecoNaTela } from '../support/cenario.js';
 
 const IMAGENS = ['araponga-galho', 'araponga-corpo', 'araponga-asa', 'araponga-ave', 'tie-galho', 'tie-corpo', 'tie-asa', 'tie-ave'];
 
@@ -156,7 +156,7 @@ test.describe('Dica e erro nas telas internas', () => {
     await page.locator('input[name="titulo"]').fill('ab');
     await page.locator('textarea[name="descricao"]').fill('Descrição com tamanho suficiente.');
     await page.locator('input[name="valor"]').fill('100');
-    await page.locator('input[name="bairro"]').fill('Centro');
+    await preencherEnderecoNaTela(page);
     await page.locator('input[name="data_servico"]').fill(dataFutura());
     await page.locator('input[name="horario"]').fill('10:00');
     await page.getByRole('button', { name: /Publicar Vaga/i }).click();

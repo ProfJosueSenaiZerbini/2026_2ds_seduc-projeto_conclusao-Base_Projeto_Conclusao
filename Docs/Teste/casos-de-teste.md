@@ -6,10 +6,12 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 - Testes unitários (`npm run test:unit`): 78 de 78 aprovados (15 de idade/cadastro/perfil + 17 do cancelamento de bico + 25 da avaliação + 5 do selo de avaliação + 13 da reputação + 3 do "Membro recente"), em `tests/unit/`.
 - Testes E2E (`npm test`): 88 de 88 aprovados, em `tests/e2e/` (inclui 5 da avaliação bidirecional, 7 do fluxo por cliques, 9 dos mascotes e 11 da reputação e dos textos fictícios).
 - A suíte completa (`npm run test:unit` e `npm test`) foi executada em 17/11/2026 às 14:00, 14:01, 14:11, 15:37, 15:40, 16:00, 16:02, 17:56, 17:58, 18:07, 18:20, 19:08, 19:11 e 19:16. A execução de referência é a de **19:16** (unitários 78/78 e E2E 88/88); as de 19:11 e 19:16 passaram inteiras e a de 19:08 teve 87/88, com uma falha intermitente do Firefox (timeout no teste de idades do cadastro, que passou 3 de 3 ao repetir). Desde as 18:20 a suíte E2E roda contra a porta 3001, porque a 3000 fica ocupada por outro servidor. Em execuções intermediárias anteriores houve falhas já corrigidas (ajuste pendente nos testes depois da remoção de e-mail e idade da lista de candidatos, mais travamentos gráficos do Firefox, e testes ainda procurando o balão antigo dos avisos de erro). O Playwright usa 2 workers.
+- **18/11/2026 – endereço do bico por CEP (CT25 e CT26):** testes unitários (`npm run test:unit`) 107 de 107 aprovados (os 78 anteriores + 29 do endereço, em `tests/unit/endereco.unit.js`). Os E2E novos (`roteiro/endereco-bico.spec.js`, 8 testes) e os ajustados do CT05 ainda **não foram executados**: exigem a `migrations/003_endereco_bico.sql` aplicada no banco local e a porta 3000 livre, porque agora o Playwright sobe o próprio servidor com `CEP_FAKE=1`.
 - Cada teste cria as próprias contas e bicos (e-mails e títulos únicos) pelas rotas reais da aplicação e não depende de dados prévios. Os helpers ficam em `tests/e2e/support/cenario.js`. Só o CT10 consulta o banco (somente leitura), para conferir o evento de finalização, que nenhuma tela exibe.
 
 **Legenda de status**
 - **Aprovado:** coberto por teste automatizado que passou, conferindo o resultado esperado.
+- **Pendente (E2E):** os testes unitários do caso passaram, e os E2E estão escritos, mas ainda não foram executados.
 
 | Caso | Cobertura (arquivo › teste) | Status |
 |---|---|---|
@@ -17,7 +19,7 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 | CT02 | `auth/roteiro-cadastro-login.spec.js` › CT02 (CPF inválido pela tela; sem maioridade no navegador; servidor recusa CPF, idade 17/91 e sem maioridade; limites 18 e 90); `auth/fluxo-login-cadastro.spec.js` › campos vazios, e-mail inválido, idades; `tests/unit/idade.unit.js` | Aprovado |
 | CT03 | `auth/roteiro-cadastro-login.spec.js` › CT03 (senha errada; e-mail inexistente e perfil trocado; rotas internas sem login; logout); login válido em `auth/fluxo-login-cadastro.spec.js` | Aprovado |
 | CT04 | `roteiro/permissoes-perfil.spec.js` › CT04 (4 testes) | Aprovado |
-| CT05 | `roteiro/bicos-e-carteira.spec.js` › CT05 (bico válido pela tela; 7 casos inválidos; erro na tela) | Aprovado |
+| CT05 | `roteiro/bicos-e-carteira.spec.js` › CT05 (bico válido pela tela; 11 casos inválidos; erro na tela com os valores mantidos) | Pendente (E2E) – ajustado ao CEP |
 | CT06 | `roteiro/bicos-e-carteira.spec.js` › CT06 (saldo e extrato; valores inválidos) | Aprovado |
 | CT07 | `roteiro/candidaturas.spec.js` › CT07 (candidatura Pendente e duplicada; contratante não se candidata) | Aprovado |
 | CT08 | `roteiro/candidaturas.spec.js` › CT08 (reserva, extrato, Em andamento, demais Recusadas) | Aprovado |
@@ -37,6 +39,8 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 | CT22 – Mascotes e movimento reduzido | `home/mascotes.spec.js` (9 testes: imagens, seletor de perfil na landing, login e cadastro, alertas, dica, movimento reduzido); alerta triste em `roteiro/fluxo-por-cliques.spec.js` | Aprovado |
 | CT23 – Reputação no perfil público | `roteiro/perfil-reputacao.spec.js` › "Perfil público: reputação" (5 testes), "Onde a decisão acontece" e "Identidade visual do perfil público"; `tests/unit/reputacao.unit.js` (13 testes); `tests/unit/perfil.unit.js` (3 testes) | Aprovado |
 | CT24 – Sem indicadores fictícios | `roteiro/perfil-reputacao.spec.js` › "Sem indicadores fictícios" (2 testes) e "Textos fictícios removidos" (2 testes); `tests/unit/perfil.unit.js` (Membro recente calculado) | Aprovado |
+| CT25 – Endereço do bico pelo CEP | `roteiro/endereco-bico.spec.js` › "CT25 – Endereço do bico verificado pelo CEP" (6 testes) e "CT25 – Rota /api/cep"; `tests/unit/endereco.unit.js` (validações, serviço de CEP com fetch simulado, publicação e rota) | Unitários aprovados; Pendente (E2E) |
+| CT26 – Privacidade do endereço | `roteiro/endereco-bico.spec.js` › "CT26 – Privacidade do endereço do bico"; `tests/unit/endereco.unit.js` › "privacidade do endereço nos detalhes do bico" | Unitários aprovados; Pendente (E2E) |
 
 ---
 
@@ -61,9 +65,9 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 **Status:** Aprovado. E2E em `roteiro/permissoes-perfil.spec.js`: trabalhador recebe 403 em `/homeContratante`, `/bicos/novo`, `/bicos/ativos` e `/carteira/contratante`; contratante recebe 403 em `/hometrabalhador`, `/historico` e `/carteira/trabalhador`; cada perfil acessa as próprias rotas.
 
 ## CT05 – Publicar bico válido e inválido
-**Procedimento:** como contratante, abrir `/bicos/novo` e enviar (a) todos os campos válidos; (b) título com menos de 3 caracteres, descrição com menos de 10, bairro com menos de 2, sem data, sem horário ou valor ≤ 0.
-**Resultado esperado:** (a) redireciona para `/homeContratante` e o bico aparece como Aberto; (b) HTTP 400 com a mensagem do campo (ex.: "O título deve ter entre 3 e 100 caracteres.").
-**Status:** Aprovado. E2E em `roteiro/bicos-e-carteira.spec.js`: o bico publicado pela tela aparece em Bicos ativos como Aberto com bairro, data, horário e valor corretos; título curto, descrição curta, bairro curto, sem data, horário inválido, valor 0 e valor negativo respondem 400 com a mensagem do campo e nenhum bico é criado.
+**Procedimento:** como contratante, abrir `/bicos/novo` e enviar (a) todos os campos válidos, com CEP e número; (b) título com menos de 3 caracteres, descrição com menos de 10, CEP com 7 dígitos, CEP inexistente, sem número, complemento com mais de 60 caracteres, CEP geral sem rua, sem data, sem horário ou valor ≤ 0.
+**Resultado esperado:** (a) redireciona para `/homeContratante` e o bico aparece como Aberto, com o bairro vindo da consulta do CEP; (b) HTTP 400 com a mensagem do campo (ex.: "O título deve ter entre 3 e 100 caracteres.", "Informe um CEP válido, com 8 dígitos.", "CEP não encontrado…"), e o formulário volta com os valores digitados.
+**Status:** Pendente (E2E). Antes do CEP estava Aprovado (com o campo bairro digitado livremente). E2E ajustados em `roteiro/bicos-e-carteira.spec.js`: o bico publicado pela tela (CEP 01310-100) aparece em Bicos ativos como Aberto com o bairro "Bela Vista", data, horário e valor corretos; os 11 casos inválidos respondem 400 com a mensagem do campo e nenhum bico é criado; o erro pela tela mantém título, CEP, número e rua preenchidos.
 
 ## CT06 – Adicionar saldo simulado
 **Procedimento:** como contratante, em `/carteira/contratante`, informar um valor (ex.: 150,00) e clicar em "Adicionar Saldo".
@@ -160,11 +164,22 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 **Resultado esperado:** nenhuma tela mostra "Verificado", "validado" nem "Taxa de resposta"; o login não tem botões Google e LinkedIn; o cadastro não promete "milhares de profissionais" nem "mais confiável"; a tela de publicar bico não diz "Pagamento garantido" nem "Anúncio Verificado" nem "Média de 5 propostas/hora" e explica a reserva do valor na carteira simulada; os perfis privados não trazem a bolinha "Online"/"Conta ativa", a bio padrão nem itens fixos "Ativo", e mostram os números reais (bicos concluídos, avaliação média, membro desde, último serviço) com o link "Ver como os outros veem meu perfil"; "Membro recente" só aparece com cadastro de menos de 30 dias.
 **Status:** Aprovado. E2E em `roteiro/perfil-reputacao.spec.js`: "nenhuma tela mostra "Verificado", "validado" ou "Taxa de resposta"" (16 páginas), "perfil privado do trabalhador mostra os números reais e o link…", "login sem Google/LinkedIn; cadastro e publicar bico com textos fiéis ao sistema" (inclui "Alcance Local" e "propostas/hora") e "perfis privados: sem bolinha online, bio padrão nem lista "Ativo"; "Membro recente" só com menos de 30 dias". Unitários em `tests/unit/perfil.unit.js`: regra dos 30 dias.
 
+## CT25 – Endereço do bico verificado pelo CEP
+**Procedimento:** como contratante, em `/bicos/novo`: (a) digitar o CEP 01310-100; (b) publicar enviando também rua, bairro, cidade e UF inventados (pelas rotas); (c) digitar o CEP geral 13690-000, informar rua e bairro e publicar; (d) digitar o CEP inexistente 99999-999 e tentar publicar; (e) provocar um erro de validação no servidor; (f) com a sessão expirada, digitar um CEP; (g) consultar `GET /api/cep/:cep` como contratante, como trabalhador e sem login; (h) nos unitários, simular a ViaCEP fora do ar, lenta (tempo esgotado) e respondendo `{"erro": true}`, e as duas APIs fora.
+**Resultado esperado:** (a) a máscara mostra 00000-000; rua "Avenida Paulista", bairro "Bela Vista", cidade "São Paulo" e UF "SP" são preenchidos somente leitura; o cursor vai para o Número; o resumo mostra "Avenida Paulista, 1578 – Bela Vista, São Paulo/SP"; o banco grava o CEP só com os dígitos (`01310100`); (b) valem os dados da consulta do CEP, e os enviados pelo formulário são ignorados; "s/n" é gravado como "S/N"; (c) rua e bairro ficam liberados para digitar, e cidade (Descalvado) e UF (SP) continuam vindo da consulta; sem rua ou sem bairro, responde 400; (d) aparece "CEP não encontrado" e o formulário não é enviado; (e) os valores digitados voltam preenchidos; (f) vai para `/login`; (g) 200 com o endereço em JSON, 404 para CEP inexistente, 400 para formato inválido, 403 para trabalhador e redirecionamento para `/login` sem login; (h) a BrasilAPI é usada como reserva, inclusive para conferir o `{"erro": true}` da ViaCEP; só responde "não existe" com 404 da BrasilAPI; com as duas fora, o bico não é publicado e aparece "Não conseguimos verificar o CEP agora, tente novamente em instantes" (HTTP 503).
+**Status:** unitários aprovados (`tests/unit/endereco.unit.js`); E2E pendentes (`roteiro/endereco-bico.spec.js`). Nos E2E, o servidor roda com `CEP_FAKE=1`, e os CEPs vêm de um provedor falso em memória, sem internet.
+
+## CT26 – Privacidade do endereço do bico
+**Procedimento:** publicar um bico com complemento; abrir `/bicos/:id` como o contratante dono, outro contratante, candidato pendente, trabalhador sem candidatura, o trabalhador aceito (depois do aceite) e um candidato recusado.
+**Resultado esperado:** o dono e o trabalhador aceito veem o cartão "Endereço" com rua, número, complemento e CEP formatado (01310-100). Todos os demais veem só "Bela Vista – São Paulo/SP": rua, número, complemento e CEP nem chegam à página, porque o controller os retira antes de montar a view. Bicos antigos, sem CEP, continuam mostrando só o bairro.
+**Status:** unitários aprovados (`tests/unit/endereco.unit.js`); E2E pendente (`roteiro/endereco-bico.spec.js`).
+
 ---
 
 ## Observações
-- Todos os 24 casos têm teste automatizado aprovado. Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT24) conferem o resultado de cada operação.
+- Os 26 casos têm teste automatizado. Do CT01 ao CT24 (exceto o CT05, ajustado ao CEP), todos estão aprovados. O CT05, o CT25 e o CT26 aguardam a execução dos E2E. Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT24) conferem o resultado de cada operação.
 - Os CT17 a CT19 exigem a tabela `avaliacoes` nova (schema atual ou `migrations/002_avaliacao_bidirecional.sql`).
-- O servidor precisa estar rodando em `http://localhost:3000` (`npm start`) com o banco ligado antes de `npm test`, e `NODE_ENV=development` (o cadastro dos testes usa CPFs fictícios de 1 a 9).
+- Desde o CT25, o `npm test` sobe o próprio servidor (`webServer` no `playwright.config.js`, com `NODE_ENV=development` e `CEP_FAKE=1`). A porta 3000 precisa estar livre (pare o `npm start`/`npm run dev` antes) e o banco precisa estar ligado. O cadastro dos testes usa CPFs fictícios de 1 a 9, liberados só em `development`.
+- Os CT05, CT25 e CT26 exigem as colunas de endereço na tabela `bicos` (schema atual ou `migrations/003_endereco_bico.sql`).
 - O E2E do cancelamento exige o banco com o tipo `ESTORNO` (schema atual ou `migrations/001_estorno.sql`).
 - A planilha antiga `Docs/Teste/Casos de Teste (1).xlsx` (citava `walletService.js`, JWT e filtro por categoria, que não existem neste projeto) foi removida do repositório.

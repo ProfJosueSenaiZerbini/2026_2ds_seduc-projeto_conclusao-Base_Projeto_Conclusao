@@ -103,14 +103,12 @@ test.describe('Fluxo Completo E2E - Área do Contratante (iBico)', () => {
         'Trabalho com materiais já fornecidos no local.'
       ];
 
-      const bairros = ['Itaim Bibi', 'Pinheiros', 'Moema', 'Vila Mariana', 'Centro'];
       const horarios = ['08:00', '09:30', '13:00', '14:30', '16:00'];
 
       // Sorteia os valores aleatoriamente
       const tituloAleatorio = titulos[Math.floor(Math.random() * titulos.length)];
       const descricaoAleatoria = descricoes[Math.floor(Math.random() * descricoes.length)];
       const valorAleatorio = Math.floor(Math.random() * 400) + 100; // Gera um valor entre 100 e 500
-      const bairroAleatorio = bairros[Math.floor(Math.random() * bairros.length)];
       const horarioAleatorio = horarios[Math.floor(Math.random() * horarios.length)];
 
       // Gera uma data futura aleatória (de 1 a 10 dias à frente)
@@ -128,11 +126,10 @@ test.describe('Fluxo Completo E2E - Área do Contratante (iBico)', () => {
         await inputValor.fill(String(valorAleatorio));
       }
 
-      // Preenchendo Bairro / Localização
-      const inputBairro = page.locator('input[placeholder*="Itaim Bibi"], input[name*="bairro"], select[name*="bairro"]').first();
-      if (await inputBairro.isVisible()) {
-        await inputBairro.fill(bairroAleatorio).catch(() => {});
-      }
+      // Preenchendo o endereço: CEP do provedor falso (CEP_FAKE=1); a consulta preenche rua, bairro, cidade e UF.
+      await page.locator('input[name="cep"]').fill('01310-100');
+      await expect(page.locator('input[name="logradouro"]')).toHaveValue('Avenida Paulista');
+      await page.locator('input[name="numero"]').fill(String(Math.floor(Math.random() * 2000) + 1));
 
       // Preenchendo Data
       const inputData = page.locator('input[type="date"]').first();

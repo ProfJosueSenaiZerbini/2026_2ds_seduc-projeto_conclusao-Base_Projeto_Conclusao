@@ -1108,3 +1108,27 @@ body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
 .sobre-contratante__lista { margin: 0 0 12px; padding-left: 18px; line-height: 1.7; color: var(--details-text-muted, #475569); }
 .sobre-contratante__link { font-weight: 600; text-decoration: underline; }
 .sobre-contratante__link, .sobre-contratante__link:visited { color: var(--details-text-dark, #111827); }
+
+/* Endereço completo do bico (só para o contratante dono e o trabalhador aceito): ocupa a linha toda da grade. */
+.info-card--endereco {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+}
+
+.info-card--endereco .info-card__sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--details-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  body.worker-details .ficha-servico .info-card--endereco {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 13px;
+  }
+}

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { gerarCpfDeUmNove } from '../support/gerarCpf.js';
+import { enderecoBico } from '../support/cenario.js';
 
 // Cancelamento de bico pelo contratante (POST /bicos/:id/cancelar).
 // Os dados são montados pelas rotas reais da aplicação, com contas fictícias novas a cada execução.
@@ -68,7 +69,7 @@ test.describe('Cancelamento de bico pelo contratante', () => {
       titulo,
       descricao: 'Bico criado pelo teste automatizado de cancelamento.',
       valor: VALOR.toFixed(2),
-      bairro: 'Centro',
+      ...enderecoBico(),
       data_servico: data.toISOString().split('T')[0],
       horario: '10:00'
     }));

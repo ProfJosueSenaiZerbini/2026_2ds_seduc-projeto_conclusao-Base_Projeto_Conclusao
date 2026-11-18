@@ -11,9 +11,30 @@ import {
     normalizarComentario,
     carregarContextoAvaliacao
 } from './avaliacaoRegras.js';
-import { validarTituloBico, validarDescricaoBico, validarBairroBico, validarDataServico, validarHorarioServico } from '../validations/bicoValidation.js';
+import {
+    validarTituloBico,
+    validarDescricaoBico,
+    validarBairroBico,
+    validarDataServico,
+    validarHorarioServico,
+    validarCep,
+    normalizarCep,
+    formatarCep,
+    validarNumeroEndereco,
+    normalizarNumeroEndereco,
+    validarComplemento,
+    validarLogradouro
+} from '../validations/bicoValidation.js';
+import { buscarEnderecoPorCep, CepIndisponivelError } from '../services/cepService.js';
 
 export { PRAZO_AVALIACAO_DIAS };
+
+// Campos do formulário devolvidos à tela quando há erro, para o contratante não perder o que digitou.
+const CAMPOS_FORMULARIO_BICO = ['titulo', 'descricao', 'valor', 'data_servico', 'horario', 'cep', 'numero', 'complemento', 'logradouro', 'bairro'];
+
+const valoresDoFormularioBico = (corpo = {}) => Object.fromEntries(
+    CAMPOS_FORMULARIO_BICO.map((campo) => [campo, typeof corpo[campo] === 'string' ? corpo[campo] : ''])
+);
 
 export const exibirFormularioPublicar = (req, res) => {
     if (!req.session?.usuario) {
@@ -22,52 +43,56 @@ export const exibirFormularioPublicar = (req, res) => {
 
     return res.render('contratante/publicarBico', {
         usuario: req.session.usuario,
-        erro: null
+        erro: null,
+        valores: valoresDoFormularioBico()
     });
 };
 
-export const cadastrarBico = async (req, res) => {
-    const { titulo, descricao, valor, bairro, data_servico, horario } = req.body;
+export const MENSAGEM_CEP_INDISPONIVEL = 'Não conseguimos verificar o CEP agora, tente novamente em instantes.';
+
+// Publicação do bico. O endereço é verificado pelo CEP: logradouro, bairro, cidade e UF são gravados
+// a partir da consulta (buscarCep), nunca do req.body. Do formulário vêm só cep, numero e complemento —
+// exceto no CEP geral de cidade pequena (consulta sem rua/bairro), em que rua e bairro digitados são aceitos.
+export const criarCadastradorBico = (banco, buscarCep = buscarEnderecoPorCep) => async (req, res) => {
+    const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body;
     const contratante_id = req.session?.usuario?.id;
 
     if (!contratante_id) {
         return res.redirect('/login');
     }
 
+    const responderErro = (erro, status = 400) => res.status(status).render('contratante/publicarBico', {
+        usuario: req.session.usuario,
+        erro,
+        valores: valoresDoFormularioBico(req.body)
+    });
+
     if (!validarTituloBico(titulo)) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'O título deve ter entre 3 e 100 caracteres.'
-        });
+        return responderErro('O título deve ter entre 3 e 100 caracteres.');
     }
 
     if (!validarDescricaoBico(descricao)) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'A descrição deve ter entre 10 e 500 caracteres.'
-        });
+        return responderErro('A descrição deve ter entre 10 e 500 caracteres.');
     }
 
-    if (!validarBairroBico(bairro)) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'O bairro deve ter entre 2 e 100 caracteres.'
-        });
+    if (!validarCep(cep)) {
+        return responderErro('Informe um CEP válido, com 8 dígitos.');
+    }
+
+    if (!validarNumeroEndereco(numero)) {
+        return responderErro('Informe o número do endereço (até 10 caracteres) ou "S/N".');
+    }
+
+    if (!validarComplemento(complemento)) {
+        return responderErro('O complemento deve ter no máximo 60 caracteres.');
     }
 
     if (!validarDataServico(data_servico)) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'Informe a data do serviço.'
-        });
+        return responderErro('Informe a data do serviço.');
     }
 
     if (!validarHorarioServico(horario)) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'Informe o horário do serviço.'
-
-        });
+        return responderErro('Informe o horário do serviço.');
     }
 
     const valorNumerico = Number(valor);
@@ -78,24 +103,61 @@ export const cadastrarBico = async (req, res) => {
         !Number.isFinite(valorNumerico) ||
         valorNumerico <= 0
     ) {
-        return res.status(400).render('contratante/publicarBico', {
-            usuario: req.session.usuario,
-            erro: 'Informe um valor maior que zero, com até duas casas decimais.'
-        });
+        return responderErro('Informe um valor maior que zero, com até duas casas decimais.');
     }
+
+    // A consulta do CEP fica por último, para não chamar as APIs com o restante do formulário inválido.
+    let endereco;
+    try {
+        endereco = await buscarCep(normalizarCep(cep));
+    } catch (erro) {
+        // As duas APIs fora (ou falha inesperada na consulta): o bico não é publicado.
+        if (!(erro instanceof CepIndisponivelError)) {
+            console.error('❌ Erro ao consultar o CEP do bico:', erro);
+        }
+        return responderErro(MENSAGEM_CEP_INDISPONIVEL, 503);
+    }
+
+    if (!endereco) {
+        return responderErro('CEP não encontrado. Confira os números ou use o link "Não sei meu CEP".');
+    }
+
+    // CEP geral: a consulta não traz rua e/ou bairro, então esses campos vêm do formulário (validados).
+    let { logradouro, bairro } = endereco;
+    if (!logradouro) {
+        if (!validarLogradouro(req.body.logradouro)) {
+            return responderErro('Este CEP não informa a rua: digite a rua (entre 2 e 150 caracteres).');
+        }
+        logradouro = req.body.logradouro.trim();
+    }
+    if (!bairro) {
+        if (!validarBairroBico(req.body.bairro)) {
+            return responderErro('Este CEP não informa o bairro: digite o bairro (entre 2 e 100 caracteres).');
+        }
+        bairro = req.body.bairro.trim();
+    }
+
+    const complementoTexto = typeof complemento === 'string' ? complemento.trim() : '';
 
     try {
         const query = `
-            INSERT INTO bicos (contratante_id, titulo, descricao, valor, bairro, data_servico, horario, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Aberto')
+            INSERT INTO bicos (contratante_id, titulo, descricao, valor, bairro, cep, logradouro, numero, complemento,
+                               cidade, uf, data_servico, horario, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Aberto')
         `;
 
-        await db.query(query, [
+        await banco.query(query, [
             contratante_id,
             titulo,
             descricao,
             valorNumerico,
             bairro,
+            endereco.cep,
+            logradouro,
+            normalizarNumeroEndereco(numero),
+            complementoTexto || null,
+            endereco.cidade,
+            endereco.uf,
             data_servico,
             horario
         ]);
@@ -108,6 +170,30 @@ export const cadastrarBico = async (req, res) => {
     }
 };
 
+export const cadastrarBico = criarCadastradorBico(db);
+
+// Privacidade do endereço: rua, número, complemento e CEP só para o contratante dono do bico e para o
+// trabalhador aceito (bicos.trabalhador_id). Os demais veem apenas bairro e cidade/UF — os campos
+// privados são retirados do objeto antes de chegar à view, e não apenas escondidos no HTML.
+export const prepararEnderecoParaExibicao = (bico, usuarioId) => {
+    const ehParticipante = Number(bico.contratante_id) === usuarioId
+        || (bico.trabalhador_id !== null && bico.trabalhador_id !== undefined && Number(bico.trabalhador_id) === usuarioId);
+
+    if (ehParticipante) {
+        return { ...bico, podeVerEnderecoCompleto: true, cep_formatado: bico.cep ? formatarCep(bico.cep) : '' };
+    }
+
+    return {
+        ...bico,
+        podeVerEnderecoCompleto: false,
+        cep: null,
+        cep_formatado: '',
+        logradouro: null,
+        numero: null,
+        complemento: null
+    };
+};
+
 export const exibirDetalhesBico = async (req, res) => {
     const { id } = req.params;
     const usuarioLogado = req.session?.usuario;
@@ -117,7 +203,8 @@ export const exibirDetalhesBico = async (req, res) => {
     }
 
     try {
-        // 1. Busca os detalhes do bico
+        // 1. Busca os detalhes do bico (b.* inclui o endereço: cep, logradouro, numero, complemento, cidade e uf;
+        //    a parte privada é filtrada em prepararEnderecoParaExibicao)
         const queryBico = `
             SELECT b.*, u.nome AS contratante_nome,
                    ${sqlMediaAvaliacoes('u.id', 'contratante_media')},
@@ -161,7 +248,7 @@ export const exibirDetalhesBico = async (req, res) => {
             : null;
 
         return res.render('detalhesBico', {
-            bico: bicoEncontrado,
+            bico: prepararEnderecoParaExibicao(bicoEncontrado, Number(trabalhador_id)),
             minhaCandidatura: minhaCandidatura || null,
             usuario: usuarioLogado,
             avaliacao
