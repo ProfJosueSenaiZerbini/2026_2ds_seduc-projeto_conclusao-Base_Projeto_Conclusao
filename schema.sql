@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS bicos (
     data_servico DATE NOT NULL,
     horario VARCHAR(20) NOT NULL,
     bairro VARCHAR(100) NOT NULL,
+    -- Endereço verificado pelo CEP (NULL nos bicos publicados antes da verificação).
+    -- O CEP é gravado só com os 8 dígitos; logradouro, bairro, cidade e UF vêm da consulta do CEP.
+    cep CHAR(8) DEFAULT NULL,
+    logradouro VARCHAR(150) DEFAULT NULL,
+    numero VARCHAR(10) DEFAULT NULL,
+    complemento VARCHAR(60) DEFAULT NULL,
+    cidade VARCHAR(100) DEFAULT NULL,
+    uf CHAR(2) DEFAULT NULL,
     status ENUM('Aberto', 'Em andamento', 'Finalizado', 'Cancelado') DEFAULT 'Aberto',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data/hora em que o bico foi publicado
     CONSTRAINT fk_bicos_contratante FOREIGN KEY (contratante_id) REFERENCES usuarios(id),

@@ -33,6 +33,14 @@
                 ? dataServicoObj.toLocaleDateString('pt-BR', { weekday: 'long', timeZone: 'UTC' }).replace(/^./, (letra) => letra.toUpperCase())
                 : '';
               const horarioTexto = String(bico.horario || '').trim();
+              // Local público (bairro e cidade/UF) e endereço completo (só para o dono do bico e o trabalhador aceito;
+              // para os demais o controller já retirou rua, número, complemento e CEP).
+              const bairroTexto = String(bico.bairro || '').trim();
+              const cidadeUf = bico.cidade && bico.uf ? `${bico.cidade}/${bico.uf}` : '';
+              const localPublico = [bairroTexto, cidadeUf].filter(Boolean).join(' – ');
+              const enderecoCompleto = bico.podeVerEnderecoCompleto && bico.logradouro
+                ? `${bico.logradouro}, ${bico.numero || 'S/N'}${bico.complemento ? ` – ${bico.complemento}` : ''}`
+                : '';
             %>
 
             <!-- BANNER HERO -->
@@ -47,7 +55,7 @@
                   </h1>
                   <% if (!ehTrabalhador) { %>
                   <div class="banner-meta">
-                    <span><i class="ph ph-map-pin" aria-hidden="true"></i> <%= bico.bairro %></span>
+                    <span id="local-bico"><i class="ph ph-map-pin" aria-hidden="true"></i> <%= localPublico || bico.bairro %></span>
                     <span><i class="ph ph-calendar-blank" aria-hidden="true"></i> <%= bico.data_servico_formatada %></span>
                   </div>
                   <% } %>
@@ -80,7 +88,8 @@
                       <span class="icon"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
                       <div>
                         <span class="card-label">Local</span>
-                        <strong><%= String(bico.bairro || '').trim() || 'Bairro a confirmar' %></strong>
+                        <strong id="local-bico"><%= localPublico || 'Bairro a confirmar' %></strong>
+                        <% if (!enderecoCompleto && bico.cidade) { %><small class="info-card__sub">Endereço completo liberado após o aceite</small><% } %>
                       </div>
                     </div>
                     <div class="info-card info-card--data">
@@ -89,6 +98,16 @@
                         <span class="card-label">Data</span>
                         <strong><%= bico.data_servico_formatada || 'Data a combinar' %></strong>
                         <% if (diaSemana) { %><small class="info-card__sub"><%= diaSemana %></small><% } %>
+                      </div>
+                    </div>
+                    <% } %>
+                    <% if (enderecoCompleto) { %>
+                    <div class="info-card info-card--endereco" id="endereco-completo">
+                      <span class="icon"><i class="ph ph-house-line" aria-hidden="true"></i></span>
+                      <div>
+                        <span class="card-label">Endereço</span>
+                        <strong><%= enderecoCompleto %></strong>
+                        <small class="info-card__sub"><%= [localPublico, bico.cep_formatado ? `CEP ${bico.cep_formatado}` : ''].filter(Boolean).join(' · ') %></small>
                       </div>
                     </div>
                     <% } %>

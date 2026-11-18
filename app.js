@@ -10,6 +10,8 @@ import authRoutes from './routes/authRoutes.js';
 import bicoRoutes from './routes/bicoRoutes.js';
 import carteiraRoutes from './routes/carteiraRoutes.js'; 
 import perfilRoutes from './routes/perfilRoutes.js';
+import cepRoutes from './routes/cepRoutes.js';
+import { modoCepFalso } from './services/cepService.js';
 import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
 dotenv.config();
 
@@ -73,6 +75,7 @@ app.use('/', authRoutes);
 app.use('/bicos', bicoRoutes);
 app.use('/carteira', carteiraRoutes);
 app.use('/perfil', perfilRoutes);
+app.use('/api/cep', cepRoutes);
 
 
 // Página inicial do iBico
@@ -98,4 +101,7 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`ta rodando? http://localhost:${PORT}`);
+    if (modoCepFalso()) {
+        console.warn('⚠️  CEP_FAKE=1: os CEPs são consultados num provedor falso em memória (modo de teste).');
+    }
 });

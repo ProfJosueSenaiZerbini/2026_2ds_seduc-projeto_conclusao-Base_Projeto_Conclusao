@@ -3,7 +3,8 @@
 import { test, expect } from '@playwright/test';
 import {
   BASE, criarConta, sufixoUnico, dataFutura, formulario,
-  adicionarSaldo, publicarBico, candidatar, listarCandidatos, aceitar, consultarBanco, envelhecerFinalizacao
+  adicionarSaldo, publicarBico, candidatar, listarCandidatos, aceitar, consultarBanco, envelhecerFinalizacao,
+  preencherEnderecoNaTela
 } from '../support/cenario.js';
 
 const VALOR = 150;
@@ -46,7 +47,7 @@ test.describe('Fluxo completo por cliques', () => {
     await pc.locator('input[name="titulo"]').fill(titulo);
     await pc.locator('textarea[name="descricao"]').fill('Bico criado pelo teste que navega só por cliques.');
     await pc.locator('input[name="valor"]').fill(String(VALOR));
-    await pc.locator('input[name="bairro"]').fill('Centro');
+    await preencherEnderecoNaTela(pc);
     await pc.locator('input[name="data_servico"]').fill(dataFutura(5));
     await pc.locator('input[name="horario"]').fill('09:00');
     await pc.getByRole('button', { name: /Publicar Vaga/i }).click();

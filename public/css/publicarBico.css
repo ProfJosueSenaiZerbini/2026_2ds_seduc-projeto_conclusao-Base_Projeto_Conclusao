@@ -413,6 +413,126 @@ textarea {
   font-weight: 700;
 }
 
+/* Endereço do bico: CEP com consulta, campos preenchidos pelo CEP (somente leitura) e aviso de privacidade. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cep-field__spinner {
+  position: absolute;
+  right: 14px;
+  color: var(--publish-green-muted);
+  font-size: 16px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cep-field.is-loading .cep-field__spinner {
+  opacity: 1;
+  animation: cep-girar 0.8s linear infinite;
+}
+
+.cep-field.is-loading > input {
+  padding-right: 40px;
+}
+
+@keyframes cep-girar {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cep-field.is-loading .cep-field__spinner { animation: none; }
+}
+
+.cep-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cep-status:empty { display: none; }
+.cep-status i { margin-top: 1px; font-size: 14px; }
+.cep-status--carregando { color: var(--publish-green-muted); }
+.cep-status--ok { color: #315f45; }
+.cep-status--aviso { color: #8a5a00; }
+.cep-status--erro { color: #b42318; }
+
+.cep-field.is-invalid > input {
+  border-color: #e3a29b;
+  background: #fff7f6;
+}
+
+.cep-help {
+  color: var(--publish-primary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cep-help:hover { text-decoration: none; }
+.cep-help i { font-size: 12px; vertical-align: -1px; }
+
+.endereco-campos {
+  margin: 0 0 20px;
+  padding: 20px 20px 0;
+  border: 1px solid var(--publish-border);
+  border-radius: 12px;
+  background: #fbfbf8;
+  min-width: 0;
+}
+
+.endereco-campos legend {
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.endereco-campos__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--publish-green-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.endereco-campos__aviso i { margin-top: 2px; color: var(--publish-primary); }
+
+.label-optional {
+  color: var(--publish-green-muted);
+  font-weight: 500;
+}
+
+/* Cidade e UF dividem a coluna: UF é curta. */
+.row.row--cidade {
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 12px;
+}
+
+input[readonly] {
+  border-style: dashed;
+  background: #eef0ea;
+  color: #3f4f47;
+  cursor: default;
+}
+
+input[readonly]:focus {
+  outline: none;
+  border-color: #c9d3cb;
+}
+
 /* Rodapé cards */
 .info-grid {
   display: grid;
@@ -492,6 +612,15 @@ textarea {
 }
 
 @media (max-width: 600px) {
+  .endereco-campos .row:not(.row--cidade) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .endereco-campos {
+    padding: 16px 14px 0;
+  }
+
   .info-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;

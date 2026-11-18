@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 import {
   BASE, criarConta, formulario, sufixoUnico, dataFutura,
-  lerSaldoContratante, adicionarSaldo
+  lerSaldoContratante, adicionarSaldo, enderecoBico, preencherEnderecoNaTela
 } from '../support/cenario.js';
 
 const dataBR = (iso) => iso.split('-').reverse().join('/');
@@ -27,7 +27,7 @@ test.describe('CT05 – Publicar bico válido e inválido', () => {
     await page.locator('input[name="titulo"]').fill(titulo);
     await page.locator('textarea[name="descricao"]').fill('Pintar a parede da sala, com tinta fornecida.');
     await page.locator('input[name="valor"]').fill('275.50');
-    await page.locator('input[name="bairro"]').fill('Pinheiros');
+    await preencherEnderecoNaTela(page, { numero: '1578' });
     await page.locator('input[name="data_servico"]').fill(data);
     await page.locator('input[name="horario"]').fill('14:30');
     await page.getByRole('button', { name: /Publicar Vaga/i }).click();
@@ -38,20 +38,20 @@ test.describe('CT05 – Publicar bico válido e inválido', () => {
     const cartao = page.locator('article', { hasText: titulo });
     await expect(cartao).toHaveCount(1);
     await expect(cartao).toContainText('Aberto');
-    await expect(cartao).toContainText('Pinheiros');
+    await expect(cartao).toContainText('Bela Vista'); // bairro vindo da consulta do CEP
     await expect(cartao).toContainText(dataBR(data));
     await expect(cartao).toContainText('14:30');
     await expect(cartao).toContainText('275,50');
     await page.close();
   });
 
-  test('bico inválido (título curto, descrição curta, bairro curto, valor 0, valor negativo, horário inválido) é recusado e não é criado', async () => {
+  test('bico inválido (título curto, descrição curta, CEP/número inválidos, valor 0, valor negativo, horário inválido) é recusado e não é criado', async () => {
     const sufixo = sufixoUnico();
     const base = {
       titulo: `Invalido CT05 ${sufixo}`,
       descricao: 'Descrição com tamanho suficiente.',
       valor: '100.00',
-      bairro: 'Centro',
+      ...enderecoBico(),
       data_servico: dataFutura(),
       horario: '10:00'
     };
@@ -59,7 +59,11 @@ test.describe('CT05 – Publicar bico válido e inválido', () => {
     const casos = [
       { descricao: 'título curto', alterar: { titulo: 'ab' }, mensagem: 'O título deve ter entre 3 e 100 caracteres.' },
       { descricao: 'descrição curta', alterar: { descricao: 'curta' }, mensagem: 'A descrição deve ter entre 10 e 500 caracteres.' },
-      { descricao: 'bairro curto', alterar: { bairro: 'x' }, mensagem: 'O bairro deve ter entre 2 e 100 caracteres.' },
+      { descricao: 'CEP com 7 dígitos', alterar: { cep: '0131010' }, mensagem: 'Informe um CEP válido, com 8 dígitos.' },
+      { descricao: 'CEP inexistente', alterar: { cep: '99999-999' }, mensagem: 'CEP não encontrado' },
+      { descricao: 'sem número', alterar: { numero: '' }, mensagem: 'Informe o número do endereço' },
+      { descricao: 'complemento longo', alterar: { complemento: 'x'.repeat(61) }, mensagem: 'O complemento deve ter no máximo 60 caracteres.' },
+      { descricao: 'CEP geral sem rua', alterar: { cep: '13690-000', bairro: 'Centro' }, mensagem: 'Este CEP não informa a rua' },
       { descricao: 'sem data', alterar: { data_servico: '' }, mensagem: 'Informe a data do serviço.' },
       { descricao: 'horário inválido', alterar: { horario: '25:99' }, mensagem: 'Informe o horário do serviço.' },
       { descricao: 'valor 0', alterar: { valor: '0' }, mensagem: 'Informe um valor maior que zero' },
@@ -87,12 +91,17 @@ test.describe('CT05 – Publicar bico válido e inválido', () => {
     await page.locator('input[name="titulo"]').fill('ab');
     await page.locator('textarea[name="descricao"]').fill('Descrição com tamanho suficiente.');
     await page.locator('input[name="valor"]').fill('100');
-    await page.locator('input[name="bairro"]').fill('Centro');
+    await preencherEnderecoNaTela(page);
     await page.locator('input[name="data_servico"]').fill(dataFutura());
     await page.locator('input[name="horario"]').fill('10:00');
     await page.getByRole('button', { name: /Publicar Vaga/i }).click();
 
     await expect(page.locator('#alerta-sistema')).toContainText('O título deve ter entre 3 e 100 caracteres.');
+    // O formulário volta com o que foi digitado, e o endereço é consultado de novo pelo CEP.
+    await expect(page.locator('input[name="titulo"]')).toHaveValue('ab');
+    await expect(page.locator('input[name="cep"]')).toHaveValue('01310-100');
+    await expect(page.locator('input[name="numero"]')).toHaveValue('1000');
+    await expect(page.locator('input[name="logradouro"]')).toHaveValue('Avenida Paulista');
     await page.close();
   });
 });
