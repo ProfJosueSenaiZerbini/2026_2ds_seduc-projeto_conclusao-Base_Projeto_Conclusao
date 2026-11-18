@@ -30,6 +30,14 @@ export default [
         }
     },
 
+    // E2E e script de capturas: rodam no Node, mas os callbacks de page.evaluate rodam no navegador.
+    {
+        files: ['tests/e2e/**/*.js', 'scripts/**/*.js'],
+        languageOptions: {
+            globals: { ...globals.node, ...globals.browser }
+        }
+    },
+
     // Front-end: scripts clássicos carregados com <script src> nas views.
     {
         files: ['public/js/**/*.js'],

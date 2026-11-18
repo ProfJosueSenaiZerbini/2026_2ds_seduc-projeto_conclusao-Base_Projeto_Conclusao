@@ -3,16 +3,16 @@
 
     // ---------- Modais ----------
     function abrir(id) {
-        var modal = document.getElementById(id);
+        const modal = document.getElementById(id);
         if (!modal) return;
         modal.classList.add('aberto');
         modal.setAttribute('aria-hidden', 'false');
-        var primeiro = modal.querySelector('input:not([disabled])');
+        const primeiro = modal.querySelector('input:not([disabled])');
         if (primeiro) primeiro.focus();
     }
 
     function fechar(id) {
-        var modal = document.getElementById(id);
+        const modal = document.getElementById(id);
         if (!modal) return;
         modal.classList.remove('aberto');
         modal.setAttribute('aria-hidden', 'true');
@@ -33,13 +33,13 @@
     };
 
     // Botões que abrem modais
-    var aberturas = {
+    const aberturas = {
         btnEditarPerfil: 'modalEditarPerfil',
         btnAlterarSenha: 'modalAlterarSenha',
         btnAddHabilidade: 'modalHabilidade'
     };
     Object.keys(aberturas).forEach(function (btnId) {
-        var btn = document.getElementById(btnId);
+        const btn = document.getElementById(btnId);
         if (btn)
             btn.addEventListener('click', function () {
                 abrir(aberturas[btnId]);
@@ -69,12 +69,12 @@
     });
 
     // ---------- Mostrar / ocultar CPF ----------
-    var btnCpf = document.getElementById('btnToggleCpf');
-    var cpfValor = document.getElementById('cpfValor');
-    var cpfTexto = document.getElementById('cpfToggleTexto');
+    const btnCpf = document.getElementById('btnToggleCpf');
+    const cpfValor = document.getElementById('cpfValor');
+    const cpfTexto = document.getElementById('cpfToggleTexto');
     if (btnCpf && cpfValor) {
-        var cpfReal = cpfValor.getAttribute('data-cpf') || '';
-        var oculto = false;
+        const cpfReal = cpfValor.getAttribute('data-cpf') || '';
+        let oculto = false;
         btnCpf.addEventListener('click', function () {
             oculto = !oculto;
             cpfValor.textContent = oculto ? cpfReal.replace(/\d/g, '•') : cpfReal;
@@ -84,12 +84,12 @@
     }
 
     // ---------- Validação: confirmar nova senha ----------
-    var formSenha = document.getElementById('formSenha');
+    const formSenha = document.getElementById('formSenha');
     if (formSenha) {
         formSenha.addEventListener('submit', function (e) {
-            var nova = document.getElementById('novaSenha').value;
-            var conf = document.getElementById('confirmarNovaSenha').value;
-            var erro = document.getElementById('erroSenha');
+            const nova = document.getElementById('novaSenha').value;
+            const conf = document.getElementById('confirmarNovaSenha').value;
+            const erro = document.getElementById('erroSenha');
             if (nova !== conf) {
                 e.preventDefault();
                 erro.hidden = false;

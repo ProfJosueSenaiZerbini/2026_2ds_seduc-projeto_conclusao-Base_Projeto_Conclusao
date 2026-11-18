@@ -9,7 +9,7 @@
   --muted: #64748b;
   --field-bg: #f8fafc;
   --field-border: #cbd5e1;
-  --surface: #ffffff;
+  --surface: #fff;
   --page-bg: #f2f5f1;
   --radius: 12px;
   --shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
@@ -21,6 +21,7 @@
 
 body {
   --login-panel-width: min(44%, 680px);
+
   position: relative;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -36,6 +37,7 @@ body {
   --profile-border: var(--teal-border);
   --profile-glow: rgba(22, 128, 68, 0.14);
   --profile-wash: rgba(20, 83, 45, 0.065);
+
   width: var(--login-panel-width);
   min-width: 420px;
   padding: clamp(32px, 4vw, 56px);
@@ -80,10 +82,7 @@ body {
 
 .connection-art {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--login-panel-width) - 126px);
-  right: auto;
+  inset: 0 auto 0 calc(var(--login-panel-width) - 126px);
   width: 250px;
   z-index: 4;
   color: var(--teal);
@@ -279,7 +278,7 @@ h1 {
   }
 }
 
-.toggle-btn:not(.active-hire):not(.active-work):hover {
+.toggle-btn:not(.active-hire, .active-work):hover {
   border-color: #cfcfd6;
 }
 
@@ -702,10 +701,7 @@ input:focus {
   }
 
   .connection-art {
-    top: calc(clamp(180px, 24svh, 220px) - 64px);
-    bottom: auto;
-    left: 0;
-    right: 0;
+    inset: calc(clamp(180px, 24svh, 220px) - 64px) 0 auto;
     width: 100%;
     height: 128px;
   }

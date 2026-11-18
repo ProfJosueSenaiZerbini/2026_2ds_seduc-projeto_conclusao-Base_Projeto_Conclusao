@@ -9,7 +9,7 @@
   --contractor-soft: #e8f5ec;
   --worker-color: #8f1d18;
   --worker-soft: #f4dfdc;
-  --surface: #ffffff;
+  --surface: #fff;
   --page-bg: #f1f5f9;
   --ink-900: #0f172a;
   --ink-700: #334155;
@@ -109,11 +109,11 @@ body {
 }
 
 .connection-contractor-to-worker {
-  stroke: url(#connectionContractorToWorker);
+  stroke: url('#connectionContractorToWorker');
 }
 
 .connection-worker-to-contractor {
-  stroke: url(#connectionWorkerToContractor);
+  stroke: url('#connectionWorkerToContractor');
 }
 
 .community-connections .contractor-node {
@@ -193,7 +193,7 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.95);
   border-radius: 50%;
   background: var(--contractor-color);
-  color: #ffffff;
+  color: #fff;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
 }
 
@@ -466,7 +466,7 @@ input:focus-visible {
   border-radius: var(--radius-sm);
   padding: 13px 16px;
   background: var(--brand-500);
-  color: #ffffff;
+  color: #fff;
   font: inherit;
   font-size: 15px;
   font-weight: 700;

@@ -151,7 +151,7 @@ body.home-contratante-page {
   padding: 22px 24px;
   border: 1px solid var(--home-border);
   border-radius: 18px;
-  background: #ffffff;
+  background: #fff;
   box-shadow: var(--home-shadow);
   transition:
     border-color 180ms ease,
@@ -264,7 +264,7 @@ body.home-contratante-page {
   padding: 18px 21px;
   border: 1px solid var(--home-border);
   border-radius: 15px;
-  background: #ffffff;
+  background: #fff;
   box-shadow: 0 4px 16px rgba(16, 37, 31, 0.04);
   transition:
     border-color 180ms ease,
@@ -323,6 +323,7 @@ body.home-contratante-page {
 .vaga-location span {
   color: #718c7a;
 }
+
 .vaga-value {
   font-weight: 700;
 }
@@ -382,6 +383,7 @@ body.home-contratante-page {
   margin: 3px 0 0;
   font-size: 16px;
 }
+
 .empty-state p {
   max-width: 430px;
   margin: 0;
@@ -389,6 +391,7 @@ body.home-contratante-page {
   font-size: 13px;
   line-height: 1.5;
 }
+
 .empty-state-button {
   margin-top: 7px;
 }
@@ -423,12 +426,14 @@ body.home-contratante-page {
   color: var(--home-primary);
   font-size: 14px;
 }
+
 .support-card p {
   margin: 3px 0 0;
   color: var(--home-muted);
   font-size: 12px;
   line-height: 1.45;
 }
+
 .support-link {
   margin-left: auto;
   white-space: nowrap;
@@ -438,17 +443,21 @@ body.home-contratante-page {
   .home-dashboard {
     padding: 30px 22px 48px;
   }
+
   .welcome-header {
     align-items: flex-start;
   }
+
   .stats-grid {
     gap: 13px;
     margin-bottom: 34px;
   }
+
   .stat-card {
     min-height: 174px;
     padding: 19px;
   }
+
   .vaga-card {
     padding: 19px;
   }
@@ -458,19 +467,23 @@ body.home-contratante-page {
   .home-dashboard {
     padding: 24px 17px 40px;
   }
+
   .welcome-header {
     flex-direction: column;
     gap: 18px;
     margin-bottom: 24px;
   }
+
   .welcome-header .home-button {
     width: 100%;
   }
+
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
     margin-bottom: 31px;
   }
+
   .stat-card {
     min-height: 0;
     display: grid;
@@ -479,53 +492,65 @@ body.home-contratante-page {
     column-gap: 13px;
     padding: 15px 17px;
   }
+
   .stat-icon {
     grid-row: 1 / span 2;
     margin: 0;
   }
+
   .stat-label {
     align-self: end;
   }
+
   .stat-value {
     grid-column: 2;
     grid-row: 2;
     margin-top: 2px;
     font-size: 1.75rem;
   }
+
   .stat-note {
     grid-column: 2;
     margin-top: 3px;
   }
+
   .section-header {
     align-items: flex-start;
   }
+
   .section-header h2 {
     font-size: 19px;
   }
+
   .section-link {
     max-width: 126px;
     justify-content: flex-end;
     text-align: right;
   }
+
   .vaga-card {
     align-items: stretch;
     flex-direction: column;
     gap: 15px;
     padding: 17px;
   }
+
   .vaga-detail-button {
     width: 100%;
   }
+
   .support-card {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 11px;
     padding: 15px;
   }
+
   .support-card > div:nth-child(2) {
     flex: 1;
     min-width: 0;
   }
+
   .support-link {
     margin-left: 45px;
   }
@@ -535,18 +560,22 @@ body.home-contratante-page {
   .home-dashboard {
     padding-inline: 13px;
   }
+
   .welcome-header h1 {
     font-size: 1.65rem;
   }
+
   .section-header {
     flex-direction: column;
     gap: 8px;
   }
+
   .section-link {
     max-width: none;
     justify-content: flex-start;
     text-align: left;
   }
+
   .vaga-meta {
     gap: 7px 10px;
   }
@@ -558,6 +587,7 @@ body.home-contratante-page {
   .vaga-card {
     transition: none;
   }
+
   .home-button-primary:hover,
   .stat-card:hover,
   .vaga-card:hover {
@@ -573,6 +603,7 @@ body.home-contratante-page {
     box-shadow 0.18s ease,
     transform 0.18s ease;
 }
+
 .stat-card--link:hover {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
   transform: translateY(-2px);

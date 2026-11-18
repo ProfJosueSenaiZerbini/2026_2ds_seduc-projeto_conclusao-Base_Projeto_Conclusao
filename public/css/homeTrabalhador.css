@@ -11,7 +11,7 @@
   --ibico-muted: #625e58;
   --ibico-line: #e5ded3;
   --ibico-line-strong: #d6cdbf;
-  --ibico-surface: #ffffff;
+  --ibico-surface: #fff;
   --ibico-page: #f5f2eb;
   --ibico-shadow: 0 5px 22px rgba(25, 25, 25, 0.055);
 }
@@ -292,12 +292,12 @@ body main.home {
   min-width: 0;
   height: 100%;
   margin: 0;
+
   /* O Chrome ignora padding para afastar a seta nativa; por isso o chevron é desenhado aqui,
      com espaço reservado à direita do texto (o texto nunca encosta nele). */
   padding: 0 26px 0 0;
   border: 0;
   outline: 0;
-  -webkit-appearance: none;
   appearance: none;
   background: transparent
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23191919' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
@@ -365,7 +365,7 @@ body main.home {
 }
 
 .home .section-heading h2 {
-  margin: 4px 0 4px;
+  margin: 4px 0;
   color: var(--ibico-ink);
   font-size: 26px;
   line-height: 1.25;
@@ -858,8 +858,7 @@ body main.home {
 
   /* Atalhos de bairro em uma única linha com rolagem lateral dentro do próprio bloco. */
   .home .area-filter {
-    flex-direction: column;
-    flex-wrap: nowrap;
+    flex-flow: column nowrap;
     align-items: stretch;
     gap: 8px;
   }
@@ -1039,16 +1038,19 @@ body main.home {
   font-size: 0.9rem;
   color: #475569;
 }
+
 .home .job-contratante a {
   color: inherit;
   font-weight: 600;
   text-decoration: underline;
 }
+
 .home .job-contratante__nota {
   margin-left: 6px;
   color: #b45309;
   font-weight: 700;
 }
+
 .home .job-contratante__nota--vazia {
   color: #64748b;
   font-weight: 400;
@@ -1066,6 +1068,7 @@ body main.home {
   font-weight: 600;
   text-decoration: none;
 }
+
 .home .hero__avaliar:hover {
   background: rgba(255, 255, 255, 0.2);
 }

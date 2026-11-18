@@ -64,7 +64,7 @@
         }
 
         const termo = normalizar(buscaEl.value.trim());
-        let cards = Array.from(lista.children);
+        const cards = Array.from(lista.children);
 
         // Ordenação
         const ord = ordenarEl.value;
@@ -167,7 +167,9 @@
     let dispensada = false;
     try {
         dispensada = sessionStorage.getItem('dicaProfissionaisFechada') === '1';
-    } catch (e) {}
+    } catch {
+        /* sem sessionStorage: a dica aparece de novo */
+    }
 
     // A dica aparece sem tirar o foco de onde o usuário estava. Guardamos o último foco FORA dela
     // para devolvê-lo se o usuário fechar a dica pelo teclado estando no botão de fechar.
@@ -187,7 +189,9 @@
         dica.hidden = true;
         try {
             sessionStorage.setItem('dicaProfissionaisFechada', '1');
-        } catch (e) {}
+        } catch {
+            /* sem sessionStorage: só não lembra que a dica foi fechada */
+        }
         if (!devolverFoco) return;
         const visivel = (el) => el && el.isConnected && el.getClientRects().length > 0;
         const destino = visivel(ultimoFocoFora) ? ultimoFocoFora : document.querySelector('.tab[aria-selected="true"]');

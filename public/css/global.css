@@ -74,9 +74,10 @@ body {
   --contractor-sidebar-secondary: #1c3029;
   --contractor-sidebar-accent: #a8c5b4;
   --contractor-sidebar-white: #f3f4ef;
+
   /* Fundo, superfícies e bordas das telas do contratante (padrão da aba Bicos Ativos). */
   --contractor-page-bg: #f3f7f4;
-  --contractor-surface: #ffffff;
+  --contractor-surface: #fff;
   --contractor-border: #e2e8f0;
 }
 
@@ -85,6 +86,7 @@ body:has(.contractor-sidebar) {
   padding-left: var(--contractor-sidebar-width);
   transition: padding-left 0.28s ease;
 }
+
 body:has(.contractor-sidebar.is-collapsed) {
   padding-left: var(--contractor-sidebar-collapsed-width);
 }
@@ -100,8 +102,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   height: 100vh;
   height: 100dvh;
   padding: 22px 14px 16px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden auto;
   border-right: 1px solid var(--contractor-sidebar-accent);
   background: var(--contractor-sidebar-primary);
   box-shadow: 8px 0 28px rgba(16, 37, 31, 0.16);
@@ -119,6 +120,7 @@ body:has(.contractor-sidebar.is-collapsed) {
     width 0.28s ease,
     transform 0.28s ease;
 }
+
 .contractor-sidebar__top {
   display: flex;
   align-items: center;
@@ -126,6 +128,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   min-height: 48px;
   gap: 12px;
 }
+
 .sidebar-brand {
   display: inline-flex;
   align-items: center;
@@ -140,6 +143,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   text-decoration: none;
   white-space: nowrap;
 }
+
 .sidebar-brand__mark {
   display: grid;
   flex: 0 0 40px;
@@ -152,6 +156,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   font-size: 25px;
   line-height: 1;
 }
+
 .sidebar-collapse-toggle,
 .sidebar-mobile-toggle {
   display: inline-flex;
@@ -170,12 +175,14 @@ body:has(.contractor-sidebar.is-collapsed) {
     border-color 0.18s ease,
     transform 0.18s ease;
 }
+
 .sidebar-collapse-toggle:hover,
 .sidebar-mobile-toggle:hover {
   border-color: var(--contractor-sidebar-white);
   background: var(--contractor-sidebar-accent);
   color: var(--contractor-sidebar-primary);
 }
+
 .sidebar-collapse-toggle:focus-visible,
 .sidebar-mobile-toggle:focus-visible,
 .sidebar-nav__link:focus-visible,
@@ -184,6 +191,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   outline: 3px solid var(--contractor-sidebar-accent);
   outline-offset: 3px;
 }
+
 .sidebar-collapse-toggle .ph,
 .sidebar-mobile-toggle .ph,
 .sidebar-nav__link .ph,
@@ -193,6 +201,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   flex: 0 0 22px;
   font-size: 22px;
 }
+
 .sidebar-nav {
   position: relative;
   display: flex;
@@ -200,6 +209,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   gap: 6px;
   width: 100%;
 }
+
 .sidebar-nav__indicator {
   position: absolute;
   z-index: 2;
@@ -211,6 +221,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   background: var(--contractor-sidebar-accent);
   pointer-events: none;
 }
+
 .sidebar-nav__link,
 .sidebar-logout {
   position: relative;
@@ -235,12 +246,14 @@ body:has(.contractor-sidebar.is-collapsed) {
     background-color 0.18s ease,
     color 0.18s ease;
 }
+
 .sidebar-nav__link:hover,
 .sidebar-logout:hover,
 .sidebar-account__profile:hover {
   background: #263c32;
   color: var(--contractor-sidebar-accent);
 }
+
 .sidebar-nav__link.active,
 .sidebar-account__profile.active {
   background: rgba(168, 197, 180, 0.15);
@@ -248,9 +261,11 @@ body:has(.contractor-sidebar.is-collapsed) {
   color: var(--contractor-sidebar-white);
   font-weight: 750;
 }
+
 .sidebar-nav__link.active::before {
   content: none;
 }
+
 .sidebar-nav__label {
   overflow: hidden;
   opacity: 1;
@@ -259,6 +274,7 @@ body:has(.contractor-sidebar.is-collapsed) {
     max-width 0.22s ease,
     opacity 0.18s ease;
 }
+
 .sidebar-balance {
   display: flex;
   align-items: center;
@@ -269,6 +285,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   border-radius: 15px;
   background: var(--contractor-sidebar-secondary);
 }
+
 .sidebar-balance__icon {
   display: grid;
   flex: 0 0 38px;
@@ -281,6 +298,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   font-size: 12px;
   font-weight: 800;
 }
+
 .sidebar-balance__details {
   display: flex;
   min-width: 0;
@@ -292,16 +310,19 @@ body:has(.contractor-sidebar.is-collapsed) {
     max-width 0.22s ease,
     opacity 0.18s ease;
 }
+
 .sidebar-balance__label {
   color: var(--contractor-sidebar-accent);
   font-size: 11px;
 }
+
 .sidebar-balance strong {
   overflow: hidden;
   color: var(--contractor-sidebar-white);
   font-size: 15px;
   text-overflow: ellipsis;
 }
+
 .sidebar-account {
   display: flex;
   flex-direction: column;
@@ -310,6 +331,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   padding-top: 12px;
   border-top: 1px solid var(--contractor-sidebar-secondary);
 }
+
 .sidebar-account__profile {
   display: flex;
   align-items: center;
@@ -324,6 +346,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   line-height: 1.35;
   text-decoration: none;
 }
+
 .sidebar-account__avatar {
   flex: 0 0 36px;
   width: 36px;
@@ -333,6 +356,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   object-fit: cover;
   box-shadow: 0 0 0 1px var(--contractor-sidebar-accent);
 }
+
 .sidebar-account__name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -341,25 +365,31 @@ body:has(.contractor-sidebar.is-collapsed) {
     max-width 0.22s ease,
     opacity 0.18s ease;
 }
+
 .sidebar-logout-form {
   margin: 0;
 }
+
 .sidebar-logout {
   width: 100%;
   color: var(--contractor-sidebar-white);
 }
+
 .sidebar-logout:hover {
   background: #263c32;
   color: var(--contractor-sidebar-accent);
 }
+
 .contractor-sidebar.is-collapsed {
   width: var(--contractor-sidebar-collapsed-width);
   align-items: center;
   padding-inline: 10px;
 }
+
 .contractor-sidebar.is-collapsed .contractor-sidebar__top {
   flex-direction: column;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-brand__text,
 .contractor-sidebar.is-collapsed .sidebar-nav__label,
 .contractor-sidebar.is-collapsed .sidebar-balance__details,
@@ -367,34 +397,42 @@ body:has(.contractor-sidebar.is-collapsed) {
   max-width: 0;
   opacity: 0;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-collapse-toggle .ph {
   transform: rotate(180deg);
 }
+
 .contractor-sidebar.is-collapsed .sidebar-nav__link,
 .contractor-sidebar.is-collapsed .sidebar-logout {
   justify-content: center;
   padding-inline: 0;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-nav__link.active::before {
   inset: 9px auto 9px -10px;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-nav__indicator {
   left: -10px;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-balance {
   justify-content: center;
   width: 100%;
   padding-inline: 0;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-account__profile {
   justify-content: center;
   padding-inline: 0;
 }
+
 .contractor-sidebar.is-collapsed .sidebar-account__avatar {
   flex-basis: 40px;
   width: 40px;
   height: 40px;
 }
+
 .sidebar-mobile-toggle,
 .sidebar-backdrop {
   display: none;
@@ -405,10 +443,12 @@ body:has(.contractor-sidebar.is-collapsed) {
     flex-direction: column;
     gap: 4px;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-brand__text {
     max-width: 64px;
     opacity: 1;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-nav,
   .contractor-sidebar.is-collapsed .sidebar-balance,
   .contractor-sidebar.is-collapsed .sidebar-account {
@@ -420,35 +460,43 @@ body:has(.contractor-sidebar.is-collapsed) {
   body:has(.contractor-sidebar) {
     padding-left: var(--contractor-sidebar-collapsed-width);
   }
+
   body:has(.contractor-sidebar:not(.is-collapsed)) {
     padding-left: var(--contractor-sidebar-width);
   }
 }
+
 @media (max-width: 760px) {
   body:has(.contractor-sidebar) {
     padding-top: 72px;
     padding-left: 0;
   }
+
   .contractor-sidebar {
     width: min(292px, calc(100vw - 52px));
     padding: 18px 14px 16px;
     transform: translateX(-105%);
   }
+
   .contractor-sidebar.is-open {
     transform: translateX(0);
   }
+
   .contractor-sidebar.is-collapsed {
     width: min(292px, calc(100vw - 52px));
     align-items: stretch;
     padding-inline: 14px;
   }
+
   .contractor-sidebar.is-collapsed .contractor-sidebar__top {
     flex-direction: row;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-brand {
     flex-direction: row;
     gap: 11px;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-brand__text,
   .contractor-sidebar.is-collapsed .sidebar-nav__label,
   .contractor-sidebar.is-collapsed .sidebar-balance__details,
@@ -456,27 +504,33 @@ body:has(.contractor-sidebar.is-collapsed) {
     max-width: 220px;
     opacity: 1;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-nav,
   .contractor-sidebar.is-collapsed .sidebar-balance,
   .contractor-sidebar.is-collapsed .sidebar-account {
     display: flex;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-nav__link,
   .contractor-sidebar.is-collapsed .sidebar-logout {
     justify-content: flex-start;
     padding-inline: 13px;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-balance {
     justify-content: flex-start;
     padding-inline: 12px;
   }
+
   .contractor-sidebar.is-collapsed .sidebar-account__profile {
     justify-content: flex-start;
     padding-inline: 8px;
   }
+
   .sidebar-collapse-toggle {
     transform: rotate(90deg);
   }
+
   .sidebar-mobile-toggle {
     position: fixed;
     z-index: 1002;
@@ -493,6 +547,7 @@ body:has(.contractor-sidebar.is-collapsed) {
     font-size: 14px;
     font-weight: 700;
   }
+
   .sidebar-backdrop {
     position: fixed;
     z-index: 999;
@@ -505,20 +560,25 @@ body:has(.contractor-sidebar.is-collapsed) {
     opacity: 0;
     transition: opacity 0.24s ease;
   }
+
   .sidebar-backdrop[hidden] {
     display: none;
   }
+
   body.sidebar-mobile-open .sidebar-backdrop {
     opacity: 1;
   }
+
   body.sidebar-mobile-open .sidebar-mobile-toggle {
     opacity: 0;
     pointer-events: none;
   }
+
   .contractor-sidebar.is-open .sidebar-collapse-toggle {
     transform: rotate(90deg);
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   body:has(.contractor-sidebar),
   .contractor-sidebar,
@@ -561,6 +621,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   outline: 2px solid var(--worker-header-ink);
   outline-offset: 3px;
 }
+
 /* =========================================================
    HEADER / NAVBAR (PARTIAL PADRÃO)
    ========================================================= */
@@ -700,7 +761,7 @@ body:has(.contractor-sidebar.is-collapsed) {
 }
 
 .footer-col h4 {
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
   font-size: 14px;
   font-family: inherit;
   font-weight: 700;

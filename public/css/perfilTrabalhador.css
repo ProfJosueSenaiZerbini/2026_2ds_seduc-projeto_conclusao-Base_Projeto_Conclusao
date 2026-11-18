@@ -9,6 +9,7 @@
   --pt-border: #e5ded3;
   --pt-cream: #f5f2eb;
   --pt-white: #fff;
+
   font-family: Inter, system-ui, sans-serif;
 }
 
@@ -1077,10 +1078,12 @@
 .pt-stat-texto {
   font-size: 1.05rem;
 }
+
 .pt-ver-publico {
   padding: 14px 32px;
   border-bottom: 1px solid var(--pt-border);
 }
+
 .pt-ver-publico .pt-btn-link {
   display: inline-flex;
   align-items: center;

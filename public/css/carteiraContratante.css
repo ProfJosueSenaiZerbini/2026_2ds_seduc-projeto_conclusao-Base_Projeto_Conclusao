@@ -4,7 +4,7 @@
 
 :root {
   --contractor-wallet-bg: var(--contractor-page-bg);
-  --contractor-wallet-white: #ffffff;
+  --contractor-wallet-white: #fff;
   --contractor-wallet-ink: #14213d;
   --contractor-wallet-ink-soft: #4b5563;
   --contractor-wallet-muted: #6b7280;

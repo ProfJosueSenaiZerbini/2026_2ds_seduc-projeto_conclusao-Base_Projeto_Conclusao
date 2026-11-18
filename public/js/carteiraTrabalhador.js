@@ -3,19 +3,19 @@
 (function () {
     'use strict';
 
-    var modal = document.getElementById('historico-modal');
-    var botaoAbrir = document.getElementById('abrir-historico');
-    var botaoFechar = document.getElementById('fechar-historico');
-    var corpoPrincipal = document.getElementById('transacoes-body');
-    var corpoCompleto = document.getElementById('historico-completo-body');
-    var filtroPrincipal = document.getElementById('filtro-bico');
-    var filtroModal = document.getElementById('filtro-bico-modal');
-    var semResultadosPrincipal = document.getElementById('sem-resultados');
-    var semResultadosModal = document.getElementById('sem-resultados-modal');
+    const modal = document.getElementById('historico-modal');
+    const botaoAbrir = document.getElementById('abrir-historico');
+    const botaoFechar = document.getElementById('fechar-historico');
+    const corpoPrincipal = document.getElementById('transacoes-body');
+    const corpoCompleto = document.getElementById('historico-completo-body');
+    const filtroPrincipal = document.getElementById('filtro-bico');
+    const filtroModal = document.getElementById('filtro-bico-modal');
+    const semResultadosPrincipal = document.getElementById('sem-resultados');
+    const semResultadosModal = document.getElementById('sem-resultados-modal');
 
     // ---------- Modal ----------
-    var focoAnterior = null;
-    var cliqueComecouNoFundo = false;
+    let focoAnterior = null;
+    let cliqueComecouNoFundo = false;
 
     function modalAberto() {
         return !!modal && modal.classList.contains('open');
@@ -69,10 +69,10 @@
 
         // Mantém o foco do teclado dentro do modal enquanto ele estiver aberto.
         if (e.key === 'Tab') {
-            var focaveis = modal.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])');
+            const focaveis = modal.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])');
             if (!focaveis.length) return;
-            var primeiro = focaveis[0];
-            var ultimo = focaveis[focaveis.length - 1];
+            const primeiro = focaveis[0];
+            const ultimo = focaveis[focaveis.length - 1];
             if (e.shiftKey && document.activeElement === primeiro) {
                 e.preventDefault();
                 ultimo.focus();
@@ -85,9 +85,9 @@
 
     // ---------- Filtro ----------
     // Critérios da interface: nome (descrição), valor e data/horário.
-    var COL_DESCRICAO = 1;
-    var COL_DATA = 2;
-    var COL_VALOR = 4;
+    const COL_DESCRICAO = 1;
+    const COL_DATA = 2;
+    const COL_VALOR = 4;
 
     function normalizar(texto) {
         return String(texto == null ? '' : texto)
@@ -98,15 +98,15 @@
     }
 
     function textoDaCelula(linha, indice) {
-        var celula = linha.cells && linha.cells[indice];
+        const celula = linha.cells && linha.cells[indice];
         return celula ? normalizar(celula.textContent).replace(/\s+/g, ' ') : '';
     }
 
     // Aceita "1234,50", "1234.50" e "1.234,50" para o valor exibido como "R$ 1234,50".
     function variantesDoTermo(termo) {
-        var variantes = [termo];
+        const variantes = [termo];
         if (/^[\d.,\s]+$/.test(termo) && /\d/.test(termo)) {
-            var compacto = termo.replace(/\s/g, '');
+            const compacto = termo.replace(/\s/g, '');
             variantes.push(compacto.indexOf(',') >= 0 ? compacto.replace(/\./g, '') : compacto.replace(/\./g, ','));
         }
         return variantes.filter(function (v, i) {
@@ -115,15 +115,15 @@
     }
 
     function criarBusca(valorDigitado) {
-        var termo = normalizar(valorDigitado);
+        const termo = normalizar(valorDigitado);
         if (!termo) return null;
-        var variantes = variantesDoTermo(termo);
+        const variantes = variantesDoTermo(termo);
 
         return function (linha) {
-            var descricao = textoDaCelula(linha, COL_DESCRICAO);
-            var data = textoDaCelula(linha, COL_DATA);
-            var valor = textoDaCelula(linha, COL_VALOR);
-            var valorNumerico = valor.replace(/[^\d,]/g, '');
+            const descricao = textoDaCelula(linha, COL_DESCRICAO);
+            const data = textoDaCelula(linha, COL_DATA);
+            const valor = textoDaCelula(linha, COL_VALOR);
+            const valorNumerico = valor.replace(/[^\d,]/g, '');
 
             return variantes.some(function (v) {
                 return (
@@ -140,19 +140,19 @@
         while (elemento.firstChild) elemento.removeChild(elemento.firstChild);
     }
 
-    var linhasCompletas = corpoCompleto ? Array.prototype.slice.call(corpoCompleto.rows) : [];
-    var linhasResumo = corpoPrincipal ? Array.prototype.slice.call(corpoPrincipal.rows) : [];
-    var statusDoResumo = linhasResumo.length && linhasResumo[0].cells[3] ? linhasResumo[0].cells[3].innerHTML : null;
+    const linhasCompletas = corpoCompleto ? Array.prototype.slice.call(corpoCompleto.rows) : [];
+    const linhasResumo = corpoPrincipal ? Array.prototype.slice.call(corpoPrincipal.rows) : [];
+    const statusDoResumo = linhasResumo.length && linhasResumo[0].cells[3] ? linhasResumo[0].cells[3].innerHTML : null;
 
     // Modal: mostra/oculta as linhas do histórico completo.
     function filtrarModal() {
         if (!filtroModal || !corpoCompleto) return;
         if (!linhasCompletas.length) return; // sem movimentações a página já mostra um aviso próprio
-        var busca = criarBusca(filtroModal.value);
-        var visiveis = 0;
+        const busca = criarBusca(filtroModal.value);
+        let visiveis = 0;
 
         linhasCompletas.forEach(function (linha) {
-            var mostrar = !busca || busca(linha);
+            const mostrar = !busca || busca(linha);
             linha.style.display = mostrar ? '' : 'none';
             if (mostrar) visiveis += 1;
         });
@@ -165,7 +165,7 @@
     function filtrarPrincipal() {
         if (!filtroPrincipal || !corpoPrincipal) return;
         if (!linhasCompletas.length) return; // sem movimentações a página já mostra um aviso próprio
-        var busca = criarBusca(filtroPrincipal.value);
+        const busca = criarBusca(filtroPrincipal.value);
 
         limpar(corpoPrincipal);
 
@@ -177,9 +177,9 @@
             return;
         }
 
-        var encontradas = linhasCompletas.filter(busca);
+        const encontradas = linhasCompletas.filter(busca);
         encontradas.forEach(function (original) {
-            var copia = original.cloneNode(true);
+            const copia = original.cloneNode(true);
             copia.style.display = ''; // o filtro do modal pode ter ocultado a linha original
             // Mantém o mesmo rótulo de status que a tabela principal já usa.
             if (statusDoResumo !== null && copia.cells[3]) copia.cells[3].innerHTML = statusDoResumo;
@@ -198,9 +198,9 @@
 
     // ---------- Relatório CSV ----------
     // Exporta TODAS as movimentações (linhas do histórico completo), ignorando qualquer filtro aplicado.
-    var botaoRelatorio = document.getElementById('gerar-relatorio');
-    var avisoRelatorio = document.getElementById('relatorio-aviso');
-    var temporizadorAviso = null;
+    const botaoRelatorio = document.getElementById('gerar-relatorio');
+    const avisoRelatorio = document.getElementById('relatorio-aviso');
+    let temporizadorAviso = null;
 
     function mostrarAviso(texto) {
         if (!avisoRelatorio) return;
@@ -215,7 +215,7 @@
     // Aspas e ";" são escapados e textos que começam com = + - @ ganham um apóstrofo,
     // para a planilha não interpretá-los como fórmula.
     function campoCsv(valor) {
-        var texto = String(valor == null ? '' : valor)
+        let texto = String(valor == null ? '' : valor)
             .replace(/\s+/g, ' ')
             .trim();
         if (/^[=+\-@]/.test(texto)) texto = "'" + texto;
@@ -236,7 +236,7 @@
     }
 
     function nomeDoArquivo() {
-        var hoje = new Date();
+        const hoje = new Date();
         return (
             'extrato-simulado-' +
             hoje.getFullYear() +
@@ -255,7 +255,7 @@
         }
 
         // Colunas da tabela: 0 Tipo, 1 Descrição, 2 Data, 3 Status, 4 Valor.
-        var linhas = ['Descrição;Data;Tipo;Status;Valor (R$)'];
+        const linhas = ['Descrição;Data;Tipo;Status;Valor (R$)'];
         linhasCompletas.forEach(function (linha) {
             linhas.push(
                 [
@@ -268,11 +268,11 @@
             );
         });
 
-        var nome = nomeDoArquivo();
+        const nome = nomeDoArquivo();
         // O BOM UTF-8 (U+FEFF) faz o Excel reconhecer os acentos.
-        var arquivo = new Blob(['\uFEFF' + linhas.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
-        var endereco = URL.createObjectURL(arquivo);
-        var link = document.createElement('a');
+        const arquivo = new Blob(['\uFEFF' + linhas.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
+        const endereco = URL.createObjectURL(arquivo);
+        const link = document.createElement('a');
         link.href = endereco;
         link.download = nome;
         document.body.appendChild(link);
@@ -295,10 +295,10 @@
 
     // ---------- Gráfico "Crescimento Mensal" ----------
     // As alturas das barras vêm prontas do servidor (proporção de cada mês); aqui só se troca o período.
-    var graficoBarras = document.getElementById('grafico-barras');
-    var seletorPeriodo = document.getElementById('grafico-periodo');
-    var notaGrafico = document.getElementById('grafico-nota');
-    var graficoVazio = document.getElementById('grafico-vazio');
+    const graficoBarras = document.getElementById('grafico-barras');
+    const seletorPeriodo = document.getElementById('grafico-periodo');
+    const notaGrafico = document.getElementById('grafico-nota');
+    const graficoVazio = document.getElementById('grafico-vazio');
 
     function formatarReais(valor) {
         return 'R$ ' + Number(valor).toFixed(2).replace('.', ',');
@@ -307,20 +307,20 @@
     function atualizarGrafico() {
         if (!graficoBarras || !seletorPeriodo) return;
 
-        var periodo = seletorPeriodo.value === '12' ? 12 : 6;
-        var colunas = Array.prototype.slice.call(graficoBarras.querySelectorAll('.bar-col'));
-        var visiveis = colunas.slice(-periodo);
+        const periodo = seletorPeriodo.value === '12' ? 12 : 6;
+        const colunas = Array.prototype.slice.call(graficoBarras.querySelectorAll('.bar-col'));
+        const visiveis = colunas.slice(-periodo);
         if (!visiveis.length) return;
 
         graficoBarras.classList.toggle('chart--6', periodo === 6);
         graficoBarras.classList.toggle('chart--12', periodo === 12);
 
-        var total = visiveis.reduce(function (soma, coluna) {
+        const total = visiveis.reduce(function (soma, coluna) {
             return soma + Number(coluna.getAttribute('data-total') || 0);
         }, 0);
-        var primeira = visiveis[0];
-        var ultima = visiveis[visiveis.length - 1];
-        var faixa =
+        const primeira = visiveis[0];
+        const ultima = visiveis[visiveis.length - 1];
+        const faixa =
             primeira.getAttribute('data-rotulo').toLowerCase() +
             '/' +
             primeira.getAttribute('data-ano') +

@@ -4,7 +4,6 @@ import {
     BASE,
     criarConta,
     sufixoUnico,
-    formulario,
     adicionarSaldo,
     publicarBico,
     candidatar,
@@ -12,8 +11,7 @@ import {
     aceitar,
     lerSaldoTrabalhador,
     statusDoBico,
-    consultarBanco,
-    executarNoBanco
+    consultarBanco
 } from '../support/cenario.js';
 
 const VALOR = 150;

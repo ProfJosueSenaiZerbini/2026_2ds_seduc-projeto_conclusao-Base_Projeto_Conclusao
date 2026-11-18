@@ -11,7 +11,7 @@
 
 body {
   background: var(--contractor-profile-bg);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
   color: var(--contractor-profile-text);
 }
 
@@ -56,7 +56,7 @@ body {
   padding: 12px 22px;
   border-radius: 12px;
   font:
-    600 1rem 'Inter',
+    600 1rem Inter,
     sans-serif;
   cursor: pointer;
   text-decoration: none;
@@ -365,7 +365,7 @@ body {
   border: none;
   color: var(--contractor-profile-text);
   font:
-    500 1rem 'Inter',
+    500 1rem Inter,
     sans-serif;
   cursor: pointer;
   padding: 4px 0;
@@ -421,7 +421,7 @@ body {
   border: 1.5px dashed #c3ccd3;
   color: var(--contractor-profile-text-muted);
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
 }
 
 .chip-add:hover {
@@ -533,7 +533,7 @@ body {
   border: 1px solid #cdd5db;
   border-radius: 10px;
   font:
-    1rem 'Inter',
+    1rem Inter,
     sans-serif;
 }
 
@@ -567,7 +567,7 @@ body {
   padding: 10px 18px;
   border-radius: 10px;
   font:
-    600 0.95rem 'Inter',
+    600 0.95rem Inter,
     sans-serif;
   cursor: pointer;
 }
@@ -579,7 +579,7 @@ body {
   padding: 10px 18px;
   border-radius: 10px;
   font:
-    600 0.95rem 'Inter',
+    600 0.95rem Inter,
     sans-serif;
   cursor: pointer;
 }
@@ -627,9 +627,11 @@ body {
     font-size: 1.8rem;
   }
 }
+
 .stat-texto {
   font-size: 1.05rem;
 }
+
 .ver-publico {
   padding: 14px 32px;
   border-bottom: 1px solid var(--contractor-profile-border);

@@ -4,41 +4,41 @@
 (function () {
     'use strict';
 
-    var DIMENSOES = { araponga: [384, 359], tie: [393, 310] };
-    var movimentoReduzido = function () {
+    const DIMENSOES = { araponga: [384, 359], tie: [393, 310] };
+    const movimentoReduzido = function () {
         return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     };
 
     // ---------- preferência de som (localStorage com try/catch) ----------
-    var CHAVE_SOM = 'ibico:som';
+    const CHAVE_SOM = 'ibico:som';
     function somLigado() {
         try {
             return window.localStorage.getItem(CHAVE_SOM) !== '0';
-        } catch (e) {
+        } catch {
             return true;
         }
     }
     function definirSom(ligado) {
         try {
             window.localStorage.setItem(CHAVE_SOM, ligado ? '1' : '0');
-        } catch (e) {
+        } catch {
             /* sem armazenamento */
         }
     }
 
     // ---------- som (Web Audio, sem arquivos) ----------
-    var ctx = null;
+    let ctx = null;
     function audio() {
         try {
             ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
             if (ctx.state === 'suspended') ctx.resume();
             return ctx;
-        } catch (e) {
+        } catch {
             return null;
         }
     }
     function tom(c, t0, freq, dur, vol, tipo, freqFim) {
-        var o = c.createOscillator(),
+        const o = c.createOscillator(),
             g = c.createGain();
         o.type = tipo || 'sine';
         o.frequency.setValueAtTime(freq, t0);
@@ -64,9 +64,9 @@
     }
     function canto(ave) {
         if (!somLigado()) return;
-        var c = audio();
+        const c = audio();
         if (!c) return;
-        var t = c.currentTime + 0.02;
+        const t = c.currentTime + 0.02;
         if (ave === 'araponga') {
             blem(c, t, 1180);
             blem(c, t + 0.26, 1180);
@@ -88,11 +88,11 @@
     // ---------- notas musicais saindo do bico ----------
     function notas(m) {
         if (movimentoReduzido()) return;
-        var box = m.querySelector('.notas');
+        const box = m.querySelector('.notas');
         if (!box) return;
-        var lado = m.classList.contains('tie') ? -1 : 1;
+        const lado = m.classList.contains('tie') ? -1 : 1;
         ['♪', '♫', '♪'].forEach(function (n, i) {
-            var e = document.createElement('span');
+            const e = document.createElement('span');
             e.className = 'nota-musical';
             e.textContent = n;
             e.style.setProperty('--dx', lado * (14 + i * 16));
@@ -109,7 +109,7 @@
     function anima(el, nome) {
         if (!el) return;
         if (nome !== 'triste') el.classList.remove('anima-triste');
-        var cls = 'anima-' + nome;
+        const cls = 'anima-' + nome;
         el.classList.remove(cls);
         void el.offsetWidth;
         el.classList.add(cls);
@@ -136,9 +136,9 @@
     // ---------- criação de mascote por JS (mesmo markup do Partials/mascote.ejs) ----------
     function criar(ave, opcoes) {
         opcoes = opcoes || {};
-        var d = DIMENSOES[ave] || DIMENSOES.araponga;
+        const d = DIMENSOES[ave] || DIMENSOES.araponga;
         function img(classe, nome) {
-            var i = document.createElement('img');
+            const i = document.createElement('img');
             i.className = classe;
             i.src = '/img/mascotes/' + ave + '-' + nome + '.png';
             i.alt = '';
@@ -147,22 +147,22 @@
             i.setAttribute('aria-hidden', 'true');
             return i;
         }
-        var m = document.createElement('div');
+        const m = document.createElement('div');
         m.className = 'mascote ' + ave;
         m.setAttribute('aria-hidden', 'true');
         if (opcoes.tamanho) m.style.width = opcoes.tamanho + 'px';
         if (opcoes.comGalho !== false) m.appendChild(img('galho', 'galho'));
-        var camada = document.createElement('div');
+        const camada = document.createElement('div');
         camada.className = 'camada-ave';
         camada.appendChild(img('corpo', 'corpo'));
         camada.appendChild(img('asa', 'asa'));
         ['palpebra', 'gota'].forEach(function (c) {
-            var s = document.createElement('span');
+            const s = document.createElement('span');
             s.className = c;
             camada.appendChild(s);
         });
         m.appendChild(camada);
-        var n = document.createElement('span');
+        const n = document.createElement('span');
         n.className = 'notas';
         m.appendChild(n);
         return m;
@@ -170,20 +170,19 @@
 
     // ---------- mensagem de sucesso: comemorar com canto e botão de som ----------
     // Chamar a partir de um clique do usuário (o navegador só libera o som logo após um clique).
-    function sucesso(container, texto, ave, opcoes) {
+    function sucesso(container, texto, ave) {
         if (!container) return null;
-        opcoes = opcoes || {};
         container.replaceChildren();
         container.classList.add('sucesso-mascote');
-        var m = criar(ave, { tamanho: 64 });
-        var span = document.createElement('span');
+        const m = criar(ave, { tamanho: 64 });
+        const span = document.createElement('span');
         span.className = 'sucesso-mascote__texto';
         span.textContent = texto;
-        var botao = document.createElement('button');
+        const botao = document.createElement('button');
         botao.type = 'button';
         botao.className = 'mascote-som';
         function rotular() {
-            var ligado = somLigado();
+            const ligado = somLigado();
             botao.setAttribute('aria-pressed', String(ligado));
             botao.setAttribute('aria-label', ligado ? 'Desligar o som do mascote' : 'Ligar o som do mascote');
             botao.title = ligado ? 'Som ligado' : 'Som desligado';
@@ -203,7 +202,7 @@
 
     // ---------- inicialização automática ----------
     function iniciar() {
-        var todos = Array.prototype.slice.call(document.querySelectorAll('.mascote'));
+        const todos = Array.prototype.slice.call(document.querySelectorAll('.mascote'));
 
         // Piscar a cada 4–7 s (único movimento contínuo), só se a página estiver visível.
         todos
@@ -234,22 +233,22 @@
                 return m.getAttribute('data-interacao') === 'asas';
             })
             .forEach(function (m) {
-                var alvo = m.closest('[data-mascote-alvo]') || m;
+                const alvo = m.closest('[data-mascote-alvo]') || m;
                 alvo.addEventListener('mouseenter', function () {
                     if (!m.classList.contains('anima-pouso') && !m.classList.contains('anima-asas')) anima(m, 'asas');
                 });
             });
 
         // Pousar uma vez, quando aparecer na tela.
-        var pousos = todos.filter(function (m) {
+        const pousos = todos.filter(function (m) {
             return m.hasAttribute('data-pouso');
         });
         if (pousos.length && 'IntersectionObserver' in window && !movimentoReduzido()) {
-            var obs = new IntersectionObserver(function (entradas) {
+            const obs = new IntersectionObserver(function (entradas) {
                 entradas.forEach(function (e) {
                     if (!e.isIntersecting) return;
                     obs.unobserve(e.target);
-                    var i = pousos.indexOf(e.target);
+                    const i = pousos.indexOf(e.target);
                     setTimeout(
                         function () {
                             anima(e.target, 'pouso');

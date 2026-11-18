@@ -152,6 +152,7 @@ body {
 .publish-note i {
   margin-top: 2px;
 }
+
 .publish-note p {
   margin: 0;
   font-size: 12px;
@@ -375,6 +376,7 @@ textarea {
   line-height: 1;
   cursor: pointer;
 }
+
 .mascot-assistant__close:hover {
   background: rgba(16, 37, 31, 0.1);
 }
@@ -488,19 +490,24 @@ textarea {
 .cep-status:empty {
   display: none;
 }
+
 .cep-status i {
   margin-top: 1px;
   font-size: 14px;
 }
+
 .cep-status--carregando {
   color: var(--publish-green-muted);
 }
+
 .cep-status--ok {
   color: #315f45;
 }
+
 .cep-status--aviso {
   color: #8a5a00;
 }
+
 .cep-status--erro {
   color: #b42318;
 }
@@ -519,6 +526,7 @@ textarea {
 .cep-help:hover {
   text-decoration: none;
 }
+
 .cep-help i {
   font-size: 12px;
   vertical-align: -1px;

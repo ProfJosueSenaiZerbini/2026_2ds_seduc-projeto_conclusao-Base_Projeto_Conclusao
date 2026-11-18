@@ -11,6 +11,7 @@
   aspect-ratio: var(--ar);
   flex-shrink: 0;
 }
+
 .mascote img {
   position: absolute;
   inset: 0;
@@ -20,11 +21,13 @@
   user-select: none;
   pointer-events: none;
 }
+
 .mascote .camada-ave {
   position: absolute;
   inset: 0;
   transform-origin: var(--pes);
 }
+
 .mascote .palpebra {
   position: absolute;
   left: var(--olho-x);
@@ -50,6 +53,7 @@
   --bico-y: 9%;
   --ombro: 56% 29.2%;
 }
+
 .mascote.tie {
   --ar: 393/310;
   --pes: 44% 73.2%;
@@ -63,6 +67,7 @@
   --ombro: 45.3% 28.4%;
   --lado: 1;
 }
+
 .mascote .asa {
   transform-origin: var(--ombro);
 }
@@ -71,49 +76,61 @@
 .anima-pouso .camada-ave {
   animation: pouso 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) both;
 }
+
 .anima-pouso .galho {
   animation: galho-cede 0.5s ease-out 0.5s both;
 }
+
 .anima-pouso .asa {
   animation: bater 0.62s ease-in-out;
 }
+
 @keyframes pouso {
   0% {
     opacity: 0;
     translate: calc(var(--lado, -1) * 90px) -120px;
     rotate: calc(var(--lado, -1) * -12deg);
   }
+
   45% {
     opacity: 1;
   }
+
   62% {
     translate: calc(var(--lado, -1) * 6px) -6px;
     rotate: calc(var(--lado, -1) * 3deg);
   }
+
   72% {
     translate: 0 0;
     rotate: 0deg;
     scale: 1.04 0.94;
   }
+
   86% {
     scale: 0.98 1.03;
   }
+
   100% {
     translate: 0 0;
     scale: 1 1;
     rotate: 0deg;
   }
 }
+
 @keyframes galho-cede {
   0% {
     translate: 0 0;
   }
+
   35% {
     translate: 0 4px;
   }
+
   70% {
     translate: 0 -1px;
   }
+
   100% {
     translate: 0 0;
   }
@@ -123,11 +140,13 @@
 .anima-pisca .palpebra {
   animation: pisca 0.22s ease-in-out;
 }
+
 @keyframes pisca {
   0%,
   100% {
     scale: 1 0;
   }
+
   45%,
   60% {
     scale: 1 1;
@@ -138,25 +157,31 @@
 .anima-pulo .camada-ave {
   animation: pulo 0.55s cubic-bezier(0.3, 0.6, 0.4, 1);
 }
+
 .anima-pulo .galho {
   animation: galho-cede 0.4s ease-out 0.33s;
 }
+
 @keyframes pulo {
   0% {
     translate: 0 0;
     scale: 1 1;
   }
+
   18% {
     scale: 1.04 0.94;
   }
+
   48% {
     translate: 0 -16px;
     scale: 0.97 1.04;
   }
+
   76% {
     translate: 0 0;
     scale: 1.03 0.96;
   }
+
   100% {
     translate: 0 0;
     scale: 1 1;
@@ -167,11 +192,13 @@
 .anima-curioso .camada-ave {
   animation: curioso 1.1s ease-in-out;
 }
+
 @keyframes curioso {
   0%,
   100% {
     rotate: 0deg;
   }
+
   30%,
   65% {
     rotate: calc(var(--lado, -1) * -6deg);
@@ -182,60 +209,74 @@
 .anima-comemora .camada-ave {
   animation: comemora 1s cubic-bezier(0.3, 0.6, 0.4, 1);
 }
+
 .anima-comemora .galho {
   animation: galho-cede2 1s ease-out;
 }
+
 .anima-comemora .asa {
   animation: bater 0.75s ease-in-out 0.08s;
 }
+
 @keyframes comemora {
   0% {
     translate: 0 0;
     scale: 1 1;
     rotate: 0deg;
   }
+
   10% {
     scale: 1.05 0.93;
   }
+
   28% {
     translate: 0 -22px;
     scale: 0.96 1.05;
     rotate: calc(var(--lado, -1) * -4deg);
   }
+
   46% {
     translate: 0 0;
     scale: 1.04 0.95;
     rotate: 0deg;
   }
+
   58% {
     translate: 0 -10px;
     scale: 0.98 1.03;
     rotate: calc(var(--lado, -1) * 3deg);
   }
+
   74% {
     translate: 0 0;
     scale: 1.02 0.98;
     rotate: 0deg;
   }
+
   100% {
     translate: 0 0;
     scale: 1 1;
   }
 }
+
 @keyframes galho-cede2 {
   0%,
   40% {
     translate: 0 0;
   }
+
   48% {
     translate: 0 4px;
   }
+
   58% {
     translate: 0 0;
   }
+
   76% {
     translate: 0 2px;
   }
+
   90%,
   100% {
     translate: 0 0;
@@ -247,41 +288,52 @@
   0% {
     rotate: 0deg;
   }
+
   12% {
     rotate: calc(var(--lado, -1) * -38deg);
   }
+
   25% {
     rotate: calc(var(--lado, -1) * -6deg);
   }
+
   38% {
     rotate: calc(var(--lado, -1) * -38deg);
   }
+
   52% {
     rotate: calc(var(--lado, -1) * -6deg);
   }
+
   66% {
     rotate: calc(var(--lado, -1) * -30deg);
   }
+
   84%,
   100% {
     rotate: 0deg;
   }
 }
+
 @keyframes pairar {
   0%,
   100% {
     translate: 0 0;
   }
+
   45% {
     translate: 0 -9px;
   }
 }
+
 .anima-asas .asa {
   animation: bater 0.7s ease-in-out;
 }
+
 .anima-asas .camada-ave {
   animation: pairar 0.7s ease-in-out;
 }
+
 .anima-asas .galho {
   animation: galho-cede 0.4s ease-out 0.5s;
 }
@@ -295,6 +347,7 @@
   height: 0;
   pointer-events: none;
 }
+
 .nota-musical {
   position: absolute;
   left: 0;
@@ -307,9 +360,11 @@
   opacity: 0;
   animation: nota-sobe 1.1s ease-out forwards;
 }
+
 .mascote.tie .nota-musical {
   --cor-nota: #c0262d;
 }
+
 @keyframes nota-sobe {
   0% {
     opacity: 0;
@@ -317,9 +372,11 @@
     scale: 0.6;
     rotate: 0deg;
   }
+
   15% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     translate: calc(var(--dx) * 1px) -70px;
@@ -332,38 +389,46 @@
 .anima-triste .camada-ave {
   animation: triste-corpo 1.6s ease-in-out forwards;
 }
+
 .anima-triste .palpebra {
   animation: triste-olho 1.6s ease-in-out forwards;
 }
+
 .anima-triste .gota {
   animation: gota 1.6s ease-in 0.5s forwards;
 }
+
 @keyframes triste-corpo {
   0% {
     rotate: 0deg;
     translate: 0 0;
     scale: 1 1;
   }
+
   35% {
     rotate: calc(var(--lado, -1) * -11deg);
     translate: 0 3px;
     scale: 1.02 0.96;
   }
+
   100% {
     rotate: calc(var(--lado, -1) * -9deg);
     translate: 0 3px;
     scale: 1.02 0.96;
   }
 }
+
 @keyframes triste-olho {
   0% {
     scale: 1 0;
   }
+
   35%,
   100% {
     scale: 1 0.55;
   }
 }
+
 .mascote .gota {
   position: absolute;
   left: calc(var(--olho-x) + var(--lado, -1) * -4%);
@@ -371,32 +436,38 @@
   width: 7px;
   height: 10px;
   background: #7fb7e6;
-  border-radius: 50% 50% 50% 50%/60% 60% 40% 40%;
+  border-radius: 50% / 60% 60% 40% 40%;
   opacity: 0;
 }
+
 @keyframes gota {
   0% {
     opacity: 0;
     translate: 0 0;
   }
+
   20% {
     opacity: 0.95;
   }
+
   80% {
     opacity: 0.9;
     translate: 0 22px;
   }
+
   100% {
     opacity: 0;
     translate: 0 30px;
   }
 }
+
 /* Pose triste mantida enquanto o alerta estiver na tela (também com movimento reduzido). */
 .estado-triste .camada-ave {
   rotate: calc(var(--lado, -1) * -9deg);
   translate: 0 3px;
   scale: 1.02 0.96;
 }
+
 .estado-triste .palpebra {
   scale: 1 0.55;
 }
@@ -418,6 +489,7 @@
   color: #3a1010;
   animation: alerta-entra 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+
 /* Mascote do alerta: 64 px (48 px no celular), sobre um círculo claro suave para a araponga ter contraste. */
 .alerta-sistema__ave {
   display: inline-grid;
@@ -429,21 +501,26 @@
   background: rgba(255, 255, 255, 0.88);
   box-shadow: inset 0 0 0 1px rgba(198, 40, 40, 0.12);
 }
+
 .alerta-sistema__ave[hidden] {
   display: none;
 }
+
 .alerta-sistema .mascote {
   width: 64px;
 }
+
 @media (max-width: 480px) {
   .alerta-sistema__ave {
     width: 58px;
     height: 58px;
   }
+
   .alerta-sistema .mascote {
     width: 48px !important;
   }
 }
+
 .alerta-sistema__texto {
   flex: 1 1 260px;
   min-width: 0;
@@ -456,12 +533,14 @@
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
+
 .alerta-sistema__icone {
   flex-shrink: 0;
   margin-top: 1px;
   color: #b91c1c;
   font-size: 20px;
 }
+
 .alerta-sistema__acao {
   display: inline-flex;
   align-items: center;
@@ -473,10 +552,12 @@
   font-weight: 700;
   text-decoration: none;
 }
+
 .alerta-sistema__acao:hover,
 .alerta-sistema__acao:focus-visible {
   background: #a61f1f;
 }
+
 .alerta-sistema--saindo {
   opacity: 0;
   translate: 0 -8px;
@@ -484,11 +565,13 @@
     opacity 0.4s ease,
     translate 0.4s ease;
 }
+
 @keyframes alerta-entra {
   from {
     opacity: 0;
     translate: 0 -10px;
   }
+
   to {
     opacity: 1;
     translate: 0 0;
@@ -507,14 +590,17 @@
   color: #0f5132;
   font-weight: 600;
 }
+
 .sucesso-mascote .mascote {
   width: 64px;
 }
+
 .sucesso-mascote__texto {
   flex: 1 1 auto;
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
 .mascote-som {
   flex-shrink: 0;
   width: 32px;
@@ -529,9 +615,11 @@
   cursor: pointer;
   font-size: 16px;
 }
+
 .mascote-som:hover {
   background: #fff;
 }
+
 .mascote-som:focus-visible {
   outline: 3px solid #759984;
   outline-offset: 2px;
@@ -543,6 +631,7 @@
   margin: 0 auto 10px;
   display: block;
 }
+
 .mascote-vazio .mascote {
   width: 90px;
 }
@@ -554,6 +643,7 @@
   .alerta-sistema {
     animation: none !important;
   }
+
   .nota-musical {
     display: none;
   }

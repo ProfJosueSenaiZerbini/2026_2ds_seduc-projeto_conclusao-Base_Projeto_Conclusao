@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+
   --cream: #f3ebdd;
   --paper: #fbf8f1;
   --forest: #173f35;
@@ -238,7 +239,7 @@ body[data-profile='trabalhador'] {
   width: 300px;
   aspect-ratio: 1;
   border: 1px solid rgba(23, 63, 53, 0.12);
-  border-radius: 48% 52% 43% 57% / 54% 46% 54% 46%;
+  border-radius: 48% 52% 43% 57% / 54% 46%;
   content: '';
   pointer-events: none;
   transition: border-color 220ms ease;

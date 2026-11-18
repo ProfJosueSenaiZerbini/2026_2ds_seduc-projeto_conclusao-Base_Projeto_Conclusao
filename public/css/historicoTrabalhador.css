@@ -637,7 +637,7 @@ body {
   border-radius: 14px;
   background: var(--history-surface);
   box-shadow: 0 10px 30px rgba(25, 25, 25, 0.16);
-  animation: tipIn 0.25s ease;
+  animation: tip-in 0.25s ease;
 }
 
 .tip-popup__icon {
@@ -692,7 +692,7 @@ body {
   color: var(--history-brand);
 }
 
-@keyframes tipIn {
+@keyframes tip-in {
   from {
     opacity: 0;
     transform: translateY(12px);
@@ -834,8 +834,7 @@ body {
   .bico-card__top > .bico-card__status {
     grid-column: 2;
     grid-row: 2;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
     align-items: center;
     justify-self: start;
     max-width: 100%;
@@ -984,6 +983,7 @@ body {
   color: inherit;
   text-decoration: underline;
 }
+
 .meta__no-rating {
   margin-left: 6px;
   font-size: 0.8em;
@@ -1001,16 +1001,19 @@ body {
   text-decoration: none;
   border: 1px solid transparent;
 }
+
 .selo-avaliacao--avaliar {
   background: #fef3c7;
   color: #92400e;
   border-color: #fcd34d;
 }
+
 .selo-avaliacao--avaliado {
   background: #dcfce7;
   color: #166534;
   border-color: #86efac;
 }
+
 .selo-avaliacao--encerrado {
   background: #f1f5f9;
   color: #64748b;
