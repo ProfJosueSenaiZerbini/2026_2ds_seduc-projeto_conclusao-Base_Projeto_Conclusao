@@ -20,7 +20,7 @@ body {
   padding: clamp(18px, 3vw, 28px);
   border: 1px solid var(--global-ibico-border);
   border-radius: 16px;
-  background: #ffffff;
+  background: #fff;
   box-shadow: 0 4px 16px rgba(16, 37, 31, 0.04);
 }
 
@@ -216,7 +216,10 @@ body {
   text-align: center;
   text-decoration: none;
   overflow-wrap: anywhere;
-  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .manage-job__link:hover {
@@ -311,7 +314,9 @@ body {
   font: inherit;
   font-weight: 650;
   cursor: pointer;
-  transition: background-color 0.18s ease, transform 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease;
 }
 
 .manage-job .evaluation-submit:hover:not(:disabled) {
@@ -391,7 +396,6 @@ body {
   font-size: 0.9rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .candidate-card__message {
@@ -399,7 +403,7 @@ body {
   padding: 12px 14px;
   border-left: 3px solid var(--contractor-sidebar-accent);
   border-radius: 0 8px 8px 0;
-  background: #ffffff;
+  background: #fff;
   color: var(--contractor-sidebar-primary);
   font-style: italic;
   line-height: 1.5;
@@ -460,7 +464,7 @@ body {
   overflow: visible;
   border: 1px solid var(--global-ibico-border);
   border-radius: 20px;
-  background: #ffffff;
+  background: #fff;
   color: var(--contractor-sidebar-primary);
   box-shadow: 0 24px 64px rgba(16, 37, 31, 0.22);
 }
@@ -536,7 +540,10 @@ body {
   font-weight: 700;
   line-height: 1.3;
   cursor: pointer;
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
 }
 
 .finalize-modal__button:hover {
@@ -716,19 +723,55 @@ body {
 }
 
 /* Avaliacao ja feita, somente leitura (prazo encerrado). */
-.evaluation-readonly { margin: 16px 0 0; }
-.evaluation-readonly__stars { color: #f59e0b; font-size: 1.6rem; letter-spacing: 2px; }
-.evaluation-readonly__comment { margin: 8px 0 0; color: #475569; line-height: 1.5; overflow-wrap: anywhere; }
+.evaluation-readonly {
+  margin: 16px 0 0;
+}
 
-.candidate-card__rating { margin: 4px 0 0; font-size: 0.9rem; color: #475569; }
-.candidate-card__stars { color: #b45309; font-weight: 700; }
-.candidate-card__no-rating { color: #64748b; }
-.candidate-card__link { color: var(--contractor-sidebar-primary, #0f766e); font-weight: 600; text-decoration: underline; }
+.evaluation-readonly__stars {
+  color: #f59e0b;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+}
+
+.evaluation-readonly__comment {
+  margin: 8px 0 0;
+  color: #475569;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.candidate-card__rating {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.candidate-card__stars {
+  color: #b45309;
+  font-weight: 700;
+}
+
+.candidate-card__no-rating {
+  color: #64748b;
+}
+
+.candidate-card__link {
+  color: var(--contractor-sidebar-primary, #0f766e);
+  font-weight: 600;
+  text-decoration: underline;
+}
 
 /* Mascote da lista de candidatos vazia: alinhado ao texto, que fica a esquerda. */
 .candidate-section .mascote-vazio {
   margin: 16px 0 0;
 }
 
-.candidate-card__concluidos { margin-top: 2px; }
-.candidate-card__concluidos { margin: 2px 0 0; font-size: 0.9rem; color: #475569; }
+.candidate-card__concluidos {
+  margin-top: 2px;
+}
+
+.candidate-card__concluidos {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: #475569;
+}

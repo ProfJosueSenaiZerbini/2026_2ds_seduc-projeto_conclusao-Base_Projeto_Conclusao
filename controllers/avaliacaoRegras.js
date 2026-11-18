@@ -48,10 +48,9 @@ export const normalizarComentario = (comentario) => {
 
 // Dados da tela do bico finalizado: avaliação já feita por este usuário e situação do prazo.
 export const carregarContextoAvaliacao = async (banco, bicoId, usuarioId, agora = new Date()) => {
-    const bicos = await banco.query(
-        `SELECT ${SQL_FINALIZADO_EM} AS finalizado_em FROM bicos b WHERE b.id = ?`,
-        [bicoId]
-    );
+    const bicos = await banco.query(`SELECT ${SQL_FINALIZADO_EM} AS finalizado_em FROM bicos b WHERE b.id = ?`, [
+        bicoId
+    ]);
     const avaliacoes = await banco.query(
         'SELECT nota, comentario FROM avaliacoes WHERE bico_id = ? AND avaliador_id = ?',
         [bicoId, usuarioId]

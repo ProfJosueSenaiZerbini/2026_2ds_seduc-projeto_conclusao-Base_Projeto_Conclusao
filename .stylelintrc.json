@@ -1,0 +1,50 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-declaration-strict-value"],
+  "rules": {
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "color",
+        "background-color",
+        "/^border(-(top|right|bottom|left|block|inline)(-(start|end))?)?-color$/",
+        "outline-color",
+        "fill"
+      ],
+      {
+        "expandShorthand": true,
+        "recurseLonghand": true,
+        "ignoreVariables": true,
+        "ignoreFunctions": false,
+        "ignoreValues": ["transparent", "currentcolor", "currentColor", "inherit", "initial", "unset", "none"],
+        "disableFix": true,
+        "severity": "warning",
+        "message": "Cor solta em \"${property}\": use var(--...) no lugar de \"${value}\" (hex/rgba só na definição de variáveis)."
+      }
+    ],
+    "declaration-property-value-disallowed-list": [
+      {
+        "box-shadow": ["/#[0-9a-fA-F]{3,8}\\b/", "/\\b(rgba?|hsla?)\\(/"]
+      },
+      {
+        "severity": "warning",
+        "message": "Cor solta em \"box-shadow\": use var(--...) para a cor da sombra (hex/rgba só na definição de variáveis)."
+      }
+    ],
+    "selector-class-pattern": [
+      "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+      { "message": "Use classes em kebab-case ou BEM (bloco__elemento--modificador)." }
+    ],
+
+    "declaration-block-single-line-max-declarations": null,
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "color-function-alias-notation": null,
+    "media-feature-range-notation": null,
+    "no-descending-specificity": null,
+    "selector-id-pattern": null,
+
+    "value-keyword-case": ["lower", { "camelCaseSvgKeywords": true, "ignoreProperties": ["/^--/"] }],
+    "property-no-deprecated": [true, { "ignoreProperties": ["clip"] }],
+    "no-duplicate-selectors": [true, { "severity": "warning" }]
+  }
+}

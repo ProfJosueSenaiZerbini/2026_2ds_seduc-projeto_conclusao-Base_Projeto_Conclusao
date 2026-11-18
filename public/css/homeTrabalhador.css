@@ -11,16 +11,16 @@
   --ibico-muted: #625e58;
   --ibico-line: #e5ded3;
   --ibico-line-strong: #d6cdbf;
-  --ibico-surface: #ffffff;
+  --ibico-surface: #fff;
   --ibico-page: #f5f2eb;
-  --ibico-shadow: 0 5px 22px rgba(25, 25, 25, .055);
+  --ibico-shadow: 0 5px 22px rgba(25, 25, 25, 0.055);
 }
 
 body {
   margin: 0;
   background: var(--ibico-page);
   color: var(--ibico-ink);
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
   font-size: 15px;
   line-height: 1.5;
 }
@@ -53,10 +53,10 @@ body main.home {
   border: 1px solid #34312e;
   border-radius: 18px;
   background:
-    radial-gradient(ellipse at 90% 50%, rgba(139, 23, 40, .16), transparent 36%),
+    radial-gradient(ellipse at 90% 50%, rgba(139, 23, 40, 0.16), transparent 36%),
     linear-gradient(112deg, #191919 0%, #202020 68%, #252323 100%);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(23, 23, 23, .1);
+  box-shadow: 0 10px 24px rgba(23, 23, 23, 0.1);
 }
 
 .home .hero::before {
@@ -65,7 +65,7 @@ body main.home {
   width: 4px;
   border-radius: 0 4px 4px 0;
   background: var(--ibico-red);
-  content: "";
+  content: '';
 }
 
 .home .hero__content {
@@ -83,7 +83,7 @@ body main.home {
   color: var(--ibico-red);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: .07em;
+  letter-spacing: 0.07em;
 }
 
 .home .hero .eyebrow {
@@ -106,7 +106,7 @@ body main.home {
   font-size: clamp(28px, 3vw, 38px);
   line-height: 1.12;
   font-weight: 750;
-  letter-spacing: -.035em;
+  letter-spacing: -0.035em;
 }
 
 .home .hero__content > p {
@@ -165,9 +165,9 @@ body main.home {
   width: 140px;
   height: 140px;
   margin-left: 10px;
-  border: 1px solid rgba(245, 242, 235, .15);
+  border: 1px solid rgba(245, 242, 235, 0.15);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 242, 235, .13) 0%, rgba(245, 242, 235, .06) 58%, transparent 59%);
+  background: radial-gradient(circle, rgba(245, 242, 235, 0.13) 0%, rgba(245, 242, 235, 0.06) 58%, transparent 59%);
 }
 
 .home .hero__mascot {
@@ -175,7 +175,7 @@ body main.home {
   width: 132px;
   max-width: 100%;
   height: auto;
-  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .2));
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.2));
 }
 
 /* ---------- Barra de pesquisa (fixa durante a rolagem) ---------- */
@@ -222,7 +222,9 @@ body main.home {
   padding: 0 16px;
   color: var(--ibico-red);
   font-size: 18px;
-  transition: border-color .16s ease, box-shadow .16s ease;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .home .search-box:hover {
@@ -231,7 +233,7 @@ body main.home {
 
 .home .search-box:focus-within {
   border-color: var(--ibico-red);
-  box-shadow: 0 0 0 3px rgba(139, 23, 40, .12);
+  box-shadow: 0 0 0 3px rgba(139, 23, 40, 0.12);
 }
 
 .home .search-box input {
@@ -264,7 +266,9 @@ body main.home {
   color: var(--ibico-muted);
   font-size: 13px;
   font-weight: 600;
-  transition: border-color .16s ease, box-shadow .16s ease;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .home .filter-select:hover {
@@ -273,7 +277,7 @@ body main.home {
 
 .home .filter-select:focus-within {
   border-color: var(--ibico-red);
-  box-shadow: 0 0 0 3px rgba(139, 23, 40, .12);
+  box-shadow: 0 0 0 3px rgba(139, 23, 40, 0.12);
 }
 
 .home .filter-select span {
@@ -288,14 +292,16 @@ body main.home {
   min-width: 0;
   height: 100%;
   margin: 0;
+
   /* O Chrome ignora padding para afastar a seta nativa; por isso o chevron é desenhado aqui,
      com espaço reservado à direita do texto (o texto nunca encosta nele). */
   padding: 0 26px 0 0;
   border: 0;
   outline: 0;
-  -webkit-appearance: none;
   appearance: none;
-  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23191919' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 2px center / 12px 8px;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23191919' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 2px center / 12px 8px;
   color: var(--ibico-ink);
   cursor: pointer;
   text-overflow: ellipsis;
@@ -316,7 +322,10 @@ body main.home {
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
-  transition: border-color .16s ease, color .16s ease, background-color .16s ease;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    background-color 0.16s ease;
 }
 
 .home .filter-reset i {
@@ -356,12 +365,12 @@ body main.home {
 }
 
 .home .section-heading h2 {
-  margin: 4px 0 4px;
+  margin: 4px 0;
   color: var(--ibico-ink);
   font-size: 26px;
   line-height: 1.25;
   font-weight: 750;
-  letter-spacing: -.03em;
+  letter-spacing: -0.03em;
 }
 
 .home .section-heading p {
@@ -425,7 +434,10 @@ body main.home {
   font: inherit;
   font-size: 13px;
   font-weight: 650;
-  transition: border-color .16s ease, background-color .16s ease, color .16s ease;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .home .area-chip span {
@@ -452,7 +464,7 @@ body main.home {
 }
 
 .home .area-chip.is-active span {
-  background: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, 0.22);
   color: #fff;
 }
 
@@ -481,14 +493,16 @@ body main.home {
   border: 1px solid #e7e2dc;
   border-radius: 14px;
   background: var(--ibico-surface);
-  box-shadow: 0 2px 8px rgba(23, 23, 23, .035);
-  transition: border-color .18s ease, box-shadow .18s ease;
+  box-shadow: 0 2px 8px rgba(23, 23, 23, 0.035);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .home .job-card:hover,
 .home .job-card:focus-within {
-  border-color: rgba(139, 23, 40, .5);
-  box-shadow: 0 6px 18px rgba(23, 23, 23, .07);
+  border-color: rgba(139, 23, 40, 0.5);
+  box-shadow: 0 6px 18px rgba(23, 23, 23, 0.07);
 }
 
 .home .job-icon {
@@ -526,7 +540,7 @@ body main.home {
   font-size: 19px;
   line-height: 1.3;
   font-weight: 700;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
 
@@ -581,7 +595,7 @@ body main.home {
   font-size: 24px;
   line-height: 1.2;
   font-weight: 800;
-  letter-spacing: -.02em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
@@ -600,7 +614,9 @@ body main.home {
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
-  transition: background-color .18s ease, box-shadow .18s ease;
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .home .btn-details > i {
@@ -610,7 +626,7 @@ body main.home {
 
 .home .btn-details:hover {
   background: var(--ibico-red-dark);
-  box-shadow: 0 3px 10px rgba(111, 18, 32, .2);
+  box-shadow: 0 3px 10px rgba(111, 18, 32, 0.2);
 }
 
 .home .btn-details:focus-visible {
@@ -651,7 +667,7 @@ body main.home {
   font: inherit;
   font-size: 14px;
   font-weight: 700;
-  transition: background-color .16s ease;
+  transition: background-color 0.16s ease;
 }
 
 .home .load-more:hover {
@@ -720,7 +736,9 @@ body main.home {
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px);
-  transition: opacity .2s, transform .2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .toast.show {
@@ -840,8 +858,7 @@ body main.home {
 
   /* Atalhos de bairro em uma única linha com rolagem lateral dentro do próprio bloco. */
   .home .area-filter {
-    flex-direction: column;
-    flex-wrap: nowrap;
+    flex-flow: column nowrap;
     align-items: stretch;
     gap: 8px;
   }
@@ -1016,10 +1033,42 @@ body main.home {
   }
 }
 
-.home .job-contratante { margin: 4px 0 8px; font-size: 0.9rem; color: #475569; }
-.home .job-contratante a { color: inherit; font-weight: 600; text-decoration: underline; }
-.home .job-contratante__nota { margin-left: 6px; color: #b45309; font-weight: 700; }
-.home .job-contratante__nota--vazia { color: #64748b; font-weight: 400; }
+.home .job-contratante {
+  margin: 4px 0 8px;
+  font-size: 0.9rem;
+  color: #475569;
+}
 
-.home .hero__avaliar { display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,0.12); color: #fff; font-weight: 600; text-decoration: none; }
-.home .hero__avaliar:hover { background: rgba(255,255,255,0.2); }
+.home .job-contratante a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.home .job-contratante__nota {
+  margin-left: 6px;
+  color: #b45309;
+  font-weight: 700;
+}
+
+.home .job-contratante__nota--vazia {
+  color: #64748b;
+  font-weight: 400;
+}
+
+.home .hero__avaliar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home .hero__avaliar:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

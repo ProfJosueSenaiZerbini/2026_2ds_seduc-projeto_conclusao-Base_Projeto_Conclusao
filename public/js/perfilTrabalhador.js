@@ -3,34 +3,39 @@
 
     // ---------- Modais ----------
     function abrir(id) {
-        var modal = document.getElementById(id);
+        const modal = document.getElementById(id);
         if (!modal) return;
         modal.classList.add('pt-aberto');
         modal.setAttribute('aria-hidden', 'false');
-        var primeiro = modal.querySelector('input:not([disabled])');
+        const primeiro = modal.querySelector('input:not([disabled])');
         if (primeiro) primeiro.focus();
     }
 
     function fechar(id) {
-        var modal = document.getElementById(id);
+        const modal = document.getElementById(id);
         if (!modal) return;
         modal.classList.remove('pt-aberto');
         modal.setAttribute('aria-hidden', 'true');
     }
 
     // Botões que abrem modais
-    var aberturas = {
+    const aberturas = {
         ptBtnEditar: 'ptModalEditar',
         ptBtnSenha: 'ptModalSenha'
     };
     Object.keys(aberturas).forEach(function (btnId) {
-        var btn = document.getElementById(btnId);
-        if (btn) btn.addEventListener('click', function () { abrir(aberturas[btnId]); });
+        const btn = document.getElementById(btnId);
+        if (btn)
+            btn.addEventListener('click', function () {
+                abrir(aberturas[btnId]);
+            });
     });
 
     // Botões de fechar / cancelar
     document.querySelectorAll('[data-pt-fechar]').forEach(function (el) {
-        el.addEventListener('click', function () { fechar(el.getAttribute('data-pt-fechar')); });
+        el.addEventListener('click', function () {
+            fechar(el.getAttribute('data-pt-fechar'));
+        });
     });
 
     // Clique no fundo escuro fecha o modal
@@ -43,16 +48,18 @@
     // ESC fecha qualquer modal aberto
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape') return;
-        document.querySelectorAll('.pt-modal-overlay.pt-aberto').forEach(function (m) { fechar(m.id); });
+        document.querySelectorAll('.pt-modal-overlay.pt-aberto').forEach(function (m) {
+            fechar(m.id);
+        });
     });
 
     // ---------- Mostrar / ocultar CPF ----------
-    var btnCpf = document.getElementById('ptBtnCpf');
-    var cpfValor = document.getElementById('ptCpfValor');
-    var cpfTexto = document.getElementById('ptCpfTexto');
+    const btnCpf = document.getElementById('ptBtnCpf');
+    const cpfValor = document.getElementById('ptCpfValor');
+    const cpfTexto = document.getElementById('ptCpfTexto');
     if (btnCpf && cpfValor) {
-        var cpfReal = cpfValor.getAttribute('data-cpf') || '';
-        var oculto = false;
+        const cpfReal = cpfValor.getAttribute('data-cpf') || '';
+        let oculto = false;
         btnCpf.addEventListener('click', function () {
             oculto = !oculto;
             cpfValor.textContent = oculto ? cpfReal.replace(/\d/g, '•') : cpfReal;
@@ -62,12 +69,12 @@
     }
 
     // ---------- Validação: confirmar nova senha ----------
-    var formSenha = document.getElementById('ptFormSenha');
+    const formSenha = document.getElementById('ptFormSenha');
     if (formSenha) {
         formSenha.addEventListener('submit', function (e) {
-            var nova = document.getElementById('novaSenha').value;
-            var conf = document.getElementById('confirmarNovaSenha').value;
-            var erro = document.getElementById('ptErroSenha');
+            const nova = document.getElementById('novaSenha').value;
+            const conf = document.getElementById('confirmarNovaSenha').value;
+            const erro = document.getElementById('ptErroSenha');
             if (nova !== conf) {
                 e.preventDefault();
                 erro.hidden = false;

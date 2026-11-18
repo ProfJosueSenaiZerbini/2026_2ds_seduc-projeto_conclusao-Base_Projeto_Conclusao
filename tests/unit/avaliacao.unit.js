@@ -26,7 +26,13 @@ const AGORA = new Date('2026-11-17T12:00:00');
 const diasAtras = (dias) => new Date(AGORA.getTime() - dias * 24 * 60 * 60 * 1000);
 
 // Banco falso: um bico e a tabela de avaliações; registra o que foi gravado.
-const criarBancoFalso = ({ status = 'Finalizado', finalizadoEm = diasAtras(1), trabalhadorId = TRABALHADOR_ID, bico = true, avaliacoes = [] } = {}) => {
+const criarBancoFalso = ({
+    status = 'Finalizado',
+    finalizadoEm = diasAtras(1),
+    trabalhadorId = TRABALHADOR_ID,
+    bico = true,
+    avaliacoes = []
+} = {}) => {
     const estado = {
         avaliacoes: avaliacoes.map((a) => ({ ...a })),
         inserts: [],
@@ -40,14 +46,27 @@ const criarBancoFalso = ({ status = 'Finalizado', finalizadoEm = diasAtras(1), t
             const comando = sql.replace(/\s+/g, ' ').trim();
             estado.consultas.push({ comando, params });
 
-            if (/^SELECT b\.contratante_id, b\.trabalhador_id, b\.status, .* AS finalizado_em FROM bicos b WHERE b\.id = \?/.test(comando)) {
+            if (
+                /^SELECT b\.contratante_id, b\.trabalhador_id, b\.status, .* AS finalizado_em FROM bicos b WHERE b\.id = \?/.test(
+                    comando
+                )
+            ) {
                 return bico
-                    ? [{ contratante_id: CONTRATANTE_ID, trabalhador_id: trabalhadorId, status, finalizado_em: finalizadoEm }]
+                    ? [
+                          {
+                              contratante_id: CONTRATANTE_ID,
+                              trabalhador_id: trabalhadorId,
+                              status,
+                              finalizado_em: finalizadoEm
+                          }
+                      ]
                     : [];
             }
             if (/^SELECT id FROM avaliacoes WHERE bico_id = \? AND avaliador_id = \?/.test(comando)) {
                 const [bicoId, avaliadorId] = params;
-                return estado.avaliacoes.filter((a) => a.bico_id === bicoId && a.avaliador_id === avaliadorId).map((a) => ({ id: a.id }));
+                return estado.avaliacoes
+                    .filter((a) => a.bico_id === bicoId && a.avaliador_id === avaliadorId)
+                    .map((a) => ({ id: a.id }));
             }
             if (/^UPDATE avaliacoes SET nota = \?, comentario = \? WHERE id = \?/.test(comando)) {
                 const [nota, comentario, id] = params;
@@ -58,7 +77,14 @@ const criarBancoFalso = ({ status = 'Finalizado', finalizadoEm = diasAtras(1), t
             }
             if (/^INSERT INTO avaliacoes/.test(comando)) {
                 const [bicoId, avaliadorId, avaliadoId, nota, comentario] = params;
-                const nova = { id: proximoId++, bico_id: bicoId, avaliador_id: avaliadorId, avaliado_id: avaliadoId, nota, comentario };
+                const nova = {
+                    id: proximoId++,
+                    bico_id: bicoId,
+                    avaliador_id: avaliadorId,
+                    avaliado_id: avaliadoId,
+                    nota,
+                    comentario
+                };
                 estado.avaliacoes.push(nova);
                 estado.inserts.push(nova);
                 return { affectedRows: 1, insertId: nova.id };
@@ -72,8 +98,14 @@ const criarBancoFalso = ({ status = 'Finalizado', finalizadoEm = diasAtras(1), t
 
 const criarRespostaFalsa = () => {
     const res = { statusCode: 200, corpo: undefined };
-    res.status = (codigo) => { res.statusCode = codigo; return res; };
-    res.json = (corpo) => { res.corpo = corpo; return res; };
+    res.status = (codigo) => {
+        res.statusCode = codigo;
+        return res;
+    };
+    res.json = (corpo) => {
+        res.corpo = corpo;
+        return res;
+    };
     return res;
 };
 
@@ -99,7 +131,12 @@ describe('avaliação: quem pode avaliar', () => {
         assert.deepEqual(res.corpo, { sucesso: true, acao: 'criada', mensagem: 'Avaliação registrada.' });
         assert.equal(estado.inserts.length, 1);
         assert.deepEqual(
-            { bico: estado.inserts[0].bico_id, de: estado.inserts[0].avaliador_id, para: estado.inserts[0].avaliado_id, nota: estado.inserts[0].nota },
+            {
+                bico: estado.inserts[0].bico_id,
+                de: estado.inserts[0].avaliador_id,
+                para: estado.inserts[0].avaliado_id,
+                nota: estado.inserts[0].nota
+            },
             { bico: BICO_ID, de: CONTRATANTE_ID, para: TRABALHADOR_ID, nota: 4 }
         );
     });
@@ -136,7 +173,10 @@ describe('avaliação: quem pode avaliar', () => {
     test('sem login responde 401; bico inexistente 404; id inválido 400', async () => {
         const { banco } = criarBancoFalso();
         assert.equal((await avaliar(banco, { usuarioId: undefined })).statusCode, 401);
-        assert.equal((await avaliar(criarBancoFalso({ bico: false }).banco, { usuarioId: CONTRATANTE_ID })).statusCode, 404);
+        assert.equal(
+            (await avaliar(criarBancoFalso({ bico: false }).banco, { usuarioId: CONTRATANTE_ID })).statusCode,
+            404
+        );
         assert.equal((await avaliar(banco, { usuarioId: CONTRATANTE_ID, bicoId: 'abc' })).statusCode, 400);
     });
 });
@@ -195,7 +235,16 @@ describe('avaliação: edição e prazo de 7 dias', () => {
     test('dentro do prazo, avaliar de novo atualiza (não cria outra avaliação)', async () => {
         const { banco, estado } = criarBancoFalso({
             finalizadoEm: diasAtras(3),
-            avaliacoes: [{ id: 7, bico_id: BICO_ID, avaliador_id: CONTRATANTE_ID, avaliado_id: TRABALHADOR_ID, nota: 4, comentario: 'Antes' }]
+            avaliacoes: [
+                {
+                    id: 7,
+                    bico_id: BICO_ID,
+                    avaliador_id: CONTRATANTE_ID,
+                    avaliado_id: TRABALHADOR_ID,
+                    nota: 4,
+                    comentario: 'Antes'
+                }
+            ]
         });
         const res = await avaliar(banco, { usuarioId: CONTRATANTE_ID, nota: '2', comentario: 'Depois' });
 
@@ -223,7 +272,16 @@ describe('avaliação: edição e prazo de 7 dias', () => {
     test('depois de 7 dias não edita a avaliação existente', async () => {
         const { banco, estado } = criarBancoFalso({
             finalizadoEm: diasAtras(10),
-            avaliacoes: [{ id: 7, bico_id: BICO_ID, avaliador_id: CONTRATANTE_ID, avaliado_id: TRABALHADOR_ID, nota: 4, comentario: 'Antes' }]
+            avaliacoes: [
+                {
+                    id: 7,
+                    bico_id: BICO_ID,
+                    avaliador_id: CONTRATANTE_ID,
+                    avaliado_id: TRABALHADOR_ID,
+                    nota: 4,
+                    comentario: 'Antes'
+                }
+            ]
         });
         const res = await avaliar(banco, { usuarioId: CONTRATANTE_ID, nota: '1', comentario: 'Tarde' });
 

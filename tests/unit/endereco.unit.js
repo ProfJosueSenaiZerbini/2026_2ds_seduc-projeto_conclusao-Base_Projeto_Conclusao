@@ -13,11 +13,17 @@ process.env.DB_NAME = 'banco_inexistente_testes_unitarios';
 delete process.env.CEP_FAKE;
 
 const {
-    validarCep, normalizarCep, formatarCep, validarNumeroEndereco, normalizarNumeroEndereco,
-    validarComplemento, validarLogradouro
+    validarCep,
+    normalizarCep,
+    formatarCep,
+    validarNumeroEndereco,
+    normalizarNumeroEndereco,
+    validarComplemento,
+    validarLogradouro
 } = await import('../../validations/bicoValidation.js');
 const { buscarEnderecoPorCep, CepIndisponivelError, modoCepFalso } = await import('../../services/cepService.js');
-const { criarCadastradorBico, prepararEnderecoParaExibicao, MENSAGEM_CEP_INDISPONIVEL } = await import('../../controllers/bicoController.js');
+const { criarCadastradorBico, prepararEnderecoParaExibicao, MENSAGEM_CEP_INDISPONIVEL } =
+    await import('../../controllers/bicoController.js');
 const { criarConsultorCep } = await import('../../controllers/cepController.js');
 const { default: pool } = await import('../../config/database.js');
 
@@ -46,22 +52,42 @@ const criarFetchFalso = ({ viaCep, brasilApi }) => {
     return { fetch, chamadas };
 };
 
-const foraDoAr = async () => { throw new TypeError('fetch failed'); };
-const naoDeveriaChamar = async () => { throw new Error('não deveria consultar esta API'); };
+const foraDoAr = async () => {
+    throw new TypeError('fetch failed');
+};
+const naoDeveriaChamar = async () => {
+    throw new Error('não deveria consultar esta API');
+};
 
 // Nunca responde: só termina quando o AbortController do serviço cancela a requisição.
-const travado = (opcoes) => new Promise((_, rejeitar) => {
-    opcoes.signal.addEventListener('abort', () => rejeitar(new DOMException('Aborted', 'AbortError')));
-});
+const travado = (opcoes) =>
+    new Promise((_, rejeitar) => {
+        opcoes.signal.addEventListener('abort', () => rejeitar(new DOMException('Aborted', 'AbortError')));
+    });
 
 const VIACEP_PAULISTA = {
-    cep: '01310-100', logradouro: 'Avenida Paulista', complemento: 'de 612 a 1510 - lado par',
-    bairro: 'Bela Vista', localidade: 'São Paulo', uf: 'SP'
+    cep: '01310-100',
+    logradouro: 'Avenida Paulista',
+    complemento: 'de 612 a 1510 - lado par',
+    bairro: 'Bela Vista',
+    localidade: 'São Paulo',
+    uf: 'SP'
 };
 const BRASILAPI_PAULISTA = {
-    cep: '01310100', state: 'SP', city: 'São Paulo', neighborhood: 'Bela Vista', street: 'Avenida Paulista', service: 'open-cep'
+    cep: '01310100',
+    state: 'SP',
+    city: 'São Paulo',
+    neighborhood: 'Bela Vista',
+    street: 'Avenida Paulista',
+    service: 'open-cep'
 };
-const ENDERECO_PAULISTA = { cep: '01310100', logradouro: 'Avenida Paulista', bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP' };
+const ENDERECO_PAULISTA = {
+    cep: '01310100',
+    logradouro: 'Avenida Paulista',
+    bairro: 'Bela Vista',
+    cidade: 'São Paulo',
+    uf: 'SP'
+};
 
 // ---------------------------------------------------------------- validações
 
@@ -70,7 +96,17 @@ describe('validações do endereço', () => {
         for (const cep of ['01310-100', '01310100', ' 01310-100 ']) {
             assert.equal(validarCep(cep), true, cep);
         }
-        for (const cep of ['0131010', '013101000', '01310-10a', 'abcdefgh', '01.310-100', '', undefined, null, 1310100]) {
+        for (const cep of [
+            '0131010',
+            '013101000',
+            '01310-10a',
+            'abcdefgh',
+            '01.310-100',
+            '',
+            undefined,
+            null,
+            1310100
+        ]) {
             assert.equal(validarCep(cep), false, String(cep));
         }
     });
@@ -115,7 +151,10 @@ describe('validações do endereço', () => {
 
 describe('cepService: buscarEnderecoPorCep', () => {
     test('CEP válido na ViaCEP: devolve o endereço normalizado sem consultar a BrasilAPI', async () => {
-        const { fetch, chamadas } = criarFetchFalso({ viaCep: async () => respostaJson(200, VIACEP_PAULISTA), brasilApi: naoDeveriaChamar });
+        const { fetch, chamadas } = criarFetchFalso({
+            viaCep: async () => respostaJson(200, VIACEP_PAULISTA),
+            brasilApi: naoDeveriaChamar
+        });
 
         assert.deepEqual(await buscarEnderecoPorCep('01310-100', { fetch }), ENDERECO_PAULISTA);
         assert.equal(chamadas.length, 1);
@@ -130,10 +169,10 @@ describe('cepService: buscarEnderecoPorCep', () => {
         });
 
         assert.equal(await buscarEnderecoPorCep('99999999', { fetch }), null);
-        assert.deepEqual(chamadas.map((c) => c.url), [
-            'https://viacep.com.br/ws/99999999/json/',
-            'https://brasilapi.com.br/api/cep/v2/99999999'
-        ]);
+        assert.deepEqual(
+            chamadas.map((c) => c.url),
+            ['https://viacep.com.br/ws/99999999/json/', 'https://brasilapi.com.br/api/cep/v2/99999999']
+        );
     });
 
     test('CEP novo que a ViaCEP ainda não tem ({"erro": "true"}): usa o endereço da BrasilAPI', async () => {
@@ -146,15 +185,25 @@ describe('cepService: buscarEnderecoPorCep', () => {
     });
 
     test('ViaCEP fora do ar: a BrasilAPI responde e o endereço é devolvido', async () => {
-        for (const viaCep of [foraDoAr, async () => respostaJson(500, null), async () => respostaJson(200, { qualquer: 'coisa' })]) {
-            const { fetch, chamadas } = criarFetchFalso({ viaCep, brasilApi: async () => respostaJson(200, BRASILAPI_PAULISTA) });
+        for (const viaCep of [
+            foraDoAr,
+            async () => respostaJson(500, null),
+            async () => respostaJson(200, { qualquer: 'coisa' })
+        ]) {
+            const { fetch, chamadas } = criarFetchFalso({
+                viaCep,
+                brasilApi: async () => respostaJson(200, BRASILAPI_PAULISTA)
+            });
             assert.deepEqual(await buscarEnderecoPorCep('01310100', { fetch }), ENDERECO_PAULISTA);
             assert.equal(chamadas.length, 2);
         }
     });
 
     test('ViaCEP estoura o tempo: a requisição é abortada e a BrasilAPI é usada', async () => {
-        const { fetch } = criarFetchFalso({ viaCep: travado, brasilApi: async () => respostaJson(200, BRASILAPI_PAULISTA) });
+        const { fetch } = criarFetchFalso({
+            viaCep: travado,
+            brasilApi: async () => respostaJson(200, BRASILAPI_PAULISTA)
+        });
 
         const inicio = Date.now();
         assert.deepEqual(await buscarEnderecoPorCep('01310100', { fetch, timeoutMs: 30 }), ENDERECO_PAULISTA);
@@ -170,7 +219,11 @@ describe('cepService: buscarEnderecoPorCep', () => {
         const silenciarConsole = console.error;
         console.error = () => {};
         try {
-            for (const [viaCep, brasilApi] of [[foraDoAr, foraDoAr], [travado, travado], [foraDoAr, async () => respostaJson(503, null)]]) {
+            for (const [viaCep, brasilApi] of [
+                [foraDoAr, foraDoAr],
+                [travado, travado],
+                [foraDoAr, async () => respostaJson(503, null)]
+            ]) {
                 const { fetch } = criarFetchFalso({ viaCep, brasilApi });
                 await assert.rejects(buscarEnderecoPorCep('01310100', { fetch, timeoutMs: 20 }), CepIndisponivelError);
             }
@@ -183,7 +236,10 @@ describe('cepService: buscarEnderecoPorCep', () => {
         const silenciarConsole = console.error;
         console.error = () => {};
         try {
-            const { fetch } = criarFetchFalso({ viaCep: async () => respostaJson(200, { erro: true }), brasilApi: foraDoAr });
+            const { fetch } = criarFetchFalso({
+                viaCep: async () => respostaJson(200, { erro: true }),
+                brasilApi: foraDoAr
+            });
             await assert.rejects(buscarEnderecoPorCep('01310100', { fetch }), CepIndisponivelError);
         } finally {
             console.error = silenciarConsole;
@@ -198,11 +254,17 @@ describe('cepService: buscarEnderecoPorCep', () => {
 
     test('CEP geral (sem rua e bairro) é devolvido com logradouro e bairro vazios', async () => {
         const { fetch } = criarFetchFalso({
-            viaCep: async () => respostaJson(200, { cep: '13690-000', logradouro: '', bairro: '', localidade: 'Descalvado', uf: 'SP' }),
+            viaCep: async () =>
+                respostaJson(200, { cep: '13690-000', logradouro: '', bairro: '', localidade: 'Descalvado', uf: 'SP' }),
             brasilApi: naoDeveriaChamar
         });
-        assert.deepEqual(await buscarEnderecoPorCep('13690000', { fetch }),
-            { cep: '13690000', logradouro: '', bairro: '', cidade: 'Descalvado', uf: 'SP' });
+        assert.deepEqual(await buscarEnderecoPorCep('13690000', { fetch }), {
+            cep: '13690000',
+            logradouro: '',
+            bairro: '',
+            cidade: 'Descalvado',
+            uf: 'SP'
+        });
     });
 });
 
@@ -227,8 +289,13 @@ describe('cepService: provedor falso (CEP_FAKE=1)', () => {
     test('responde os CEPs dos testes sem acessar a internet', async () => {
         assert.equal(modoCepFalso(), true);
         assert.deepEqual(await buscarEnderecoPorCep('01310-100'), ENDERECO_PAULISTA);
-        assert.deepEqual(await buscarEnderecoPorCep('13690-000'),
-            { cep: '13690000', logradouro: '', bairro: '', cidade: 'Descalvado', uf: 'SP' });
+        assert.deepEqual(await buscarEnderecoPorCep('13690-000'), {
+            cep: '13690000',
+            logradouro: '',
+            bairro: '',
+            cidade: 'Descalvado',
+            uf: 'SP'
+        });
         assert.equal(await buscarEnderecoPorCep('99999-999'), null);
     });
 
@@ -256,11 +323,28 @@ const criarBancoFalso = () => {
 const criarRespostaFalsa = () => {
     const resposta = {
         statusCode: 200,
-        status(codigo) { this.statusCode = codigo; return this; },
-        render(view, dados) { this.view = view; this.dados = dados; return this; },
-        redirect(url) { this.statusCode = 302; this.location = url; return this; },
-        json(dados) { this.corpo = dados; return this; },
-        send(dados) { this.corpo = dados; return this; }
+        status(codigo) {
+            this.statusCode = codigo;
+            return this;
+        },
+        render(view, dados) {
+            this.view = view;
+            this.dados = dados;
+            return this;
+        },
+        redirect(url) {
+            this.statusCode = 302;
+            this.location = url;
+            return this;
+        },
+        json(dados) {
+            this.corpo = dados;
+            return this;
+        },
+        send(dados) {
+            this.corpo = dados;
+            return this;
+        }
     };
     return resposta;
 };
@@ -278,13 +362,30 @@ const corpoValido = (extra = {}) => ({
 });
 
 // Colunas na ordem do INSERT do controller.
-const COLUNAS_INSERT = ['contratante_id', 'titulo', 'descricao', 'valor', 'bairro', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf', 'data_servico', 'horario'];
+const COLUNAS_INSERT = [
+    'contratante_id',
+    'titulo',
+    'descricao',
+    'valor',
+    'bairro',
+    'cep',
+    'logradouro',
+    'numero',
+    'complemento',
+    'cidade',
+    'uf',
+    'data_servico',
+    'horario'
+];
 const linhaInserida = (params) => Object.fromEntries(COLUNAS_INSERT.map((coluna, i) => [coluna, params[i]]));
 
 const publicar = async (corpo, buscarCep) => {
     const banco = criarBancoFalso();
     const chamadasCep = [];
-    const buscar = async (cep) => { chamadasCep.push(cep); return buscarCep(cep); };
+    const buscar = async (cep) => {
+        chamadasCep.push(cep);
+        return buscarCep(cep);
+    };
     const res = criarRespostaFalsa();
     await criarCadastradorBico(banco, buscar)({ body: corpo, session: { usuario: CONTRATANTE } }, res);
     return { res, banco, chamadasCep };
@@ -293,7 +394,13 @@ const publicar = async (corpo, buscarCep) => {
 describe('publicar bico com endereço verificado pelo CEP', () => {
     test('grava logradouro, bairro, cidade e UF da consulta e ignora os enviados no formulário', async () => {
         const { res, banco, chamadasCep } = await publicar(
-            corpoValido({ logradouro: 'Rua Inventada', bairro: 'Bairro Falso', cidade: 'Cidade Falsa', uf: 'XX', numero: 's/n' }),
+            corpoValido({
+                logradouro: 'Rua Inventada',
+                bairro: 'Bairro Falso',
+                cidade: 'Cidade Falsa',
+                uf: 'XX',
+                numero: 's/n'
+            }),
             async () => ({ ...ENDERECO_PAULISTA })
         );
 
@@ -319,7 +426,13 @@ describe('publicar bico com endereço verificado pelo CEP', () => {
     test('CEP geral: aceita rua e bairro do formulário, mas cidade e UF continuam vindo da consulta', async () => {
         const consulta = async () => ({ cep: '13690000', logradouro: '', bairro: '', cidade: 'Descalvado', uf: 'SP' });
         const { res, banco } = await publicar(
-            corpoValido({ cep: '13690-000', logradouro: ' Rua XV de Novembro ', bairro: 'Centro', cidade: 'Outra', uf: 'RJ' }),
+            corpoValido({
+                cep: '13690-000',
+                logradouro: ' Rua XV de Novembro ',
+                bairro: 'Centro',
+                cidade: 'Outra',
+                uf: 'RJ'
+            }),
             consulta
         );
 
@@ -339,7 +452,10 @@ describe('publicar bico com endereço verificado pelo CEP', () => {
         assert.match(semRua.res.dados.erro, /não informa a rua/);
         assert.equal(semRua.banco.insercoes.length, 0);
 
-        const semBairro = await publicar(corpoValido({ cep: '13690-000', logradouro: 'Rua Um', bairro: 'x' }), consulta);
+        const semBairro = await publicar(
+            corpoValido({ cep: '13690-000', logradouro: 'Rua Um', bairro: 'x' }),
+            consulta
+        );
         assert.equal(semBairro.res.statusCode, 400);
         assert.match(semBairro.res.dados.erro, /não informa o bairro/);
         assert.equal(semBairro.banco.insercoes.length, 0);
@@ -358,7 +474,9 @@ describe('publicar bico com endereço verificado pelo CEP', () => {
     });
 
     test('as duas APIs fora: o bico não é publicado e a mensagem pede para tentar de novo', async () => {
-        const { res, banco } = await publicar(corpoValido(), async () => { throw new CepIndisponivelError(); });
+        const { res, banco } = await publicar(corpoValido(), async () => {
+            throw new CepIndisponivelError();
+        });
 
         assert.equal(res.statusCode, 503);
         assert.equal(res.view, 'contratante/publicarBico');
@@ -379,7 +497,9 @@ describe('publicar bico com endereço verificado pelo CEP', () => {
         ];
 
         for (const [alteracao, mensagem] of casos) {
-            const { res, banco, chamadasCep } = await publicar(corpoValido(alteracao), async () => ({ ...ENDERECO_PAULISTA }));
+            const { res, banco, chamadasCep } = await publicar(corpoValido(alteracao), async () => ({
+                ...ENDERECO_PAULISTA
+            }));
             assert.equal(res.statusCode, 400, mensagem);
             assert.equal(res.dados.erro, mensagem);
             assert.equal(chamadasCep.length, 0, 'não chama as APIs com o formulário inválido');
@@ -406,10 +526,14 @@ describe('GET /api/cep/:cep', () => {
         assert.equal(inexistente.statusCode, 404);
         assert.deepEqual(inexistente.corpo, { erro: 'CEP não encontrado.' });
 
-        const invalido = await consultar('123', async () => { throw new Error('não deveria consultar'); });
+        const invalido = await consultar('123', async () => {
+            throw new Error('não deveria consultar');
+        });
         assert.equal(invalido.statusCode, 400);
 
-        const fora = await consultar('01310100', async () => { throw new CepIndisponivelError(); });
+        const fora = await consultar('01310100', async () => {
+            throw new CepIndisponivelError();
+        });
         assert.equal(fora.statusCode, 503);
         assert.equal(fora.corpo.erro, 'Não conseguimos verificar o CEP agora, tente novamente em instantes.');
     });
@@ -419,8 +543,16 @@ describe('GET /api/cep/:cep', () => {
 
 describe('privacidade do endereço nos detalhes do bico', () => {
     const bico = {
-        id: 1, contratante_id: 10, trabalhador_id: 20, bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP',
-        cep: '01310100', logradouro: 'Avenida Paulista', numero: '1578', complemento: 'Sala 4'
+        id: 1,
+        contratante_id: 10,
+        trabalhador_id: 20,
+        bairro: 'Bela Vista',
+        cidade: 'São Paulo',
+        uf: 'SP',
+        cep: '01310100',
+        logradouro: 'Avenida Paulista',
+        numero: '1578',
+        complemento: 'Sala 4'
     };
 
     test('o contratante dono e o trabalhador aceito recebem o endereço completo, com o CEP formatado', () => {
@@ -455,7 +587,18 @@ describe('privacidade do endereço nos detalhes do bico', () => {
     });
 
     test('bico antigo (sem CEP) continua com o bairro e sem CEP formatado', () => {
-        const antigo = { id: 2, contratante_id: 10, trabalhador_id: null, bairro: 'Centro', cep: null, logradouro: null, numero: null, complemento: null, cidade: null, uf: null };
+        const antigo = {
+            id: 2,
+            contratante_id: 10,
+            trabalhador_id: null,
+            bairro: 'Centro',
+            cep: null,
+            logradouro: null,
+            numero: null,
+            complemento: null,
+            cidade: null,
+            uf: null
+        };
         const exibido = prepararEnderecoParaExibicao(antigo, 10);
         assert.equal(exibido.bairro, 'Centro');
         assert.equal(exibido.cep_formatado, '');

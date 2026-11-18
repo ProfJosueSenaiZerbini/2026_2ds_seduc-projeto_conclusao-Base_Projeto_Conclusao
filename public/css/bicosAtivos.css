@@ -10,7 +10,7 @@
 
 body {
   background-color: var(--active-page-bg);
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
   color: var(--active-text-dark);
   margin: 0;
 }
@@ -51,7 +51,7 @@ body {
 
 .btn-new-job {
   background-color: var(--active-primary-green);
-  color: #ffffff;
+  color: #fff;
   font-weight: 600;
   padding: 0.8rem 1.4rem;
   border-radius: 10px;
@@ -94,9 +94,20 @@ body {
   font-size: 1.1rem;
 }
 
-.icon-green { background-color: #e6f4ed; color: var(--active-primary-green); }
-.icon-yellow { background-color: #fef3c7; color: #b45309; }
-.icon-blue { background-color: #e0f2fe; color: #0369a1; }
+.icon-green {
+  background-color: #e6f4ed;
+  color: var(--active-primary-green);
+}
+
+.icon-yellow {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.icon-blue {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
 
 .metric-info {
   display: flex;
@@ -121,8 +132,13 @@ body {
   font-weight: 600;
 }
 
-.text-green { color: #16a34a; }
-.text-muted { color: var(--active-muted); }
+.text-green {
+  color: #16a34a;
+}
+
+.text-muted {
+  color: var(--active-muted);
+}
 
 /* Content Section & Filters */
 .section-bar {
@@ -183,10 +199,10 @@ body {
 }
 
 .filter-btn.active {
-  background: #ffffff;
+  background: #fff;
   color: var(--active-text-dark);
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .filter-btn span {
@@ -226,7 +242,11 @@ body {
   border-radius: 20px;
 }
 
-.job-card .badge .ph-circle { margin-right: 4px; font-size: 7px; vertical-align: middle; }
+.job-card .badge .ph-circle {
+  margin-right: 4px;
+  font-size: 7px;
+  vertical-align: middle;
+}
 
 .badge-ongoing {
   background-color: #fef3c7;
@@ -249,7 +269,7 @@ body {
 .job-title {
   font-size: 1.1rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
 }
 
 .job-meta {
@@ -286,9 +306,20 @@ body {
   font-weight: 700;
 }
 
-.avatar-purple { background: #f3e8ff; color: #7e22ce; }
-.avatar-blue { background: #e0f2fe; color: #0369a1; }
-.avatar-proposals { background: #ffedd5; color: #c2410c; }
+.avatar-purple {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.avatar-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.avatar-proposals {
+  background: #ffedd5;
+  color: #c2410c;
+}
 
 .user-role {
   display: block;
@@ -331,7 +362,7 @@ body {
   border: 1px solid var(--active-primary-green);
   border-radius: 8px;
   background-color: var(--active-primary-green);
-  color: #ffffff;
+  color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.2;

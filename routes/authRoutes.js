@@ -1,6 +1,11 @@
 import express from 'express';
 import pool from '../config/database.js';
-import { cadastrarUsuario, logarUsuario, homeContratante, exibirHistoricoTrabalhador } from '../controllers/authController.js';
+import {
+    cadastrarUsuario,
+    logarUsuario,
+    homeContratante,
+    exibirHistoricoTrabalhador
+} from '../controllers/authController.js';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
 import { contarBicosParaAvaliar } from '../controllers/avaliacaoRegras.js';
 
@@ -50,7 +55,6 @@ const renderHomeTrabalhador = async (req, res) => {
         return res.status(500).send('Erro interno ao carregar as vagas.');
     }
 };
-
 
 // O painel e o historico ficam restritos ao perfil trabalhador.
 router.get('/hometrabalhador', requireAuth, requireRole('trabalhador'), renderHomeTrabalhador);

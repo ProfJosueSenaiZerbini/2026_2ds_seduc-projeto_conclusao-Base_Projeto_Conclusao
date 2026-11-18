@@ -1,0 +1,94 @@
+# Padrão de código e testes a cada push e pull request.
+# Banco MariaDB 11 como service, com o schema.sql importado; os E2E rodam com CEP_FAKE=1 (sem internet).
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: ci_root_senha
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      CI: true
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar o Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Importar o schema.sql no MariaDB
+        run: docker exec -i ${{ job.services.mariadb.id }} mariadb -uroot -pci_root_senha < schema.sql
+
+      - name: Gerar o .env do CI
+        run: |
+          cat > .env <<EOF
+          PORT=3000
+          NODE_ENV=development
+          SESSION_SECRET=$(openssl rand -hex 32)
+          DB_HOST=127.0.0.1
+          DB_USER=root
+          DB_PASSWORD=ci_root_senha
+          DB_NAME=db_bico
+          DB_PORT=3306
+          CEP_FAKE=1
+          EOF
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Prettier (format:check)
+        run: npm run format:check
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Stylelint
+        run: npm run lint:css
+
+      - name: Testes unitários
+        run: npm run test:unit
+
+      - name: Instalar o Firefox do Playwright
+        run: npx playwright install --with-deps firefox
+
+      - name: Testes E2E
+        run: npm test
+
+      - name: Publicar o relatório do Playwright
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

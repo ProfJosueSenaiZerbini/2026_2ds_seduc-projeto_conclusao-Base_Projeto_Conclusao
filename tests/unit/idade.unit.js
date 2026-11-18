@@ -40,10 +40,23 @@ const hasherFalso = {
 // Resposta falsa do Express: guarda status, render, send e redirect.
 const criarRespostaFalsa = () => {
     const res = { statusCode: 200 };
-    res.status = (codigo) => { res.statusCode = codigo; return res; };
-    res.render = (view, locais) => { res.view = view; res.locais = locais; return res; };
-    res.send = (corpo) => { res.corpo = corpo; return res; };
-    res.redirect = (url) => { res.redirecionadoPara = url; return res; };
+    res.status = (codigo) => {
+        res.statusCode = codigo;
+        return res;
+    };
+    res.render = (view, locais) => {
+        res.view = view;
+        res.locais = locais;
+        return res;
+    };
+    res.send = (corpo) => {
+        res.corpo = corpo;
+        return res;
+    };
+    res.redirect = (url) => {
+        res.redirecionadoPara = url;
+        return res;
+    };
     return res;
 };
 
@@ -73,7 +86,12 @@ describe('validarIdade', () => {
         assert.equal(IDADE_MAXIMA, 90);
     });
 
-    for (const [idade, esperado] of [[17, false], [18, true], [90, true], [91, false]]) {
+    for (const [idade, esperado] of [
+        [17, false],
+        [18, true],
+        [90, true],
+        [91, false]
+    ]) {
         test(`${idade} anos (número e texto) → ${esperado ? 'aceita' : 'rejeita'}`, () => {
             assert.equal(validarIdade(idade), esperado);
             assert.equal(validarIdade(String(idade)), esperado);

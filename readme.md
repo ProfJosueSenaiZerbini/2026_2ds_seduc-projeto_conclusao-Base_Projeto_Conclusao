@@ -126,6 +126,45 @@ Com o MariaDB ligado, execute `node scripts/prints-tcc.js`. O script cria dados 
 
 ---
 
+## 🧹 Padrão de código
+
+O projeto usa **Prettier** (formatação), **ESLint** (JavaScript) e **Stylelint** (CSS), todos instalados como dependências de desenvolvimento pelo `npm install`.
+
+| Comando                | O que faz                                                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `npm run format`       | Formata o projeto com o Prettier (grava as mudanças).                                                                   |
+| `npm run format:check` | Só confere a formatação, sem alterar nada (usado no GitHub Actions).                                                    |
+| `npm run lint`         | Analisa o JavaScript com o ESLint.                                                                                      |
+| `npm run lint:css`     | Analisa o CSS de `public/css` com o Stylelint.                                                                          |
+| `npm run test:unit`    | Testes unitários.                                                                                                       |
+| `npm test`             | Testes E2E (Playwright). O próprio Playwright sobe o servidor com `CEP_FAKE=1`, então a porta 3000 precisa estar livre. |
+
+**Regras principais**
+
+- JavaScript: 4 espaços, aspas simples, ponto e vírgula, sem vírgula final e linhas de até 120 caracteres. CSS, JSON, YAML, Markdown e HTML: 2 espaços. Views `.ejs` e scripts `.sql` não são formatados.
+- Fim de linha sempre **LF**, inclusive no Windows (garantido pelo `.gitattributes` e pelo `.editorconfig`).
+- CSS: classes em kebab-case ou BEM (`.wallet__card--primary`). Cores devem usar variáveis (`var(--...)`); hex e `rgba()` só na definição das variáveis. Por enquanto, cor solta gera **aviso**, não erro.
+
+**Extensões recomendadas do VS Code** (o editor sugere ao abrir o projeto, por causa do `.vscode/extensions.json`):
+
+- Prettier – Code formatter (`esbenp.prettier-vscode`)
+- ESLint (`dbaeumer.vscode-eslint`)
+- Stylelint (`stylelint.vscode-stylelint`)
+
+Com elas, o `.vscode/settings.json` formata o arquivo ao salvar e mostra os avisos do ESLint e do Stylelint no editor.
+
+**`git blame` sem o commit de formatação:** o commit `style: formatação inicial com Prettier` mexeu em quase todas as linhas de JS e CSS. Para o `git blame` mostrar quem escreveu cada linha de verdade, rode uma vez em cada clone:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+O arquivo `.git-blame-ignore-revs` lista os commits só de formatação. A visualização de blame do GitHub já usa esse arquivo automaticamente. Quando houver outro commit só de formatação, acrescente o hash completo dele nesse arquivo.
+
+**GitHub Actions:** o workflow `.github/workflows/testes.yml` roda, a cada push na `main` e a cada pull request, a conferência de formatação, os dois linters, os testes unitários e os E2E, usando um MariaDB 11 com o `schema.sql`. Se os E2E falharem, o relatório do Playwright fica disponível como artifact.
+
+---
+
 ## 📌 Status
 
 🚧 **Em desenvolvimento**

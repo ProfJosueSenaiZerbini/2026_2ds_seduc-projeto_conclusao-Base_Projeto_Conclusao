@@ -1,6 +1,6 @@
 :root {
   --worker-wallet-bg: #f5f2eb;
-  --worker-wallet-card: #ffffff;
+  --worker-wallet-card: #fff;
   --worker-wallet-border: #e5ded3;
   --worker-wallet-text-primary: #191919;
   --worker-wallet-text-secondary: #625e58;
@@ -10,7 +10,7 @@
   --worker-wallet-gray-bg: #f5f2eb;
   --worker-wallet-gray-text: #514d48;
   --worker-wallet-bar-gray: #e5ded3;
-  --worker-wallet-shadow: 0 2px 6px rgba(25, 25, 25, .035), 0 12px 28px rgba(25, 25, 25, .045);
+  --worker-wallet-shadow: 0 2px 6px rgba(25, 25, 25, 0.035), 0 12px 28px rgba(25, 25, 25, 0.045);
   --worker-wallet-radius-lg: 16px;
   --worker-wallet-radius-md: 10px;
   --worker-wallet-radius-full: 999px;
@@ -20,7 +20,7 @@ body {
   margin: 0;
   background: var(--worker-wallet-bg);
   color: var(--worker-wallet-text-primary);
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
   font-size: 15px;
   line-height: 1.5;
 }
@@ -50,7 +50,7 @@ body {
   font-size: clamp(30px, 3vw, 38px);
   font-weight: 750;
   line-height: 1.15;
-  letter-spacing: -.035em;
+  letter-spacing: -0.035em;
 }
 
 .title-row p {
@@ -97,7 +97,10 @@ body {
   font-weight: 600;
   line-height: 1.3;
   white-space: nowrap;
-  transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
 }
 
 /* Botão de contorno, discreto, com destaque vermelho da marca ao passar o mouse. */
@@ -129,7 +132,7 @@ body {
 
 .top-grid {
   display: grid;
-  grid-template-columns: minmax(270px, .9fr) minmax(0, 1.6fr);
+  grid-template-columns: minmax(270px, 0.9fr) minmax(0, 1.6fr);
   gap: 18px;
   margin-bottom: 24px;
 }
@@ -155,6 +158,7 @@ body {
   border-color: var(--worker-wallet-brand);
   background: var(--worker-wallet-brand);
   color: #fff;
+
   --balance-pad: 22px; /* mesmo valor do padding do card; usado pelo aviso para ocupar a largura toda */
 }
 
@@ -164,9 +168,9 @@ body {
   right: -32px;
   width: 150px;
   height: 150px;
-  border: 1px solid rgba(255, 255, 255, .13);
+  border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 50%;
-  content: "";
+  content: '';
   pointer-events: none;
 }
 
@@ -174,8 +178,8 @@ body {
 .balance-note {
   margin: 16px calc(var(--balance-pad) * -1) calc(var(--balance-pad) * -1);
   padding: 8px var(--balance-pad) 10px;
-  border-top: 1px solid rgba(255, 255, 255, .16);
-  background: rgba(25, 25, 25, .12);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(25, 25, 25, 0.12);
   color: #fff;
   font-size: 12px;
   line-height: 1.4;
@@ -186,12 +190,12 @@ body {
   color: var(--worker-wallet-text-secondary);
   font-size: 11px;
   font-weight: 750;
-  letter-spacing: .075em;
+  letter-spacing: 0.075em;
 }
 
 .balance-stack .card:first-child .balance-label,
 .balance-stack .card:first-child .balance-delta {
-  color: rgba(255, 255, 255, .82);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .balance-value {
@@ -199,7 +203,7 @@ body {
   font-size: clamp(27px, 3vw, 36px);
   font-weight: 800;
   line-height: 1.15;
-  letter-spacing: -.035em;
+  letter-spacing: -0.035em;
   overflow-wrap: anywhere;
 }
 
@@ -291,6 +295,7 @@ body {
 
 .bars {
   --bar-max: 130px; /* barra mais alta + rótulo precisam caber nos 160px do gráfico */
+
   display: flex;
   height: 160px;
   align-items: flex-end;
@@ -298,12 +303,7 @@ body {
   gap: 8px;
   padding: 0 8px;
   border-bottom: 1px solid var(--worker-wallet-border);
-  background: repeating-linear-gradient(
-    to top,
-    transparent 0,
-    transparent 39px,
-    rgba(229, 222, 211, .55) 40px
-  );
+  background: repeating-linear-gradient(to top, transparent 0, transparent 39px, rgba(229, 222, 211, 0.55) 40px);
 }
 
 .bar-col {
@@ -323,7 +323,7 @@ body {
   min-height: 2px;
   border-radius: 6px 6px 0 0;
   background: var(--worker-wallet-bar-gray);
-  transition: background-color .2s ease;
+  transition: background-color 0.2s ease;
 }
 
 /* Visão de 6 meses: escala pelo maior dos 6 e esconde os 6 mais antigos. */
@@ -414,7 +414,7 @@ body {
   color: var(--worker-wallet-text-secondary);
   font-size: 11px;
   font-weight: 750;
-  letter-spacing: .07em;
+  letter-spacing: 0.07em;
   text-align: left;
   text-transform: uppercase;
 }
@@ -426,7 +426,7 @@ body {
 
 .page tbody tr {
   border-bottom: 1px solid var(--worker-wallet-border);
-  transition: background-color .14s ease;
+  transition: background-color 0.14s ease;
 }
 
 .page tbody tr:hover {
@@ -499,17 +499,19 @@ body {
 }
 
 /* "Ver todo o histórico" é um botão: cursor de clique, destaque ao passar o mouse e foco visível. */
-.see-all[role="button"] {
+.see-all[role='button'] {
   cursor: pointer;
-  transition: background-color .16s ease, color .16s ease;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
 }
 
-.see-all[role="button"]:hover {
+.see-all[role='button']:hover {
   background: var(--worker-wallet-brand-soft);
   color: var(--worker-wallet-brand-dark);
 }
 
-.see-all[role="button"]:focus-visible {
+.see-all[role='button']:focus-visible {
   outline: 2px solid var(--worker-wallet-brand);
   outline-offset: -4px;
 }
@@ -522,7 +524,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(25, 25, 25, .58);
+  background: rgba(25, 25, 25, 0.58);
   backdrop-filter: blur(3px);
 }
 
@@ -539,7 +541,7 @@ body {
   border: 1px solid var(--worker-wallet-border);
   border-radius: var(--worker-wallet-radius-lg);
   background: var(--worker-wallet-card);
-  box-shadow: 0 20px 50px rgba(25, 25, 25, .22);
+  box-shadow: 0 20px 50px rgba(25, 25, 25, 0.22);
 }
 
 .modal-header {
@@ -564,7 +566,10 @@ body {
   color: var(--worker-wallet-text-secondary);
   cursor: pointer;
   font-size: 15px;
-  transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .modal-close:hover {
@@ -613,7 +618,7 @@ body {
     color: var(--worker-wallet-text-secondary);
     font-size: 11px;
     font-weight: 750;
-    letter-spacing: .07em;
+    letter-spacing: 0.07em;
     text-align: left;
     text-transform: uppercase;
     white-space: nowrap;
@@ -628,7 +633,7 @@ body {
     text-align: left;
     vertical-align: middle;
     overflow-wrap: anywhere;
-    transition: background-color .14s ease;
+    transition: background-color 0.14s ease;
   }
 
   /* Alinha as bordas da tabela com o título e a busca do modal (20px). */
@@ -757,7 +762,7 @@ body {
     color: var(--worker-wallet-text-secondary);
     font-size: 11px;
     font-weight: 750;
-    letter-spacing: .045em;
+    letter-spacing: 0.045em;
     text-transform: uppercase;
   }
 
@@ -769,7 +774,7 @@ body {
 
   .page .history-card td:nth-child(1)::before,
   .modal-scroll td:nth-child(1)::before {
-    content: "Tipo";
+    content: 'Tipo';
   }
 
   .page .history-card td:nth-child(2),
@@ -780,7 +785,7 @@ body {
 
   .page .history-card td:nth-child(2)::before,
   .modal-scroll td:nth-child(2)::before {
-    content: "Bico";
+    content: 'Bico';
   }
 
   .page .history-card td:nth-child(3),
@@ -791,7 +796,7 @@ body {
 
   .page .history-card td:nth-child(3)::before,
   .modal-scroll td:nth-child(3)::before {
-    content: "Data";
+    content: 'Data';
   }
 
   .page .history-card td:nth-child(4),
@@ -802,7 +807,7 @@ body {
 
   .page .history-card td:nth-child(4)::before,
   .modal-scroll td:nth-child(4)::before {
-    content: "Status";
+    content: 'Status';
   }
 
   .page .history-card td:nth-child(5),
@@ -817,7 +822,7 @@ body {
 
   .page .history-card td:nth-child(5)::before,
   .modal-scroll td:nth-child(5)::before {
-    content: "Valor";
+    content: 'Valor';
   }
 
   .page .badge,
@@ -889,6 +894,7 @@ body {
 
   .bars {
     --bar-max: 118px;
+
     height: 140px;
     gap: 4px;
     padding: 0 2px;

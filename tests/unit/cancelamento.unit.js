@@ -26,13 +26,7 @@ const BICO_ID = 5;
 const VALOR = 150;
 
 // Banco falso: guarda o estado das tabelas envolvidas e registra tudo que é executado.
-const criarBancoFalso = ({
-    bico,
-    movimentacoes = [],
-    pendentes = [],
-    aceitas = [],
-    saldoContratante = 0
-}) => {
+const criarBancoFalso = ({ bico, movimentacoes = [], pendentes = [], aceitas = [], saldoContratante = 0 }) => {
     const estado = {
         bico: bico ? { ...bico } : null,
         movimentacoes: movimentacoes.map((m) => ({ ...m })),
@@ -47,10 +41,18 @@ const criarBancoFalso = ({
     };
 
     const connection = {
-        beginTransaction: async () => { estado.transacao.push('begin'); },
-        commit: async () => { estado.transacao.push('commit'); },
-        rollback: async () => { estado.transacao.push('rollback'); },
-        release: () => { estado.transacao.push('release'); },
+        beginTransaction: async () => {
+            estado.transacao.push('begin');
+        },
+        commit: async () => {
+            estado.transacao.push('commit');
+        },
+        rollback: async () => {
+            estado.transacao.push('rollback');
+        },
+        release: () => {
+            estado.transacao.push('release');
+        },
         query: async (sql, params = []) => {
             estado.consultas.push({ sql, params });
             const comando = sql.replace(/\s+/g, ' ').trim();
@@ -122,23 +124,32 @@ const criarBancoFalso = ({
     return { estado, banco: { getConnection: async () => connection } };
 };
 
-const bicoAberto = { id: BICO_ID, contratante_id: CONTRATANTE_ID, trabalhador_id: null, valor: VALOR, status: 'Aberto' };
+const bicoAberto = {
+    id: BICO_ID,
+    contratante_id: CONTRATANTE_ID,
+    trabalhador_id: null,
+    valor: VALOR,
+    status: 'Aberto'
+};
 const bicoEmAndamento = { ...bicoAberto, trabalhador_id: TRABALHADOR_ID, status: 'Em andamento' };
 const reserva = { usuario_id: CONTRATANTE_ID, bico_id: BICO_ID, tipo: 'RESERVA', valor: VALOR };
 
 const criarRespostaFalsa = () => {
     const res = { statusCode: 200 };
-    res.status = (codigo) => { res.statusCode = codigo; return res; };
-    res.json = (corpo) => { res.corpo = corpo; return res; };
+    res.status = (codigo) => {
+        res.statusCode = codigo;
+        return res;
+    };
+    res.json = (corpo) => {
+        res.corpo = corpo;
+        return res;
+    };
     return res;
 };
 
 const cancelar = async (banco, { usuarioId = CONTRATANTE_ID, id = String(BICO_ID), body = {} } = {}) => {
     const res = criarRespostaFalsa();
-    await criarCanceladorBico(banco)(
-        { params: { id }, session: { usuario: { id: usuarioId } }, body },
-        res
-    );
+    await criarCanceladorBico(banco)({ params: { id }, session: { usuario: { id: usuarioId } }, body }, res);
     return res;
 };
 

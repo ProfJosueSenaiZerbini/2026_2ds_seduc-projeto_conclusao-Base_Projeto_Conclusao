@@ -6,9 +6,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // 1. IMPORTANTE: Importando o seu arquivo de rotas
-import authRoutes from './routes/authRoutes.js'; 
+import authRoutes from './routes/authRoutes.js';
 import bicoRoutes from './routes/bicoRoutes.js';
-import carteiraRoutes from './routes/carteiraRoutes.js'; 
+import carteiraRoutes from './routes/carteiraRoutes.js';
 import perfilRoutes from './routes/perfilRoutes.js';
 import cepRoutes from './routes/cepRoutes.js';
 import { modoCepFalso } from './services/cepService.js';
@@ -46,28 +46,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fluxo de login/configuração de sessão
-app.use(session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: isProduction
-    }
-}));
+app.use(
+    session({
+        secret: sessionSecret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: isProduction
+        }
+    })
+);
 
 // Disponibiliza as informações da sessão para todas as views (.ejs)
 app.use((req, res, next) => {
-  res.locals.usuario = req.session.usuario || null;
+    res.locals.usuario = req.session.usuario || null;
     // Disponibiliza a rota atual para destacar o item correto no menu.
     res.locals.rotaAtual = req.path;
-  next();
+    next();
 });
 
 // Saldo sempre atual (lido do banco) e alerta de uma só exibição para as views.
 app.use(carregarDadosDaSessao);
-
 
 // 2. CONECTANDO AS SUAS ROTAS:
 // Isso faz o Express ler o authRoutes.js para responder por /login e /cadastrar
@@ -77,13 +78,10 @@ app.use('/carteira', carteiraRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/api/cep', cepRoutes);
 
-
 // Página inicial do iBico
 app.get('/', (req, res) => {
     if (req.session?.usuario) {
-        const tipoPerfil = req.session.usuario.tipo_perfil
-            ?.trim()
-            .toLowerCase();
+        const tipoPerfil = req.session.usuario.tipo_perfil?.trim().toLowerCase();
 
         if (tipoPerfil === 'contratante') {
             return res.redirect('/homeContratante');
@@ -96,7 +94,6 @@ app.get('/', (req, res) => {
 
     return res.render('landing');
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

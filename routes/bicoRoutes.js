@@ -11,13 +11,9 @@ import {
     finalizarBico,
     salvarAvaliacaoBico,
     cancelarCandidatura,
-    cancelarBico,
+    cancelarBico
 } from '../controllers/bicoController.js';
-import {
-    exibirChatCandidatura,
-    listarNovasMensagensChat,
-    enviarMensagemChat
-} from '../controllers/chatController.js';
+import { exibirChatCandidatura, listarNovasMensagensChat, enviarMensagemChat } from '../controllers/chatController.js';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
