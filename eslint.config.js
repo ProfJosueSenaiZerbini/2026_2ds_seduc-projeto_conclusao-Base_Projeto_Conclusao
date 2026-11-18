@@ -50,7 +50,8 @@ export default [
 
     {
         rules: {
-            eqeqeq: ['error', 'always'],
+            // `x == null` (null ou undefined) é o único uso de == aceito.
+            eqeqeq: ['error', 'always', { null: 'ignore' }],
             'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
             'prefer-const': 'error',
             'no-var': 'error',
