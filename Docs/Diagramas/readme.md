@@ -1,4 +1,5 @@
 
+
 ## Acrescentar nesta pasta
 
 - Links para abrir os diagramas que forem executados
@@ -22,4 +23,4 @@
 
 
 ### Mapa de Empatia e Personas
-<img width="663" height="360" alt="personas" src="https://github.com/user-attachments/assets/96a70a90-8dc3-46d7-b637-5e4a6f92b1c8" />
+<img width="1920" height="1080" alt="download" src="https://github.com/user-attachments/assets/5c901ceb-0c37-4e82-8f8f-e572d24beebb" />
