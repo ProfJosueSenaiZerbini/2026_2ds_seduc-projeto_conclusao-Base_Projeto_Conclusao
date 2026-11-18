@@ -382,7 +382,7 @@ test.describe('Identidade visual do perfil público', () => {
         await expect(p1.locator('header.navbar')).toBeVisible();
         expect(await p1.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
             'rgb(243, 247, 244)'
-        ); // fundo das telas do contratante (--contractor-page-bg)
+        ); // fundo das telas do contratante (--contratante-fundo)
         expect(await p1.locator('.worker-card').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
             'rgb(20, 51, 43)'
         ); // verde-escuro

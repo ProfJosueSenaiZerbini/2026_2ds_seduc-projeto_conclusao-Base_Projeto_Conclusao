@@ -14,7 +14,7 @@
 /* Visão do contratante: fundo da página no padrão das telas do contratante (global.css).
    A visão do trabalhador (body.worker-details) define o próprio fundo mais abaixo. */
 body:not(.worker-details) {
-  background: var(--contractor-page-bg);
+  background: var(--contratante-fundo);
 }
 
 /* HERO BANNER DE DESTAQUE DO BICO */
