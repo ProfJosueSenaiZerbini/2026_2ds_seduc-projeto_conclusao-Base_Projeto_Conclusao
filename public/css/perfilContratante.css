@@ -5,8 +5,8 @@
   --contractor-profile-green-light: #e6f6ee;
   --contractor-profile-text: #0f2a22;
   --contractor-profile-text-muted: #6b7a84;
-  --contractor-profile-border: #e4e9ee;
-  --contractor-profile-bg: #f5f7f9;
+  --contractor-profile-border: var(--contractor-border);
+  --contractor-profile-bg: var(--contractor-page-bg);
 }
 
 body {

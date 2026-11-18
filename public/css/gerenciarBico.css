@@ -1,3 +1,8 @@
+/* Fundo da página no padrão das telas do contratante (global.css). */
+body {
+  background: var(--contractor-page-bg);
+}
+
 .manage-job {
   display: flex;
   width: min(100%, 1120px);

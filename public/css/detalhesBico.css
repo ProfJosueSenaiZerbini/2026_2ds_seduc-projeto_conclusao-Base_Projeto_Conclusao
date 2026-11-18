@@ -11,6 +11,12 @@
   --details-border: #e2e8f0;
 }
 
+/* Visão do contratante: fundo da página no padrão das telas do contratante (global.css).
+   A visão do trabalhador (body.worker-details) define o próprio fundo mais abaixo. */
+body:not(.worker-details) {
+  background: var(--contractor-page-bg);
+}
+
 /* HERO BANNER DE DESTAQUE DO BICO */
 .hero-banner {
   background: linear-gradient(135deg, var(--details-red-banner), var(--details-red-dark));

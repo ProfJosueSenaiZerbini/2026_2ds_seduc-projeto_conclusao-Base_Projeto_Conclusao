@@ -68,6 +68,10 @@ body {
   --contractor-sidebar-secondary: #1C3029;
   --contractor-sidebar-accent: #A8C5B4;
   --contractor-sidebar-white: #F3F4EF;
+  /* Fundo, superfícies e bordas das telas do contratante (padrão da aba Bicos Ativos). */
+  --contractor-page-bg: #f3f7f4;
+  --contractor-surface: #ffffff;
+  --contractor-border: #e2e8f0;
 }
 
 body:has(.contractor-sidebar) {

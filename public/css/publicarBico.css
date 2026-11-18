@@ -2,9 +2,9 @@
   --publish-primary: #10251f;
   --publish-primary-hover: #1c3029;
   --publish-ink: #10251f;
-  --publish-page-bg: #f5f4ee;
-  --publish-border: #e2e7e1;
-  --publish-surface-soft: #f3f4ef;
+  --publish-page-bg: var(--contractor-page-bg);
+  --publish-border: var(--contractor-border);
+  --publish-surface-soft: var(--contractor-surface);
   --publish-green-muted: #68766f;
   --publish-green-light: #e7f0e8;
 }
@@ -198,7 +198,7 @@ textarea {
 }
 
 .balance-box {
-  background: var(--publish-surface-soft);
+  background: var(--publish-page-bg);
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -488,7 +488,7 @@ textarea {
   padding: 20px 20px 0;
   border: 1px solid var(--publish-border);
   border-radius: 12px;
-  background: #fbfbf8;
+  background: var(--contractor-surface);
   min-width: 0;
 }
 
@@ -523,7 +523,7 @@ textarea {
 
 input[readonly] {
   border-style: dashed;
-  background: #eef0ea;
+  background: var(--publish-page-bg);
   color: #3f4f47;
   cursor: default;
 }

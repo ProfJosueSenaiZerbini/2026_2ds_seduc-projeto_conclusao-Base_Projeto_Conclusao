@@ -3,12 +3,12 @@
    ========================================================= */
 
 :root {
-  --contractor-wallet-bg: #FAF9F6;
+  --contractor-wallet-bg: var(--contractor-page-bg);
   --contractor-wallet-white: #FFFFFF;
   --contractor-wallet-ink: #14213D;
   --contractor-wallet-ink-soft: #4B5563;
   --contractor-wallet-muted: #6B7280;
-  --contractor-wallet-line: #E7E5E0;
+  --contractor-wallet-line: var(--contractor-border);
   --contractor-wallet-brand-green: #12372A;
   --contractor-wallet-brand-green-hover: #0C2A20;
   --contractor-wallet-brand-green-light: #E7F6EC;
@@ -16,6 +16,11 @@
   --contractor-wallet-radius-lg: 16px;
   --contractor-wallet-radius-md: 10px;
   --contractor-wallet-radius-full: 999px;
+}
+
+/* Fundo da página no padrão das telas do contratante (global.css). */
+body {
+  background: var(--contractor-wallet-bg);
 }
 
 /* LAYOUT E ESTRUTURA (DESKTOP) */
