@@ -66,17 +66,17 @@ Verifique ou crie o arquivo `backend/.env` baseado no `backend/.env.example`:
 PORT=3000
 
 # Conexão com o Supabase Online
-SUPABASE_URL=https://sujfguorzowifvtqymzs.supabase.co
+SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY=sua_chave_publica
 SUPABASE_SECRET_KEY=sua_chave_secreta
 
 # Segurança
-JWT_SECRET=super_secret_jwt_key_123456
+JWT_SECRET=
 
 # Administrador Inicial
-ADMIN_NOME=Administrador
-ADMIN_EMAIL=admin@blog.com
-ADMIN_SENHA=admin123
+ADMIN_NOME=
+ADMIN_EMAIL=
+ADMIN_SENHA=
 ```
 
 ### 4. Inicializar o Usuário Administrador
