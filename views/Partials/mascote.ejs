@@ -1,0 +1,14 @@
+<%
+  // Mascote em camadas (galho parado + corpo + asa + pálpebra + gota + notas).
+  // Parâmetros: ave 'araponga' | 'tie'; tamanho (largura em px, opcional: o CSS define a largura padrão);
+  //             comGalho (padrão true); piscar (padrão false); interacao 'asas' | 'nenhuma' (padrão 'nenhuma');
+  //             pouso (padrão false: pousa uma vez ao aparecer na tela); classe (classes extras, opcional).
+  const aveMascote = (typeof ave !== 'undefined' && ave === 'tie') ? 'tie' : 'araponga';
+  const dimMascote = aveMascote === 'tie' ? [393, 310] : [384, 359];
+  const larguraMascote = (typeof tamanho !== 'undefined' && Number(tamanho) > 0) ? Number(tamanho) : null;
+  const usaGalho = !(typeof comGalho !== 'undefined' && comGalho === false);
+  const piscaMascote = typeof piscar !== 'undefined' && piscar === true;
+  const asasMascote = typeof interacao !== 'undefined' && interacao === 'asas';
+  const pousoMascote = typeof pouso !== 'undefined' && pouso === true;
+  const classeExtra = (typeof classe !== 'undefined' && classe) ? ' ' + classe : '';
+%><div class="mascote <%= aveMascote %><%= classeExtra %>" data-ave="<%= aveMascote %>"<%- piscaMascote ? ' data-pisca' : '' %><%- asasMascote ? ' data-interacao="asas"' : '' %><%- pousoMascote ? ' data-pouso' : '' %><%- larguraMascote ? ` style="width:${larguraMascote}px"` : '' %> aria-hidden="true"><% if (usaGalho) { %><img class="galho" src="/img/mascotes/<%= aveMascote %>-galho.png" width="<%= dimMascote[0] %>" height="<%= dimMascote[1] %>" alt=""><% } %><div class="camada-ave"><img class="corpo" src="/img/mascotes/<%= aveMascote %>-corpo.png" width="<%= dimMascote[0] %>" height="<%= dimMascote[1] %>" alt=""><img class="asa" src="/img/mascotes/<%= aveMascote %>-asa.png" width="<%= dimMascote[0] %>" height="<%= dimMascote[1] %>" alt=""><span class="palpebra"></span><span class="gota"></span></div><span class="notas"></span></div>

@@ -1,0 +1,1004 @@
+:root {
+  --worker-wallet-bg: var(--trabalhador-creme);
+  --worker-wallet-card: var(--cor-branco);
+  --worker-wallet-border: var(--trabalhador-borda);
+  --worker-wallet-text-primary: var(--trabalhador-grafite);
+  --worker-wallet-text-secondary: var(--trabalhador-texto-suave);
+  --worker-wallet-brand: var(--trabalhador-vermelho);
+  --worker-wallet-brand-dark: var(--trabalhador-vermelho-escuro);
+  --worker-wallet-brand-soft: var(--trabalhador-rosa-suave);
+  --worker-wallet-gray-bg: var(--trabalhador-creme);
+  --worker-wallet-gray-text: var(--trabalhador-texto-suave);
+  --worker-wallet-bar-gray: var(--trabalhador-borda);
+  --worker-wallet-shadow: 0 2px 6px var(--trabalhador-grafite-a3-5), 0 12px 28px var(--trabalhador-grafite-a4-5);
+  --worker-wallet-radius-lg: 16px;
+  --worker-wallet-radius-md: 10px;
+  --worker-wallet-radius-full: 999px;
+}
+
+body {
+  margin: 0;
+  background: var(--worker-wallet-bg);
+  color: var(--worker-wallet-text-primary);
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 38px 32px 56px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.title-row > div:first-child {
+  min-width: 0;
+}
+
+.title-row h1 {
+  margin: 0;
+  color: var(--worker-wallet-text-primary);
+  font-size: clamp(30px, 3vw, 38px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.title-row p {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Mensagem curta abaixo do botão (relatório gerado / sem movimentações).
+   Prefixada por .title-row para vencer a regra ".title-row p" do subtítulo da página. */
+.title-row .actions-feedback {
+  max-width: 280px;
+  margin: 0;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: var(--worker-wallet-radius-md);
+  background: var(--cor-branco);
+  color: var(--worker-wallet-text-primary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+/* Botão de contorno, discreto, com destaque vermelho da marca ao passar o mouse. */
+.btn-secondary {
+  border-color: var(--worker-wallet-border);
+  background: var(--cor-branco);
+  color: var(--worker-wallet-text-primary);
+}
+
+.btn .ph {
+  color: var(--worker-wallet-brand);
+  font-size: 16px;
+}
+
+.btn:hover {
+  border-color: var(--worker-wallet-brand);
+  background: var(--worker-wallet-brand-soft);
+  color: var(--worker-wallet-brand-dark);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn:focus-visible,
+.modal-close:focus-visible,
+.search-box:focus-within {
+  outline: 2px solid var(--worker-wallet-brand);
+  outline-offset: 3px;
+}
+
+.top-grid {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.9fr) minmax(0, 1.6fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.balance-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: var(--worker-wallet-radius-lg);
+  background: var(--worker-wallet-card);
+  box-shadow: var(--worker-wallet-shadow);
+}
+
+.balance-stack .card:first-child {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--worker-wallet-brand);
+  background: var(--worker-wallet-brand);
+  color: var(--cor-branco);
+
+  --balance-pad: 22px; /* mesmo valor do padding do card; usado pelo aviso para ocupar a largura toda */
+}
+
+.balance-stack .card:first-child::before {
+  position: absolute;
+  top: -50px;
+  right: -32px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid var(--cor-branco-a13);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+/* Aviso de valor simulado: faixa na base do card, dentro do fluxo (quebra linha conforme a largura). */
+.balance-note {
+  margin: 16px calc(var(--balance-pad) * -1) calc(var(--balance-pad) * -1);
+  padding: 8px var(--balance-pad) 10px;
+  border-top: 1px solid var(--cor-branco-a16);
+  background: var(--trabalhador-grafite-a12);
+  color: var(--cor-branco);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.balance-label {
+  margin-bottom: 7px;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.075em;
+}
+
+.balance-stack .card:first-child .balance-label,
+.balance-stack .card:first-child .balance-delta {
+  color: var(--cor-branco-a82);
+}
+
+.balance-value {
+  color: var(--worker-wallet-text-primary);
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.balance-stack .card:first-child .balance-value {
+  color: var(--cor-branco);
+}
+
+.balance-delta,
+.balance-sub {
+  margin-top: 8px;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.balance-stack .card:nth-child(2) {
+  padding: 18px 22px;
+  box-shadow: none;
+}
+
+.balance-stack .card:nth-child(2) .balance-value {
+  font-size: clamp(23px, 2.4vw, 29px);
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.chart-header h3,
+.history-header h3,
+.modal-header h3 {
+  margin: 0;
+  color: var(--worker-wallet-text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.chart-header p {
+  margin: 5px 0 0;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 13px;
+}
+
+/* Aviso de valores simulados do gráfico (texto no HTML, em fluxo normal). */
+.chart-note {
+  margin: 0 0 16px;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.chart-select {
+  flex: 0 0 auto;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: 8px;
+  appearance: none;
+  background-color: var(--worker-wallet-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23625e58' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  color: var(--worker-wallet-text-primary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chart-select:hover {
+  border-color: var(--worker-wallet-brand);
+}
+
+.chart-select:focus-visible {
+  outline: 2px solid var(--worker-wallet-brand);
+  outline-offset: 2px;
+}
+
+.chart-empty {
+  margin: 10px 0 0;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.bars {
+  --bar-max: 130px; /* barra mais alta + rótulo precisam caber nos 160px do gráfico */
+
+  display: flex;
+  height: 160px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--worker-wallet-border);
+
+  --bars-fundo: repeating-linear-gradient(to top, transparent 0, transparent 39px, var(--trabalhador-borda-a55) 40px);
+
+  background: var(--bars-fundo);
+}
+
+.bar-col {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+/* A altura vem da proporção do mês (--p12 ou --p6), calculada no servidor; mês sem crédito fica no mínimo de 2px. */
+.bar {
+  width: min(36px, 75%);
+  height: calc(var(--p12, 0) * var(--bar-max));
+  min-height: 2px;
+  border-radius: 6px 6px 0 0;
+  background: var(--worker-wallet-bar-gray);
+  transition: background-color 0.2s ease;
+}
+
+/* Visão de 6 meses: escala pelo maior dos 6 e esconde os 6 mais antigos. */
+.chart--6 .bar {
+  height: calc(var(--p6, 0) * var(--bar-max));
+}
+
+.chart--6 .bar-col:nth-child(-n + 6) {
+  display: none;
+}
+
+.bar-label {
+  max-width: 100%;
+  white-space: nowrap;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 11px;
+}
+
+.bar.active {
+  background: var(--worker-wallet-brand);
+}
+
+.bar-col.active .bar-label {
+  color: var(--worker-wallet-text-primary);
+  font-weight: 700;
+}
+
+.history-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.search-box {
+  display: flex;
+  min-width: 280px;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: var(--worker-wallet-radius-md);
+  background: var(--cor-branco);
+  color: var(--worker-wallet-text-secondary);
+  font-size: 13px;
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--worker-wallet-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.search-box input::placeholder {
+  color: var(--trabalhador-texto-suave);
+  opacity: 1;
+}
+
+.page table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.page thead tr {
+  border-top: 1px solid var(--worker-wallet-border);
+  border-bottom: 1px solid var(--worker-wallet-border);
+  background: var(--worker-wallet-bg);
+}
+
+.page th {
+  padding: 11px 16px;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.page th:last-child,
+.page td:last-child {
+  text-align: right;
+}
+
+.page tbody tr {
+  border-bottom: 1px solid var(--worker-wallet-border);
+  transition: background-color 0.14s ease;
+}
+
+.page tbody tr:hover {
+  background: var(--trabalhador-creme-claro);
+}
+
+.page tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.page td {
+  padding: 13px 16px;
+  color: var(--worker-wallet-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.page td:nth-child(2) {
+  font-weight: 600;
+}
+
+.page .badge,
+.modal-scroll .badge {
+  display: inline-block;
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--worker-wallet-radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.page .badge--success,
+.modal-scroll .badge--success {
+  border-color: var(--contratante-verde-suave);
+  background: var(--contratante-verde-suave);
+  color: var(--contratante-verde-medio);
+}
+
+.page .badge--pending,
+.modal-scroll .badge--pending {
+  border-color: var(--aviso-fundo);
+  background: var(--trabalhador-creme);
+  color: var(--aviso);
+}
+
+.wallet__value--positive {
+  color: var(--worker-wallet-brand);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.wallet__value--negative {
+  color: var(--worker-wallet-text-primary);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.see-all {
+  padding: 15px 18px;
+  border-top: 1px solid var(--worker-wallet-border);
+  color: var(--worker-wallet-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: default;
+}
+
+/* "Ver todo o histórico" é um botão: cursor de clique, destaque ao passar o mouse e foco visível. */
+.see-all[role='button'] {
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.see-all[role='button']:hover {
+  background: var(--worker-wallet-brand-soft);
+  color: var(--worker-wallet-brand-dark);
+}
+
+.see-all[role='button']:focus-visible {
+  outline: 2px solid var(--worker-wallet-brand);
+  outline-offset: -4px;
+}
+
+.modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--trabalhador-grafite-a58);
+  backdrop-filter: blur(3px);
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  display: flex;
+  width: min(100%, 900px);
+  max-height: min(85vh, 820px);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: var(--worker-wallet-radius-lg);
+  background: var(--worker-wallet-card);
+  box-shadow: 0 20px 50px var(--sombra-cor-forte);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--worker-wallet-border);
+}
+
+.modal-close {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--worker-wallet-border);
+  border-radius: 9px;
+  background: var(--worker-wallet-bg);
+  color: var(--worker-wallet-text-secondary);
+  cursor: pointer;
+  font-size: 15px;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.modal-close:hover {
+  border-color: var(--worker-wallet-brand);
+  background: var(--worker-wallet-brand-soft);
+  color: var(--worker-wallet-brand);
+}
+
+.modal-search {
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--worker-wallet-border);
+  background: var(--trabalhador-creme-claro);
+}
+
+.modal-search .search-box {
+  width: 100%;
+  min-width: 0;
+}
+
+.modal-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+
+.modal-scroll thead th {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: var(--worker-wallet-bg);
+}
+
+/* O modal fica fora de .page, então a tabela dele repete o estilo da tabela principal.
+   Em telas pequenas (<=850px) ela vira cards pelas regras do @media abaixo. */
+@media (min-width: 851px) {
+  .modal-scroll table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+  }
+
+  .modal-scroll th {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--worker-wallet-border);
+    color: var(--worker-wallet-text-secondary);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.07em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .modal-scroll td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--worker-wallet-border);
+    color: var(--worker-wallet-text-primary);
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    transition: background-color 0.14s ease;
+  }
+
+  /* Alinha as bordas da tabela com o título e a busca do modal (20px). */
+  .modal-scroll th:first-child,
+  .modal-scroll td:first-child {
+    padding-left: 20px;
+  }
+
+  .modal-scroll th:last-child,
+  .modal-scroll td:last-child {
+    padding-right: 20px;
+    text-align: right;
+  }
+
+  .modal-scroll td:nth-child(2) {
+    font-weight: 600;
+  }
+
+  /* Valor em vermelho da marca, como já era no modal (a regra de cor da célula acima o sobrescreveria). */
+  .modal-scroll td.wallet__value--positive {
+    color: var(--worker-wallet-brand);
+  }
+
+  /* Só a descrição quebra linha; Tipo, Data, Status e Valor ficam em uma linha. */
+  .modal-scroll td:nth-child(1),
+  .modal-scroll td:nth-child(3),
+  .modal-scroll td:nth-child(4),
+  .modal-scroll td:nth-child(5) {
+    white-space: nowrap;
+  }
+
+  .modal-scroll tbody tr:hover td {
+    background: var(--trabalhador-creme-claro);
+  }
+
+  .modal-scroll tbody tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 850px) {
+  .page {
+    padding: 30px 24px 44px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .actions {
+    align-items: flex-start;
+  }
+
+  .title-row .actions-feedback {
+    text-align: left;
+  }
+
+  .top-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .balance-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .page .history-card table,
+  .modal-scroll table {
+    display: block;
+    width: 100%;
+  }
+
+  .page .history-card thead,
+  .modal-scroll thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .page .history-card tbody,
+  .modal-scroll tbody {
+    display: grid;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .page .history-card tbody tr,
+  .modal-scroll tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 5px 10px;
+    padding: 10px;
+    border: 1px solid var(--worker-wallet-border);
+    border-radius: 10px;
+    background: var(--cor-branco);
+  }
+
+  .page .history-card tbody tr:hover,
+  .modal-scroll tbody tr:hover {
+    background: var(--cor-branco);
+  }
+
+  .page .history-card td,
+  .modal-scroll td {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 0;
+    border: 0;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .page .history-card td::before,
+  .modal-scroll td::before {
+    flex: 0 0 auto;
+    color: var(--worker-wallet-text-secondary);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .page .history-card td:nth-child(1),
+  .modal-scroll td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .page .history-card td:nth-child(1)::before,
+  .modal-scroll td:nth-child(1)::before {
+    content: 'Tipo';
+  }
+
+  .page .history-card td:nth-child(2),
+  .modal-scroll td:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .page .history-card td:nth-child(2)::before,
+  .modal-scroll td:nth-child(2)::before {
+    content: 'Bico';
+  }
+
+  .page .history-card td:nth-child(3),
+  .modal-scroll td:nth-child(3) {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .page .history-card td:nth-child(3)::before,
+  .modal-scroll td:nth-child(3)::before {
+    content: 'Data';
+  }
+
+  .page .history-card td:nth-child(4),
+  .modal-scroll td:nth-child(4) {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .page .history-card td:nth-child(4)::before,
+  .modal-scroll td:nth-child(4)::before {
+    content: 'Status';
+  }
+
+  .page .history-card td:nth-child(5),
+  .modal-scroll td:nth-child(5) {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    justify-content: space-between;
+    align-self: start;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .page .history-card td:nth-child(5)::before,
+  .modal-scroll td:nth-child(5)::before {
+    content: 'Valor';
+  }
+
+  .page .badge,
+  .modal-scroll .badge {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 14px 36px;
+  }
+
+  .title-row {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .title-row h1 {
+    font-size: 30px;
+  }
+
+  .title-row p {
+    font-size: 14px;
+  }
+
+  .top-grid {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .balance-stack {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    padding: 17px;
+    border-radius: 13px;
+  }
+
+  .balance-stack .card:first-child {
+    --balance-pad: 17px;
+  }
+
+  .balance-stack .card:nth-child(2) {
+    padding: 16px 17px;
+  }
+
+  .chart-header {
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .chart-note {
+    margin-bottom: 14px;
+    font-size: 11px;
+  }
+
+  .chart-header h3,
+  .history-header h3,
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .chart-select {
+    font-size: 12px;
+  }
+
+  .bars {
+    --bar-max: 118px;
+
+    height: 140px;
+    gap: 4px;
+    padding: 0 2px;
+  }
+
+  .bar-col {
+    gap: 5px;
+  }
+
+  .bar {
+    width: min(28px, 70%);
+  }
+
+  .bar-label {
+    font-size: 10px;
+  }
+
+  /* 12 barras não comportam todos os rótulos: mostra um mês sim, outro não (o mês atual sempre aparece). */
+  .chart--12 .bar-col:nth-child(odd) .bar-label {
+    visibility: hidden;
+  }
+
+  /* O padding de .card sobrescrevia o padding 0 do histórico (a tabela ficava estreita e com margem dupla). */
+  .card.history-card {
+    padding: 0;
+  }
+
+  .history-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .search-box {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .modal-overlay {
+    align-items: center;
+    padding: 10px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    border-radius: 13px;
+  }
+
+  .modal-header {
+    padding: 12px 14px;
+  }
+
+  .modal-search {
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .title-row h1 {
+    font-size: 30px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .balance-stack .card:first-child {
+    --balance-pad: 15px;
+  }
+
+  .balance-note {
+    font-size: 11px;
+  }
+
+  .page .history-card tbody,
+  .modal-scroll tbody {
+    padding: 8px;
+  }
+
+  .page .history-card tbody tr,
+  .modal-scroll tbody tr {
+    grid-template-columns: minmax(0, 1fr) minmax(90px, auto);
+    gap: 5px 8px;
+    padding: 8px;
+  }
+
+  .page .history-card td,
+  .modal-scroll td {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .page tbody tr,
+  .modal-close,
+  .bar {
+    transition: none;
+  }
+}

@@ -1,0 +1,22 @@
+# Coerente com o .prettierrc: JS com 4 espaços; CSS, JSON, YAML, Markdown e HTML com 2.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+[*.{css,json,yml,yaml,md,html}]
+indent_size = 2
+
+# Views EJS (o Prettier não formata) seguem o recuo de 2 espaços que já usam.
+[*.ejs]
+indent_size = 2
+
+# Markdown usa dois espaços no fim da linha como quebra.
+[*.md]
+trim_trailing_whitespace = false
