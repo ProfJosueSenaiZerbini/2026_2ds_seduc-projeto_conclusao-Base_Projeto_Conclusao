@@ -1,0 +1,189 @@
+/* =========================================================
+   PALETA OFICIAL DO IBICO
+   Única fonte das cores do projeto: os demais arquivos usam var(--...).
+   Carregada em todas as telas, antes dos outros CSS.
+   ========================================================= */
+:root {
+  /* Neutros */
+  --cor-branco: #fff;
+  --cor-fundo: #f8fafc;
+  --cor-fundo-sutil: #f1f5f9;
+  --cor-borda: #e2e8f0;
+  --cor-borda-forte: #cbd5e1;
+  --cor-texto-mudo: #64748b;
+  --cor-texto-suave: #475569;
+  --cor-texto: #0f172a;
+
+  /* Contratante */
+  --contratante-fundo: #f3f7f4;
+  --contratante-verde-palido: #eef2f0;
+  --contratante-verde-suave: #e8efe9;
+  --contratante-verde-claro: #a8c5b4;
+  --contratante-verde-medio: #315f45;
+  --contratante-verde: #0b5c37;
+  --contratante-verde-hover: #08472a;
+  --contratante-musgo: #1c3029;
+  --contratante-noite: #10251f;
+  --contratante-texto-mudo: #68766f;
+  --contratante-texto-suave: #5f6f66;
+
+  /* Trabalhador */
+  --trabalhador-creme-claro: #faf8f4;
+  --trabalhador-creme: #f5f2eb;
+  --trabalhador-rosa-suave: #f2e5e3;
+  --trabalhador-borda: #e5ded3;
+  --trabalhador-texto-suave: #625e58;
+  --trabalhador-vermelho: #8b1728;
+  --trabalhador-vermelho-escuro: #68101e;
+  --trabalhador-grafite: #191919;
+  --trabalhador-borda-forte: #c9a8a9;
+  --trabalhador-borda-hover: #b9aea0;
+  --trabalhador-grafite-claro: #3b3836;
+
+  /* Estados */
+  --sucesso-fundo: #dcfce7;
+  --sucesso: #15803d;
+  --aviso-fundo: #fef3c7;
+  --aviso-estrela: #f59e0b;
+  --aviso: #b45309;
+  --aviso-escuro: #92400e;
+  --erro-fundo: #fdecec;
+  --erro: #b91c1c;
+  --erro-escuro: #991b1b;
+  --info-fundo: #e0f2fe;
+  --info: #0369a1;
+  --marca-ibico: #0d9488;
+  --sucesso-vivo: #16a34a;
+  --sucesso-borda: #86efac;
+  --aviso-borda: #fcd34d;
+  --erro-borda: #f1b9b9;
+
+  /* Cores próprias: mascotes e avatar */
+  --mascote-tie-pena: #e3302a;
+  --mascote-gota: #7fb7e6;
+  --avatar-roxo: #7e22ce;
+  --avatar-roxo-fundo: #f3e8ff;
+
+  /* Sombras (cor da sombra; o deslocamento e o desfoque ficam em cada regra) */
+  --sombra-cor-leve: color-mix(in srgb, var(--trabalhador-grafite) 5%, transparent);
+  --sombra-cor-media: color-mix(in srgb, var(--trabalhador-grafite) 12%, transparent);
+  --sombra-cor-forte: color-mix(in srgb, var(--trabalhador-grafite) 25%, transparent);
+
+  /* Transparências: cor da paleta + opacidade (nome-aNN = NN%) */
+  --contratante-musgo-a10: color-mix(in srgb, var(--contratante-musgo) 10%, transparent);
+  --contratante-musgo-a12: color-mix(in srgb, var(--contratante-musgo) 12%, transparent);
+  --contratante-musgo-a18: color-mix(in srgb, var(--contratante-musgo) 18%, transparent);
+  --contratante-musgo-a25: color-mix(in srgb, var(--contratante-musgo) 25%, transparent);
+  --contratante-musgo-a3-5: color-mix(in srgb, var(--contratante-musgo) 3.5%, transparent);
+  --contratante-musgo-a35: color-mix(in srgb, var(--contratante-musgo) 35%, transparent);
+  --contratante-musgo-a36: color-mix(in srgb, var(--contratante-musgo) 36%, transparent);
+  --contratante-musgo-a8: color-mix(in srgb, var(--contratante-musgo) 8%, transparent);
+  --contratante-musgo-a9: color-mix(in srgb, var(--contratante-musgo) 9%, transparent);
+  --contratante-noite-a10: color-mix(in srgb, var(--contratante-noite) 10%, transparent);
+  --contratante-noite-a28: color-mix(in srgb, var(--contratante-noite) 28%, transparent);
+  --contratante-noite-a5-5: color-mix(in srgb, var(--contratante-noite) 5.5%, transparent);
+  --contratante-noite-a55: color-mix(in srgb, var(--contratante-noite) 55%, transparent);
+  --contratante-verde-a30: color-mix(in srgb, var(--contratante-verde) 30%, transparent);
+  --contratante-verde-a6-5: color-mix(in srgb, var(--contratante-verde) 6.5%, transparent);
+  --contratante-verde-claro-a14: color-mix(in srgb, var(--contratante-verde-claro) 14%, transparent);
+  --contratante-verde-claro-a15: color-mix(in srgb, var(--contratante-verde-claro) 15%, transparent);
+  --contratante-verde-hover-a25: color-mix(in srgb, var(--contratante-verde-hover) 25%, transparent);
+  --contratante-verde-hover-a35: color-mix(in srgb, var(--contratante-verde-hover) 35%, transparent);
+  --cor-borda-a72: color-mix(in srgb, var(--cor-borda) 72%, transparent);
+  --cor-branco-a10: color-mix(in srgb, var(--cor-branco) 10%, transparent);
+  --cor-branco-a12: color-mix(in srgb, var(--cor-branco) 12%, transparent);
+  --cor-branco-a13: color-mix(in srgb, var(--cor-branco) 13%, transparent);
+  --cor-branco-a16: color-mix(in srgb, var(--cor-branco) 16%, transparent);
+  --cor-branco-a18: color-mix(in srgb, var(--cor-branco) 18%, transparent);
+  --cor-branco-a2-5: color-mix(in srgb, var(--cor-branco) 2.5%, transparent);
+  --cor-branco-a20: color-mix(in srgb, var(--cor-branco) 20%, transparent);
+  --cor-branco-a22: color-mix(in srgb, var(--cor-branco) 22%, transparent);
+  --cor-branco-a25: color-mix(in srgb, var(--cor-branco) 25%, transparent);
+  --cor-branco-a3-5: color-mix(in srgb, var(--cor-branco) 3.5%, transparent);
+  --cor-branco-a30: color-mix(in srgb, var(--cor-branco) 30%, transparent);
+  --cor-branco-a35: color-mix(in srgb, var(--cor-branco) 35%, transparent);
+  --cor-branco-a60: color-mix(in srgb, var(--cor-branco) 60%, transparent);
+  --cor-branco-a70: color-mix(in srgb, var(--cor-branco) 70%, transparent);
+  --cor-branco-a72: color-mix(in srgb, var(--cor-branco) 72%, transparent);
+  --cor-branco-a75: color-mix(in srgb, var(--cor-branco) 75%, transparent);
+  --cor-branco-a8: color-mix(in srgb, var(--cor-branco) 8%, transparent);
+  --cor-branco-a82: color-mix(in srgb, var(--cor-branco) 82%, transparent);
+  --cor-branco-a85: color-mix(in srgb, var(--cor-branco) 85%, transparent);
+  --cor-branco-a86: color-mix(in srgb, var(--cor-branco) 86%, transparent);
+  --cor-branco-a88: color-mix(in srgb, var(--cor-branco) 88%, transparent);
+  --cor-branco-a94: color-mix(in srgb, var(--cor-branco) 94%, transparent);
+  --cor-branco-a95: color-mix(in srgb, var(--cor-branco) 95%, transparent);
+  --cor-branco-a96: color-mix(in srgb, var(--cor-branco) 96%, transparent);
+  --cor-texto-a25: color-mix(in srgb, var(--cor-texto) 25%, transparent);
+  --cor-texto-a4: color-mix(in srgb, var(--cor-texto) 4%, transparent);
+  --cor-texto-a5: color-mix(in srgb, var(--cor-texto) 5%, transparent);
+  --cor-texto-a56: color-mix(in srgb, var(--cor-texto) 56%, transparent);
+  --cor-texto-a8: color-mix(in srgb, var(--cor-texto) 8%, transparent);
+  --cor-texto-mudo-a18: color-mix(in srgb, var(--cor-texto-mudo) 18%, transparent);
+  --erro-a10: color-mix(in srgb, var(--erro) 10%, transparent);
+  --erro-a12: color-mix(in srgb, var(--erro) 12%, transparent);
+  --erro-a3-5: color-mix(in srgb, var(--erro) 3.5%, transparent);
+  --erro-a35: color-mix(in srgb, var(--erro) 35%, transparent);
+  --sucesso-a14: color-mix(in srgb, var(--sucesso) 14%, transparent);
+  --sucesso-a16: color-mix(in srgb, var(--sucesso) 16%, transparent);
+  --sucesso-vivo-a15: color-mix(in srgb, var(--sucesso-vivo) 15%, transparent);
+  --sucesso-vivo-a20: color-mix(in srgb, var(--sucesso-vivo) 20%, transparent);
+  --trabalhador-borda-a32: color-mix(in srgb, var(--trabalhador-borda) 32%, transparent);
+  --trabalhador-borda-a55: color-mix(in srgb, var(--trabalhador-borda) 55%, transparent);
+  --trabalhador-borda-a60: color-mix(in srgb, var(--trabalhador-borda) 60%, transparent);
+  --trabalhador-borda-a75: color-mix(in srgb, var(--trabalhador-borda) 75%, transparent);
+  --trabalhador-borda-a78: color-mix(in srgb, var(--trabalhador-borda) 78%, transparent);
+  --trabalhador-borda-a84: color-mix(in srgb, var(--trabalhador-borda) 84%, transparent);
+  --trabalhador-borda-a96: color-mix(in srgb, var(--trabalhador-borda) 96%, transparent);
+  --trabalhador-creme-a13: color-mix(in srgb, var(--trabalhador-creme) 13%, transparent);
+  --trabalhador-creme-a15: color-mix(in srgb, var(--trabalhador-creme) 15%, transparent);
+  --trabalhador-creme-a18: color-mix(in srgb, var(--trabalhador-creme) 18%, transparent);
+  --trabalhador-creme-a20: color-mix(in srgb, var(--trabalhador-creme) 20%, transparent);
+  --trabalhador-creme-a6: color-mix(in srgb, var(--trabalhador-creme) 6%, transparent);
+  --trabalhador-creme-a62: color-mix(in srgb, var(--trabalhador-creme) 62%, transparent);
+  --trabalhador-grafite-a12: color-mix(in srgb, var(--trabalhador-grafite) 12%, transparent);
+  --trabalhador-grafite-a14: color-mix(in srgb, var(--trabalhador-grafite) 14%, transparent);
+  --trabalhador-grafite-a15: color-mix(in srgb, var(--trabalhador-grafite) 15%, transparent);
+  --trabalhador-grafite-a16: color-mix(in srgb, var(--trabalhador-grafite) 16%, transparent);
+  --trabalhador-grafite-a18: color-mix(in srgb, var(--trabalhador-grafite) 18%, transparent);
+  --trabalhador-grafite-a20: color-mix(in srgb, var(--trabalhador-grafite) 20%, transparent);
+  --trabalhador-grafite-a26: color-mix(in srgb, var(--trabalhador-grafite) 26%, transparent);
+  --trabalhador-grafite-a28: color-mix(in srgb, var(--trabalhador-grafite) 28%, transparent);
+  --trabalhador-grafite-a3-5: color-mix(in srgb, var(--trabalhador-grafite) 3.5%, transparent);
+  --trabalhador-grafite-a4-5: color-mix(in srgb, var(--trabalhador-grafite) 4.5%, transparent);
+  --trabalhador-grafite-a45: color-mix(in srgb, var(--trabalhador-grafite) 45%, transparent);
+  --trabalhador-grafite-a5-5: color-mix(in srgb, var(--trabalhador-grafite) 5.5%, transparent);
+  --trabalhador-grafite-a58: color-mix(in srgb, var(--trabalhador-grafite) 58%, transparent);
+  --trabalhador-grafite-a65: color-mix(in srgb, var(--trabalhador-grafite) 65%, transparent);
+  --trabalhador-grafite-a66: color-mix(in srgb, var(--trabalhador-grafite) 66%, transparent);
+  --trabalhador-grafite-a7: color-mix(in srgb, var(--trabalhador-grafite) 7%, transparent);
+  --trabalhador-grafite-a9: color-mix(in srgb, var(--trabalhador-grafite) 9%, transparent);
+  --trabalhador-vermelho-a10: color-mix(in srgb, var(--trabalhador-vermelho) 10%, transparent);
+  --trabalhador-vermelho-a12: color-mix(in srgb, var(--trabalhador-vermelho) 12%, transparent);
+  --trabalhador-vermelho-a14: color-mix(in srgb, var(--trabalhador-vermelho) 14%, transparent);
+  --trabalhador-vermelho-a15: color-mix(in srgb, var(--trabalhador-vermelho) 15%, transparent);
+  --trabalhador-vermelho-a16: color-mix(in srgb, var(--trabalhador-vermelho) 16%, transparent);
+  --trabalhador-vermelho-a18: color-mix(in srgb, var(--trabalhador-vermelho) 18%, transparent);
+  --trabalhador-vermelho-a19: color-mix(in srgb, var(--trabalhador-vermelho) 19%, transparent);
+  --trabalhador-vermelho-a20: color-mix(in srgb, var(--trabalhador-vermelho) 20%, transparent);
+  --trabalhador-vermelho-a50: color-mix(in srgb, var(--trabalhador-vermelho) 50%, transparent);
+  --trabalhador-vermelho-a6-5: color-mix(in srgb, var(--trabalhador-vermelho) 6.5%, transparent);
+  --trabalhador-vermelho-a8: color-mix(in srgb, var(--trabalhador-vermelho) 8%, transparent);
+  --trabalhador-vermelho-escuro-a20: color-mix(in srgb, var(--trabalhador-vermelho-escuro) 20%, transparent);
+  --trabalhador-vermelho-escuro-a24: color-mix(in srgb, var(--trabalhador-vermelho-escuro) 24%, transparent);
+  --trabalhador-vermelho-escuro-a30: color-mix(in srgb, var(--trabalhador-vermelho-escuro) 30%, transparent);
+  --trabalhador-vermelho-escuro-a42: color-mix(in srgb, var(--trabalhador-vermelho-escuro) 42%, transparent);
+
+  /* Variáveis globais anteriores (apontam para a paleta) */
+  --global-ibico-brand: var(--marca-ibico);
+  --global-ibico-green: var(--sucesso-vivo);
+  --global-ibico-ink: var(--cor-texto);
+  --global-ibico-page-bg: var(--cor-fundo);
+  --global-ibico-border: var(--cor-borda);
+  --global-ibico-text-muted: var(--cor-texto-mudo);
+  --worker-header-bg: var(--trabalhador-grafite);
+  --worker-header-border: var(--trabalhador-grafite-claro);
+  --worker-header-ink: var(--trabalhador-creme);
+  --worker-header-muted: var(--trabalhador-borda);
+  --worker-header-accent: var(--trabalhador-vermelho);
+}

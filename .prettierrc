@@ -1,0 +1,19 @@
+{
+  "tabWidth": 4,
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 120,
+  "endOfLine": "lf",
+  "trailingComma": "none",
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": "*.css",
+      "options": { "tabWidth": 2 }
+    },
+    {
+      "files": [".prettierrc", "*.json", "*.md", "*.yml", "*.yaml", "*.html"],
+      "options": { "tabWidth": 2 }
+    }
+  ]
+}

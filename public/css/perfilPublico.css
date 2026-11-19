@@ -1,0 +1,452 @@
+/* =============================================================================
+   Perfil público (trabalhador e contratante).
+   A identidade visual acompanha o perfil EXIBIDO:
+   - contratante (araponga): verde-escuro e creme;
+   - trabalhador (tiê-sangue): grafite, vinho e creme.
+   Fonte e cabeçalho são os do resto do sistema (Inter + menu de quem está vendo).
+   ============================================================================= */
+
+.perfil-publico {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  background: var(--pp-bg);
+  color: var(--pp-ink);
+}
+
+.perfil-publico.tema-contratante {
+  --pp-bg: var(--contratante-fundo);
+  --pp-surface: var(--cor-branco);
+  --pp-border: var(--cor-borda);
+  --pp-ink: var(--contratante-musgo);
+  --pp-muted: var(--contratante-texto-suave);
+  --pp-accent: var(--contratante-verde-medio);
+  --pp-accent-soft: var(--contratante-verde-suave);
+  --pp-hero: var(--contratante-musgo);
+  --pp-hero-ink: var(--trabalhador-creme);
+  --pp-hero-muted: var(--contratante-verde-claro);
+  --pp-bar-track: var(--cor-borda);
+  --pp-star: var(--aviso-estrela);
+}
+
+.perfil-publico.tema-trabalhador {
+  --pp-bg: var(--trabalhador-creme);
+  --pp-surface: var(--trabalhador-creme-claro);
+  --pp-border: var(--trabalhador-borda);
+  --pp-ink: var(--trabalhador-grafite);
+  --pp-muted: var(--trabalhador-texto-suave);
+  --pp-accent: var(--trabalhador-vermelho);
+  --pp-accent-soft: var(--erro-fundo);
+  --pp-hero: var(--trabalhador-grafite);
+  --pp-hero-ink: var(--trabalhador-rosa-suave);
+  --pp-hero-muted: var(--trabalhador-borda-forte);
+  --pp-bar-track: var(--trabalhador-borda);
+  --pp-star: var(--aviso-estrela);
+}
+
+.public-profile {
+  width: min(900px, 100%);
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--pp-muted);
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+  color: var(--pp-accent);
+  text-decoration: underline;
+}
+
+/* ---------- cabeçalho do perfil ---------- */
+.worker-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 30px;
+  border-radius: 16px;
+  background: var(--pp-hero);
+  color: var(--pp-hero-ink);
+  box-shadow: 0 8px 24px var(--sombra-cor-media);
+}
+
+.worker-avatar {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  flex: 0 0 82px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pp-accent);
+  color: var(--cor-branco);
+  font-size: 1.65rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 3px var(--cor-branco-a18);
+}
+
+.worker-summary {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--pp-hero-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.worker-summary h1 {
+  margin: 0;
+  color: var(--pp-hero-ink);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.profile-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 8px 0 10px;
+  padding: 0;
+  list-style: none;
+  color: var(--pp-hero-muted);
+  font-size: 0.95rem;
+}
+
+.overall-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 8px;
+}
+
+.rating-stars,
+.review-stars {
+  color: var(--pp-star);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.worker-card .rating-stars {
+  color: var(--aviso-estrela);
+  font-size: 1.35rem;
+}
+
+.overall-rating strong {
+  color: var(--pp-hero-ink);
+  font-size: 1rem;
+}
+
+.review-count {
+  color: var(--pp-hero-muted);
+}
+
+.no-rating {
+  margin: 6px 0 0;
+  color: var(--pp-hero-muted);
+}
+
+.perfil-mascote {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: -6px -6px -14px 0;
+}
+
+.perfil-mascote .mascote {
+  width: 96px;
+}
+
+/* ---------- seções ---------- */
+.reputation-section,
+.review-card {
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-border);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px var(--sombra-cor-leve);
+}
+
+.reputation-section {
+  margin: 24px 0;
+  padding: 22px;
+}
+
+.reviews-section {
+  margin-top: 34px;
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--pp-ink);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.section-heading > span {
+  color: var(--pp-muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- reputação ---------- */
+.reputation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.reputation-block h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pp-ink);
+}
+
+.reputation-note {
+  margin: 10px 0 0;
+  color: var(--pp-muted);
+  font-size: 0.9rem;
+}
+
+.dist-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dist-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--pp-ink);
+}
+
+.dist-label {
+  font-weight: 700;
+  color: var(--pp-star);
+}
+
+.dist-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pp-bar-track);
+  overflow: hidden;
+}
+
+.dist-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pp-accent);
+}
+
+.dist-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.indicator-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.indicator-list > div {
+  display: grid;
+  gap: 2px;
+}
+
+.indicator-list dt {
+  color: var(--pp-muted);
+  font-size: 0.85rem;
+}
+
+.indicator-list dd {
+  margin: 0;
+  color: var(--pp-ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.indicator-list small {
+  color: var(--pp-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.indicator-empty {
+  color: var(--pp-muted) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* ---------- avaliações ---------- */
+.reviews-list {
+  display: grid;
+  gap: 14px;
+}
+
+.review-card {
+  padding: 22px 24px;
+}
+
+.review-card[hidden] {
+  display: none;
+}
+
+.review-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.review-heading h3 {
+  margin: 0;
+  color: var(--pp-ink);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.review-heading time {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--pp-muted);
+  font-size: 0.85rem;
+}
+
+.review-stars {
+  font-size: 1.1rem;
+}
+
+.review-comment {
+  margin: 16px 0 0;
+  color: var(--pp-ink);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.review-role {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--pp-accent-soft);
+  color: var(--pp-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.empty-reviews {
+  padding: 36px 20px;
+  border: 1px dashed var(--pp-border);
+  border-radius: 14px;
+  background: var(--pp-surface);
+  text-align: center;
+}
+
+.empty-star {
+  color: var(--pp-star);
+  font-size: 2.3rem;
+}
+
+.empty-reviews p {
+  margin: 10px 0 6px;
+  color: var(--pp-ink);
+  font-weight: 700;
+}
+
+.empty-reviews > span:last-child {
+  color: var(--pp-muted);
+  font-size: 0.9rem;
+}
+
+.see-all-button {
+  display: block;
+  margin: 16px auto 0;
+  padding: 10px 22px;
+  border: 1px solid var(--pp-accent);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--pp-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.see-all-button:hover,
+.see-all-button:focus-visible {
+  background: var(--pp-accent);
+  color: var(--cor-branco);
+}
+
+@media (max-width: 640px) {
+  .public-profile {
+    padding: 24px 16px 48px;
+  }
+
+  .reputation-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .worker-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 22px 18px;
+  }
+
+  .worker-avatar {
+    width: 58px;
+    height: 58px;
+    flex-basis: 58px;
+    font-size: 1.25rem;
+  }
+
+  .perfil-mascote {
+    order: 3;
+    margin: 0 0 0 auto;
+  }
+
+  .perfil-mascote .mascote {
+    width: 72px;
+  }
+
+  .review-card {
+    padding: 18px;
+  }
+
+  .review-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

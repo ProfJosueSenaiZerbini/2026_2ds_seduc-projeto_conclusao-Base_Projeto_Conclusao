@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibico | Extrato da Carteira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <%- include('../Partials/phosphorIcons') %>
+    <link rel="stylesheet" href="/css/paleta.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/carteiraTrabalhador.css">
+</head>
+
+<body>
+
+  <%- include('../Partials/headertrabalhador') %>
+
+    <main class="page">
+
+      <div class="title-row">
+        <div>
+          <h1>Extrato da Carteira</h1>
+          <p>Gerencie seus ganhos e acompanhe suas transações com transparência.</p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" id="gerar-relatorio"><i class="ph ph-file-text"
+              aria-hidden="true"></i> Gerar Relatório</button>
+          <p class="actions-feedback" id="relatorio-aviso" role="status" aria-live="polite" hidden></p>
+        </div>
+      </div>
+
+      <div class="top-grid">
+        <div class="balance-stack">
+          <div class="card">
+            <div class="balance-label">SALDO SIMULADO</div>
+            <div class="balance-value" id="saldo-disponivel">
+              R$ <%= carteira && carteira.saldoDisponivel ? carteira.saldoDisponivel.toFixed(2).replace('.', ',' )
+                : '0,00' %>
+            </div>
+            <div class="balance-delta" id="saldo-delta">
+              <%= carteira && carteira.delta ? carteira.delta : '' %>
+            </div>
+            <p class="balance-note">Valor simulado, apenas para demonstração. Não há saque nem transferência real.</p>
+          </div>
+          <div class="card">
+            <div class="balance-label">SALDO RETIDO</div>
+            <div class="balance-value" id="saldo-retido">
+              R$ <%= carteira && carteira.saldoRetido ? carteira.saldoRetido.toFixed(2).replace('.', ',' ) : '0,00' %>
+            </div>
+            <div class="balance-sub" id="saldo-retido-info">
+              <%= carteira && carteira.infoRetido ? carteira.infoRetido : '' %>
+            </div>
+          </div>
+        </div>
+
+        <%
+          // Créditos simulados por mês (últimos 12), calculados no controller; meses sem crédito valem 0.
+          const dadosGrafico = (typeof grafico !== 'undefined' && grafico && Array.isArray(grafico.meses)) ? grafico : { meses: [], total6: 0, total12: 0 };
+          const mesesGrafico = dadosGrafico.meses;
+          const reais = (valor) => 'R$ ' + Number(valor || 0).toFixed(2).replace('.', ',');
+          const faixaMeses = (lista) => lista.length
+            ? lista[0].rotulo.toLowerCase() + '/' + lista[0].ano + ' a ' + lista[lista.length - 1].rotulo.toLowerCase() + '/' + lista[lista.length - 1].ano
+            : '';
+          const ultimosSeis = mesesGrafico.slice(-6);
+        %>
+        <div class="card">
+          <div class="chart-header">
+            <div>
+              <h3>Crescimento Mensal</h3>
+              <p>Acompanhamento de ganhos brutos</p>
+            </div>
+            <select class="chart-select" id="grafico-periodo" aria-label="Período do gráfico">
+              <option value="6" selected>Últimos 6 meses</option>
+              <option value="12">Últimos 12 meses</option>
+            </select>
+          </div>
+          <p class="chart-note" id="grafico-nota">Créditos simulados recebidos por mês<%= ultimosSeis.length ? ', de ' + faixaMeses(ultimosSeis) : '' %>. Meses sem movimentação aparecem como zero.</p>
+          <div class="bars chart--6" id="grafico-barras" role="img"
+            aria-label="Créditos simulados por mês: <%= ultimosSeis.map(m => m.rotulo + '/' + m.ano + ' ' + reais(m.total)).join('; ') %>">
+            <% mesesGrafico.forEach((m, i) => { const atual = i === mesesGrafico.length - 1; %>
+              <div class="bar-col<%= atual ? ' active' : '' %>" data-rotulo="<%= m.rotulo %>" data-ano="<%= m.ano %>"
+                data-total="<%= m.total %>" style="--p6: <%= m.p6 %>; --p12: <%= m.p12 %>;"
+                title="<%= m.rotulo %>/<%= m.ano %>: <%= reais(m.total) %>">
+                <div class="bar<%= atual ? ' active' : '' %>"></div>
+                <div class="bar-label"><%= m.rotulo %></div>
+              </div>
+            <% }) %>
+          </div>
+          <p class="chart-empty" id="grafico-vazio" role="status" <%= dadosGrafico.total6 > 0 ? 'hidden' : '' %>>Nenhum crédito simulado no período.</p>
+        </div>
+      </div>
+
+      <div class="card history-card">
+        <div class="history-header">
+          <h3>Histórico de Transações</h3>
+          <div class="search-box">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input type="text" id="filtro-bico" placeholder="Filtrar por nome, valor ou data/horário..."
+              aria-label="Filtrar transações por nome, valor ou data/horário">
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição do Bico</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="transacoes-body">
+            <% if (typeof transacoes !=='undefined' && transacoes.length> 0) { %>
+              <% transacoes.slice(0, 5).forEach(t=> { %>
+                <tr>
+                  <td>
+                    <%= t.tipo %>
+                  </td>
+                  <td>
+                    <%= t.descricao %>
+                  </td>
+                  <td>
+                    <%= t.dataHora %>
+                  </td>
+                  <td>
+                    <span class="badge <%= t.status === 'CREDITO' ? 'badge--success' : 'badge--pending' %>">
+                      <%= t.status==='CREDITO' ? 'Creditado' : 'Pendente' %>
+                    </span>
+                  </td>
+                  <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
+                    <%= t.tipo==='Entrada' ? '+' : '-' %> R$ <%= Number(t.valor).toFixed(2).replace('.', ',' ) %>
+                  </td>
+                </tr>
+                <% }) %>
+                  <% } %>
+          </tbody>
+        </table>
+        <% if (typeof transacoes === 'undefined' || transacoes.length === 0) { %>
+          <div class="see-all" id="sem-movimentacoes" role="status">Nenhuma movimentação registrada ainda.</div>
+        <% } %>
+        <div class="see-all" id="sem-resultados" role="status" hidden>Nenhuma movimentação encontrada para a busca.</div>
+        <div class="see-all" id="abrir-historico" role="button" tabindex="0" aria-haspopup="dialog"
+          aria-controls="historico-modal">Ver todo o histórico</div>
+      </div>
+
+    </main>
+
+    <!-- Modal: Histórico completo -->
+    <div class="modal-overlay" id="historico-modal">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="historico-titulo">
+        <div class="modal-header">
+          <h3 id="historico-titulo">Histórico Completo</h3>
+          <button class="modal-close" id="fechar-historico" aria-label="Fechar"><i class="ph ph-x"
+              aria-hidden="true"></i></button>
+        </div>
+        <div class="modal-search">
+          <div class="search-box">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input type="text" id="filtro-bico-modal" placeholder="Filtrar por nome, valor ou data/horário..."
+              aria-label="Filtrar histórico completo por nome, valor ou data/horário">
+          </div>
+        </div>
+        <div class="modal-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Descrição do Bico</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="historico-completo-body">
+              <% if (typeof transacoes !=='undefined' && transacoes.length> 0) { %>
+                <% transacoes.forEach(t=> { %>
+                  <tr>
+                    <td>
+                      <%= t.tipo %>
+                    </td>
+                    <td>
+                      <%= t.descricao %>
+                    </td>
+                    <td>
+                      <%= t.dataHora %>
+                    </td>
+                    <td>
+                      <span class="badge <%= t.status === 'CREDITO' ? 'badge--success' : 'badge--pending' %>">
+                        <%= t.status==='CREDITO' ? 'Creditado' : 'Pendente' %>
+                      </span>
+                    </td>
+                    <td class="<%= t.tipo === 'Entrada' ? 'wallet__value--positive' : 'wallet__value--negative' %>">
+                      <%= t.tipo==='Entrada' ? '+' : '-' %> R$ <%= Number(t.valor).toFixed(2).replace('.', ',' ) %>
+                    </td>
+                  </tr>
+                  <% }) %>
+                    <% } %>
+            </tbody>
+          </table>
+          <% if (typeof transacoes === 'undefined' || transacoes.length === 0) { %>
+            <div class="see-all" role="status">Nenhuma movimentação registrada ainda.</div>
+          <% } %>
+          <div class="see-all" id="sem-resultados-modal" role="status" hidden>Nenhuma movimentação encontrada para a busca.</div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('../Partials/footer') %>
+
+    <script src="/js/carteiraTrabalhador.js" defer></script>
+
+</body>
+
+</html>

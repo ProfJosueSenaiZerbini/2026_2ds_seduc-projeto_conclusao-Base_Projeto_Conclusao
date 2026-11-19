@@ -1,0 +1,162 @@
+<% // Variáveis recebidas: bico, tipo ('aceito' | 'concluido' | 'pendente' | 'cancelado' ), rotulo (opcional: texto do badge em 'cancelado')
+    const rotuloBadge = (typeof rotulo !== 'undefined') ? rotulo : '';
+    const
+    statusTxt=String(bico.bico_status || bico.status_novo || '' ).toLowerCase(); const finalizado=tipo==='concluido' ||
+    statusTxt.includes('conclu') || statusTxt.includes('finaliz'); const valorNum=Number(bico.valor);
+    // Valor simulado em reais: milhar + 2 casas (R$ 1.234,50); nulo/inválido vira 0,00
+    const valorFmt=(Number.isFinite(valorNum) ? valorNum : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); const
+    codigo=bico.codigo || ('BC-' + (bico.bico_id || bico.id || '' ));
+    // Ordenação "recentes/antigos": cronologia da CANDIDATURA (envio/aceitação/recusa/cancelamento), não a data do serviço.
+    // Chave = segundos do evento * 1e6 + id da candidatura (desempate estável). Sem evento, cai na data do serviço.
+    const ordemEvento = Math.floor(Number(bico.candidatura_ordem_ts));
+    const dataTs = ordemEvento > 0
+        ? ordemEvento * 1e6 + (Number(bico.candidatura_id) || 0)
+        : (bico.data_servico_iso ? new Date(bico.data_servico_iso).getTime() : (bico.data_servico ? new Date(bico.data_servico).getTime() : 0));
+    const busca=[bico.titulo, bico.cliente_nome, bico.descricao, bico.local].join(' ').toLowerCase();
+%>
+<%
+    // Estado da CANDIDATURA (badge principal) x estado do BICO (badge secundário, só para candidaturas aceitas).
+    const rotulosServico = { 'Em andamento': 'Serviço em andamento', 'Finalizado': 'Serviço finalizado', 'Aberto': 'Serviço aberto', 'Cancelado': 'Serviço cancelado' };
+    const rotuloServico = rotulosServico[bico.bico_status] || (bico.bico_status ? 'Serviço: ' + bico.bico_status : 'Serviço em andamento');
+    const classeServico = bico.bico_status === 'Em andamento' || !bico.bico_status ? 'badge--info' : 'badge--muted';
+    const criadaEm = bico.candidatura_criada_formatada;
+    const atualizadaEm = bico.candidatura_atualizada_formatada;
+    const finalizadaEm = tipo === 'concluido' ? bico.finalizacao_formatada : ''; // só com evento real de finalização
+    const mostrarAtualizada = !!atualizadaEm && atualizadaEm !== criadaEm && tipo !== 'cancelado'; // recusada/cancelada têm data própria no painel
+    const rotuloDataPainel = rotuloBadge === 'Recusado' ? 'Recusada em' : (rotuloBadge === 'Cancelado' ? 'Cancelada em' : 'Data da alteração');
+    // Painel de Recusado/Cancelado: explicação do estado + observação somente quando for real e relevante.
+    const ehRecusado = rotuloBadge === 'Recusado' || (!rotuloBadge && bico.status_novo === 'Recusado');
+    const canceladoPeloContratante = !!bico.cancelado_pelo_contratante; // candidatura aceita cujo bico foi cancelado pelo contratante
+    const observacaoTexto = String(bico.observacao || '').trim();
+    const OBSERVACAO_PADRAO_CANCELAMENTO = 'Candidatura cancelada pelo próprio trabalhador'; // texto automático: já está na explicação
+    const mostrarObservacao = !!observacaoTexto && (ehRecusado || observacaoTexto !== OBSERVACAO_PADRAO_CANCELAMENTO);
+%>
+<li class="bico-card" data-busca="<%= busca %>" data-ts="<%= dataTs %>">
+    <div class="bico-card__top">
+        <div class="bico-card__icon" aria-hidden="true"><% if (bico.icone) { %><%= bico.icone %><% } else { %><i class="ph ph-briefcase"></i><% } %>
+    </div>
+
+    <div class="bico-card__main">
+        <div class="bico-card__title-row">
+            <h3 class="bico-card__title">
+                <%= bico.titulo %>
+            </h3>
+            <span class="bico-card__code">• #<%= codigo %></span>
+        </div>
+        <p class="bico-card__desc">
+            <%= bico.descricao %>
+        </p>
+    </div>
+
+    <div class="bico-card__status">
+        <% if (tipo==='pendente' ) { %>
+            <span class="badge badge--warning">Pendente</span>
+        <% } else if (tipo==='cancelado' ) { %>
+            <span class="badge <%= ehRecusado ? 'badge--danger' : 'badge--cancelado' %>"><%= canceladoPeloContratante ? 'Cancelado pelo contratante' : (rotuloBadge || bico.status_novo || 'Cancelado') %></span>
+        <% } else { %>
+            <span class="badge badge--success"><span class="badge__dot"></span>Aceito</span>
+            <span class="badge <%= classeServico %>"><%= rotuloServico %></span>
+        <% } %>
+    </div>
+                        </div>
+
+                        <div class="bico-card__meta">
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-calendar-blank" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Data do serviço</span>
+                                    <span class="meta__value">
+                                        <%= bico.data_servico_formatada %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-clock" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Horário</span>
+                                    <span class="meta__value">
+                                        <%= bico.horario || '--:--' %>
+                                            <% if (bico.duracao) { %> • ~<%= bico.duracao %>
+                                                    <% } %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Local</span>
+                                    <span class="meta__value">
+                                        <%= bico.local || '-' %>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="meta__icon"><i class="ph ph-user" aria-hidden="true"></i></span>
+                                <div><span class="meta__label">Cliente</span>
+                                    <span class="meta__value">
+                                        <% if (bico.cliente_id) { %>
+                                            <a class="meta__link" href="/perfil/publico/<%= bico.cliente_id %>"><%= bico.cliente_nome || '-' %></a>
+                                        <% } else { %><%= bico.cliente_nome || '-' %><% } %>
+                                            <% if (bico.cliente_nota) { %><span class="meta__star">★ <%=
+                                                        Number(bico.cliente_nota).toFixed(1).replace('.', ',') %> (<%= Number(bico.cliente_total_avaliacoes || 0) %>)</span>
+                                                <% } else { %><span class="meta__no-rating">Sem avaliações</span><% } %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if (criadaEm || finalizadaEm) { %>
+                        <div class="bico-card__candidatura">
+                            <% if (criadaEm) { %>
+                            <span><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span>Candidatura enviada em <strong><%= criadaEm %></strong></span></span>
+                            <% } %>
+                            <% if (mostrarAtualizada) { %>
+                            <span><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span>Atualizada em <strong><%= atualizadaEm %></strong></span></span>
+                            <% } %>
+                            <% if (finalizadaEm) { %>
+                            <span><i class="ph ph-check-circle" aria-hidden="true"></i><span>Serviço finalizado em <strong><%= finalizadaEm %></strong></span></span>
+                            <% } %>
+                        </div>
+                        <% } %>
+
+                        <% if (tipo==='cancelado' ) { %>
+                            <div class="bico-card__cancel <%= ehRecusado ? 'bico-card__cancel--recusado' : 'bico-card__cancel--cancelado' %>">
+                                <% if (ehRecusado) { %>
+                                <p class="bico-card__cancel-titulo"><i class="ph-fill ph-x-circle" aria-hidden="true"></i><strong>O contratante não selecionou sua candidatura.</strong></p>
+                                <% } else if (canceladoPeloContratante) { %>
+                                <p class="bico-card__cancel-titulo"><i class="ph-fill ph-prohibit" aria-hidden="true"></i><strong>O contratante cancelou este bico. O serviço não será realizado.</strong></p>
+                                <% } else { %>
+                                <p class="bico-card__cancel-titulo"><i class="ph-fill ph-prohibit" aria-hidden="true"></i><strong>Você cancelou esta candidatura. Não é possível se candidatar novamente a este serviço.</strong></p>
+                                <% } %>
+                                <p><strong><%= rotuloDataPainel %>:</strong>
+                                    <%= bico.data_alteracao_formatada || atualizadaEm || 'Não registrada' %>
+                                </p>
+                                <% if (mostrarObservacao) { %>
+                                <p><strong>Observação:</strong>
+                                    <%= observacaoTexto %>
+                                </p>
+                                <% } %>
+                            </div>
+                            <% } %>
+
+                                <div class="bico-card__footer">
+                                    <div class="bico-card__price">
+                                        <span class="price__label">Valor simulado:</span>
+                                        <span class="price__value">R$ <%= valorFmt %></span>
+                                    </div>
+
+                                    <div class="bico-card__actions">
+                                        <% if (tipo === 'concluido' && bico.selo_avaliacao) { %>
+                                        <a class="selo-avaliacao selo-avaliacao--<%= bico.selo_avaliacao.tipo %>"
+                                            href="/bicos/<%= bico.bico_id || bico.id %>"><%= bico.selo_avaliacao.texto %></a>
+                                        <% } %>
+                                        <a class="btn btn--secondary"
+                                            href="/bicos/<%= bico.bico_id || bico.id %>">Ver detalhes</a>
+
+                                                    <% if ((tipo==='aceito' || tipo==='concluido' ) &&
+                                                        bico.candidatura_id) { %>
+                                                        <a class="btn btn--primary"
+                                                            href="/bicos/candidaturas/<%= bico.candidatura_id %>/chat">
+                                                            <i class="ph ph-chat-circle" aria-hidden="true"></i> Abrir conversa
+                                                        </a>
+                                                        <% } %>
+                                    </div>
+                                </div>
+                                </li>

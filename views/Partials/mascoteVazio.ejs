@@ -1,0 +1,4 @@
+<%
+  // Mascote da área para listas vazias: parado, sem animação. Variável: area ('contratante' | 'trabalhador').
+  const aveVazio = (typeof area !== 'undefined' && area === 'trabalhador') ? 'tie' : 'araponga';
+%><div class="mascote-vazio"><%- include('mascote', { ave: aveVazio, tamanho: 90 }) %></div>

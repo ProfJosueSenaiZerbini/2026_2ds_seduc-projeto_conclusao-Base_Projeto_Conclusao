@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil — Ibico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <%- include('../Partials/phosphorIcons') %>
+    <link rel="stylesheet" href="/css/paleta.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/perfilTrabalhador.css">
+</head>
+
+<body>
+    <%
+        // Números reais (os mesmos do perfil público): nada de indicador fixo.
+        const bicosConcluidos = reputacao.concluidos;
+        const avaliacao = reputacao.media !== null ? reputacao.media.toFixed(1).replace('.', ',') : '—';
+        const totalAvaliacoes = reputacao.totalAvaliacoes;
+        const bio = usuario.bio || '';
+        const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'TR';
+    %>
+
+    <%- include('../Partials/headertrabalhador') %>
+
+    <main class="pt-page">
+        <!-- Topo da página -->
+        <div class="pt-topo">
+            <div>
+                <h1>Meu Perfil</h1>
+                <p>Mantenha suas informações atualizadas para conseguir mais bicos.</p>
+            </div>
+            <div class="pt-acoes">
+                <button type="button" class="pt-btn pt-btn-primary" id="ptBtnEditar">
+                    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
+                    Editar Perfil
+                </button>
+                <a href="/hometrabalhador" class="pt-btn pt-btn-outline">
+                    <i class="ph ph-arrow-left" aria-hidden="true"></i>
+                    Voltar
+                </a>
+            </div>
+        </div>
+
+        <section class="pt-card">
+            <!-- Banner -->
+            <div class="pt-banner">
+                <div class="pt-avatar">
+                    <span><%= iniciais %></span>
+                </div>
+                <div class="pt-banner-info">
+                    <div class="pt-banner-linha">
+                        <h2><%= usuario.nome %></h2>
+                        <span class="pt-pill pt-pill-role"><i class="pt-dot"></i><%= usuario.tipo_perfil ? usuario.tipo_perfil.toLowerCase() : 'trabalhador' %></span>
+                    </div>
+                    <% if (bio) { %><p class="pt-banner-bio"><%= bio %></p><% } %>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="pt-stats">
+                <div class="pt-stat">
+                    <span class="pt-stat-label">Bicos concluídos</span>
+                    <strong class="pt-stat-valor"><%= bicosConcluidos %></strong>
+                </div>
+                <div class="pt-stat">
+                    <span class="pt-stat-label">Avaliação média</span>
+                    <strong class="pt-stat-valor">
+                        <%= avaliacao %> <span class="pt-estrela">★</span>
+                        <small>(<%= totalAvaliacoes %> <%= totalAvaliacoes === 1 ? 'avaliação' : 'avaliações' %>)</small>
+                    </strong>
+                </div>
+                <div class="pt-stat">
+                    <span class="pt-stat-label">Membro desde</span>
+                    <strong class="pt-stat-valor pt-stat-texto"><%= membroDesde || usuario.data_cadastro_formatada %></strong>
+                </div>
+                <div class="pt-stat">
+                    <span class="pt-stat-label">Último serviço concluído</span>
+                    <strong class="pt-stat-valor pt-stat-texto"><%= reputacao.ultimoServico || 'Nenhum ainda' %></strong>
+                </div>
+            </div>
+            <div class="pt-ver-publico">
+                <a class="pt-btn-link" id="link-perfil-publico" href="/perfil/publico/<%= usuario.id %>">
+                    <i class="ph ph-eye" aria-hidden="true"></i> Ver como os outros veem meu perfil
+                </a>
+            </div>
+
+            <div class="pt-corpo">
+                <!-- Dados cadastrais -->
+                <div class="pt-secao-titulo">
+                    <h3>
+                        <i class="ph ph-user-circle" aria-hidden="true"></i>
+                        Dados Cadastrais
+                    </h3>
+                    <span>Informações privadas e do cadastro</span>
+                </div>
+
+                <div class="pt-grid">
+                    <div class="pt-campo">
+                        <label>Nome completo</label>
+                        <div class="pt-campo-linha">
+                            <div class="pt-campo-valor"><%= usuario.nome %></div>
+                            <i class="pt-campo-icone ph ph-user-circle" aria-hidden="true"></i>
+                        </div>
+                    </div>
+
+                    <div class="pt-campo">
+                        <label>Email</label>
+                        <div class="pt-campo-linha">
+                            <div class="pt-campo-valor pt-mono"><%= usuario.email %></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-campo">
+                        <label>CPF</label>
+                        <div class="pt-campo-linha">
+                            <div class="pt-campo-valor pt-mono" id="ptCpfValor" data-cpf="<%= usuario.cpf %>"><%= usuario.cpf %></div>
+                            <button type="button" class="pt-btn-link" id="ptBtnCpf" aria-pressed="false">
+                                <i class="ph ph-eye" aria-hidden="true"></i>
+                                <span id="ptCpfTexto">Ocultar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-campo">
+                        <label>Idade</label>
+                        <div class="pt-campo-linha">
+                            <div class="pt-campo-valor"><%= usuario.idade %> anos</div>
+                            <span class="pt-campo-nota"><%= Number(usuario.idade) >= 18 ? 'Maior de idade' : '' %></span>
+                        </div>
+                    </div>
+
+                    <div class="pt-campo pt-campo-largo">
+                        <label>Data de cadastro</label>
+                        <div class="pt-campo-linha">
+                            <div class="pt-campo-valor pt-mono">
+                                <i class="ph ph-calendar-blank" aria-hidden="true"></i>
+                                <%= usuario.data_cadastro_formatada %>
+                            </div>
+                            <% if (membroRecente) { %><span class="pt-tag-neutra">Membro recente</span><% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Segurança -->
+                <div class="pt-duas-colunas">
+                    <div>
+                        <h3 class="pt-sub-titulo">
+                            <i class="ph ph-shield-check" aria-hidden="true"></i>
+                            Segurança
+                        </h3>
+                        <button type="button" class="pt-btn-link pt-btn-senha" id="ptBtnSenha">Alterar senha</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../Partials/footer') %>
+
+    <!-- MODAL: Editar perfil -->
+    <div id="ptModalEditar" class="pt-modal-overlay" aria-hidden="true">
+        <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloEditar">
+            <div class="pt-modal-header">
+                <h3 id="ptTituloEditar">Editar Perfil</h3>
+                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalEditar" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </div>
+            <form action="/perfil/editar" method="POST">
+                <div class="pt-modal-grupo">
+                    <label for="ptNome">Nome completo</label>
+                    <input type="text" id="ptNome" name="nome" value="<%= usuario.nome %>" required minlength="1" maxlength="100">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label for="ptEmail">E-mail</label>
+                    <input type="email" id="ptEmail" name="email" value="<%= usuario.email %>" required maxlength="100">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label for="ptIdade">Idade</label>
+                    <input type="number" id="ptIdade" name="idade" value="<%= usuario.idade || '' %>" required min="18" max="90" step="1">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label for="ptBio">Apresentação</label>
+                    <input type="text" id="ptBio" name="bio" value="<%= usuario.bio || '' %>" maxlength="150" placeholder="Ex.: Disponível para pequenos reparos">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label>CPF (não alterável)</label>
+                    <input type="text" value="<%= usuario.cpf %>" disabled class="pt-input-desabilitado">
+                </div>
+                <div class="pt-modal-acoes">
+                    <button type="button" class="pt-modal-cancelar" data-pt-fechar="ptModalEditar">Cancelar</button>
+                    <button type="submit" class="pt-modal-salvar">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Alterar senha -->
+    <div id="ptModalSenha" class="pt-modal-overlay" aria-hidden="true">
+        <div class="pt-modal" role="dialog" aria-modal="true" aria-labelledby="ptTituloSenha">
+            <div class="pt-modal-header">
+                <h3 id="ptTituloSenha">Alterar Senha</h3>
+                <button type="button" class="pt-modal-x" data-pt-fechar="ptModalSenha" aria-label="Fechar"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </div>
+            <form action="/perfil/alterar-senha" method="POST" id="ptFormSenha">
+                <div class="pt-modal-grupo">
+                    <label for="senhaAtual">Senha atual</label>
+                    <input type="password" id="senhaAtual" name="senhaAtual" required maxlength="72" placeholder="Digite sua senha atual">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label for="novaSenha">Nova senha</label>
+                    <input type="password" id="novaSenha" name="novaSenha" required minlength="6" maxlength="72" placeholder="Digite a nova senha">
+                </div>
+                <div class="pt-modal-grupo">
+                    <label for="confirmarNovaSenha">Confirmar nova senha</label>
+                    <input type="password" id="confirmarNovaSenha" name="confirmarNovaSenha" required minlength="6" maxlength="72" placeholder="Repita a nova senha">
+                    <small class="pt-erro" id="ptErroSenha" hidden>As senhas não coincidem.</small>
+                </div>
+                <div class="pt-modal-acoes">
+                    <button type="button" class="pt-modal-cancelar" data-pt-fechar="ptModalSenha">Cancelar</button>
+                    <button type="submit" class="pt-modal-salvar">Salvar Nova Senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/perfilTrabalhador.js"></script>
+</body>
+
+</html>

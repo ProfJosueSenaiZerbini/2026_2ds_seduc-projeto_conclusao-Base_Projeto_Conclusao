@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "prettier.requireConfig": true,
+  "[ejs]": {
+    "editor.formatOnSave": false
+  },
+  "[sql]": {
+    "editor.formatOnSave": false
+  },
+  "eslint.useFlatConfig": true,
+  "css.validate": false,
+  "stylelint.validate": ["css"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "never",
+    "source.fixAll.stylelint": "never"
+  }
+}

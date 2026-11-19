@@ -1,0 +1,33 @@
+<%
+  // Alerta de erro padronizado: mascote da área (triste) + mensagem + ação opcional.
+  // Fontes da mensagem: variável `alerta` { tipo, mensagem, acao } (res.locals, uma só exibição) ou
+  // include com { alerta: { mensagem } }.
+  // Parâmetro `area`: 'contratante' (araponga) | 'trabalhador' (tiê) | 'seletor' (as duas aves; só a do perfil
+  // escolhido fica visível, trocada pelo JS junto com o seletor — use `perfilInicial`). Sem `area`, vale o perfil logado.
+  // A caixa é sempre vermelho-claro; a cor da área aparece só no mascote.
+  const perfilLogado = typeof usuario !== 'undefined' && usuario
+    ? String(usuario.tipo_perfil || '').trim().toLowerCase() : '';
+  const areaAlerta = (typeof area !== 'undefined' && area) ? area : (perfilLogado === 'trabalhador' ? 'trabalhador' : 'contratante');
+  const perfilVisivel = (typeof perfilInicial !== 'undefined' && String(perfilInicial).toLowerCase() === 'trabalhador') ? 'trabalhador' : 'contratante';
+%>
+<% if (typeof alerta !== 'undefined' && alerta && alerta.mensagem) { %>
+  <div class="alerta-sistema" id="alerta-sistema" role="alert" data-area="<%= areaAlerta %>"<%- typeof autoOcultar !== 'undefined' && autoOcultar ? ' data-auto-ocultar' : '' %>>
+    <% if (areaAlerta === 'seletor') { %>
+      <span class="alerta-sistema__ave" data-mascote-perfil="contratante"<%- perfilVisivel === 'contratante' ? '' : ' hidden' %>>
+        <%- include('mascote', { ave: 'araponga', tamanho: 64, comGalho: false }) %>
+      </span>
+      <span class="alerta-sistema__ave" data-mascote-perfil="trabalhador"<%- perfilVisivel === 'trabalhador' ? '' : ' hidden' %>>
+        <%- include('mascote', { ave: 'tie', tamanho: 64, comGalho: false }) %>
+      </span>
+    <% } else { %>
+      <span class="alerta-sistema__ave"><%- include('mascote', { ave: areaAlerta === 'trabalhador' ? 'tie' : 'araponga', tamanho: 64, comGalho: false }) %></span>
+    <% } %>
+    <p class="alerta-sistema__texto">
+      <i class="ph-fill ph-warning-circle alerta-sistema__icone" aria-hidden="true"></i>
+      <span id="alerta-sistema-mensagem"><%= alerta.mensagem %></span>
+    </p>
+    <% if (alerta.acao && alerta.acao.href) { %>
+      <a class="alerta-sistema__acao" id="alerta-sistema-acao" href="<%= alerta.acao.href %>"><%= alerta.acao.rotulo %></a>
+    <% } %>
+  </div>
+<% } %>

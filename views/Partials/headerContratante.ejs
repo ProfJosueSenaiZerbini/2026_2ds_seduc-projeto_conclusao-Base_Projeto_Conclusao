@@ -1,0 +1,112 @@
+<aside
+  class="contractor-sidebar"
+  id="sidebar-contratante"
+  aria-label="Navegação do contratante"
+  data-contractor-sidebar
+>
+  <div class="contractor-sidebar__top">
+    <a href="/homeContratante" class="sidebar-brand" aria-label="iBico — início">
+      <span class="sidebar-brand__mark" aria-hidden="true">i</span>
+      <span class="sidebar-brand__text">Ibico</span>
+    </a>
+    <button
+      class="sidebar-collapse-toggle"
+      type="button"
+      aria-label="Recolher menu lateral"
+      aria-expanded="true"
+      aria-controls="sidebar-contratante"
+      data-sidebar-collapse
+    >
+      <i class="ph ph-caret-left" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Navegação principal" id="navegacao-contratante">
+    <span class="sidebar-nav__indicator" aria-hidden="true"></span>
+    <a
+      href="/homeContratante"
+      class="sidebar-nav__link <%= rotaAtual === '/homeContratante' ? 'active' : '' %>"
+      aria-label="Início"
+      title="Início"
+      <%- rotaAtual === '/homeContratante' ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-house" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Início</span>
+    </a>
+    <a
+      href="/bicos/novo"
+      class="sidebar-nav__link <%= rotaAtual === '/bicos/novo' ? 'active' : '' %>"
+      aria-label="Publicar Bico"
+      title="Publicar Bico"
+      <%- rotaAtual === '/bicos/novo' ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-plus" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Publicar Bico</span>
+    </a>
+    <a
+      href="/bicos/ativos"
+      class="sidebar-nav__link <%= rotaAtual === '/bicos/ativos' || /^\/bicos\/\d+/.test(rotaAtual) ? 'active' : '' %>"
+      aria-label="Bicos"
+      title="Bicos"
+      <%- rotaAtual === '/bicos/ativos' || /^\/bicos\/\d+/.test(rotaAtual) ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-briefcase" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Bicos</span>
+    </a>
+    <a
+      href="/carteira/contratante"
+      class="sidebar-nav__link <%= rotaAtual === '/carteira/contratante' ? 'active' : '' %>"
+      aria-label="Carteira"
+      title="Carteira"
+      <%- rotaAtual === '/carteira/contratante' ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-credit-card" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Carteira</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-balance" aria-label="Saldo disponível">
+    <span class="sidebar-balance__icon" aria-hidden="true">R$</span>
+    <span class="sidebar-balance__details">
+      <span class="sidebar-balance__label">Saldo disponível</span>
+      <strong><%= formatarMoedaBRL(usuario?.saldo_simulado) %></strong>
+    </span>
+  </div>
+
+  <div class="sidebar-account">
+    <a
+      href="/perfil"
+      class="sidebar-account__profile <%= rotaAtual === '/perfil' ? 'active' : '' %>"
+      aria-label="Perfil de <%= usuario && usuario.nome ? usuario.nome : 'Contratante' %>"
+      title="Perfil"
+      <%- rotaAtual === '/perfil' ? 'aria-current="page"' : '' %>
+    >
+      <img
+        src="<%= usuario && usuario.foto ? usuario.foto : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop' %>"
+        alt=""
+        class="sidebar-account__avatar"
+      >
+      <span class="sidebar-account__name"><%= usuario && usuario.nome ? usuario.nome : 'Contratante' %></span>
+    </a>
+    <form action="/logout" method="POST" class="sidebar-logout-form">
+      <button type="submit" class="sidebar-logout" aria-label="Sair" title="Sair">
+        <i class="ph ph-sign-out" aria-hidden="true"></i>
+        <span class="sidebar-nav__label">Sair</span>
+      </button>
+    </form>
+  </div>
+</aside>
+
+<button
+  class="sidebar-mobile-toggle"
+  type="button"
+  aria-label="Abrir navegação"
+  aria-expanded="false"
+  aria-controls="sidebar-contratante"
+  data-sidebar-mobile-toggle
+>
+  <i class="ph ph-list" aria-hidden="true"></i>
+  <span>Menu</span>
+</button>
+<button class="sidebar-backdrop" type="button" aria-label="Fechar navegação" data-sidebar-backdrop tabindex="-1" hidden></button>
+<script src="/js/navbarContratante.js" defer></script>
