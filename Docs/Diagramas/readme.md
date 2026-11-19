@@ -23,4 +23,5 @@
 
 
 ### Mapa de Empatia e Personas
+<img width="1024" height="768" alt="image" src="https://github.com/user-attachments/assets/754c284e-5804-4ef7-b08d-44d814270292" />
 
