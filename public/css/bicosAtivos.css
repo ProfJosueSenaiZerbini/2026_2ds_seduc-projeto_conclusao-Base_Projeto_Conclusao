@@ -160,12 +160,15 @@ body {
   color: var(--active-muted);
 }
 
+/* Barra de filtros */
 .filters-bar {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
+/* Campo de busca */
 .search-box {
   background: var(--active-card-bg);
   border: 1px solid var(--active-border-color);
@@ -173,10 +176,11 @@ body {
   padding: 0.5rem 0.8rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
 }
 
 .search-box input {
+  min-width: 0;
   border: none;
   outline: none;
   font-size: 0.85rem;
@@ -184,30 +188,83 @@ body {
 
 .filter-tabs {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 12px;
 }
 
 .filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
   background: transparent;
-  border: none;
-  font-size: 0.85rem;
-  color: var(--active-muted);
-  cursor: pointer;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
+  color: var(--cor-texto-mudo);
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
+/* Botão selecionado */
 .filter-btn.active {
-  background: var(--cor-branco);
-  color: var(--active-text-dark);
+  background-color: var(--cor-branco);
+  color: var(--cor-texto);
+  border-color: var(--cor-borda);
+  box-shadow: 0 1px 3px var(--cor-texto-a8);
   font-weight: 700;
-  box-shadow: 0 1px 3px var(--sombra-cor-media);
+}
+
+.filter-btn:hover:not(.active) {
+  background-color: var(--contratante-verde-suave);
+  color: var(--cor-texto);
 }
 
 .filter-btn span {
-  font-size: 0.75rem;
-  opacity: 0.7;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Esconde os cards que não correspondem ao filtro */
+.job-card[hidden] {
+  display: none !important;
+}
+
+/* Mensagem quando não houver resultados */
+.empty-filter-message {
+  display: none;
+  grid-column: 1 / -1;
+  padding: 35px 20px;
+  text-align: center;
+  color: var(--cor-texto-mudo);
+  background: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 14px;
+}
+
+.empty-filter-message.visible {
+  display: block;
+}
+
+.empty-filter-message h3 {
+  margin: 0 0 8px;
+  color: var(--cor-texto);
+  font-size: 16px;
+}
+
+.empty-filter-message p {
+  margin: 0;
+  font-size: 14px;
 }
 
 /* Jobs Grid */
@@ -397,6 +454,108 @@ body {
   color: var(--active-primary-green-hover);
 }
 
+/* Abas do painel (mesmo desenho das abas do histórico do trabalhador). */
+.painel-abas {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  margin: 0 0 24px;
+  border-radius: 14px;
+  background: var(--contratante-verde-palido);
+  overflow-x: auto;
+}
+
+.painel-abas__aba {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.painel-abas__aba:hover:not(.painel-abas__aba--ativa) {
+  background: var(--contratante-verde-suave);
+  color: var(--cor-texto);
+}
+
+.painel-abas__aba--ativa {
+  background: var(--contratante-musgo);
+  color: var(--cor-branco);
+  box-shadow: 0 2px 6px var(--contratante-musgo-a25);
+}
+
+.painel-abas__contagem {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--cor-texto-mudo-a18);
+  font-size: 12px;
+  text-align: center;
+}
+
+.painel-abas__aba--ativa .painel-abas__contagem {
+  background: var(--cor-branco-a22);
+}
+
+.selo-avaliacao {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.selo-avaliacao--avaliar {
+  background: var(--aviso-fundo);
+  color: var(--aviso-escuro);
+  border-color: var(--aviso-borda);
+}
+
+.selo-avaliacao--avaliado {
+  background: var(--sucesso-fundo);
+  color: var(--sucesso);
+  border-color: var(--sucesso-borda);
+}
+
+.selo-avaliacao--encerrado {
+  background: var(--cor-fundo-sutil);
+  color: var(--cor-texto-mudo);
+  border-color: var(--cor-borda-forte);
+}
+
+.badge-done {
+  background: var(--cor-borda);
+  color: var(--cor-texto-suave);
+}
+
+.badge-cancelled {
+  background: var(--erro-fundo);
+  color: var(--erro-escuro);
+}
+
+.job-note {
+  margin: 8px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.job-note ~ .job-footer {
+  margin-top: 18px;
+}
+
 @media (max-width: 900px) {
   .metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -431,5 +590,33 @@ body {
 
   .metric-card {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-bar {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .filter-tabs {
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .filter-btn {
+    flex: 1;
+    padding: 9px 7px;
+    font-size: 12px;
   }
 }
