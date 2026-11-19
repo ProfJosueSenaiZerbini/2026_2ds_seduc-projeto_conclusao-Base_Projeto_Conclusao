@@ -1,10 +1,10 @@
 :root {
-  --active-primary-green: #0b5c37;
-  --active-primary-green-hover: #08472a;
+  --active-primary-green: var(--contratante-verde);
+  --active-primary-green-hover: var(--contratante-verde-hover);
   --active-page-bg: var(--contratante-fundo);
   --active-card-bg: var(--cor-branco);
-  --active-text-dark: #0f172a;
-  --active-muted: #64748b;
+  --active-text-dark: var(--cor-texto);
+  --active-muted: var(--cor-texto-mudo);
   --active-border-color: var(--cor-borda);
 }
 
@@ -39,7 +39,7 @@ body {
 .dashboard-header h1 {
   font-size: 2rem;
   font-weight: 800;
-  color: #0d291b;
+  color: var(--contratante-noite);
   margin: 0.2rem 0;
 }
 
@@ -51,7 +51,7 @@ body {
 
 .btn-new-job {
   background-color: var(--active-primary-green);
-  color: #fff;
+  color: var(--cor-branco);
   font-weight: 600;
   padding: 0.8rem 1.4rem;
   border-radius: 10px;
@@ -80,8 +80,8 @@ body {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  border: 1px solid #eef2f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--contratante-fundo);
+  box-shadow: 0 2px 4px var(--sombra-cor-leve);
 }
 
 .metric-icon {
@@ -95,18 +95,18 @@ body {
 }
 
 .icon-green {
-  background-color: #e6f4ed;
+  background-color: var(--contratante-verde-suave);
   color: var(--active-primary-green);
 }
 
 .icon-yellow {
-  background-color: #fef3c7;
-  color: #b45309;
+  background-color: var(--aviso-fundo);
+  color: var(--aviso);
 }
 
 .icon-blue {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: var(--info-fundo);
+  color: var(--info);
 }
 
 .metric-info {
@@ -133,7 +133,7 @@ body {
 }
 
 .text-green {
-  color: #16a34a;
+  color: var(--sucesso-vivo);
 }
 
 .text-muted {
@@ -199,10 +199,10 @@ body {
 }
 
 .filter-btn.active {
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--active-text-dark);
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--sombra-cor-media);
 }
 
 .filter-btn span {
@@ -221,11 +221,11 @@ body {
   background: var(--active-card-bg);
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #eef2f0;
+  border: 1px solid var(--contratante-fundo);
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 6px var(--sombra-cor-leve);
 }
 
 .job-card-header {
@@ -249,13 +249,13 @@ body {
 }
 
 .badge-ongoing {
-  background-color: #fef3c7;
-  color: #b45309;
+  background-color: var(--aviso-fundo);
+  color: var(--aviso);
 }
 
 .badge-open {
-  background-color: #dcfce7;
-  color: #15803d;
+  background-color: var(--sucesso-fundo);
+  color: var(--sucesso);
 }
 
 .btn-more {
@@ -285,7 +285,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--cor-fundo-sutil);
   margin-bottom: 1rem;
 }
 
@@ -307,18 +307,18 @@ body {
 }
 
 .avatar-purple {
-  background: #f3e8ff;
-  color: #7e22ce;
+  background: var(--avatar-roxo-fundo);
+  color: var(--avatar-roxo);
 }
 
 .avatar-blue {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--info-fundo);
+  color: var(--info);
 }
 
 .avatar-proposals {
-  background: #ffedd5;
-  color: #c2410c;
+  background: var(--trabalhador-borda);
+  color: var(--aviso);
 }
 
 .user-role {
@@ -362,7 +362,7 @@ body {
   border: 1px solid var(--active-primary-green);
   border-radius: 8px;
   background-color: var(--active-primary-green);
-  color: #fff;
+  color: var(--cor-branco);
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.2;
@@ -379,7 +379,7 @@ body {
 }
 
 .job-details-link:focus-visible {
-  outline: 3px solid rgba(11, 92, 55, 0.3);
+  outline: 3px solid var(--contratante-verde-a30);
   outline-offset: 2px;
 }
 

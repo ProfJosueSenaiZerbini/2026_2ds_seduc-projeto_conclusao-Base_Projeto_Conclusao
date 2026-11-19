@@ -1,16 +1,16 @@
 :root {
   color-scheme: light;
 
-  --cream: #f3ebdd;
-  --paper: #fbf8f1;
-  --forest: #173f35;
-  --red: #8b1728;
-  --ink: #191919;
-  --muted: #625e58;
-  --line: rgba(25, 25, 25, 0.14);
+  --cream: var(--trabalhador-borda);
+  --paper: var(--trabalhador-creme);
+  --forest: var(--contratante-musgo);
+  --red: var(--trabalhador-vermelho);
+  --ink: var(--trabalhador-grafite);
+  --muted: var(--trabalhador-texto-suave);
+  --line: var(--trabalhador-grafite-a14);
   --identity: var(--forest);
-  --identity-deep: #102f28;
-  --identity-soft: rgba(23, 63, 53, 0.08);
+  --identity-deep: var(--contratante-musgo);
+  --identity-soft: var(--contratante-musgo-a8);
   --identity-ink: var(--forest);
 }
 
@@ -38,15 +38,15 @@ body.landing-page {
 
 body[data-profile='contratante'] {
   --identity: var(--forest);
-  --identity-deep: #102f28;
-  --identity-soft: rgba(23, 63, 53, 0.09);
+  --identity-deep: var(--contratante-musgo);
+  --identity-soft: var(--contratante-musgo-a9);
   --identity-ink: var(--forest);
 }
 
 body[data-profile='trabalhador'] {
   --identity: var(--red);
-  --identity-deep: #68101e;
-  --identity-soft: rgba(139, 23, 40, 0.08);
+  --identity-deep: var(--trabalhador-vermelho-escuro);
+  --identity-soft: var(--trabalhador-vermelho-a8);
   --identity-ink: var(--red);
 }
 
@@ -71,7 +71,7 @@ body[data-profile='trabalhador'] {
   padding: 10px 14px;
   transform: translateY(-160%);
   background: var(--ink);
-  color: white !important;
+  color: var(--cor-branco) !important;
   font-size: 13px;
   font-weight: 600;
 }
@@ -84,8 +84,8 @@ body[data-profile='trabalhador'] {
   position: sticky;
   z-index: 10;
   top: 0;
-  border-bottom: 1px solid rgba(25, 25, 25, 0.12);
-  background: rgba(243, 235, 221, 0.96);
+  border-bottom: 1px solid var(--trabalhador-grafite-a12);
+  background: var(--trabalhador-borda-a96);
   backdrop-filter: blur(12px);
 }
 
@@ -140,7 +140,7 @@ body[data-profile='trabalhador'] {
 
 .landing-nav a,
 .landing-login-link {
-  color: #514d48;
+  color: var(--trabalhador-texto-suave);
   font-size: 11px;
   font-weight: 600;
   text-decoration: none;
@@ -182,9 +182,9 @@ body[data-profile='trabalhador'] {
   justify-self: end;
   gap: 2px;
   padding: 3px;
-  border: 1px solid rgba(25, 25, 25, 0.16);
+  border: 1px solid var(--trabalhador-grafite-a16);
   border-radius: 30px;
-  background: rgba(251, 248, 241, 0.62);
+  background: var(--trabalhador-creme-a62);
 }
 
 .landing-switcher button {
@@ -197,7 +197,7 @@ body[data-profile='trabalhador'] {
   border: 0;
   border-radius: 24px;
   background: transparent;
-  color: #514d48;
+  color: var(--trabalhador-texto-suave);
   cursor: pointer;
   font: inherit;
   font-size: 9px;
@@ -238,7 +238,7 @@ body[data-profile='trabalhador'] {
   z-index: 0;
   width: 300px;
   aspect-ratio: 1;
-  border: 1px solid rgba(23, 63, 53, 0.12);
+  border: 1px solid var(--contratante-musgo-a12);
   border-radius: 48% 52% 43% 57% / 54% 46%;
   content: '';
   pointer-events: none;
@@ -259,7 +259,7 @@ body[data-profile='trabalhador'] {
 
 body[data-profile='trabalhador'] .landing-hero::before,
 body[data-profile='trabalhador'] .landing-hero::after {
-  border-color: rgba(139, 23, 40, 0.18);
+  border-color: var(--trabalhador-vermelho-a18);
 }
 
 .landing-hero__state {
@@ -403,7 +403,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   align-items: flex-start;
   overflow: hidden;
   padding: 21px 17px;
-  border: 1px solid rgba(25, 25, 25, 0.14);
+  border: 1px solid var(--trabalhador-grafite-a14);
   background: var(--paper);
   color: var(--ink);
   cursor: pointer;
@@ -417,7 +417,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
 .landing-choice__option:hover {
   transform: translateY(-3px);
   border-color: var(--identity);
-  background: #fffdf8;
+  background: var(--trabalhador-creme-claro);
 }
 
 .landing-choice__number,
@@ -462,7 +462,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   z-index: 1;
   width: 43%;
   max-width: 160px;
-  filter: drop-shadow(0 8px 8px rgba(25, 25, 25, 0.09));
+  filter: drop-shadow(0 8px 8px var(--trabalhador-grafite-a9));
   pointer-events: none;
 }
 
@@ -479,7 +479,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   bottom: 23px;
   width: 148px;
   aspect-ratio: 1;
-  border: 1px solid rgba(23, 63, 53, 0.18);
+  border: 1px solid var(--contratante-musgo-a18);
   border-radius: 48% 52% 50% 50% / 50% 46% 54% 50%;
   pointer-events: none;
 }
@@ -488,7 +488,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   right: -29px;
   bottom: 20px;
   width: 142px;
-  border-color: rgba(139, 23, 40, 0.2);
+  border-color: var(--trabalhador-vermelho-a20);
 }
 
 .landing-hero__state--hire,
@@ -520,12 +520,12 @@ body[data-profile='trabalhador'] .landing-hero::after {
 
 .landing-hero__state--hire h1 span,
 .landing-hero__state--work h1 span {
-  color: rgba(243, 235, 221, 0.75);
+  color: var(--trabalhador-borda-a75);
 }
 
 .landing-hero__state--hire .landing-hero__description,
 .landing-hero__state--work .landing-hero__description {
-  color: rgba(243, 235, 221, 0.84);
+  color: var(--trabalhador-borda-a84);
 }
 
 .landing-hero__actions {
@@ -568,8 +568,8 @@ body[data-profile='trabalhador'] .landing-hero::after {
 }
 
 .landing-hero__state .landing-button:hover {
-  border-color: #fffdf8;
-  background: #fffdf8;
+  border-color: var(--trabalhador-creme-claro);
+  background: var(--trabalhador-creme-claro);
 }
 
 .landing-hero__login {
@@ -602,14 +602,14 @@ body[data-profile='trabalhador'] .landing-hero::after {
   width: min(88%, 430px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%) rotate(-12deg);
-  border: 1px solid rgba(243, 235, 221, 0.32);
+  border: 1px solid var(--trabalhador-borda-a32);
   border-radius: 47% 53% 55% 45% / 50% 43% 57% 50%;
 }
 
 .landing-hero__mascot .mascote {
   display: block;
   width: min(88%, 390px);
-  filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(0 14px 12px var(--trabalhador-grafite-a18));
 }
 
 .landing-hero__mascot figcaption {
@@ -619,7 +619,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: rgba(243, 235, 221, 0.78);
+  color: var(--trabalhador-borda-a78);
   font-size: 9px;
 }
 
@@ -633,7 +633,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
 .landing-hero__mascot figcaption i {
   width: 22px;
   height: 1px;
-  background: rgba(243, 235, 221, 0.6);
+  background: var(--trabalhador-borda-a60);
 }
 
 .landing-purpose {
@@ -648,7 +648,10 @@ body[data-profile='trabalhador'] .landing-hero::after {
   right: max(40px, calc((100vw - 1200px) / 2));
   left: max(40px, calc((100vw - 1200px) / 2));
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--identity) 20% 80%, transparent);
+
+  --landing-purpose-fundo: linear-gradient(90deg, transparent, var(--identity) 20% 80%, transparent);
+
+  background: var(--landing-purpose-fundo);
   opacity: 0.22;
   content: '';
 }
@@ -823,7 +826,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   min-width: 0;
   gap: 17px;
   padding: 22px 0;
-  border-bottom: 1px solid rgba(25, 25, 25, 0.14);
+  border-bottom: 1px solid var(--trabalhador-grafite-a14);
 }
 
 .landing-steps li:first-child {
@@ -890,7 +893,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   font-size: 11px;
   font-weight: 700;
   text-decoration: underline;
-  text-decoration-color: rgba(25, 25, 25, 0.26);
+  text-decoration-color: var(--trabalhador-grafite-a26);
   text-underline-offset: 4px;
 }
 

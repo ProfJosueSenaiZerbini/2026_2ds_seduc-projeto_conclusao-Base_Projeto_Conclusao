@@ -21,30 +21,30 @@
   --pp-bg: var(--contratante-fundo);
   --pp-surface: var(--cor-branco);
   --pp-border: var(--cor-borda);
-  --pp-ink: #14332b;
-  --pp-muted: #5f6f66;
-  --pp-accent: #1f5a46;
-  --pp-accent-soft: #dcebe2;
-  --pp-hero: #14332b;
-  --pp-hero-ink: #f2ebdf;
-  --pp-hero-muted: #b9cfc2;
+  --pp-ink: var(--contratante-musgo);
+  --pp-muted: var(--contratante-texto-suave);
+  --pp-accent: var(--contratante-verde-medio);
+  --pp-accent-soft: var(--contratante-verde-suave);
+  --pp-hero: var(--contratante-musgo);
+  --pp-hero-ink: var(--trabalhador-creme);
+  --pp-hero-muted: var(--contratante-verde-claro);
   --pp-bar-track: var(--cor-borda);
-  --pp-star: #b8860b;
+  --pp-star: var(--aviso-estrela);
 }
 
 .perfil-publico.tema-trabalhador {
-  --pp-bg: #f4ece4;
-  --pp-surface: #fbf6f0;
-  --pp-border: #e7d9ce;
-  --pp-ink: #211b1c;
-  --pp-muted: #6f5d5d;
-  --pp-accent: #8b1a2b;
-  --pp-accent-soft: #f3dde0;
-  --pp-hero: #211b1c;
-  --pp-hero-ink: #f4ece9;
-  --pp-hero-muted: #cdb6b3;
-  --pp-bar-track: #eadccf;
-  --pp-star: #b8860b;
+  --pp-bg: var(--trabalhador-creme);
+  --pp-surface: var(--trabalhador-creme-claro);
+  --pp-border: var(--trabalhador-borda);
+  --pp-ink: var(--trabalhador-grafite);
+  --pp-muted: var(--trabalhador-texto-suave);
+  --pp-accent: var(--trabalhador-vermelho);
+  --pp-accent-soft: var(--erro-fundo);
+  --pp-hero: var(--trabalhador-grafite);
+  --pp-hero-ink: var(--trabalhador-rosa-suave);
+  --pp-hero-muted: var(--trabalhador-borda-forte);
+  --pp-bar-track: var(--trabalhador-borda);
+  --pp-star: var(--aviso-estrela);
 }
 
 .public-profile {
@@ -77,7 +77,7 @@
   border-radius: 16px;
   background: var(--pp-hero);
   color: var(--pp-hero-ink);
-  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.12);
+  box-shadow: 0 8px 24px var(--sombra-cor-media);
 }
 
 .worker-avatar {
@@ -88,10 +88,10 @@
   place-items: center;
   border-radius: 50%;
   background: var(--pp-accent);
-  color: #fff;
+  color: var(--cor-branco);
   font-size: 1.65rem;
   font-weight: 800;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 0 3px var(--cor-branco-a18);
 }
 
 .worker-summary {
@@ -144,7 +144,7 @@
 }
 
 .worker-card .rating-stars {
-  color: #e3b43b;
+  color: var(--aviso-estrela);
   font-size: 1.35rem;
 }
 
@@ -178,7 +178,7 @@
   background: var(--pp-surface);
   border: 1px solid var(--pp-border);
   border-radius: 14px;
-  box-shadow: 0 3px 12px rgba(20, 20, 20, 0.05);
+  box-shadow: 0 3px 12px var(--sombra-cor-leve);
 }
 
 .reputation-section {
@@ -406,7 +406,7 @@
 .see-all-button:hover,
 .see-all-button:focus-visible {
   background: var(--pp-accent);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 @media (max-width: 640px) {

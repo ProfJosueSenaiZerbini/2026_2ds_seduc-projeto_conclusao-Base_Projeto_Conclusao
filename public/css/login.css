@@ -1,18 +1,18 @@
 :root {
-  --teal: #14532d;
-  --teal-bg: #ecfdf3;
-  --teal-border: #168044;
-  --red: #8f1d18;
-  --red-bg: #fff0ee;
-  --red-border: #b52c25;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --field-bg: #f8fafc;
-  --field-border: #cbd5e1;
-  --surface: #fff;
-  --page-bg: #f2f5f1;
+  --teal: var(--contratante-verde);
+  --teal-bg: var(--contratante-verde-suave);
+  --teal-border: var(--sucesso);
+  --red: var(--trabalhador-vermelho);
+  --red-bg: var(--erro-fundo);
+  --red-border: var(--erro);
+  --ink: var(--cor-texto);
+  --muted: var(--cor-texto-mudo);
+  --field-bg: var(--cor-fundo);
+  --field-border: var(--cor-borda);
+  --surface: var(--cor-branco);
+  --page-bg: var(--contratante-fundo);
   --radius: 12px;
-  --shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
+  --shadow: 0 18px 48px var(--cor-texto-a10);
 }
 
 * {
@@ -35,22 +35,25 @@ body {
   --profile-primary: var(--teal);
   --profile-soft: var(--teal-bg);
   --profile-border: var(--teal-border);
-  --profile-glow: rgba(22, 128, 68, 0.14);
-  --profile-wash: rgba(20, 83, 45, 0.065);
+  --profile-glow: var(--sucesso-a14);
+  --profile-wash: var(--contratante-verde-a6-5);
 
   width: var(--login-panel-width);
   min-width: 420px;
   padding: clamp(32px, 4vw, 56px);
   position: relative;
   isolation: isolate;
-  background: linear-gradient(112deg, #fff 20%, var(--profile-wash));
+
+  --panel-fundo: linear-gradient(112deg, var(--cor-branco) 20%, var(--profile-wash));
+
+  background: var(--panel-fundo);
   z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
   box-shadow:
-    12px 0 42px rgba(15, 23, 42, 0.08),
-    0 18px 48px rgba(15, 23, 42, 0.1);
+    12px 0 42px var(--sombra-cor-media),
+    0 18px 48px var(--sombra-cor-media);
   transition:
     background 0.35s ease,
     box-shadow 0.35s ease;
@@ -65,7 +68,10 @@ body {
   width: 84px;
   height: min(56vh, 440px);
   border-radius: 50%;
-  background: radial-gradient(ellipse, var(--profile-glow) 0%, var(--profile-wash) 45%, transparent 72%);
+
+  --panel-brilho: radial-gradient(ellipse, var(--profile-glow) 0%, var(--profile-wash) 45%, transparent 72%);
+
+  background: var(--panel-brilho);
   filter: blur(8px);
   pointer-events: none;
   transition: background 0.35s ease;
@@ -144,13 +150,13 @@ body {
 .connection-icon-glow {
   fill: currentColor;
   fill-opacity: 0.18;
-  stroke: rgba(255, 255, 255, 0.72);
+  stroke: var(--cor-branco-a72);
   stroke-width: 1px;
 }
 
 .connection-icon path {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.96);
+  stroke: var(--cor-branco-a96);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6px;
@@ -160,8 +166,8 @@ body {
   --profile-primary: var(--red);
   --profile-soft: var(--red-bg);
   --profile-border: var(--red-border);
-  --profile-glow: rgba(143, 29, 24, 0.14);
-  --profile-wash: rgba(143, 29, 24, 0.065);
+  --profile-glow: var(--trabalhador-vermelho-a14);
+  --profile-wash: var(--trabalhador-vermelho-a6-5);
 }
 
 .panel-intro {
@@ -207,7 +213,7 @@ h1 {
 .toggle-btn {
   flex: 1;
   border: 1.5px solid var(--field-border);
-  background: #fff;
+  background: var(--cor-branco);
   border-radius: var(--radius);
   padding: 16px 10px 14px;
   display: flex;
@@ -279,7 +285,7 @@ h1 {
 }
 
 .toggle-btn:not(.active-hire, .active-work):hover {
-  border-color: #cfcfd6;
+  border-color: var(--cor-borda);
 }
 
 label {
@@ -393,7 +399,7 @@ input:focus {
   border: none;
   border-radius: var(--radius);
   background: var(--profile-primary);
-  color: #fff;
+  color: var(--cor-branco);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -440,7 +446,7 @@ input:focus {
   content: '';
   flex: 1;
   height: 1px;
-  background: #e5e5ea;
+  background: var(--cor-borda);
 }
 
 .social-row {
@@ -454,7 +460,7 @@ input:focus {
   padding: 12px;
   border: 1px solid var(--field-border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--cor-branco);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -482,8 +488,8 @@ input:focus {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #102419;
-  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--contratante-noite);
+  border-left: 1px solid var(--cor-texto-a8);
 }
 
 .side::before {
@@ -492,11 +498,16 @@ input:focus {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(110deg, rgba(4, 20, 12, 0.28), transparent 68%);
+
+  --side-fundo: linear-gradient(110deg, var(--contratante-noite-a28), transparent 68%);
+
+  background: var(--side-fundo);
 }
 
 .panel.mode-work + .side::before {
-  background: linear-gradient(110deg, rgba(72, 13, 17, 0.3), transparent 68%);
+  --side-trabalho-fundo: linear-gradient(110deg, var(--trabalhador-vermelho-escuro-a30), transparent 68%);
+
+  background: var(--side-trabalho-fundo);
 }
 
 .side::after {
@@ -507,11 +518,11 @@ input:focus {
   right: -18%;
   width: min(58vw, 760px);
   aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--cor-branco-a18);
   border-radius: 50%;
   box-shadow:
-    0 0 0 28px rgba(255, 255, 255, 0.035),
-    0 0 0 76px rgba(255, 255, 255, 0.025);
+    0 0 0 28px var(--cor-branco-a3-5),
+    0 0 0 76px var(--cor-branco-a2-5);
   pointer-events: none;
 }
 
@@ -523,7 +534,7 @@ input:focus {
   width: min(52%, 500px);
   padding: 0;
   text-align: left;
-  color: #fff;
+  color: var(--cor-branco);
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
@@ -540,10 +551,10 @@ input:focus {
   min-height: 30px;
   margin-bottom: 18px;
   padding: 6px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--cor-branco-a30);
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.25);
-  color: rgba(255, 255, 255, 0.94);
+  background: var(--cor-texto-a25);
+  color: var(--cor-branco-a94);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -553,41 +564,41 @@ input:focus {
 
 .side-caption .name {
   max-width: 100%;
-  color: #fff;
+  color: var(--cor-branco);
   font-size: clamp(42px, 5.2vw, 78px);
   font-weight: 800;
   line-height: 0.98;
   letter-spacing: -0.055em;
   text-wrap: balance;
-  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.28);
+  text-shadow: 0 3px 24px var(--trabalhador-grafite-a28);
 }
 
 .side-caption .latin {
   margin-top: 12px;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--cor-branco-a88);
   font-size: 16px;
   font-style: italic;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 2px 12px var(--trabalhador-grafite-a45);
 }
 
 .image-credit {
   margin-top: 18px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--cor-branco-a82);
   font-size: 11px;
   line-height: 1.5;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 1px 8px var(--trabalhador-grafite-a65);
 }
 
 .image-credit a {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.6);
+  text-decoration-color: var(--cor-branco-a60);
   text-underline-offset: 2px;
 }
 
 .image-credit a:hover,
 .image-credit a:focus-visible {
-  color: #fff;
+  color: var(--cor-branco);
   text-decoration-color: currentColor;
 }
 
@@ -621,9 +632,11 @@ input:focus {
 }
 
 #birdHire::after {
-  background:
-    linear-gradient(90deg, rgba(13, 45, 27, 0.35), transparent 72%),
-    linear-gradient(0deg, rgba(13, 45, 27, 0.36), transparent 56%);
+  --bird-hire-fundo:
+    linear-gradient(90deg, var(--contratante-musgo-a35), transparent 72%),
+    linear-gradient(0deg, var(--contratante-musgo-a36), transparent 56%);
+
+  background: var(--bird-hire-fundo);
 }
 
 #birdWork {
@@ -632,9 +645,11 @@ input:focus {
 }
 
 #birdWork::after {
-  background:
-    linear-gradient(90deg, rgba(72, 13, 17, 0.42), transparent 74%),
-    linear-gradient(0deg, rgba(72, 13, 17, 0.42), transparent 58%);
+  --bird-work-fundo:
+    linear-gradient(90deg, var(--trabalhador-vermelho-escuro-a42), transparent 74%),
+    linear-gradient(0deg, var(--trabalhador-vermelho-escuro-a42), transparent 58%);
+
+  background: var(--bird-work-fundo);
 }
 
 @media (max-width: 980px) {
@@ -663,9 +678,12 @@ input:focus {
     order: 0;
     flex: 0 0 clamp(180px, 24svh, 220px);
     width: 100%;
+    position: relative;
+    z-index: 1;
   }
 
   .panel {
+    z-index: 2;
     order: 1;
     width: 100%;
     max-width: 100%;
@@ -689,15 +707,6 @@ input:focus {
 
   h1 {
     height: 3.6em;
-  }
-
-  .side {
-    position: relative;
-    z-index: 1;
-  }
-
-  .panel {
-    z-index: 2;
   }
 
   .connection-art {

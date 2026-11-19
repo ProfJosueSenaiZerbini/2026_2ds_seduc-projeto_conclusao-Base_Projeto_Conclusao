@@ -1,12 +1,12 @@
 :root {
-  --publish-primary: #10251f;
-  --publish-primary-hover: #1c3029;
-  --publish-ink: #10251f;
+  --publish-primary: var(--contratante-noite);
+  --publish-primary-hover: var(--contratante-musgo);
+  --publish-ink: var(--contratante-noite);
   --publish-page-bg: var(--contratante-fundo);
   --publish-border: var(--cor-borda);
   --publish-surface-soft: var(--cor-branco);
-  --publish-green-muted: #68766f;
-  --publish-green-light: #e7f0e8;
+  --publish-green-muted: var(--contratante-texto-mudo);
+  --publish-green-light: var(--contratante-verde-suave);
 }
 
 body {
@@ -48,7 +48,7 @@ body {
 
 .badge-verified {
   background: var(--publish-green-light);
-  color: #315f45;
+  color: var(--contratante-verde-medio);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 12px;
@@ -56,11 +56,11 @@ body {
 }
 
 .main-card {
-  background: #fff;
+  background: var(--cor-branco);
   padding: 40px;
   border-radius: 16px;
   border: 1px solid var(--publish-border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px var(--sombra-cor-leve);
 }
 
 .form-layout {
@@ -76,12 +76,12 @@ body {
   padding: 24px;
   border: 1px solid var(--publish-border);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(16, 37, 31, 0.055);
+  background: var(--cor-branco);
+  box-shadow: 0 8px 24px var(--sombra-cor-leve);
 }
 
 .summary-eyebrow {
-  color: #6d8175;
+  color: var(--contratante-texto-mudo);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.13em;
@@ -143,10 +143,10 @@ body {
   gap: 10px;
   margin-top: 24px;
   padding: 13px 15px;
-  border: 1px solid #dce5dd;
+  border: 1px solid var(--contratante-verde-suave);
   border-radius: 12px;
-  background: #eaf0e9;
-  color: #315f45;
+  background: var(--contratante-verde-suave);
+  color: var(--contratante-verde-medio);
 }
 
 .publish-note i {
@@ -231,7 +231,7 @@ textarea {
 }
 
 .wallet-icon {
-  background: #fff;
+  background: var(--cor-branco);
   padding: 10px;
   border-radius: 8px;
   border: 1px solid var(--publish-border);
@@ -260,7 +260,7 @@ textarea {
 }
 
 .status-ok {
-  color: #315f45;
+  color: var(--contratante-verde-medio);
   margin-top: 4px;
   font-weight: 600;
 }
@@ -281,7 +281,7 @@ textarea {
 
 .btn-submit {
   background: var(--publish-primary);
-  color: #fff;
+  color: var(--cor-branco);
   border: none;
   padding: 12px 24px;
   border-radius: 50px;
@@ -318,8 +318,8 @@ textarea {
   padding: 16px 44px 16px 18px;
   border: 1px solid var(--publish-border);
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  background: var(--cor-branco);
+  box-shadow: 0 4px 12px var(--sombra-cor-media);
 }
 
 .mascot-assistant__bubble::before {
@@ -330,7 +330,7 @@ textarea {
   height: 14px;
   border-right: 1px solid var(--publish-border);
   border-bottom: 1px solid var(--publish-border);
-  background: #fff;
+  background: var(--cor-branco);
   content: '';
   transform: rotate(45deg);
 }
@@ -341,7 +341,7 @@ textarea {
 
 .mascot-assistant__bubble-content {
   position: relative;
-  color: #10251f;
+  color: var(--contratante-noite);
 }
 
 .mascot-assistant__bubble h2 {
@@ -370,7 +370,7 @@ textarea {
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: #10251f;
+  color: var(--contratante-noite);
   font: inherit;
   font-size: 22px;
   line-height: 1;
@@ -378,7 +378,7 @@ textarea {
 }
 
 .mascot-assistant__close:hover {
-  background: rgba(16, 37, 31, 0.1);
+  background: var(--contratante-noite-a10);
 }
 
 .mascot-assistant__toggle {
@@ -402,12 +402,12 @@ textarea {
 .mascot-assistant__toggle:hover {
   transform: translateY(-2px);
   border-color: var(--publish-border);
-  background: #fff;
+  background: var(--cor-branco);
 }
 
 .mascot-assistant__toggle:focus-visible,
 .mascot-assistant__close:focus-visible {
-  outline: 3px solid #759984;
+  outline: 3px solid var(--marca-ibico);
   outline-offset: 3px;
 }
 
@@ -429,7 +429,7 @@ textarea {
   border: 2px solid var(--publish-page-bg);
   border-radius: 50%;
   background: var(--publish-primary);
-  color: #fff;
+  color: var(--cor-branco);
   font-size: 13px;
   font-weight: 700;
 }
@@ -501,20 +501,20 @@ textarea {
 }
 
 .cep-status--ok {
-  color: #315f45;
+  color: var(--contratante-verde-medio);
 }
 
 .cep-status--aviso {
-  color: #8a5a00;
+  color: var(--aviso);
 }
 
 .cep-status--erro {
-  color: #b42318;
+  color: var(--erro);
 }
 
 .cep-field.is-invalid > input {
-  border-color: #e3a29b;
-  background: #fff7f6;
+  border-color: var(--erro-borda);
+  background: var(--trabalhador-creme-claro);
 }
 
 .cep-help {
@@ -576,13 +576,13 @@ textarea {
 input[readonly] {
   border-style: dashed;
   background: var(--publish-page-bg);
-  color: #3f4f47;
+  color: var(--contratante-texto-suave);
   cursor: default;
 }
 
 input[readonly]:focus {
   outline: none;
-  border-color: #c9d3cb;
+  border-color: var(--contratante-verde-suave);
 }
 
 /* Rodapé cards */
@@ -596,7 +596,7 @@ input[readonly]:focus {
 .info-card {
   min-width: 0;
   overflow-wrap: anywhere;
-  background: #fff;
+  background: var(--cor-branco);
   padding: 15px;
   border-radius: 12px;
   border: 1px solid var(--publish-border);
