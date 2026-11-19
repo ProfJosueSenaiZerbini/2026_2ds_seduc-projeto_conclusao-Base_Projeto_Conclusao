@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+/* ______ CORUJATECA — IDENTIDADE VISUAL ______ */
+
+:root {
+  /* Marca */
+  --brand-800: #4f2426;
+  --brand-700: #790a0f;
+  --brand-600: #634b2b;
+  --brand-500: #9d7746;
+  --brand-400: #c8995d;
+  --brand-300: #e1bb8c;
+  --brand-200: #e4e4d2;
+  --brand-100: #e8e8e8;
+
+  /* Superfícies */
+  --app-background: #e8e8e8;
+  --surface: #ffffff;
+  --surface-warm: #e4e4d2;
+  --surface-hover: #f7f3eb;
+
+  /* Texto */
+  --text-primary: #4f2426;
+  --text-secondary: #634b2b;
+  --text-inverse: #ffffff;
+  --text-muted: #756b63;
+
+  /* Ações */
+  --button-primary: #790a0f;
+  --button-primary-hover: #4f2426;
+  --button-secondary: #634b2b;
+  --button-secondary-hover: #4f2426;
+
+  /* Bordas e foco */
+  --border-default: #d8d0c4;
+  --border-strong: #c8995d;
+  --focus-ring: #9d7746;
+
+  /* Estados */
+  --status-success: #286345;
+  --status-warning: #8a5700;
+  --status-danger: #9b2525;
+  --status-info: #315a78;
+
+  /* Formas e sombras */
+  --radius-card: 14px;
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --radius-modal: 18px;
+
+  --shadow-card: 0 2px 10px rgb(79 36 38 / 8%);
+  --shadow-modal: 0 16px 48px rgb(40 24 20 / 20%);
+}
+
+/* ______ TOKENS DO TAILWIND ______ */
+
+@theme inline {
+  --color-background: var(--app-background);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-inverse: var(--text-inverse);
+  --color-text-muted: var(--text-muted);
+
+  --color-button-primary: var(--button-primary);
+  --color-button-secondary: var(--button-secondary);
+
+  --color-brand-800: var(--brand-800);
+  --color-brand-700: var(--brand-700);
+  --color-brand-600: var(--brand-600);
+  --color-brand-500: var(--brand-500);
+  --color-brand-400: var(--brand-400);
+  --color-brand-300: var(--brand-300);
+  --color-brand-200: var(--brand-200);
+  --color-brand-100: var(--brand-100);
+
+  /* Categorias dos livros */
+  --color-romance: #ffb8de;
+  --color-religion-mythology: #f7ffb8;
+  --color-fiction: #c0ffb8;
+  --color-art-culture: #ffb8f8;
+  --color-fantasy: #ffd6b8;
+  --color-biographies-memoirs: #ffe3b8;
+  --color-thriller-mystery: #dcb8ff;
+  --color-comics-manga: #a2c2e8;
+  --color-horror: #e37e7e;
+  --color-children-young-adult: #ffb8cb;
+  --color-adventure: #ffe082;
+  --color-science-knowledge: #b8dbff;
+  --color-poetry-chronicles: #b8fff4;
+  --color-history: #ffc5b8;
+  --color-guide-manual-gastronomy: #ffc56f;
+  --color-politics: #6aa4d8;
+  --color-selfHelp-personal-development: #e76c98;
+  --color-economy: #9fe5bf;
+  --color-literature: #a160d4;
+}
+
+/* ______ BASE ______ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--app-background);
+  color: var(--text-primary);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Elementos interativos */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--brand-300);
+  color: var(--brand-800);
+}
