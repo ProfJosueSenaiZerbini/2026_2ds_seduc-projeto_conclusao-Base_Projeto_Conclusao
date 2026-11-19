@@ -4,7 +4,7 @@
 
 :root {
   --details-red-banner: var(--erro);
-  --details-red-dark: var(--erro);
+  --details-red-dark: var(--erro-escuro);
   --details-bg-main: var(--cor-fundo);
   --details-text-dark: var(--cor-texto);
   --details-text-muted: var(--cor-texto-mudo);

@@ -12,6 +12,7 @@
   --identity-deep: var(--contratante-musgo);
   --identity-soft: var(--contratante-musgo-a8);
   --identity-ink: var(--forest);
+  --identity-rotulo: var(--contratante-verde);
 }
 
 * {
@@ -41,6 +42,7 @@ body[data-profile='contratante'] {
   --identity-deep: var(--contratante-musgo);
   --identity-soft: var(--contratante-musgo-a9);
   --identity-ink: var(--forest);
+  --identity-rotulo: var(--contratante-verde);
 }
 
 body[data-profile='trabalhador'] {
@@ -48,6 +50,7 @@ body[data-profile='trabalhador'] {
   --identity-deep: var(--trabalhador-vermelho-escuro);
   --identity-soft: var(--trabalhador-vermelho-a8);
   --identity-ink: var(--red);
+  --identity-rotulo: var(--red);
 }
 
 .landing-page [hidden] {
@@ -427,7 +430,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
 }
 
 .landing-choice__number {
-  color: var(--identity-ink);
+  color: var(--identity-rotulo);
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.13em;
@@ -668,7 +671,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   align-items: center;
   gap: 11px;
   margin: 0;
-  color: var(--identity-ink);
+  color: var(--identity-rotulo);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -715,7 +718,7 @@ body[data-profile='trabalhador'] .landing-hero::after {
   gap: 10px;
   grid-column: 2;
   margin-top: 6px;
-  color: var(--identity-ink);
+  color: var(--identity-rotulo);
   font-size: 10px;
   font-weight: 700;
 }
