@@ -119,6 +119,15 @@ body {
   stroke: url('#connectionWorkerToContractor');
 }
 
+/* Cores das pontas dos degradês das linhas de conexão (os <stop> do SVG). */
+.connection-stop--contratante {
+  stop-color: var(--contractor-color);
+}
+
+.connection-stop--trabalhador {
+  stop-color: var(--worker-color);
+}
+
 .community-connections .contractor-node {
   fill: var(--surface);
   stroke: var(--contractor-color);
