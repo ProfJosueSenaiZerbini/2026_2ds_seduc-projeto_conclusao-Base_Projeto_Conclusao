@@ -19,8 +19,7 @@
 
 
 ### Mapa De Empatia e Personas
-<img width="1384" height="752" alt="Gemini_Generated_Image_mst5nbmst5nbmst5" src="https://github.com/user-attachments/assets/0dd3cabd-805a-4e36-9cf9-b1dcd8fe2276" />
 
 
 ### Mapa de Empatia e Personas
-<img width="1920" height="1080" alt="download" src="https://github.com/user-attachments/assets/5c901ceb-0c37-4e82-8f8f-e572d24beebb" />
+
