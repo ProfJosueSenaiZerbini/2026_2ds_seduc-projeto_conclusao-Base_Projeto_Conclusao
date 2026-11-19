@@ -1,7 +1,6 @@
 :root {
   --home-primary: var(--contratante-noite);
   --home-secondary: var(--contratante-musgo);
-  --home-accent: var(--contratante-verde-claro);
   --home-white: var(--contratante-fundo);
   --home-cream: var(--contratante-fundo);
   --home-muted: var(--contratante-texto-mudo);

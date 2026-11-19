@@ -2,14 +2,11 @@
   --history-brand: var(--trabalhador-vermelho);
   --history-brand-dark: var(--trabalhador-vermelho-escuro);
   --history-red-soft: var(--trabalhador-rosa-suave);
-  --history-graphite: var(--trabalhador-grafite);
   --history-text: var(--trabalhador-grafite);
   --history-muted: var(--trabalhador-texto-suave);
   --history-page-bg: var(--trabalhador-creme);
   --history-surface: var(--cor-branco);
   --history-border: var(--trabalhador-borda);
-  --history-green: var(--contratante-verde-medio);
-  --history-green-bg: var(--contratante-verde-suave);
   --history-blue-text: var(--trabalhador-texto-suave);
   --history-blue-bg: var(--trabalhador-creme);
 }

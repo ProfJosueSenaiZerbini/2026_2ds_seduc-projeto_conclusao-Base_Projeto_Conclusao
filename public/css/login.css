@@ -12,7 +12,6 @@
   --surface: var(--cor-branco);
   --page-bg: var(--contratante-fundo);
   --radius: 12px;
-  --shadow: 0 18px 48px var(--cor-texto-a10);
 }
 
 * {

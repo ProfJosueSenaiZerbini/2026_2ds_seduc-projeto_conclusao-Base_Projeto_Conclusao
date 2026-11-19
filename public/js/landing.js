@@ -12,10 +12,12 @@
         contratante: 'Conheça o iBico: publique serviços, acompanhe candidaturas e converse com quem você escolher.',
         trabalhador: 'Conheça o iBico: encontre bicos, envie candidaturas e acompanhe suas oportunidades.'
     };
+    // A meta theme-color só aceita cor literal (não lê var(--...)): cada hex abaixo
+    // precisa bater com a variável indicada em public/css/paleta.css.
     const themeColors = {
-        neutral: '#F3EBDD',
-        contratante: '#173F35',
-        trabalhador: '#8B1728'
+        neutral: '#E5DED3', // --trabalhador-borda (fundo da landing, --cream)
+        contratante: '#1C3029', // --contratante-musgo (identidade do contratante, --forest)
+        trabalhador: '#8B1728' // --trabalhador-vermelho (identidade do trabalhador, --red)
     };
 
     function selectProfile(profile, source) {

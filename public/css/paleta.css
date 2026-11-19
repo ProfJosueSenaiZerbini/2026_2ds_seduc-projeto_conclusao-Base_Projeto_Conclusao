@@ -9,12 +9,14 @@
   --cor-fundo: #f8fafc;
   --cor-fundo-sutil: #f1f5f9;
   --cor-borda: #e2e8f0;
+  --cor-borda-forte: #cbd5e1;
   --cor-texto-mudo: #64748b;
   --cor-texto-suave: #475569;
   --cor-texto: #0f172a;
 
   /* Contratante */
   --contratante-fundo: #f3f7f4;
+  --contratante-verde-palido: #eef2f0;
   --contratante-verde-suave: #e8efe9;
   --contratante-verde-claro: #a8c5b4;
   --contratante-verde-medio: #315f45;
@@ -44,6 +46,7 @@
   --aviso-fundo: #fef3c7;
   --aviso-estrela: #f59e0b;
   --aviso: #b45309;
+  --aviso-escuro: #92400e;
   --erro-fundo: #fdecec;
   --erro: #b91c1c;
   --erro-escuro: #991b1b;
@@ -70,6 +73,7 @@
   --contratante-musgo-a10: color-mix(in srgb, var(--contratante-musgo) 10%, transparent);
   --contratante-musgo-a12: color-mix(in srgb, var(--contratante-musgo) 12%, transparent);
   --contratante-musgo-a18: color-mix(in srgb, var(--contratante-musgo) 18%, transparent);
+  --contratante-musgo-a25: color-mix(in srgb, var(--contratante-musgo) 25%, transparent);
   --contratante-musgo-a3-5: color-mix(in srgb, var(--contratante-musgo) 3.5%, transparent);
   --contratante-musgo-a35: color-mix(in srgb, var(--contratante-musgo) 35%, transparent);
   --contratante-musgo-a36: color-mix(in srgb, var(--contratante-musgo) 36%, transparent);
@@ -110,12 +114,12 @@
   --cor-branco-a94: color-mix(in srgb, var(--cor-branco) 94%, transparent);
   --cor-branco-a95: color-mix(in srgb, var(--cor-branco) 95%, transparent);
   --cor-branco-a96: color-mix(in srgb, var(--cor-branco) 96%, transparent);
-  --cor-texto-a10: color-mix(in srgb, var(--cor-texto) 10%, transparent);
   --cor-texto-a25: color-mix(in srgb, var(--cor-texto) 25%, transparent);
   --cor-texto-a4: color-mix(in srgb, var(--cor-texto) 4%, transparent);
   --cor-texto-a5: color-mix(in srgb, var(--cor-texto) 5%, transparent);
   --cor-texto-a56: color-mix(in srgb, var(--cor-texto) 56%, transparent);
   --cor-texto-a8: color-mix(in srgb, var(--cor-texto) 8%, transparent);
+  --cor-texto-mudo-a18: color-mix(in srgb, var(--cor-texto-mudo) 18%, transparent);
   --erro-a10: color-mix(in srgb, var(--erro) 10%, transparent);
   --erro-a12: color-mix(in srgb, var(--erro) 12%, transparent);
   --erro-a3-5: color-mix(in srgb, var(--erro) 3.5%, transparent);
@@ -172,7 +176,6 @@
 
   /* Variáveis globais anteriores (apontam para a paleta) */
   --global-ibico-brand: var(--marca-ibico);
-  --global-ibico-brand-hover: var(--marca-ibico);
   --global-ibico-green: var(--sucesso-vivo);
   --global-ibico-ink: var(--cor-texto);
   --global-ibico-page-bg: var(--cor-fundo);
