@@ -384,8 +384,8 @@ test.describe('Identidade visual do perfil público', () => {
             'rgb(243, 247, 244)'
         ); // fundo das telas do contratante (--contratante-fundo)
         expect(await p1.locator('.worker-card').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
-            'rgb(20, 51, 43)'
-        ); // verde-escuro
+            'rgb(28, 48, 41)'
+        ); // verde-escuro (--contratante-musgo, paleta oficial)
         expect(await p1.locator('body').evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Inter/);
         // O mascote fica parado: sem animação e sem piscar automático.
         expect(
@@ -404,11 +404,11 @@ test.describe('Identidade visual do perfil público', () => {
         await expect(p2.locator('.perfil-mascote .mascote.araponga')).toHaveCount(0);
         await expect(p2.locator('.contractor-sidebar')).toBeVisible();
         expect(await p2.locator('.worker-card').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
-            'rgb(33, 27, 28)'
-        ); // grafite
+            'rgb(25, 25, 25)'
+        ); // grafite (--trabalhador-grafite, paleta oficial)
         expect(await p2.locator('.worker-avatar').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
-            'rgb(139, 26, 43)'
-        ); // vinho
+            'rgb(139, 23, 40)'
+        ); // vinho (paleta oficial)
         await p2.close();
         await c.ctx.close();
         await t.ctx.close();

@@ -2,67 +2,6 @@
    IBICO — Estilos Globais (Header e Footer Partials)
    ========================================================= */
 
-/* =========================================================
-   PALETA OFICIAL DO IBICO
-   Única fonte das cores do projeto: os demais arquivos usam var(--...).
-   ========================================================= */
-:root {
-  /* Neutros */
-  --cor-branco: #fff;
-  --cor-fundo: #f8fafc;
-  --cor-fundo-sutil: #f1f5f9;
-  --cor-borda: #e2e8f0;
-  --cor-texto-mudo: #64748b;
-  --cor-texto-suave: #475569;
-  --cor-texto: #0f172a;
-
-  /* Contratante */
-  --contratante-fundo: #f3f7f4;
-  --contratante-verde-suave: #e8efe9;
-  --contratante-verde-claro: #a8c5b4;
-  --contratante-verde-medio: #315f45;
-  --contratante-verde: #0b5c37;
-  --contratante-verde-hover: #08472a;
-  --contratante-musgo: #1c3029;
-  --contratante-noite: #10251f;
-
-  /* Trabalhador */
-  --trabalhador-creme-claro: #faf8f4;
-  --trabalhador-creme: #f5f2eb;
-  --trabalhador-rosa-suave: #f2e5e3;
-  --trabalhador-borda: #e5ded3;
-  --trabalhador-texto-suave: #625e58;
-  --trabalhador-vermelho: #8b1728;
-  --trabalhador-vermelho-escuro: #68101e;
-  --trabalhador-grafite: #191919;
-
-  /* Estados */
-  --sucesso-fundo: #dcfce7;
-  --sucesso: #15803d;
-  --aviso-fundo: #fef3c7;
-  --aviso-estrela: #f59e0b;
-  --aviso: #b45309;
-  --erro-fundo: #fdecec;
-  --erro: #b91c1c;
-  --info-fundo: #e0f2fe;
-  --info: #0369a1;
-  --marca-ibico: #0d9488;
-
-  /* Variáveis globais anteriores (passam a apontar para a paleta) */
-  --global-ibico-brand: #0d9488;
-  --global-ibico-brand-hover: #0a7a6f;
-  --global-ibico-green: #16a34a;
-  --global-ibico-ink: #0f172a;
-  --global-ibico-page-bg: #f8fafc;
-  --global-ibico-border: #e2e8f0;
-  --global-ibico-text-muted: #64748b;
-  --worker-header-bg: #191919;
-  --worker-header-border: #34312e;
-  --worker-header-ink: #f5f2eb;
-  --worker-header-muted: #d1cec7;
-  --worker-header-accent: #8b1728;
-}
-
 /* RESET BÁSICO */
 * {
   box-sizing: border-box;
@@ -115,10 +54,10 @@ body {
 :root {
   --contractor-sidebar-width: 272px;
   --contractor-sidebar-collapsed-width: 84px;
-  --contractor-sidebar-primary: #10251f;
-  --contractor-sidebar-secondary: #1c3029;
-  --contractor-sidebar-accent: #a8c5b4;
-  --contractor-sidebar-white: #f3f4ef;
+  --contractor-sidebar-primary: var(--contratante-noite);
+  --contractor-sidebar-secondary: var(--contratante-musgo);
+  --contractor-sidebar-accent: var(--contratante-verde-claro);
+  --contractor-sidebar-white: var(--contratante-fundo);
 }
 
 body:has(.contractor-sidebar) {
@@ -145,7 +84,7 @@ body:has(.contractor-sidebar.is-collapsed) {
   overflow: hidden auto;
   border-right: 1px solid var(--contractor-sidebar-accent);
   background: var(--contractor-sidebar-primary);
-  box-shadow: 8px 0 28px rgba(16, 37, 31, 0.16);
+  box-shadow: 8px 0 28px var(--sombra-cor-media);
   color: var(--contractor-sidebar-white);
   font-family:
     system-ui,
@@ -290,14 +229,14 @@ body:has(.contractor-sidebar.is-collapsed) {
 .sidebar-nav__link:hover,
 .sidebar-logout:hover,
 .sidebar-account__profile:hover {
-  background: #263c32;
+  background: var(--contratante-musgo);
   color: var(--contractor-sidebar-accent);
 }
 
 .sidebar-nav__link.active,
 .sidebar-account__profile.active {
-  background: rgba(168, 197, 180, 0.15);
-  box-shadow: inset 0 0 0 1px rgba(168, 197, 180, 0.14);
+  background: var(--contratante-verde-claro-a15);
+  box-shadow: inset 0 0 0 1px var(--contratante-verde-claro-a14);
   color: var(--contractor-sidebar-white);
   font-weight: 750;
 }
@@ -416,7 +355,7 @@ body:has(.contractor-sidebar.is-collapsed) {
 }
 
 .sidebar-logout:hover {
-  background: #263c32;
+  background: var(--contratante-musgo);
   color: var(--contractor-sidebar-accent);
 }
 
@@ -582,7 +521,7 @@ body:has(.contractor-sidebar.is-collapsed) {
     padding: 0 13px;
     border-radius: 999px;
     background: var(--contractor-sidebar-primary);
-    box-shadow: 0 5px 18px rgba(16, 37, 31, 0.22);
+    box-shadow: 0 5px 18px var(--sombra-cor-forte);
     font: inherit;
     font-size: 14px;
     font-weight: 700;
@@ -596,7 +535,7 @@ body:has(.contractor-sidebar.is-collapsed) {
     width: 100%;
     height: 100%;
     border: 0;
-    background: rgba(16, 37, 31, 0.55);
+    background: var(--contratante-noite-a55);
     opacity: 0;
     transition: opacity 0.24s ease;
   }
@@ -652,7 +591,7 @@ body:has(.contractor-sidebar.is-collapsed) {
 .logout-btn:hover {
   border-color: var(--worker-header-accent);
   background: var(--worker-header-accent);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .logout-btn:focus-visible,
@@ -745,14 +684,14 @@ body:has(.contractor-sidebar.is-collapsed) {
 
 .icon-btn:hover {
   background: var(--worker-header-accent);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 /* =========================================================
    FOOTER
    ========================================================= */
 .footer {
-  background: #f1f5f9;
+  background: var(--cor-fundo-sutil);
   border-top: 1px solid var(--global-ibico-border);
   padding: 32px 0;
   margin-top: 60px;
@@ -828,38 +767,38 @@ body:has(.contractor-sidebar.is-collapsed) {
 }
 
 .footer--worker {
-  border-top-color: #e5ded3;
-  background: #f5f2eb;
-  color: #191919;
+  border-top-color: var(--trabalhador-borda);
+  background: var(--trabalhador-creme);
+  color: var(--trabalhador-grafite);
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
 
 .footer--worker .footer-col a.brand,
 .footer--worker .footer-col a.hint-link {
-  color: #8b1728;
+  color: var(--trabalhador-vermelho);
 }
 
 .footer--worker .brand-dot {
-  background-color: #8b1728;
+  background-color: var(--trabalhador-vermelho);
 }
 
 .footer--worker .footer__description,
 .footer--worker .footer__copyright,
 .footer--worker .footer-col a {
-  color: #625e58;
+  color: var(--trabalhador-texto-suave);
 }
 
 .footer--worker .footer-col h4 {
-  color: #191919;
+  color: var(--trabalhador-grafite);
 }
 
 .footer--worker .footer-col a:hover {
-  color: #8b1728;
+  color: var(--trabalhador-vermelho);
 }
 
 .footer--worker a:focus-visible {
   border-radius: 3px;
-  outline: 2px solid #8b1728;
+  outline: 2px solid var(--trabalhador-vermelho);
   outline-offset: 3px;
 }
 

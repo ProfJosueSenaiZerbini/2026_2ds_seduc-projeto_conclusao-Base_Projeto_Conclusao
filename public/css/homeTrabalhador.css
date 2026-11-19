@@ -3,17 +3,17 @@
    Paleta: vinho #8b1728, grafite #191919 e neutros quentes. */
 
 :root {
-  --ibico-graphite: #191919;
-  --ibico-red: #8b1728;
-  --ibico-red-dark: #6f1220;
-  --ibico-red-soft: #f2e5e3;
+  --ibico-graphite: var(--trabalhador-grafite);
+  --ibico-red: var(--trabalhador-vermelho);
+  --ibico-red-dark: var(--trabalhador-vermelho-escuro);
+  --ibico-red-soft: var(--trabalhador-rosa-suave);
   --ibico-ink: var(--ibico-graphite);
-  --ibico-muted: #625e58;
-  --ibico-line: #e5ded3;
-  --ibico-line-strong: #d6cdbf;
-  --ibico-surface: #fff;
-  --ibico-page: #f5f2eb;
-  --ibico-shadow: 0 5px 22px rgba(25, 25, 25, 0.055);
+  --ibico-muted: var(--trabalhador-texto-suave);
+  --ibico-line: var(--trabalhador-borda);
+  --ibico-line-strong: var(--trabalhador-borda);
+  --ibico-surface: var(--cor-branco);
+  --ibico-page: var(--trabalhador-creme);
+  --ibico-shadow: 0 5px 22px var(--trabalhador-grafite-a5-5);
 }
 
 body {
@@ -50,13 +50,21 @@ body main.home {
   gap: 28px;
   padding: 28px 44px;
   overflow: hidden;
-  border: 1px solid #34312e;
+  border: 1px solid var(--trabalhador-grafite-claro);
   border-radius: 18px;
-  background:
-    radial-gradient(ellipse at 90% 50%, rgba(139, 23, 40, 0.16), transparent 36%),
-    linear-gradient(112deg, #191919 0%, #202020 68%, #252323 100%);
-  color: #fff;
-  box-shadow: 0 10px 24px rgba(23, 23, 23, 0.1);
+
+  --hero-fundo:
+    radial-gradient(ellipse at 90% 50%, var(--trabalhador-vermelho-a16), transparent 36%),
+    linear-gradient(
+      112deg,
+      var(--trabalhador-grafite) 0%,
+      var(--trabalhador-grafite) 68%,
+      var(--trabalhador-grafite) 100%
+    );
+
+  background: var(--hero-fundo);
+  color: var(--cor-branco);
+  box-shadow: 0 10px 24px var(--sombra-cor-media);
 }
 
 .home .hero::before {
@@ -102,7 +110,7 @@ body main.home {
 
 .home .hero h1 {
   margin: 10px 0 8px;
-  color: #fff;
+  color: var(--cor-branco);
   font-size: clamp(28px, 3vw, 38px);
   line-height: 1.12;
   font-weight: 750;
@@ -112,7 +120,7 @@ body main.home {
 .home .hero__content > p {
   max-width: 560px;
   margin: 0;
-  color: #e3dfd8;
+  color: var(--trabalhador-borda);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -130,7 +138,7 @@ body main.home {
   flex-direction: column-reverse;
   gap: 2px;
   padding: 0 28px;
-  border-left: 1px solid #514747;
+  border-left: 1px solid var(--trabalhador-grafite-claro);
 }
 
 .home .hero__stats > div:first-child {
@@ -140,14 +148,14 @@ body main.home {
 
 .home .hero__stats dd {
   margin: 0;
-  color: #fff;
+  color: var(--cor-branco);
   font-size: 20px;
   font-weight: 750;
   line-height: 1.2;
 }
 
 .home .hero__stats dt {
-  color: #d3cec6;
+  color: var(--trabalhador-borda);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -165,9 +173,17 @@ body main.home {
   width: 140px;
   height: 140px;
   margin-left: 10px;
-  border: 1px solid rgba(245, 242, 235, 0.15);
+  border: 1px solid var(--trabalhador-creme-a15);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 242, 235, 0.13) 0%, rgba(245, 242, 235, 0.06) 58%, transparent 59%);
+
+  --illustration-circle-fundo: radial-gradient(
+    circle,
+    var(--trabalhador-creme-a13) 0%,
+    var(--trabalhador-creme-a6) 58%,
+    transparent 59%
+  );
+
+  background: var(--illustration-circle-fundo);
 }
 
 .home .hero__mascot {
@@ -175,7 +191,7 @@ body main.home {
   width: 132px;
   max-width: 100%;
   height: auto;
-  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 10px 10px var(--trabalhador-grafite-a20));
 }
 
 /* ---------- Barra de pesquisa (fixa durante a rolagem) ---------- */
@@ -228,12 +244,12 @@ body main.home {
 }
 
 .home .search-box:hover {
-  border-color: #b9aea0;
+  border-color: var(--trabalhador-borda-hover);
 }
 
 .home .search-box:focus-within {
   border-color: var(--ibico-red);
-  box-shadow: 0 0 0 3px rgba(139, 23, 40, 0.12);
+  box-shadow: 0 0 0 3px var(--trabalhador-vermelho-a12);
 }
 
 .home .search-box input {
@@ -253,7 +269,7 @@ body main.home {
 }
 
 .home .search-box input::placeholder {
-  color: #7a756e;
+  color: var(--trabalhador-texto-suave);
   opacity: 1;
 }
 
@@ -272,12 +288,12 @@ body main.home {
 }
 
 .home .filter-select:hover {
-  border-color: #b9aea0;
+  border-color: var(--trabalhador-borda-hover);
 }
 
 .home .filter-select:focus-within {
   border-color: var(--ibico-red);
-  box-shadow: 0 0 0 3px rgba(139, 23, 40, 0.12);
+  box-shadow: 0 0 0 3px var(--trabalhador-vermelho-a12);
 }
 
 .home .filter-select span {
@@ -444,8 +460,8 @@ body main.home {
   min-width: 22px;
   padding: 2px 7px;
   border-radius: 999px;
-  background: #ece8e0;
-  color: #514d48;
+  background: var(--trabalhador-creme);
+  color: var(--trabalhador-texto-suave);
   font-size: 12px;
   font-weight: 800;
   line-height: 1.4;
@@ -460,12 +476,12 @@ body main.home {
 .home .area-chip.is-active {
   border-color: var(--ibico-red);
   background: var(--ibico-red);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .home .area-chip.is-active span {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: var(--cor-branco-a22);
+  color: var(--cor-branco);
 }
 
 /* ---------- Lista e cards de oportunidade ---------- */
@@ -490,10 +506,10 @@ body main.home {
   min-width: 0;
   margin: 0;
   padding: 18px 24px;
-  border: 1px solid #e7e2dc;
+  border: 1px solid var(--trabalhador-borda);
   border-radius: 14px;
   background: var(--ibico-surface);
-  box-shadow: 0 2px 8px rgba(23, 23, 23, 0.035);
+  box-shadow: 0 2px 8px var(--sombra-cor-leve);
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease;
@@ -501,8 +517,8 @@ body main.home {
 
 .home .job-card:hover,
 .home .job-card:focus-within {
-  border-color: rgba(139, 23, 40, 0.5);
-  box-shadow: 0 6px 18px rgba(23, 23, 23, 0.07);
+  border-color: var(--trabalhador-vermelho-a50);
+  box-shadow: 0 6px 18px var(--sombra-cor-leve);
 }
 
 .home .job-icon {
@@ -558,7 +574,7 @@ body main.home {
   align-items: center;
   min-width: 0;
   gap: 7px;
-  color: #55524d;
+  color: var(--trabalhador-texto-suave);
   font-size: 13.5px;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -585,7 +601,7 @@ body main.home {
 }
 
 .home .job-price span {
-  color: #6c6862;
+  color: var(--trabalhador-texto-suave);
   font-size: 12px;
   font-weight: 600;
 }
@@ -609,7 +625,7 @@ body main.home {
   border: 0;
   border-radius: 10px;
   background: var(--ibico-red);
-  color: #fff;
+  color: var(--cor-branco);
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
@@ -626,7 +642,7 @@ body main.home {
 
 .home .btn-details:hover {
   background: var(--ibico-red-dark);
-  box-shadow: 0 3px 10px rgba(111, 18, 32, 0.2);
+  box-shadow: 0 3px 10px var(--trabalhador-vermelho-escuro-a20);
 }
 
 .home .btn-details:focus-visible {
@@ -730,7 +746,7 @@ body main.home {
   padding: 14px 20px;
   border-radius: 10px;
   background: var(--ibico-red);
-  color: #fff;
+  color: var(--cor-branco);
   box-shadow: var(--ibico-shadow);
   font-size: 13px;
   opacity: 0;
@@ -788,7 +804,7 @@ body main.home {
     justify-content: space-between;
     gap: 10px 16px;
     padding-top: 14px;
-    border-top: 1px solid #eee9e3;
+    border-top: 1px solid var(--trabalhador-creme);
   }
 
   .home .job-price {
@@ -1036,7 +1052,7 @@ body main.home {
 .home .job-contratante {
   margin: 4px 0 8px;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--cor-texto-suave);
 }
 
 .home .job-contratante a {
@@ -1047,12 +1063,12 @@ body main.home {
 
 .home .job-contratante__nota {
   margin-left: 6px;
-  color: #b45309;
+  color: var(--aviso);
   font-weight: 700;
 }
 
 .home .job-contratante__nota--vazia {
-  color: #64748b;
+  color: var(--cor-texto-mudo);
   font-weight: 400;
 }
 
@@ -1063,12 +1079,12 @@ body main.home {
   margin: 12px 0 0;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: var(--cor-branco-a12);
+  color: var(--cor-branco);
   font-weight: 600;
   text-decoration: none;
 }
 
 .home .hero__avaliar:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--cor-branco-a20);
 }

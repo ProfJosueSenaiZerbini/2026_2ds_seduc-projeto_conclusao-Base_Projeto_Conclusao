@@ -1,17 +1,17 @@
 :root {
-  --history-brand: #8b1728;
-  --history-brand-dark: #6f1220;
-  --history-red-soft: #f2e5e3;
-  --history-graphite: #191919;
-  --history-text: #191919;
-  --history-muted: #625e58;
-  --history-page-bg: #f5f2eb;
-  --history-surface: #fff;
-  --history-border: #e5ded3;
-  --history-green: #405b4a;
-  --history-green-bg: #e8eee8;
-  --history-blue-text: #514d48;
-  --history-blue-bg: #ece9e2;
+  --history-brand: var(--trabalhador-vermelho);
+  --history-brand-dark: var(--trabalhador-vermelho-escuro);
+  --history-red-soft: var(--trabalhador-rosa-suave);
+  --history-graphite: var(--trabalhador-grafite);
+  --history-text: var(--trabalhador-grafite);
+  --history-muted: var(--trabalhador-texto-suave);
+  --history-page-bg: var(--trabalhador-creme);
+  --history-surface: var(--cor-branco);
+  --history-border: var(--trabalhador-borda);
+  --history-green: var(--contratante-verde-medio);
+  --history-green-bg: var(--contratante-verde-suave);
+  --history-blue-text: var(--trabalhador-texto-suave);
+  --history-blue-bg: var(--trabalhador-creme);
 }
 
 body {
@@ -69,7 +69,7 @@ body {
   border: 1px solid var(--history-border);
   border-radius: 16px;
   background: var(--history-surface);
-  box-shadow: 0 4px 16px rgba(25, 25, 25, 0.035);
+  box-shadow: 0 4px 16px var(--sombra-cor-leve);
 }
 
 .tabs {
@@ -113,15 +113,15 @@ body {
 .tab--active:hover {
   border-color: var(--history-brand);
   background: var(--history-brand);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(139, 23, 40, 0.15);
+  color: var(--cor-branco);
+  box-shadow: 0 2px 6px var(--trabalhador-vermelho-a15);
 }
 
 .tab__count {
   min-width: 22px;
   padding: 2px 6px;
   border-radius: 999px;
-  background: rgba(25, 25, 25, 0.07);
+  background: var(--trabalhador-grafite-a7);
   color: inherit;
   font-size: 11px;
   line-height: 1.3;
@@ -129,7 +129,7 @@ body {
 }
 
 .tab--active .tab__count {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--cor-branco-a18);
 }
 
 .filters {
@@ -173,7 +173,7 @@ body {
 }
 
 .search input::placeholder {
-  color: #77736d;
+  color: var(--trabalhador-texto-suave);
   opacity: 1;
 }
 
@@ -217,7 +217,7 @@ body {
 .empty {
   margin: 0;
   padding: 26px 20px;
-  border: 1px dashed #d8cfc2;
+  border: 1px dashed var(--trabalhador-borda);
   border-radius: 12px;
   background: var(--history-surface);
   color: var(--history-muted);
@@ -235,15 +235,15 @@ body {
   border: 1px solid var(--history-border);
   border-radius: 14px;
   background: var(--history-surface);
-  box-shadow: 0 3px 12px rgba(25, 25, 25, 0.035);
+  box-shadow: 0 3px 12px var(--sombra-cor-leve);
   transition:
     border-color 0.16s ease,
     box-shadow 0.16s ease;
 }
 
 .bico-card:hover {
-  border-color: #c9a8a9;
-  box-shadow: 0 6px 18px rgba(25, 25, 25, 0.07);
+  border-color: var(--trabalhador-borda-forte);
+  box-shadow: 0 6px 18px var(--sombra-cor-leve);
 }
 
 .bico-card__top {
@@ -316,40 +316,40 @@ body {
 }
 
 .badge--success {
-  border-color: #d4dfd4;
-  background: #e8eee8;
-  color: #405b4a;
+  border-color: var(--contratante-verde-suave);
+  background: var(--contratante-verde-suave);
+  color: var(--contratante-verde-medio);
 }
 
 .badge--info {
-  border-color: #ded9ce;
+  border-color: var(--trabalhador-borda);
   background: var(--history-blue-bg);
   color: var(--history-blue-text);
 }
 
 .badge--warning {
-  border-color: #e5d8b8;
-  background: #f5efe0;
-  color: #68572f;
+  border-color: var(--aviso-fundo);
+  background: var(--trabalhador-creme);
+  color: var(--aviso);
 }
 
 .badge--danger {
-  border-color: #e4c9c8;
+  border-color: var(--trabalhador-rosa-suave);
   background: var(--history-red-soft);
   color: var(--history-brand);
 }
 
 /* Cancelado pelo próprio trabalhador: neutro/grafite (diferente do vermelho de Recusado) */
 .badge--cancelado {
-  border-color: #cfc8bb;
-  background: #e9e5dd;
-  color: #2f2c29;
+  border-color: var(--trabalhador-borda);
+  background: var(--trabalhador-borda);
+  color: var(--trabalhador-grafite-claro);
 }
 
 .badge--muted {
-  border-color: #ddd7cb;
-  background: #f1eee7;
-  color: #514d48;
+  border-color: var(--trabalhador-borda);
+  background: var(--trabalhador-creme);
+  color: var(--trabalhador-texto-suave);
 }
 
 /* Estado da candidatura (e, quando aceita, o estado do serviço) */
@@ -394,9 +394,9 @@ body {
   gap: 10px;
   margin-top: 14px;
   padding: 11px;
-  border: 1px solid #eee9e1;
+  border: 1px solid var(--trabalhador-creme);
   border-radius: 10px;
-  background: #faf8f4;
+  background: var(--trabalhador-creme-claro);
 }
 
 .meta {
@@ -443,7 +443,7 @@ body {
   border-left: 3px solid var(--history-brand);
   border-radius: 0 8px 8px 0;
   background: var(--history-red-soft);
-  color: #514346;
+  color: var(--trabalhador-grafite-claro);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -474,13 +474,13 @@ body {
 }
 
 .bico-card__cancel--cancelado {
-  border-left-color: #3b3836;
-  background: #efece6;
-  color: #3f3b38;
+  border-left-color: var(--trabalhador-grafite-claro);
+  background: var(--trabalhador-creme);
+  color: var(--trabalhador-grafite-claro);
 }
 
 .bico-card__cancel--cancelado .bico-card__cancel-titulo i {
-  color: #3b3836;
+  color: var(--trabalhador-grafite-claro);
 }
 
 .bico-card__footer {
@@ -543,13 +543,13 @@ body {
 .btn--primary {
   border-color: var(--history-brand);
   background: var(--history-brand);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .btn--primary:hover {
   border-color: var(--history-brand-dark);
   background: var(--history-brand-dark);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .btn--secondary {
@@ -619,7 +619,7 @@ body {
 .pagination__btn--active:hover {
   border-color: var(--history-brand);
   background: var(--history-brand);
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .tip-popup {
@@ -636,7 +636,7 @@ body {
   border: 1px solid var(--history-border);
   border-radius: 14px;
   background: var(--history-surface);
-  box-shadow: 0 10px 30px rgba(25, 25, 25, 0.16);
+  box-shadow: 0 10px 30px var(--sombra-cor-media);
   animation: tip-in 0.25s ease;
 }
 
@@ -987,7 +987,7 @@ body {
 .meta__no-rating {
   margin-left: 6px;
   font-size: 0.8em;
-  color: #64748b;
+  color: var(--cor-texto-mudo);
 }
 
 .selo-avaliacao {
@@ -1003,21 +1003,21 @@ body {
 }
 
 .selo-avaliacao--avaliar {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #fcd34d;
+  background: var(--aviso-fundo);
+  color: var(--aviso);
+  border-color: var(--aviso-borda);
 }
 
 .selo-avaliacao--avaliado {
-  background: #dcfce7;
-  color: #166534;
-  border-color: #86efac;
+  background: var(--sucesso-fundo);
+  color: var(--contratante-verde);
+  border-color: var(--sucesso-borda);
 }
 
 .selo-avaliacao--encerrado {
-  background: #f1f5f9;
-  color: #64748b;
-  border-color: #cbd5e1;
+  background: var(--cor-fundo-sutil);
+  color: var(--cor-texto-mudo);
+  border-color: var(--cor-borda);
 }
 
 .empty > p {

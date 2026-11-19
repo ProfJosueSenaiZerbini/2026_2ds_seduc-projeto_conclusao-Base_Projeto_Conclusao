@@ -1,16 +1,16 @@
 :root {
-  --worker-wallet-bg: #f5f2eb;
-  --worker-wallet-card: #fff;
-  --worker-wallet-border: #e5ded3;
-  --worker-wallet-text-primary: #191919;
-  --worker-wallet-text-secondary: #625e58;
-  --worker-wallet-brand: #8b1728;
-  --worker-wallet-brand-dark: #6f1220;
-  --worker-wallet-brand-soft: #f2e5e3;
-  --worker-wallet-gray-bg: #f5f2eb;
-  --worker-wallet-gray-text: #514d48;
-  --worker-wallet-bar-gray: #e5ded3;
-  --worker-wallet-shadow: 0 2px 6px rgba(25, 25, 25, 0.035), 0 12px 28px rgba(25, 25, 25, 0.045);
+  --worker-wallet-bg: var(--trabalhador-creme);
+  --worker-wallet-card: var(--cor-branco);
+  --worker-wallet-border: var(--trabalhador-borda);
+  --worker-wallet-text-primary: var(--trabalhador-grafite);
+  --worker-wallet-text-secondary: var(--trabalhador-texto-suave);
+  --worker-wallet-brand: var(--trabalhador-vermelho);
+  --worker-wallet-brand-dark: var(--trabalhador-vermelho-escuro);
+  --worker-wallet-brand-soft: var(--trabalhador-rosa-suave);
+  --worker-wallet-gray-bg: var(--trabalhador-creme);
+  --worker-wallet-gray-text: var(--trabalhador-texto-suave);
+  --worker-wallet-bar-gray: var(--trabalhador-borda);
+  --worker-wallet-shadow: 0 2px 6px var(--trabalhador-grafite-a3-5), 0 12px 28px var(--trabalhador-grafite-a4-5);
   --worker-wallet-radius-lg: 16px;
   --worker-wallet-radius-md: 10px;
   --worker-wallet-radius-full: 999px;
@@ -89,7 +89,7 @@ body {
   padding: 10px 15px;
   border: 1px solid var(--worker-wallet-border);
   border-radius: var(--worker-wallet-radius-md);
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--worker-wallet-text-primary);
   cursor: pointer;
   font-family: inherit;
@@ -106,7 +106,7 @@ body {
 /* Botão de contorno, discreto, com destaque vermelho da marca ao passar o mouse. */
 .btn-secondary {
   border-color: var(--worker-wallet-border);
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--worker-wallet-text-primary);
 }
 
@@ -157,7 +157,7 @@ body {
   overflow: hidden;
   border-color: var(--worker-wallet-brand);
   background: var(--worker-wallet-brand);
-  color: #fff;
+  color: var(--cor-branco);
 
   --balance-pad: 22px; /* mesmo valor do padding do card; usado pelo aviso para ocupar a largura toda */
 }
@@ -168,7 +168,7 @@ body {
   right: -32px;
   width: 150px;
   height: 150px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--cor-branco-a13);
   border-radius: 50%;
   content: '';
   pointer-events: none;
@@ -178,9 +178,9 @@ body {
 .balance-note {
   margin: 16px calc(var(--balance-pad) * -1) calc(var(--balance-pad) * -1);
   padding: 8px var(--balance-pad) 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(25, 25, 25, 0.12);
-  color: #fff;
+  border-top: 1px solid var(--cor-branco-a16);
+  background: var(--trabalhador-grafite-a12);
+  color: var(--cor-branco);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -195,7 +195,7 @@ body {
 
 .balance-stack .card:first-child .balance-label,
 .balance-stack .card:first-child .balance-delta {
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--cor-branco-a82);
 }
 
 .balance-value {
@@ -208,7 +208,7 @@ body {
 }
 
 .balance-stack .card:first-child .balance-value {
-  color: #fff;
+  color: var(--cor-branco);
 }
 
 .balance-delta,
@@ -303,7 +303,10 @@ body {
   gap: 8px;
   padding: 0 8px;
   border-bottom: 1px solid var(--worker-wallet-border);
-  background: repeating-linear-gradient(to top, transparent 0, transparent 39px, rgba(229, 222, 211, 0.55) 40px);
+
+  --bars-fundo: repeating-linear-gradient(to top, transparent 0, transparent 39px, var(--trabalhador-borda-a55) 40px);
+
+  background: var(--bars-fundo);
 }
 
 .bar-col {
@@ -338,15 +341,12 @@ body {
 .bar-label {
   max-width: 100%;
   white-space: nowrap;
+  color: var(--worker-wallet-text-secondary);
+  font-size: 11px;
 }
 
 .bar.active {
   background: var(--worker-wallet-brand);
-}
-
-.bar-label {
-  color: var(--worker-wallet-text-secondary);
-  font-size: 11px;
 }
 
 .bar-col.active .bar-label {
@@ -376,7 +376,7 @@ body {
   padding: 8px 12px;
   border: 1px solid var(--worker-wallet-border);
   border-radius: var(--worker-wallet-radius-md);
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--worker-wallet-text-secondary);
   font-size: 13px;
 }
@@ -393,7 +393,7 @@ body {
 }
 
 .search-box input::placeholder {
-  color: #77736d;
+  color: var(--trabalhador-texto-suave);
   opacity: 1;
 }
 
@@ -430,7 +430,7 @@ body {
 }
 
 .page tbody tr:hover {
-  background: #faf8f4;
+  background: var(--trabalhador-creme-claro);
 }
 
 .page tbody tr:last-child {
@@ -464,16 +464,16 @@ body {
 
 .page .badge--success,
 .modal-scroll .badge--success {
-  border-color: #d8e0d8;
-  background: #e9eee9;
-  color: #405b4a;
+  border-color: var(--contratante-verde-suave);
+  background: var(--contratante-verde-suave);
+  color: var(--contratante-verde-medio);
 }
 
 .page .badge--pending,
 .modal-scroll .badge--pending {
-  border-color: #e5d8b8;
-  background: #f5efe0;
-  color: #68572f;
+  border-color: var(--aviso-fundo);
+  background: var(--trabalhador-creme);
+  color: var(--aviso);
 }
 
 .wallet__value--positive {
@@ -524,7 +524,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(25, 25, 25, 0.58);
+  background: var(--trabalhador-grafite-a58);
   backdrop-filter: blur(3px);
 }
 
@@ -541,7 +541,7 @@ body {
   border: 1px solid var(--worker-wallet-border);
   border-radius: var(--worker-wallet-radius-lg);
   background: var(--worker-wallet-card);
-  box-shadow: 0 20px 50px rgba(25, 25, 25, 0.22);
+  box-shadow: 0 20px 50px var(--sombra-cor-forte);
 }
 
 .modal-header {
@@ -581,7 +581,7 @@ body {
 .modal-search {
   padding: 13px 20px;
   border-bottom: 1px solid var(--worker-wallet-border);
-  background: #faf8f4;
+  background: var(--trabalhador-creme-claro);
 }
 
 .modal-search .search-box {
@@ -666,7 +666,7 @@ body {
   }
 
   .modal-scroll tbody tr:hover td {
-    background: #faf8f4;
+    background: var(--trabalhador-creme-claro);
   }
 
   .modal-scroll tbody tr:last-child td {
@@ -736,12 +736,12 @@ body {
     padding: 10px;
     border: 1px solid var(--worker-wallet-border);
     border-radius: 10px;
-    background: #fff;
+    background: var(--cor-branco);
   }
 
   .page .history-card tbody tr:hover,
   .modal-scroll tbody tr:hover {
-    background: #fff;
+    background: var(--cor-branco);
   }
 
   .page .history-card td,

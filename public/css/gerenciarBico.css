@@ -20,8 +20,8 @@ body {
   padding: clamp(18px, 3vw, 28px);
   border: 1px solid var(--global-ibico-border);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(16, 37, 31, 0.04);
+  background: var(--cor-branco);
+  box-shadow: 0 4px 16px var(--sombra-cor-leve);
 }
 
 .job-status {
@@ -159,12 +159,12 @@ body {
 }
 
 .manage-job__button--danger {
-  background: #b91c1c;
+  background: var(--erro);
   color: var(--contractor-sidebar-white);
 }
 
 .manage-job__button--danger:hover:not(:disabled) {
-  background: #991b1b;
+  background: var(--erro);
 }
 
 .manage-job__button--secondary {
@@ -321,9 +321,6 @@ body {
 
 .manage-job .evaluation-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-}
-
-.manage-job .evaluation-submit:hover:not(:disabled) {
   background: var(--contractor-sidebar-secondary);
 }
 
@@ -343,7 +340,7 @@ body {
 }
 
 .manage-job .evaluation-feedback--error {
-  color: #b91c1c;
+  color: var(--erro);
 }
 
 .manage-job .evaluation-note {
@@ -403,7 +400,7 @@ body {
   padding: 12px 14px;
   border-left: 3px solid var(--contractor-sidebar-accent);
   border-radius: 0 8px 8px 0;
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--contractor-sidebar-primary);
   font-style: italic;
   line-height: 1.5;
@@ -464,9 +461,9 @@ body {
   overflow: visible;
   border: 1px solid var(--global-ibico-border);
   border-radius: 20px;
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--contractor-sidebar-primary);
-  box-shadow: 0 24px 64px rgba(16, 37, 31, 0.22);
+  box-shadow: 0 24px 64px var(--sombra-cor-forte);
 }
 
 .finalize-modal[open] {
@@ -474,7 +471,7 @@ body {
 }
 
 .finalize-modal::backdrop {
-  background: rgba(15, 23, 42, 0.56);
+  background: var(--cor-texto-a56);
   animation: finalize-modal-backdrop-enter 180ms ease-out both;
 }
 
@@ -565,12 +562,12 @@ body {
 }
 
 .finalize-modal__button--danger {
-  background: #b91c1c;
+  background: var(--erro);
   color: var(--contractor-sidebar-white);
 }
 
 .finalize-modal__button--danger:hover {
-  background: #991b1b;
+  background: var(--erro);
 }
 
 .finalize-modal__label {
@@ -728,14 +725,14 @@ body {
 }
 
 .evaluation-readonly__stars {
-  color: #f59e0b;
+  color: var(--aviso-estrela);
   font-size: 1.6rem;
   letter-spacing: 2px;
 }
 
 .evaluation-readonly__comment {
   margin: 8px 0 0;
-  color: #475569;
+  color: var(--cor-texto-suave);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -743,20 +740,20 @@ body {
 .candidate-card__rating {
   margin: 4px 0 0;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--cor-texto-suave);
 }
 
 .candidate-card__stars {
-  color: #b45309;
+  color: var(--aviso);
   font-weight: 700;
 }
 
 .candidate-card__no-rating {
-  color: #64748b;
+  color: var(--cor-texto-mudo);
 }
 
 .candidate-card__link {
-  color: var(--contractor-sidebar-primary, #0f766e);
+  color: var(--contractor-sidebar-primary, var(--marca-ibico));
   font-weight: 600;
   text-decoration: underline;
 }
@@ -767,11 +764,7 @@ body {
 }
 
 .candidate-card__concluidos {
-  margin-top: 2px;
-}
-
-.candidate-card__concluidos {
   margin: 2px 0 0;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--cor-texto-suave);
 }

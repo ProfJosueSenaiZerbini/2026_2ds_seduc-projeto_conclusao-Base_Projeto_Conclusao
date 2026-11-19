@@ -3,12 +3,12 @@
    ========================================================= */
 
 :root {
-  --details-red-banner: #e11d48;
-  --details-red-dark: #be123c;
-  --details-bg-main: #f8fafc;
-  --details-text-dark: #0f172a;
-  --details-text-muted: #64748b;
-  --details-border: #e2e8f0;
+  --details-red-banner: var(--erro);
+  --details-red-dark: var(--erro-escuro);
+  --details-bg-main: var(--cor-fundo);
+  --details-text-dark: var(--cor-texto);
+  --details-text-muted: var(--cor-texto-mudo);
+  --details-border: var(--cor-borda);
 }
 
 /* Visão do contratante: fundo da página no padrão das telas do contratante (global.css).
@@ -19,8 +19,10 @@ body:not(.worker-details) {
 
 /* HERO BANNER DE DESTAQUE DO BICO */
 .hero-banner {
-  background: linear-gradient(135deg, var(--details-red-banner), var(--details-red-dark));
-  color: #fff;
+  --hero-banner-fundo: linear-gradient(135deg, var(--details-red-banner), var(--details-red-dark));
+
+  background: var(--hero-banner-fundo);
+  color: var(--cor-branco);
   padding: 40px 0;
 }
 
@@ -34,7 +36,7 @@ body:not(.worker-details) {
 }
 
 .badge-status {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--cor-branco-a20);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -56,7 +58,7 @@ body:not(.worker-details) {
 
 .banner-price {
   text-align: right;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--trabalhador-grafite-a15);
   padding: 20px 30px;
   border-radius: 12px;
 }
@@ -89,7 +91,7 @@ body:not(.worker-details) {
 }
 
 .section-block {
-  background: #fff;
+  background: var(--cor-branco);
   padding: 24px;
   border-radius: 12px;
   border: 1px solid var(--details-border);
@@ -103,7 +105,7 @@ body:not(.worker-details) {
 }
 
 .description-text {
-  color: #475569;
+  color: var(--cor-texto-suave);
   line-height: 1.6;
 }
 
@@ -117,7 +119,7 @@ body:not(.worker-details) {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: #f1f5f9;
+  background: var(--cor-fundo-sutil);
   padding: 15px;
   border-radius: 8px;
 }
@@ -141,11 +143,11 @@ body:not(.worker-details) {
 
 /* SIDEBAR DE RESUMO E AÇÕES */
 .summary-card {
-  background: #fff;
+  background: var(--cor-branco);
   padding: 24px;
   border-radius: 12px;
-  border: 2px solid #fecdd3;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--erro-borda);
+  box-shadow: 0 4px 12px var(--sombra-cor-leve);
 }
 
 .summary-item {
@@ -159,7 +161,7 @@ body:not(.worker-details) {
 .btn-accept {
   width: 100%;
   background: var(--details-red-banner);
-  color: #fff;
+  color: var(--cor-branco);
   border: none;
   padding: 16px;
   border-radius: 8px;
@@ -178,7 +180,7 @@ body:not(.worker-details) {
   display: block;
   text-align: center;
   width: 100%;
-  background: #e2e8f0;
+  background: var(--cor-borda);
   color: var(--details-text-dark);
   padding: 12px;
   border-radius: 8px;
@@ -232,7 +234,7 @@ body:not(.worker-details) {
 }
 
 .evaluation-star {
-  color: #cbd5e1;
+  color: var(--cor-borda);
   cursor: pointer;
   font-size: 2rem;
   line-height: 1;
@@ -243,7 +245,7 @@ body:not(.worker-details) {
 .evaluation-star-input:focus-visible + .evaluation-star,
 .evaluation-star:hover,
 .evaluation-star:hover ~ .evaluation-star {
-  color: #f59e0b;
+  color: var(--aviso-estrela);
 }
 
 .evaluation-comment-label {
@@ -266,13 +268,13 @@ body:not(.worker-details) {
 #comentario-avaliacao:focus-visible,
 .evaluation-submit:focus-visible,
 .evaluation-star:focus-visible {
-  outline: 3px solid rgba(225, 29, 72, 0.35);
+  outline: 3px solid var(--erro-a35);
   outline-offset: 2px;
 }
 
 .evaluation-submit {
   background: var(--details-red-banner);
-  color: #fff;
+  color: var(--cor-branco);
   border: 0;
   padding: 11px 18px;
   border-radius: 8px;
@@ -296,11 +298,11 @@ body:not(.worker-details) {
 }
 
 .evaluation-feedback--success {
-  color: #166534;
+  color: var(--contratante-verde);
 }
 
 .evaluation-feedback--error {
-  color: #b91c1c;
+  color: var(--erro);
 }
 
 .evaluation-note {
@@ -352,12 +354,12 @@ body:not(.worker-details) {
 
 /* Identidade e ajustes exclusivos para a visualização do trabalhador. */
 body.worker-details {
-  --details-red-banner: #8b1728;
-  --details-red-dark: #68101e;
-  --details-bg-main: #f5f2eb;
-  --details-text-dark: #191919;
-  --details-text-muted: #625e57;
-  --details-border: #e5ded3;
+  --details-red-banner: var(--trabalhador-vermelho);
+  --details-red-dark: var(--trabalhador-vermelho-escuro);
+  --details-bg-main: var(--trabalhador-creme);
+  --details-text-dark: var(--trabalhador-grafite);
+  --details-text-muted: var(--trabalhador-texto-suave);
+  --details-border: var(--trabalhador-borda);
 
   min-height: 100vh;
   background: var(--details-bg-main);
@@ -367,7 +369,15 @@ body.worker-details {
 
 body.worker-details .hero-banner {
   padding: 42px 0;
-  background: linear-gradient(118deg, #191919 0%, #191919 48%, #8b1728 100%);
+
+  --hero-banner-trabalhador-fundo: linear-gradient(
+    118deg,
+    var(--trabalhador-grafite) 0%,
+    var(--trabalhador-grafite) 48%,
+    var(--trabalhador-vermelho) 100%
+  );
+
+  background: var(--hero-banner-trabalhador-fundo);
 }
 
 body.worker-details .banner-container {
@@ -384,7 +394,7 @@ body.worker-details .badge-status {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
-  background: #8b1728;
+  background: var(--trabalhador-vermelho);
   letter-spacing: 0.06em;
 }
 
@@ -410,23 +420,23 @@ body.worker-details .banner-meta span {
   max-width: 100%;
   min-width: 0;
   padding: 7px 11px;
-  border: 1px solid rgba(245, 242, 235, 0.2);
+  border: 1px solid var(--trabalhador-creme-a20);
   border-radius: 999px;
-  background: rgba(245, 242, 235, 0.06);
+  background: var(--trabalhador-creme-a6);
   overflow-wrap: anywhere;
 }
 
 body.worker-details .banner-meta i {
   flex: 0 0 auto;
-  color: #f5f2eb;
+  color: var(--trabalhador-creme);
 }
 
 body.worker-details .banner-price {
   flex: 0 0 auto;
   min-width: 250px;
   padding: 22px 26px;
-  border: 1px solid rgba(245, 242, 235, 0.18);
-  background: rgba(25, 25, 25, 0.28);
+  border: 1px solid var(--trabalhador-creme-a18);
+  background: var(--trabalhador-grafite-a28);
   text-align: left;
 }
 
@@ -461,7 +471,7 @@ body.worker-details .section-block {
   padding: 26px 28px;
   border-color: var(--details-border);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(25, 25, 25, 0.045);
+  box-shadow: 0 8px 24px var(--sombra-cor-leve);
 }
 
 body.worker-details .section-block h3,
@@ -474,7 +484,7 @@ body.worker-details .summary-card h3 {
 }
 
 body.worker-details .description-text {
-  color: #494640;
+  color: var(--trabalhador-grafite-claro);
   font-size: 15px;
   line-height: 1.75;
   overflow-wrap: anywhere;
@@ -491,7 +501,7 @@ body.worker-details .info-card {
   gap: 13px;
   padding: 16px;
   border: 1px solid var(--details-border);
-  background: #f8f6f1;
+  background: var(--trabalhador-creme-claro);
 }
 
 body.worker-details .info-card > div {
@@ -526,7 +536,7 @@ body.worker-details .summary-card {
   border: 1px solid var(--details-border);
   border-top: 4px solid var(--details-red-banner);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(25, 25, 25, 0.06);
+  box-shadow: 0 8px 24px var(--sombra-cor-leve);
 }
 
 body.worker-details .summary-card h3 {
@@ -553,7 +563,7 @@ body.worker-details .btn-accept {
   border: 1px solid var(--details-red-banner);
   border-radius: 10px;
   background: var(--details-red-banner);
-  box-shadow: 0 5px 12px rgba(139, 23, 40, 0.18);
+  box-shadow: 0 5px 12px var(--trabalhador-vermelho-a18);
   font-family: inherit;
   line-height: 1.35;
   transition:
@@ -564,27 +574,27 @@ body.worker-details .btn-accept {
 
 body.worker-details .btn-accept:hover {
   background: var(--details-red-dark);
-  box-shadow: 0 7px 16px rgba(104, 16, 30, 0.24);
+  box-shadow: 0 7px 16px var(--trabalhador-vermelho-escuro-a24);
   transform: translateY(-1px);
 }
 
 body.worker-details .btn-accept--cancel {
   border-color: var(--details-border);
-  background: #f5f2eb;
+  background: var(--trabalhador-creme);
   box-shadow: none;
   color: var(--details-red-banner);
 }
 
 body.worker-details .btn-accept--cancel:hover {
   border-color: var(--details-red-banner);
-  background: #f0e5e2;
+  background: var(--trabalhador-rosa-suave);
   box-shadow: none;
 }
 
 body.worker-details .btn-back {
   border: 1px solid var(--details-border);
   border-radius: 10px;
-  background: #f5f2eb;
+  background: var(--trabalhador-creme);
   color: var(--details-text-dark);
   transition:
     border-color 0.18s ease,
@@ -594,17 +604,17 @@ body.worker-details .btn-back {
 
 body.worker-details .btn-back:hover {
   border-color: var(--details-red-banner);
-  background: #f0e5e2;
+  background: var(--trabalhador-rosa-suave);
   color: var(--details-red-banner);
 }
 
 body.worker-details :is(a, button, textarea):focus-visible {
-  outline: 3px solid #8b1728;
+  outline: 3px solid var(--trabalhador-vermelho);
   outline-offset: 3px;
 }
 
 body.worker-details .navbar :is(a, button):focus-visible {
-  outline-color: #f5f2eb;
+  outline-color: var(--trabalhador-creme);
 }
 
 body.worker-details .candidatura-status {
@@ -614,38 +624,38 @@ body.worker-details .candidatura-status {
   padding: 14px;
   border: 1px solid var(--details-border);
   border-radius: 10px;
-  background: #f8f6f1;
+  background: var(--trabalhador-creme-claro);
   text-align: center;
 }
 
 body.worker-details .candidatura-status--pendente {
-  border-color: #d7b87d;
-  background: #fbf5e8;
+  border-color: var(--aviso-borda);
+  background: var(--trabalhador-creme);
 }
 
 body.worker-details .candidatura-status--pendente .candidatura-status__value {
-  color: #78520a;
+  color: var(--aviso);
 }
 
 body.worker-details .candidatura-status--enviada {
-  border-color: #c99ca3;
-  background: #f8eff0;
+  border-color: var(--trabalhador-borda-forte);
+  background: var(--trabalhador-rosa-suave);
 }
 
 /* Cancelado pelo próprio trabalhador: neutro/grafite (sem aparência de sucesso) */
 body.worker-details .candidatura-status--cancelada {
-  border-color: #cfc8bb;
-  background: #efece6;
+  border-color: var(--trabalhador-borda);
+  background: var(--trabalhador-creme);
 }
 
 body.worker-details .candidatura-status--cancelada .candidatura-status__value {
-  color: #2f2c29;
+  color: var(--trabalhador-grafite-claro);
 }
 
 /* Recusado pelo contratante: alerta em vinho */
 body.worker-details .candidatura-status--recusada {
-  border-color: #d9a9ae;
-  background: #fbe9eb;
+  border-color: var(--trabalhador-borda-forte);
+  background: var(--erro-fundo);
 }
 
 body.worker-details .candidatura-status--recusada .candidatura-status__value {
@@ -680,6 +690,9 @@ body.worker-details .candidatura-form {
 
 body.worker-details .candidatura-form--cancelar {
   margin-top: 14px;
+
+  /* flow-root evita que a margem do botão colapse com a do contêiner (mantém o espaçamento do botão anterior). */
+  display: flow-root;
 }
 
 body.worker-details .candidatura-form__field {
@@ -700,9 +713,9 @@ body.worker-details .candidatura-form__textarea {
   width: 100%;
   min-height: 92px;
   padding: 11px 12px;
-  border: 1px solid #cfc8bd;
+  border: 1px solid var(--trabalhador-borda);
   border-radius: 9px;
-  background: #fff;
+  background: var(--cor-branco);
   color: var(--details-text-dark);
   font: inherit;
   font-size: 14px;
@@ -711,7 +724,7 @@ body.worker-details .candidatura-form__textarea {
 }
 
 body.worker-details .candidatura-form__textarea::placeholder {
-  color: #777168;
+  color: var(--trabalhador-texto-suave);
 }
 
 body.worker-details .candidatura-form__textarea:focus-visible {
@@ -723,7 +736,7 @@ body.worker-details .candidatura-indisponivel {
   padding: 12px;
   border: 1px solid var(--details-border);
   border-radius: 10px;
-  background: #f8f6f1;
+  background: var(--trabalhador-creme-claro);
   color: var(--details-text-muted);
   line-height: 1.5;
   text-align: center;
@@ -900,11 +913,6 @@ body.worker-details .ficha-servico .info-card__sub {
 /* Modal de confirmação do cancelamento de candidatura (trabalhador).
    Sem JavaScript abre por :target; com JavaScript a classe .is-open controla a exibição. */
 
-/* flow-root evita que a margem do botão colapse com a do contêiner (mantém o espaçamento do botão anterior). */
-body.worker-details .candidatura-form--cancelar {
-  display: flow-root;
-}
-
 body.worker-details a.btn-accept {
   display: flex;
   align-items: center;
@@ -936,7 +944,7 @@ body.worker-details .modal-cancelar:target {
 body.worker-details .modal-cancelar__fundo {
   position: absolute;
   inset: 0;
-  background: rgba(25, 25, 25, 0.66);
+  background: var(--trabalhador-grafite-a66);
   cursor: default;
 }
 
@@ -949,8 +957,8 @@ body.worker-details .modal-cancelar__caixa {
   overflow-y: auto;
   border-top: 4px solid var(--details-red-banner);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 24px 60px rgba(25, 25, 25, 0.4);
+  background: var(--cor-branco);
+  box-shadow: 0 24px 60px var(--sombra-cor-forte);
   animation: modal-cancelar-entrada 0.18s ease-out;
 }
 
@@ -981,7 +989,7 @@ body.worker-details .modal-cancelar__fechar {
 }
 
 body.worker-details .modal-cancelar__fechar:hover {
-  background: #f5f2eb;
+  background: var(--trabalhador-creme);
   color: var(--details-text-dark);
 }
 
@@ -1002,7 +1010,7 @@ body.worker-details .modal-cancelar__aviso {
   padding: 11px 13px;
   border-left: 4px solid var(--details-red-banner);
   border-radius: 0 8px 8px 0;
-  background: #f2e5e3;
+  background: var(--trabalhador-rosa-suave);
   color: var(--details-red-dark);
   font-size: 15px;
   font-weight: 700;
@@ -1055,7 +1063,7 @@ body.worker-details .modal-cancelar__confirmar {
 
 body.worker-details .modal-cancelar__voltar {
   border: 1px solid var(--details-border);
-  background: #f5f2eb;
+  background: var(--trabalhador-creme);
   color: var(--details-text-dark);
   font-weight: 600;
 }
@@ -1068,7 +1076,7 @@ body.worker-details .modal-cancelar__voltar:hover {
 body.worker-details .modal-cancelar__confirmar {
   border: 1px solid var(--details-red-banner);
   background: var(--details-red-banner);
-  color: #fff;
+  color: var(--cor-branco);
   font-weight: 700;
 }
 
@@ -1120,14 +1128,14 @@ body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
 }
 
 .evaluation-readonly__stars {
-  color: #f59e0b;
+  color: var(--aviso-estrela);
   font-size: 1.6rem;
   letter-spacing: 2px;
 }
 
 .evaluation-readonly__comment {
   margin: 8px 0 0;
-  color: #475569;
+  color: var(--cor-texto-suave);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -1153,7 +1161,7 @@ body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
 }
 
 .contratante-nota__estrela {
-  color: #b45309;
+  color: var(--aviso);
   font-weight: 700;
 }
 
@@ -1171,7 +1179,7 @@ body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
   margin: 0 0 12px;
   padding-left: 18px;
   line-height: 1.7;
-  color: var(--details-text-muted, #475569);
+  color: var(--details-text-muted, var(--cor-texto-suave));
 }
 
 .sobre-contratante__link {
@@ -1181,7 +1189,7 @@ body.worker-details .modal-cancelar.is-enviando .modal-cancelar__fechar {
 
 .sobre-contratante__link,
 .sobre-contratante__link:visited {
-  color: var(--details-text-dark, #111827);
+  color: var(--details-text-dark, var(--cor-texto));
 }
 
 /* Endereço completo do bico (só para o contratante dono e o trabalhador aceito): ocupa a linha toda da grade. */
