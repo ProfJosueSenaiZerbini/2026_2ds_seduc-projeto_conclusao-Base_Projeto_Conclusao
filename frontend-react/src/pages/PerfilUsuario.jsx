@@ -576,9 +576,6 @@ const PerfilUsuario = () => {
         {/* ✦ CARTÃO 1: CABEÇALHO DO PERFIL ESTILO LINKEDIN (COM IDENTIDADE LUMINA) ✦ */}
         <div className="bg-white border-2 border-graphite shadow-[6px_6px_0_0_#111111] relative">
 
-          {/* Fita adesiva decorativa retrô no canto */}
-          <Tape variant="yellow" className="-top-3 right-8 w-24 h-6 rotate-2 pointer-events-none" />
-
           {/* 1.1 Banner / Capa Superior da Página (com overflow-hidden interno) */}
           <div className="relative h-44 sm:h-56 md:h-64 w-full bg-gradient-to-r from-[#E9E4DC] via-[#FAF6F0] to-[#E2DDD5] border-b-2 border-graphite overflow-hidden flex items-center justify-center">
 
@@ -883,8 +880,6 @@ const PerfilUsuario = () => {
 
         {/* ✦ CARTÃO 3: DESTAQUE DE ATUAÇÃO (Totalmente desobstruído e legível) ✦ */}
         <div className="bg-white border-2 border-graphite p-6 sm:p-8 shadow-[5px_5px_0_0_#C8102E] relative">
-          <Tape variant="yellow" className="-top-3 left-8 w-20 h-5 -rotate-1 pointer-events-none" />
-
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
             <div className="flex-1 min-w-0">
 
@@ -1004,8 +999,6 @@ const PerfilUsuario = () => {
                 <form onSubmit={handlePublicarPostPerfil}
                   className="bg-[#FAF8F5] border-2 border-graphite p-5 sm:p-7 mb-8 shadow-[5px_5px_0_0_#111111] relative space-y-4"
                 >
-                  <Tape variant="yellow" className="-top-3 right-8 w-24 h-5 rotate-1 pointer-events-none" />
-
                   <div className="flex items-center justify-between pb-2 border-b border-gray-300">
                     <h4 className="font-serif font-bold text-lg text-graphite flex items-center gap-2">
                       <Sparkles size={16} className="text-red-editorial" />
@@ -1362,8 +1355,6 @@ const PerfilUsuario = () => {
       {mostrarModalEdicao && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white border-2 border-graphite p-6 sm:p-8 max-w-2xl w-full shadow-[8px_8px_0_0_#111111] relative my-8 max-h-[90vh] overflow-y-auto">
-            <Tape variant="yellow" className="-top-3 right-8 w-24 h-6 rotate-1 pointer-events-none" />
-
             <div className="flex items-center justify-between pb-3 border-b-2 border-graphite mb-6">
               <div className="flex items-center gap-2">
                 <Edit3 size={20} className="text-red-editorial" />
@@ -1600,8 +1591,6 @@ const PerfilUsuario = () => {
       {mostrarModalContato && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border-2 border-graphite p-6 sm:p-8 max-w-md w-full shadow-[8px_8px_0_0_#111111] relative">
-            <Tape variant="yellow" className="-top-3 right-8 w-20 h-5 rotate-1 pointer-events-none" />
-
             <div className="flex items-center justify-between pb-3 border-b-2 border-graphite mb-6">
               <h3 className="font-serif font-black text-xl text-graphite">
                 Informações de Contato

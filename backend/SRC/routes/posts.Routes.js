@@ -7,10 +7,13 @@ const {
     criar,
     excluirPost,
     alternarCurtida,
-    statusCurtida,
+    statusCurtida
+} = require("../controllers/postController");
+
+const {
     listarComentarios,
     adicionarComentario
-} = require("../controllers/postController");
+} = require("../controllers/comentarios.controller");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const { authOpcional } = require("../middleware/authMiddleware");
@@ -25,7 +28,7 @@ router.delete("/:id", authMiddleware, excluirPost);
 router.post("/:id/curtir", authMiddleware, alternarCurtida);
 router.get("/:id/curtidas", authOpcional, statusCurtida);
 
-// ✦ REDE SOCIAL: Rotas de comentários
+// ✦ REDE SOCIAL: Rotas de comentários delegadas ao controlador de comentários
 router.get("/:id/comentarios", listarComentarios);
 router.post("/:id/comentarios", authMiddleware, adicionarComentario);
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // Endereço do backend
+  baseURL: import.meta.env.VITE_API_URL || '/api', // Se unificado no backend usa /api, ou variável se definida
   timeout: 10000,
 });
 

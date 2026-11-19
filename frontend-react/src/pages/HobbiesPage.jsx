@@ -227,8 +227,6 @@ const HobbiesPage = () => {
         
         {/* ✦ CABEÇALHO EDITORIAL ✦ */}
         <div className="bg-white border-2 border-graphite p-8 sm:p-12 shadow-[6px_6px_0_0_#111111] relative">
-          <Tape variant="yellow" className="-top-3 right-8 w-28 h-6 rotate-2 pointer-events-none" />
-
           <div className="flex items-center gap-2 mb-3">
             <span className="bg-red-editorial text-white text-[10px] font-mono font-bold tracking-widest px-3 py-1 uppercase shadow-2xs">
               GUIA EDITORIAL LUMINA
@@ -313,13 +311,6 @@ const HobbiesPage = () => {
                 key={hobby.id}
                 className="bg-white border-2 border-graphite flex flex-col justify-between shadow-[6px_6px_0_0_#111111] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#C8102E] transition-all duration-200 relative group overflow-hidden"
               >
-                {/* Fita adesiva retrô nos cantos */}
-                {index % 2 === 0 ? (
-                  <Tape variant="yellow" className="-top-3 left-6 w-20 h-5 rotate-1 pointer-events-none z-10" />
-                ) : (
-                  <Tape variant="blue" className="-top-3 right-6 w-18 h-5 -rotate-2 pointer-events-none z-10" />
-                )}
-
                 <div>
                   {/* Foto de Capa Estilo Polaroid com Badge de Localização */}
                   <div className="relative aspect-[16/10] overflow-hidden border-b-2 border-graphite bg-gray-100">

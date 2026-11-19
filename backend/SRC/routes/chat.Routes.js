@@ -3,6 +3,7 @@ const router = express.Router();
 const database = require("../DATABASE/connection");
 const authMiddleware = require("../middleware/authMiddleware");
 const { authOpcional } = require("../middleware/authMiddleware");
+const { gerarRespostaIA } = require("../services/aiService");
 
 // Estrutura de armazenamento em memória/contingência caso tabelas SQL não existam no momento
 let publicMessagesMemory = [
@@ -164,32 +165,20 @@ router.post("/privado/:outroId", authOpcional, async (req, res) => {
   }
 });
 
-// 5. Conversa Diária com a IA Lumina (Assistente Cultural & Diária)
+// 5. Conversa Diária com a IA Lumina (Assistente Inteligente estilo ChatGPT / Gemini)
 router.post("/ia", async (req, res) => {
   try {
-    const { mensagem, nomeUsuario } = req.body;
-    const nome = nomeUsuario || "amiga";
+    const { mensagem, nomeUsuario, historico } = req.body;
 
     if (!mensagem || !mensagem.trim()) {
       return res.status(400).json({ mensagem: "Mensagem vazia." });
     }
 
-    const msgLower = mensagem.toLowerCase();
-    let resposta = "";
-
-    if (msgLower.includes("filme") || msgLower.includes("cinema") || msgLower.includes("assistir")) {
-      resposta = `Ah, adoro recomendações cinematográficas! ✧ Se você quer algo com nostalgia dos anos 2000, recomendo 'As Patricinhas de Beverly Hills', 'Meninas Malvadas' ou 'Encontros e Desencontros' da Sofia Coppola. Se preferir algo mais intimista e poético, assista a 'Aftersun' ou 'Retrato de uma Jovem em Chamas'. Prepare um chá aconchegante e aproveite a sessão!`;
-    } else if (msgLower.includes("livro") || msgLower.includes("leitura") || msgLower.includes("ler")) {
-      resposta = `Que delícia falar de livros, ${nome}! 📖 Para leituras acolhedoras e reflexivas, sugiro 'Tudo Sobre o Amor' da bell hooks ou 'A Elegância do Ouriço' de Muriel Barbery. Se quiser ficção contemporânea envolvente, 'Pessoas Normais' da Sally Rooney ou 'Torto Arado' do Itamar Vieira Junior são leituras inesquecíveis. O que você gosta mais de ler?`;
-    } else if (msgLower.includes("hobby") || msgLower.includes("hobbies") || msgLower.includes("fazer") || msgLower.includes("tedio") || msgLower.includes("tédio")) {
-      resposta = `Para um momento de desaceleração hoje, que tal experimentar um hobby analógico? Você pode começar um diário visual (scrapbook) com recortes de revistas antigas e ingressos guardados, modelar um porta-joias de cerâmica fria ou visitar um sebo/café com luz natural no centro da cidade. Na nossa nova aba 'Hobbies' na Navbar você encontra um guia completo! ✧`;
-    } else if (msgLower.includes("dia") || msgLower.includes("cansada") || msgLower.includes("ansiosa") || msgLower.includes("triste") || msgLower.includes("desabafo")) {
-      resposta = `Sinto muito que o dia tenha sido desafiador, ${nome}. 🌿 Respire fundo: você não precisa dar conta de tudo o tempo todo. Que tal colocar o celular no silencioso por 15 minutinhos, tomar um banho morno, preparar uma xícara de camomila e apenas ouvir sua playlist favorita? Estou aqui com você para quando quiser conversar.`;
-    } else if (msgLower.includes("bom dia") || msgLower.includes("boa tarde") || msgLower.includes("boa noite") || msgLower.includes("olá") || msgLower.includes("oi")) {
-      resposta = `Olá, ${nome}! ✧ É um prazer imenso ter você aqui na nossa comunidade. Como está sendo seu dia hoje? Me conte o que você tem lido, assistido ou como posso te inspirar com novas ideias para a sua rotina!`;
-    } else {
-      resposta = `Adorei refletir sobre isso com você, ${nome}! ✧ Viver com mais arte, calma e sensibilidade é justamente a essência da nossa revista Lumina. O que acha de anotarmos essa ideia ou sensação no seu diário hoje? Me conte mais sobre como isso tem tocado a sua rotina.`;
-    }
+    const resposta = await gerarRespostaIA({
+      mensagem: mensagem.trim(),
+      nomeUsuario,
+      historico: Array.isArray(historico) ? historico : []
+    });
 
     return res.json({
       resposta,
@@ -198,7 +187,7 @@ router.post("/ia", async (req, res) => {
   } catch (err) {
     console.error("Erro na resposta da IA:", err);
     return res.json({
-      resposta: "Estou aqui sempre para ouvir suas reflexões diárias, querida leitora! ✧ Como posso ajudar você hoje?",
+      resposta: "Olá! Tive uma pequena oscilação na conexão, mas estou aqui para você. Me envie sua mensagem novamente!",
       criado_em: new Date().toISOString()
     });
   }

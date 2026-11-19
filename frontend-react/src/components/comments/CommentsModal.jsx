@@ -24,17 +24,6 @@ const formatarTempo = (dataRaw) => {
   return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 };
 
-// Comentários padrão para posts iniciais/mock caso o banco ainda não os tenha
-const MOCK_COMMENTS_PADRAO = {
-  1: [
-    { id: 'm1', autor: 'Camila Duarte', texto: 'A estética Y2K traz tanta nostalgia! Esse ensaio capturou perfeitamente o espírito da época ✧', criado_em: new Date(Date.now() - 3600000 * 5) },
-    { id: 'm2', autor: 'Beatriz Vasconcelos', texto: 'Amei as referências de estilo! Quero ver mais textos sobre isso.', criado_em: new Date(Date.now() - 3600000 * 2) }
-  ],
-  2: [
-    { id: 'm3', autor: 'Juliana Mendes', texto: 'Meninas Malvadas é um clássico atemporal. Análise incrível!', criado_em: new Date(Date.now() - 3600000 * 8) }
-  ]
-};
-
 const QUICK_EMOJIS = ['❤️', '✨', '👏', '😍', '✍️', '☕', '🔥'];
 
 const CommentsModal = ({ isOpen, onClose, post, onCommentAdded }) => {
@@ -69,7 +58,7 @@ const CommentsModal = ({ isOpen, onClose, post, onCommentAdded }) => {
     };
   }, [isOpen, onClose]);
 
-  // Carrega comentários ao abrir
+  // Carrega comentários direto do backend ao abrir
   useEffect(() => {
     if (!isOpen || !post?.id) return;
 
@@ -79,18 +68,11 @@ const CommentsModal = ({ isOpen, onClose, post, onCommentAdded }) => {
 
     getComments(post.id)
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setComentarios(data);
-        } else {
-          // Fallback para posts de exemplo/mock
-          const mock = MOCK_COMMENTS_PADRAO[post.id] || [];
-          setComentarios(mock);
-        }
+        setComentarios(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
-        console.warn('Erro ao carregar comentários via API, usando fallback:', err);
-        const mock = MOCK_COMMENTS_PADRAO[post.id] || [];
-        setComentarios(mock);
+        console.error('Erro ao carregar comentários do backend:', err);
+        setComentarios([]);
       })
       .finally(() => {
         setLoading(false);
@@ -123,23 +105,8 @@ const CommentsModal = ({ isOpen, onClose, post, onCommentAdded }) => {
     setErro('');
 
     try {
-      let comentarioCriado = null;
-      try {
-        comentarioCriado = await addComment(post.id, textoLimpo);
-      } catch (apiErr) {
-        console.warn('API de comentário falhou, simulando localmente:', apiErr);
-      }
-
-      const comentarioFinal = comentarioCriado || {
-        id: 'local-' + Date.now(),
-        texto: textoLimpo,
-        criado_em: new Date().toISOString(),
-        usuario_id: userLogado?.id || '1',
-        autor: userLogado?.nome || 'Você',
-        autor_foto: userLogado?.foto || ''
-      };
-
-      const novos = [...comentarios, comentarioFinal];
+      const comentarioCriado = await addComment(post.id, textoLimpo);
+      const novos = [...comentarios, comentarioCriado];
       setComentarios(novos);
       setNovoComentario('');
 
@@ -150,7 +117,8 @@ const CommentsModal = ({ isOpen, onClose, post, onCommentAdded }) => {
 
       setTimeout(scrollToBottom, 100);
     } catch (err) {
-      setErro('Não foi possível enviar o comentário. Tente novamente.');
+      console.error('Erro ao enviar comentário para o backend:', err);
+      setErro('Não foi possível enviar o comentário ao servidor. Tente novamente.');
     } finally {
       setEnviando(false);
     }

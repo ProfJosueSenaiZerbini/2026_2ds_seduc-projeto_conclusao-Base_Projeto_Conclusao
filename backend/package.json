@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start":"nodemon src/server.js",
+    "start": "nodemon src/server.js",
+    "server": "node src/server.js",
+    "build-front": "npm --prefix ../frontend-react run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "criar-admin":"node scripts/criarAdmin.js"
+    "criar-admin": "node scripts/criarAdmin.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

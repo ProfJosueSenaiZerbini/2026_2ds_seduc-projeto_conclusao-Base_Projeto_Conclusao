@@ -1,7 +1,6 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const database = require("../SRC/DATABASE/connection");
-require("dotenv").config();
 
 async function criarAdmin() {
     try{

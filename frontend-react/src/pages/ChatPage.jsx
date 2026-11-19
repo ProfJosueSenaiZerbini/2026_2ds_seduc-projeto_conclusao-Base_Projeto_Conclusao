@@ -209,22 +209,18 @@ const ChatPage = () => {
     try {
       let respostaTexto = '';
       try {
-        const res = await chatWithAI({ mensagem: texto, nomeUsuario: userLogado.nome });
+        const res = await chatWithAI({
+          mensagem: texto,
+          nomeUsuario: userLogado?.nome || 'amiga',
+          historico: mensagensIA.slice(-6)
+        });
         if (res?.resposta) respostaTexto = res.resposta;
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Erro ao chamar IA no backend:', e);
+      }
 
-      // Fallback inteligente se a API externa não responder
       if (!respostaTexto) {
-        const tLower = texto.toLowerCase();
-        if (tLower.includes('livro') || tLower.includes('ler')) {
-          respostaTexto = `Para uma leitura acolhedora hoje, recomendo 'Tudo Sobre o Amor' da bell hooks ou 'A Elegância do Ouriço'. São livros que aquecem a alma e despertam reflexões profundas. Você costuma preferir romance ou ensaios? 📖✧`;
-        } else if (tLower.includes('filme') || tLower.includes('cinema')) {
-          respostaTexto = `Se você quiser algo nostálgico e estiloso dos anos 2000, assista a 'Encontros e Desencontros' (Lost in Translation) ou 'Meninas Malvadas'. Se preferir algo poético, 'Aftersun' é uma obra-prima inesquecível! 🎬✨`;
-        } else if (tLower.includes('hobby') || tLower.includes('dia') || tLower.includes('ansiosa')) {
-          respostaTexto = `Respire fundo, querida. Que tal experimentar um chá de camomila morno e passar 15 minutos colando recortes em um scrapbook ou organizando suas leituras? Na nossa aba 'Hobbies' você encontra ideias maravilhosas para desacelerar! 🌿`;
-        } else {
-          respostaTexto = `Adorei conversar sobre isso com você! ✧ Viver com sensibilidade e arte transforma os pequenos momentos do dia a dia. Me conte mais sobre como tem sido a sua rotina essa semana!`;
-        }
+        respostaTexto = 'Olá! Estou processando suas reflexões com carinho. Me envie sua próxima pergunta para continuarmos nosso bate-papo! ✧';
       }
 
       const msgIA = {
@@ -267,8 +263,6 @@ const ChatPage = () => {
         
         {/* ✦ CABEÇALHO DO CHAT & COMUNIDADE ✦ */}
         <div className="bg-white border-2 border-graphite p-6 sm:p-8 shadow-[6px_6px_0_0_#111111] relative">
-          <Tape variant="yellow" className="-top-3 right-8 w-28 h-6 rotate-1 pointer-events-none" />
-
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -631,8 +625,6 @@ const ChatPage = () => {
       {modalNovoContato && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border-2 border-graphite p-6 sm:p-8 max-w-md w-full shadow-[6px_6px_0_0_#111111] relative">
-            <Tape variant="yellow" className="-top-3 right-8 w-20 h-5 rotate-1 pointer-events-none" />
-
             <h3 className="font-serif font-black text-xl text-graphite mb-1">
               Chamar para Conversa Íntima
             </h3>

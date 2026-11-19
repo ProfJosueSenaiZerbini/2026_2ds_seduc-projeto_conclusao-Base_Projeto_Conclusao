@@ -144,8 +144,6 @@ const Resenhas = () => {
 
       {/* Cabeçalho da Seção de Resenhas */}
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-graphite pb-6 mb-10 gap-6 relative">
-        <Tape variant="yellow" className="-top-3 right-6 w-24 h-6 rotate-1 pointer-events-none" />
-
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline">CATÁLOGO EDITORIAL</Badge>
@@ -213,14 +211,6 @@ const Resenhas = () => {
                   onClick={() => navigate(`/post/${post.id}`)}
                   className="bg-cream-light border-2 border-graphite flex flex-col justify-between shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(200,16,46,1)] transition-all duration-200 relative cursor-pointer group"
                 >
-                  {/* Fitas adesivas */}
-                  {index % 3 === 0 && (
-                    <Tape variant="yellow" className="-top-3 left-6 w-24 h-6 rotate-1 pointer-events-none" />
-                  )}
-                  {index % 3 === 1 && (
-                    <Tape variant="blue" className="-top-3 right-6 w-20 h-5 -rotate-2 pointer-events-none" />
-                  )}
-
                   <div>
                     {/* Imagem de Capa do Post */}
                     <div className="relative aspect-[16/10] overflow-hidden border-b-2 border-graphite bg-gray-100">

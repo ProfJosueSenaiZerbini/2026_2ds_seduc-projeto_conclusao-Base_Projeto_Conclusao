@@ -1,25 +1,60 @@
-CREATE DATABASE blog;
+CREATE DATABASE IF NOT EXISTS blog;
 USE blog;
 
-
-CREATE TABLE usuario(
-id  INT auto_increment primary key,
-nome varchar(100) not null,
-email varchar(150) not null unique,
-senha varchar (255) not null
+CREATE TABLE IF NOT EXISTS usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    bio TEXT,
+    headline VARCHAR(255),
+    localizacao VARCHAR(150) DEFAULT 'São Paulo, Brasil',
+    foto LONGTEXT,
+    capa LONGTEXT,
+    status_tag VARCHAR(100) DEFAULT '#CRIADORA ATIVA',
+    interesses TEXT,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-CREATE table posts(
-id int auto_increment primary key,
-titulo varchar(200) not null,
-resumo varchar(255),
-conteudo TEXT not null,
-imagem LONGTEXT,
-publicado boolean not null DEFAULT true,
-criando_em datetime not null default current_timestamp,
-usuario_id int not null,
 
-constraint fk_post_usuario foreign key(usuario_id)
-references usuario(id)
+CREATE TABLE IF NOT EXISTS posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    resumo VARCHAR(255),
+    conteudo TEXT NOT NULL,
+    imagem LONGTEXT,
+    publicado BOOLEAN NOT NULL DEFAULT TRUE,
+    criando_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INT NOT NULL,
+    categoria VARCHAR(100) DEFAULT 'MODA & ESTILO',
+    CONSTRAINT fk_post_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS curtidas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    post_id INT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_usuario_post (usuario_id, post_id),
+    CONSTRAINT fk_curtida_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE,
+    CONSTRAINT fk_curtida_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS comentarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    texto TEXT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_comentario_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comentario_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS chat_publico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    texto TEXT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_chat_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
 SELECT * FROM usuario;

@@ -228,9 +228,6 @@ const PostPage = () => {
         {/* Imagem de Capa com moldura Polaroid/Scrapbook */}
         {post.imagem && (
           <div className="relative mb-12 bg-white border-2 border-graphite shadow-[6px_6px_0_0_#111111] p-2 sm:p-3">
-            {/* Fita Adesiva Translúcida */}
-            <Tape variant="yellow" className="-top-3 left-1/2 -translate-x-1/2 w-28 h-6 rotate-1 pointer-events-none" />
-
             <div className="overflow-hidden aspect-[16/9] w-full bg-gray-100">
               <img 
                 src={post.imagem} 
@@ -289,9 +286,6 @@ const PostPage = () => {
 
         {/* ✦ SEÇÃO REDE SOCIAL: MURAL DE RECADOS / GIRL TALK (COMENTÁRIOS) ✦ */}
         <section className="bg-white border-2 border-graphite p-6 sm:p-8 shadow-[6px_6px_0_0_#C8102E] relative">
-          {/* Fita Adesiva decorativa */}
-          <Tape variant="yellow" className="-top-3 right-8 w-24 h-6 -rotate-2 pointer-events-none" />
-
           {/* Cabeçalho da Seção de Comentários */}
           <div className="flex items-center justify-between pb-4 border-b-2 border-graphite mb-6">
             <div className="flex items-center gap-2.5">
