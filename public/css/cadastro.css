@@ -4,7 +4,6 @@
   --brand-500: var(--sucesso);
   --brand-600: var(--contratante-verde);
   --brand-700: var(--contratante-verde-hover);
-  --visual-bg: var(--contratante-verde-suave);
   --contractor-color: var(--contratante-verde);
   --contractor-soft: var(--contratante-verde-suave);
   --worker-color: var(--trabalhador-vermelho);
@@ -19,7 +18,6 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --shadow-sm: 0 1px 3px var(--cor-texto-a8);
-  --shadow-lg: 0 18px 48px var(--cor-texto-a10);
 }
 
 * {
@@ -45,7 +43,6 @@ body {
   --brand-500: var(--erro);
   --brand-600: var(--trabalhador-vermelho);
   --brand-700: var(--trabalhador-vermelho-escuro);
-  --visual-bg: var(--trabalhador-rosa-suave);
   --page-bg: var(--trabalhador-rosa-suave);
 }
 

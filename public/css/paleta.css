@@ -114,7 +114,6 @@
   --cor-branco-a94: color-mix(in srgb, var(--cor-branco) 94%, transparent);
   --cor-branco-a95: color-mix(in srgb, var(--cor-branco) 95%, transparent);
   --cor-branco-a96: color-mix(in srgb, var(--cor-branco) 96%, transparent);
-  --cor-texto-a10: color-mix(in srgb, var(--cor-texto) 10%, transparent);
   --cor-texto-a25: color-mix(in srgb, var(--cor-texto) 25%, transparent);
   --cor-texto-a4: color-mix(in srgb, var(--cor-texto) 4%, transparent);
   --cor-texto-a5: color-mix(in srgb, var(--cor-texto) 5%, transparent);
@@ -177,7 +176,6 @@
 
   /* Variáveis globais anteriores (apontam para a paleta) */
   --global-ibico-brand: var(--marca-ibico);
-  --global-ibico-brand-hover: var(--marca-ibico);
   --global-ibico-green: var(--sucesso-vivo);
   --global-ibico-ink: var(--cor-texto);
   --global-ibico-page-bg: var(--cor-fundo);

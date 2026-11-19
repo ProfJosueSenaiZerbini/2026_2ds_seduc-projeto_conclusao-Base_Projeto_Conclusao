@@ -7,8 +7,6 @@
   --worker-wallet-brand: var(--trabalhador-vermelho);
   --worker-wallet-brand-dark: var(--trabalhador-vermelho-escuro);
   --worker-wallet-brand-soft: var(--trabalhador-rosa-suave);
-  --worker-wallet-gray-bg: var(--trabalhador-creme);
-  --worker-wallet-gray-text: var(--trabalhador-texto-suave);
   --worker-wallet-bar-gray: var(--trabalhador-borda);
   --worker-wallet-shadow: 0 2px 6px var(--trabalhador-grafite-a3-5), 0 12px 28px var(--trabalhador-grafite-a4-5);
   --worker-wallet-radius-lg: 16px;
