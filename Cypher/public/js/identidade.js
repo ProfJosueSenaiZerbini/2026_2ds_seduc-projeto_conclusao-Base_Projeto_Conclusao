@@ -29,25 +29,53 @@
 })();
 
 (() => {
-  const page = document.querySelector(".tag-page");
-  if (!page) return;
-  const motion = matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
-  function follow(event) {
-    page.style.setProperty("--reflexo", (event.clientX / innerWidth * 100) + "%");
-    page.style.setProperty("--cursor-x", (event.clientX / innerWidth - .5) * 32 + "px");
-    page.style.setProperty("--cursor-y", (event.clientY / innerHeight - .5) * 24 + "px");
-  }
-  function reset() {
-    page.style.removeProperty("--reflexo");
-    page.style.removeProperty("--cursor-x");
-    page.style.removeProperty("--cursor-y");
-  }
-  function sync() {
-    page.removeEventListener("pointermove", follow);
-    reset();
-    if (motion.matches) page.addEventListener("pointermove", follow, { passive: true });
-  }
-  page.addEventListener("pointerleave", reset);
-  motion.addEventListener("change", sync);
-  sync();
+  const panel = document.querySelector('.tag-page .tag-panel');
+  if (!panel || !window.ResizeObserver) return;
+  const content = document.createElement('div');
+  content.className = 'tag-panel-content';
+  content.append(...panel.childNodes);
+  panel.append(content);
+  const mobile = matchMedia('(max-width: 600px)');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let animation;
+  let initialized = false;
+  let previousTarget = 0;
+  const resize = () => {
+    if (mobile.matches || panel.getClientRects().length === 0) {
+      animation?.cancel();
+      panel.style.removeProperty('height');
+      initialized = false;
+      previousTarget = 0;
+      return;
+    }
+    const style = getComputedStyle(panel);
+    const target = Math.max(parseFloat(style.minHeight) || 0,
+      content.getBoundingClientRect().height + parseFloat(style.paddingTop) +
+      parseFloat(style.paddingBottom) + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth));
+    if (Math.abs(target - previousTarget) < 1) return;
+    const from = panel.getBoundingClientRect().height;
+    animation?.cancel();
+    panel.style.height = `${target}px`;
+    if (initialized && !reduced.matches) {
+      animation = panel.animate([{height:`${from}px`},{height:`${target}px`}], {
+        duration:280, easing:'cubic-bezier(.22,.61,.36,1)'
+      });
+    }
+    previousTarget = target;
+    initialized = true;
+  };
+  const observer = new ResizeObserver(resize);
+  observer.observe(content);
+  mobile.addEventListener('change', resize);
+  reduced.addEventListener('change', resize);
+  new MutationObserver(() => {
+    if (reduced.matches) return;
+    const stage = content.querySelector('[data-register-stage]:not([hidden])');
+    if (stage && stage !== lastStage) {
+      stage.animate([{opacity:.35,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:220,easing:'ease-out'});
+    }
+    lastStage = stage;
+  }).observe(content, {subtree:true,attributes:true,attributeFilter:['hidden']});
+  let lastStage = content.querySelector('[data-register-stage]:not([hidden])');
+  resize();
 })();

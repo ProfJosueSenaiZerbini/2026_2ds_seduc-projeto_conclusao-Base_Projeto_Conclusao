@@ -1,4 +1,34 @@
 (() => {
+  const navegacaoMobile = document.querySelector(".dc-bottom");
+  const indicadorMobile = navegacaoMobile?.querySelector(".dc-nav-glider");
+  if (
+    indicadorMobile?.animate &&
+    document.referrer &&
+    matchMedia("(max-width: 900px)").matches &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    const origem = new URL(document.referrer);
+    const destinos = Array.from(navegacaoMobile.querySelectorAll("a"));
+    const anterior = destinos.findIndex(
+      link => link.pathname === origem.pathname
+    );
+    const atual = destinos.findIndex(link => link.hasAttribute("aria-current"));
+    if (
+      origem.origin === location.origin &&
+      anterior >= 0 &&
+      atual >= 0 &&
+      anterior !== atual
+    ) {
+      indicadorMobile.animate(
+        [
+          { transform: `translateX(${anterior * 100}%)` },
+          { transform: `translateX(${atual * 100}%)` },
+        ],
+        { duration: 220, easing: "cubic-bezier(0.2, 0.75, 0.25, 1)" }
+      );
+    }
+  }
+
   const navegacaoPerfil = document.querySelector("[data-profile-section-nav]");
   if (navegacaoPerfil) {
     const linksPerfil = Array.from(
@@ -58,10 +88,14 @@
     const botaoCompartilhar = evento.target.closest("[data-share-event]");
     if (!botaoCompartilhar) return;
     const dialogo = botaoCompartilhar.closest("dialog");
+    const eventoId = dialogo?.dataset.eventId;
+    if (!eventoId) return;
     const titulo = dialogo
-      ?.querySelector("[data-event-title-detail]")
+      .querySelector("[data-event-title-detail]")
       ?.textContent?.trim();
-    const url = window.location.href;
+    const ficha = new URL("/events?localizacao=", window.location.href);
+    ficha.hash = `evento-${encodeURIComponent(eventoId)}`;
+    const url = ficha.href;
     try {
       if (navigator.share) {
         await navigator.share({ title: titulo || "Evento Cypher", url });
@@ -306,16 +340,101 @@
   });
 
   const barraLateral = document.querySelector(".sidebar");
+  // Continuidade do rail: estado de uma navegação, não uma preferência fixa.
+  const raizSidebar = document.documentElement;
+  const chaveSidebar = "cypher-sidebar-percurso";
+  const ambienteSidebar = window.matchMedia(
+    "(min-width: 901px) and (hover: hover) and (pointer: fine)"
+  );
+  const limparContinuidadeSidebar = () => {
+    raizSidebar.classList.remove("sidebar-em-transicao");
+    try {
+      sessionStorage.removeItem(chaveSidebar);
+    } catch {}
+  };
+  if (barraLateral?.closest(".dc-shell")) {
+    barraLateral.addEventListener("pointerleave", limparContinuidadeSidebar);
+    document.documentElement.addEventListener(
+      "pointerleave",
+      limparContinuidadeSidebar
+    );
+    barraLateral.addEventListener("click", evento => {
+      limparContinuidadeSidebar();
+      const link = evento.target.closest("a[href]");
+      if (
+        !link ||
+        !ambienteSidebar.matches ||
+        !barraLateral.matches(":hover") ||
+        evento.defaultPrevented ||
+        evento.button !== 0 ||
+        evento.detail === 0 ||
+        evento.pointerType === "touch" ||
+        evento.ctrlKey ||
+        evento.metaKey ||
+        evento.shiftKey ||
+        evento.altKey ||
+        link.hasAttribute("download") ||
+        (link.target && link.target.toLowerCase() !== "_self")
+      )
+        return;
+      const destino = new URL(link.href, window.location.href);
+      if (
+        destino.origin !== location.origin ||
+        destino.hash ||
+        !["/", "/dashboard", "/espaco-de-trabalho"].includes(destino.pathname)
+      )
+        return;
+      try {
+        sessionStorage.setItem(
+          chaveSidebar,
+          JSON.stringify({
+            destino:
+              (destino.pathname === "/" ? "/dashboard" : destino.pathname) +
+              destino.search,
+            instante: Date.now(),
+          })
+        );
+        raizSidebar.classList.add("sidebar-em-transicao");
+      } catch {}
+    });
+    document.addEventListener("pointermove", evento => {
+      if (
+        evento.pointerType === "touch" ||
+        !raizSidebar.classList.contains("sidebar-em-transicao")
+      )
+        return;
+      const limites = barraLateral.getBoundingClientRect();
+      if (
+        evento.clientX < limites.left ||
+        evento.clientX >= limites.right ||
+        evento.clientY < limites.top ||
+        evento.clientY >= limites.bottom
+      )
+        limparContinuidadeSidebar();
+    });
+    ambienteSidebar.addEventListener("change", () => {
+      if (!ambienteSidebar.matches) limparContinuidadeSidebar();
+    });
+    window.addEventListener("pageshow", evento => {
+      if (evento.persisted) limparContinuidadeSidebar();
+    });
+  } else {
+    limparContinuidadeSidebar();
+  }
   const camadaMenu = document.querySelector(
     "[data-sidebar-close].mobile-overlay"
   );
+  const abrirMenu = document.querySelector("[data-sidebar-open]");
   const fecharMenu = () => {
+    if (barraLateral?.classList.contains("sidebar-open")) abrirMenu?.focus();
+    abrirMenu?.setAttribute("aria-expanded", "false");
     barraLateral?.classList.remove("sidebar-open");
     document.body.classList.remove("sidebar-visible");
     if (camadaMenu) camadaMenu.hidden = true;
   };
   document.querySelectorAll("[data-sidebar-open]").forEach(botao => {
     botao.addEventListener("click", () => {
+      botao.setAttribute("aria-expanded", "true");
       barraLateral?.classList.add("sidebar-open");
       document.body.classList.add("sidebar-visible");
       if (camadaMenu) camadaMenu.hidden = false;
@@ -360,13 +479,11 @@
       botao.setAttribute("aria-pressed", String(ativo));
       botao.disabled = !eventoId || confirmado || demonstracao;
       const rotulo = botao.querySelector("[data-interest-label]");
-      if (rotulo)
-        rotulo.textContent = demonstracao
-          ? "Evento demonstrativo"
-          : (rotulos[status] ?? rotuloInicial);
+      if (rotulo) rotulo.textContent = rotulos[status] ?? rotuloInicial;
       botao.classList.toggle("is-interested", ativo);
     });
     document.querySelectorAll("[data-interest-form]").forEach(formulario => {
+      formulario.hidden = demonstracao;
       if (eventoId && !demonstracao) {
         formulario.action = ativo
           ? `/events/${encodeURIComponent(eventoId)}/interest/cancel`
@@ -378,35 +495,11 @@
     document.querySelectorAll("[data-interest-notice]").forEach(aviso => {
       aviso.hidden = !ativo || demonstracao;
     });
-    document.querySelectorAll("[data-event-demo-notice]").forEach(aviso => {
-      aviso.hidden = !demonstracao;
+    document.querySelectorAll(".event-detail-count").forEach(contagem => {
+      contagem.hidden = demonstracao;
     });
   };
   atualizarInteresse(null, null, false);
-
-  document.querySelectorAll("[data-event-filter]").forEach(botao => {
-    botao.addEventListener("click", () => {
-      const filtro = botao.dataset.eventFilter;
-      document.querySelectorAll("[data-event-filter]").forEach(outro => {
-        const ativo = outro === botao;
-        outro.classList.toggle("active", ativo);
-        outro.setAttribute("aria-pressed", String(ativo));
-      });
-      const cartoes = [...document.querySelectorAll("[data-event-card]")];
-      let visiveis = 0;
-      cartoes.forEach(cartao => {
-        const visivel =
-          filtro === "Todos" || cartao.dataset.eventCategory === filtro;
-        cartao.hidden = !visivel;
-        if (visivel) visiveis += 1;
-      });
-      document
-        .querySelectorAll("[data-events-filter-empty]")
-        .forEach(estado => {
-          estado.hidden = visiveis > 0;
-        });
-    });
-  });
 
   const seletorTipoObra = document.querySelector("#selecao-tipo-obra");
   let acionadorTipoObra = null;
@@ -453,6 +546,7 @@
       const ativa = botao.dataset.eventDetailTab === aba;
       botao.classList.toggle("is-active", ativa);
       botao.setAttribute("aria-selected", String(ativa));
+      botao.tabIndex = ativa ? 0 : -1;
     });
     dialogo.querySelectorAll("[data-event-detail-panel]").forEach(painel => {
       painel.hidden = painel.dataset.eventDetailPanel !== aba;
@@ -465,10 +559,8 @@
     const lista = dialogo.querySelector("[data-event-interested-list]");
     const proprietario = dados.detailOwned === "true";
     abaGestao.hidden = !proprietario;
-    if (!proprietario) {
-      selecionarAbaEvento(dialogo, "geral");
-      return;
-    }
+    selecionarAbaEvento(dialogo, "geral");
+    if (!proprietario) return;
     editora.href = `/events/${encodeURIComponent(dados.detailId)}/edit`;
     exclusao.action = `/events/${encodeURIComponent(dados.detailId)}/delete`;
     lista.replaceChildren();
@@ -527,6 +619,8 @@
         salvar.type = "submit";
         salvar.textContent = "Salvar";
         formulario.append(seletor, salvar);
+        const csrf = exclusao.elements.namedItem("_csrf");
+        if (csrf) formulario.appendChild(csrf.cloneNode(true));
         linha.appendChild(formulario);
       }
       lista.appendChild(linha);
@@ -536,6 +630,21 @@
     botao.addEventListener("click", () => {
       const dialogo = botao.closest("dialog");
       if (dialogo) selecionarAbaEvento(dialogo, botao.dataset.eventDetailTab);
+    });
+    botao.addEventListener("keydown", evento => {
+      const abas = [...botao.parentElement.querySelectorAll("[data-event-detail-tab]:not([hidden])")];
+      const atual = abas.indexOf(botao);
+      const destinos = {
+        ArrowLeft: (atual + abas.length - 1) % abas.length,
+        ArrowRight: (atual + 1) % abas.length,
+        Home: 0,
+        End: abas.length - 1,
+      };
+      if (!Object.hasOwn(destinos, evento.key)) return;
+      evento.preventDefault();
+      const destino = abas[destinos[evento.key]];
+      selecionarAbaEvento(botao.closest("dialog"), destino.dataset.eventDetailTab);
+      destino.focus();
     });
   });
   const abrirDialogo = (dialogo, acionador) => {
@@ -555,12 +664,17 @@
       definirTexto(
         dialogo,
         "[data-event-category-detail]",
-        dados.detailCategoryDetail
-          ? `${dados.detailCategory} · ${dados.detailCategoryDetail}`
-          : dados.detailCategory
+        [
+          dados.detailCategory,
+          dados.detailCategoryDetail,
+          ...(dados.detailWorkshopTypes ?? "").split("|").filter(Boolean),
+        ]
+          .filter(Boolean)
+          .join(" · ")
       );
       definirTexto(dialogo, "[data-event-date-detail]", dados.detailDate);
       definirTexto(dialogo, "[data-event-time-detail]", dados.detailTime);
+      definirTexto(dialogo, "[data-event-status-detail]", dados.detailStatus);
       definirTexto(
         dialogo,
         "[data-event-location-detail]",
@@ -597,17 +711,15 @@
         dados.detailDemonstracao === "true",
         dados.detailParticipationType || "aberta"
       );
-      definirTexto(
-        dialogo,
-        "[data-event-interest-total]",
-        dados.detailTotalInterested || "0"
-      );
+      const total = Number(dados.detailTotalInterested) || 0;
+      const [singular, plural] = dados.detailParticipationType === "aprovacao"
+        ? ["solicitação recebida.", "solicitações recebidas."]
+        : ["participação registrada.", "participações registradas."];
+      definirTexto(dialogo, "[data-event-interest-total]", String(total));
       definirTexto(
         dialogo,
         "[data-event-interest-count-label]",
-        dados.detailParticipationType === "aprovacao"
-          ? "solicitação(ões) recebida(s)."
-          : "participação(ões) registrada(s)."
+        total === 1 ? singular : plural
       );
       preencherGestaoEvento(dialogo, dados);
       abrirDialogo(dialogo, cartao);
@@ -779,6 +891,15 @@
     dialogo.addEventListener("close", () => dialogos.get(dialogo)?.focus());
   });
 
+  // Links da Descoberta abrem a mesma ficha acionada no catálogo.
+  function abrirFichaVinculada() {
+    const item = document.getElementById(location.hash.slice(1));
+    if (item?.matches("[data-event-card]")) item.click();
+    else item?.querySelector("[data-beat-detail]")?.click();
+  }
+  abrirFichaVinculada();
+  window.addEventListener("hashchange", abrirFichaVinculada);
+
   const linksConfiguracao = [
     ...document.querySelectorAll("[data-settings-link]"),
   ];
@@ -802,13 +923,20 @@
   window.addEventListener("hashchange", sincronizarSecaoConfiguracao);
   sincronizarSecaoConfiguracao();
 
+  const salvarTema = tema => {
+    try {
+      window.localStorage.setItem("cypher-tema", tema);
+    } catch {
+      /* armazenamento pode estar bloqueado */
+    }
+  };
   const aplicarTema = tema => {
     document.documentElement.classList.toggle("dark", tema === "dark");
-    document.querySelectorAll("[data-theme-toggle]").forEach(botao => {
+    document.querySelectorAll("[data-theme-toggle]").forEach(controle => {
       const escuro = tema === "dark";
       const destino = escuro ? "claro" : "escuro";
-      botao.setAttribute("aria-label", `Ativar tema ${destino}`);
-      botao.title = `Ativar tema ${destino}`;
+      controle.checked = escuro;
+      controle.title = `Ativar tema ${destino}`;
     });
     document.querySelectorAll("[data-theme-mode]").forEach(botao => {
       botao.setAttribute(
@@ -816,37 +944,49 @@
         String(botao.dataset.themeMode === tema)
       );
     });
-    try {
-      window.localStorage.setItem("cypher-tema", tema);
-    } catch {
-      /* armazenamento pode estar bloqueado */
-    }
+    document
+      .querySelectorAll('form[action="/settings/preferencias"] [name="tema"]')
+      .forEach(campo => {
+        campo.value = tema;
+      });
   };
-  const temaServidor=document.querySelector('meta[name="cypher-theme"]')?.content;
-  let temaSalvo = temaServidor || "dark";
-  try {
-    temaSalvo =
-      temaServidor || (window.localStorage.getItem("cypher-tema") === "light" ? "light" : "dark");
-  } catch {
-    /* usa o tema escuro padrão */
-  }
-  aplicarTema(temaSalvo);
-  document.querySelectorAll("[data-theme-toggle]").forEach(botao => {
+  // O cabeçalho já resolveu a preferência antes dos estilos; não a sobrescreve.
+  aplicarTema(document.documentElement.classList.contains("dark") ? "dark" : "light");
+  document.querySelectorAll("[data-theme-toggle]").forEach(controle => {
     let alternando = false;
-    botao.addEventListener("click", async () => {
-      if (alternando) return;
-      const trocar = () => aplicarTema(document.documentElement.classList.contains("dark") ? "light" : "dark");
+    controle.addEventListener("change", async () => {
+      if (alternando) {
+        controle.checked = document.documentElement.classList.contains("dark");
+        return;
+      }
+      const temaSolicitado = controle.checked ? "dark" : "light";
+      salvarTema(temaSolicitado);
+      const trocar = () => aplicarTema(temaSolicitado);
       if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
         alternando = true;
         try { await document.startViewTransition(trocar).finished; }
-        catch { /* A troca já aplicada permanece se a animação for interrompida. */ }
+        catch { trocar(); }
         finally { alternando = false; }
       } else trocar();
     });
   });
   document.querySelectorAll("[data-theme-mode]").forEach(botao => {
-    botao.addEventListener("click", () => aplicarTema(botao.dataset.themeMode));
+    botao.addEventListener("click", () => {
+      salvarTema(botao.dataset.themeMode);
+      aplicarTema(botao.dataset.themeMode);
+    });
   });
+  document
+    .querySelectorAll('form[action="/settings/preferencias"]')
+    .forEach(formulario => {
+      formulario.addEventListener("submit", () => {
+        const tema = formulario.elements.tema?.value;
+        if (tema === "light" || tema === "dark") {
+          salvarTema(tema);
+          aplicarTema(tema);
+        }
+      });
+    });
 
   const formularioObra = document.querySelector("[data-work-form]");
   const escolhasTipoObra = [
@@ -1076,6 +1216,17 @@
   const entradaCategoriaEventoOutro = formularioEvento?.querySelector(
     "[data-event-category-other-input]"
   );
+  const campoTiposWorkshop = formularioEvento?.querySelector(
+    "[data-workshop-types-field]"
+  );
+  const erroTiposWorkshop = formularioEvento?.querySelector(
+    "[data-workshop-types-error]"
+  );
+  const opcoesTiposWorkshop = [
+    ...(formularioEvento?.querySelectorAll(
+      'input[name="tiposWorkshop"]'
+    ) ?? []),
+  ];
   const atualizarDetalheCategoriaEvento = () => {
     const outro = categoriaEvento?.value === "Outro";
     if (campoCategoriaEventoOutro) campoCategoriaEventoOutro.hidden = !outro;
@@ -1089,6 +1240,43 @@
   };
   categoriaEvento?.addEventListener("change", atualizarDetalheCategoriaEvento);
   atualizarDetalheCategoriaEvento();
+  const atualizarTiposWorkshop = () => {
+    const workshop = categoriaEvento?.value === "Workshop";
+    if (campoTiposWorkshop) campoTiposWorkshop.hidden = !workshop;
+    if (!workshop) {
+      opcoesTiposWorkshop.forEach(opcao => {
+        opcao.checked = false;
+        opcao.disabled = true;
+        opcao.closest(".workshop-type-option")?.classList.remove("selected");
+      });
+      if (erroTiposWorkshop) erroTiposWorkshop.hidden = true;
+    } else {
+      opcoesTiposWorkshop.forEach(opcao => {
+        opcao.disabled = false;
+        opcao.closest(".workshop-type-option")?.classList.toggle("selected", opcao.checked);
+      });
+    }
+  };
+  categoriaEvento?.addEventListener("change", atualizarTiposWorkshop);
+  atualizarTiposWorkshop();
+  opcoesTiposWorkshop.forEach(opcao => {
+    opcao.addEventListener("change", () => {
+      opcao.closest(".workshop-type-option")?.classList.toggle("selected", opcao.checked);
+      if (opcoesTiposWorkshop.some(item => item.checked) && erroTiposWorkshop) {
+        erroTiposWorkshop.hidden = true;
+      }
+    });
+  });
+  formularioEvento?.addEventListener("submit", evento => {
+    if (
+      categoriaEvento?.value === "Workshop" &&
+      !opcoesTiposWorkshop.some(opcao => opcao.checked)
+    ) {
+      evento.preventDefault();
+      if (erroTiposWorkshop) erroTiposWorkshop.hidden = false;
+      opcoesTiposWorkshop[0]?.focus();
+    }
+  });
   const categoriaOutros = document.querySelector("[data-category-other]");
   const blocoOutraCategoria = document.querySelector(
     "[data-other-category-field]"
@@ -1314,5 +1502,89 @@
   });
   document.addEventListener("keydown", evento => {
     if (evento.key === "Escape") fecharNotificacoes();
+  });
+})();
+
+(() => {
+  const cachePaletas = new Map();
+  const cartazesWorkshop = document.querySelectorAll(
+    '.dc-event-card[data-event-theme="cartaz-de-rua"][data-event-category="Workshop"][data-event-cover-src]'
+  );
+
+  const extrairMatiz = imagem => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 32;
+    canvas.height = 24;
+    const contexto = canvas.getContext("2d", { willReadFrequently: true });
+    if (!contexto) return null;
+    contexto.drawImage(imagem, 0, 0, canvas.width, canvas.height);
+
+    const dados = contexto.getImageData(0, 0, canvas.width, canvas.height).data;
+    let somaX = 0;
+    let somaY = 0;
+    let pesoTotal = 0;
+    for (let pixel = 0; pixel < dados.length; pixel += 16) {
+      const vermelho = dados[pixel] / 255;
+      const verde = dados[pixel + 1] / 255;
+      const azul = dados[pixel + 2] / 255;
+      const maximo = Math.max(vermelho, verde, azul);
+      const minimo = Math.min(vermelho, verde, azul);
+      const diferenca = maximo - minimo;
+      const saturacao = maximo ? diferenca / maximo : 0;
+      const luminosidade = (maximo + minimo) / 2;
+      if (saturacao < 0.16 || luminosidade < 0.12 || luminosidade > 0.9) {
+        continue;
+      }
+
+      let matiz;
+      if (maximo === vermelho) {
+        matiz = ((verde - azul) / diferenca) % 6;
+      } else if (maximo === verde) {
+        matiz = (azul - vermelho) / diferenca + 2;
+      } else {
+        matiz = (vermelho - verde) / diferenca + 4;
+      }
+      matiz = ((matiz * 60) % 360 + 360) % 360;
+      const peso = saturacao * (1 - Math.abs(luminosidade - 0.52));
+      const radianos = (matiz * Math.PI) / 180;
+      somaX += Math.cos(radianos) * peso;
+      somaY += Math.sin(radianos) * peso;
+      pesoTotal += peso;
+    }
+
+    if (!pesoTotal) return null;
+    return (Math.atan2(somaY, somaX) * 180 / Math.PI + 360) % 360;
+  };
+
+  cartazesWorkshop.forEach(cartaz => {
+    const origem = cartaz.dataset.eventCoverSrc;
+    const aplicarPaleta = matiz => {
+      cartaz.style.setProperty(
+        "--cartaz-workshop-sticker-color",
+        `hsl(${matiz} 42% 80%)`
+      );
+      cartaz.style.setProperty(
+        "--cartaz-workshop-band-color",
+        `hsl(${matiz} 44% 72%)`
+      );
+    };
+
+    if (cachePaletas.has(origem)) {
+      aplicarPaleta(cachePaletas.get(origem));
+      return;
+    }
+
+    const imagem = new Image();
+    imagem.onload = () => {
+      try {
+        const matiz = extrairMatiz(imagem);
+        if (matiz === null) return;
+        cachePaletas.set(origem, matiz);
+        aplicarPaleta(matiz);
+      } catch {
+        // Mantém a paleta Cypher de fallback se o navegador bloquear a leitura da imagem.
+      }
+    };
+    imagem.src = origem;
   });
 })();

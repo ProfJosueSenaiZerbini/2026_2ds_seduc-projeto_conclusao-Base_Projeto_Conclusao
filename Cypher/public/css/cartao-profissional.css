@@ -1,0 +1,129 @@
+.cy-profile-card {
+  --profile-card-ink: #263221;
+  --profile-card-glass: linear-gradient(145deg, #faf7e7eb, #d0dbb9b8);
+  --profile-card-edge: #73835596;
+  --profile-card-accent: #435d28;
+  --profile-card-accent-ink: #fcfaea;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 16px 12px 14px;
+  border: 1px solid var(--profile-card-edge);
+  border-width: 1px 1px 3px 2px;
+  border-radius: 7px 13px 10px 6px;
+  background: var(--profile-card-glass);
+  backdrop-filter: blur(5px);
+  box-shadow: -4px 9px 19px #18201224;
+  color: var(--profile-card-ink);
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.dark .cy-profile-card {
+  --profile-card-ink: #f6f6e8;
+  --profile-card-glass: linear-gradient(145deg, #303b27e8, #10140fe8);
+  --profile-card-edge: #9caa716b;
+  --profile-card-accent: #e4c561;
+  --profile-card-accent-ink: #23291c;
+}
+.cy-profile-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 54%;
+  height: 4px;
+  border-radius: 0 0 6px 6px;
+  background: var(--profile-card-accent);
+}
+.cy-profile-dots {
+  display: flex;
+  align-self: flex-start;
+  gap: 4px;
+}
+.cy-profile-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b96f5c;
+}
+.cy-profile-dots i:nth-child(2) {
+  background: #d9b34b;
+}
+.cy-profile-dots i:nth-child(3) {
+  background: #7f9a52;
+}
+.cy-profile-portrait {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 76px;
+  margin-block: 3px;
+  overflow: hidden;
+  border: 2px solid var(--profile-card-edge);
+  border-radius: 7px 14px 8px 12px;
+  background: var(--profile-card-accent);
+  color: var(--profile-card-accent-ink);
+  font:
+    700 27px/1 "Space Grotesk",
+    sans-serif;
+}
+.cy-profile-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cy-profile-name {
+  font:
+    700 19px/1.12 "Space Grotesk",
+    sans-serif;
+}
+.cy-profile-role,
+.cy-profile-info {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.cy-profile-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding: 6px 9px;
+  border-radius: 3px 7px 4px 6px;
+  background: var(--profile-card-accent);
+  color: var(--profile-card-accent-ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+.cy-profile-action svg {
+  width: 13px;
+  height: 13px;
+  vertical-align: middle;
+}
+.cy-profile-card:focus-visible {
+  outline: 2px solid var(--profile-card-accent);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .cy-profile-card {
+    transform: skewX(2deg);
+    transition: transform 240ms ease;
+  }
+  .cy-profile-card:is(:hover, :focus-visible) {
+    transform: translateY(-3px);
+  }
+  .cy-profile-info {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 240ms ease;
+  }
+  .cy-profile-info > span {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .cy-profile-card:is(:hover, :focus-visible) .cy-profile-info {
+    grid-template-rows: 1fr;
+  }
+}

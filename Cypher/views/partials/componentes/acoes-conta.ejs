@@ -1,0 +1,53 @@
+    <div class="notification-center" data-notification-center>
+      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+        <span class="lucide-icon" aria-hidden="true">
+          <%- icones.bell %>
+        </span>
+        <% if ((quantidadeNaoLidas ?? 0) > 0) { %>
+          <span class="notification-count" aria-label="<%= quantidadeNaoLidas %>não lida(s)">
+            <%= quantidadeNaoLidas %>
+          </span>
+        <% } %>
+      </button>
+      <section class="notification-popover" id="painel-notificacoes" data-notification-panel hidden aria-labelledby="titulo-notificacoes">
+        <div class="notification-popover-header">
+          <strong id="titulo-notificacoes">
+            Notificações
+          </strong>
+          <a href="/notificacoes">
+            Ver todas
+          </a>
+        </div>
+        <% if ((notificacoesRecentes ?? []).length) { %>
+          <div class="notification-list">
+            <% notificacoesRecentes.forEach(notificacao => { %>
+              <article class="notification-item<%= notificacao.lida ? '' : ' notification-item-unread' %>">
+                <a href="<%= notificacao.url || '/notificacoes' %>">
+                  <strong>
+                    <%= notificacao.titulo %>
+                  </strong>
+                  <span>
+                    <%= notificacao.mensagem %>
+                  </span>
+                </a>
+                <% if (!notificacao.lida) { %>
+                  <form method="post" action="/notificacoes/<%= encodeURIComponent(notificacao.id) %>/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+</form>
+                <% } %>
+              </article>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="notification-empty">
+            Nenhuma notificação por enquanto.
+          </p>
+        <% } %>
+      </section>
+    </div>
+    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de <%= usuario.name %>" title="Perfil de <%= usuario.name %>">
+      <%= usuario.initials %>
+    </a>

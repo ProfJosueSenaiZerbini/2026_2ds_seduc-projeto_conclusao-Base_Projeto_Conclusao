@@ -125,7 +125,7 @@ assert.throws(
   () => banco.listarRespostasAtuacaoProfissaoCypher("usuario-que-nao-existe"),
   /USUARIO_NAO_ENCONTRADO/
 );
-assert.equal(db.pragma("user_version", { simple: true }), 24);
+assert.equal(db.pragma("user_version", { simple: true }), 26);
 console.log(
   "OK: 26 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional."
 );

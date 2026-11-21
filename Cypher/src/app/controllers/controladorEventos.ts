@@ -1,6 +1,9 @@
 // @ts-nocheck
 import { obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
 import { podePublicar } from "../models/permissoes.js";
+import { normalizarBusca } from "../models/espacoTrabalho.js";
+import { fotoEventoDemonstrativo } from "../models/modeloDescoberta.js";
+import { resolverTemaEvento, temaEventoPadrao, temasEvento } from "../models/temasEvento.js";
 
 import type { Request, Response } from "express";
 import {
@@ -19,6 +22,7 @@ import {
   coresEvento,
   etiquetasDoFormulario,
   situacoesEvento,
+  tiposWorkshop,
   tiposParticipacaoEvento,
   validarFormularioEvento,
   type ValoresFormularioEvento,
@@ -29,12 +33,14 @@ const valoresVazios: ValoresFormularioEvento = {
   titulo: "",
   categoria: "",
   categoriaDetalhe: "",
+  tiposWorkshop: [],
   data: "",
   horario: "",
   local: "",
   organizador: "",
   situacao: "Inscrições abertas",
   cor: "yellow",
+  temaCartao: temaEventoPadrao,
   descricao: "",
   formato: "",
   inscricao: "",
@@ -62,12 +68,12 @@ function textoQuery(req: Request, chave: string): string {
   return typeof valor === "string" ? valor.trim() : "";
 }
 
-function normalizarFiltros(req: Request): FiltrosEventos {
+function normalizarFiltros(req: Request, localizacao: string): FiltrosEventos {
   const periodo = textoQuery(req, "periodo");
   const ordem = textoQuery(req, "ordem");
   return {
     categoria: textoQuery(req, "categoria"),
-    localizacao: (req.query.localizacao === undefined ? obterPreferenciasUsuario(req.res!.locals.usuario.id).regiao : textoQuery(req,"localizacao")).slice(0,100),
+    localizacao: localizacao.slice(0, 100),
     formato: textoQuery(req, "formato"),
     periodo:
       periodo === "passados" || periodo === "proximos" ? periodo : "todos",
@@ -75,25 +81,45 @@ function normalizarFiltros(req: Request): FiltrosEventos {
   };
 }
 
-function formatarData(data: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
-  const partes = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    timeZone: "UTC",
-  })
-    .formatToParts(new Date(`${data}T00:00:00Z`))
-    .reduce<Record<string, string>>((resultado, parte) => {
-      if (parte.type === "day" || parte.type === "month") {
-        resultado[parte.type] = parte.value.replace(".", "").toUpperCase();
-      }
-      return resultado;
-    }, {});
-  return `${partes.day} ${partes.month}`;
-}
+const dataDoEvento = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "short",
+  timeZone: "UTC",
+});
 
 function prepararEventoParaView(evento: EventoContaPersistido) {
-  return { ...evento, date: formatarData(evento.date) };
+  const data = new Date(`${evento.date}T00:00:00Z`);
+  const partes =
+    /^\d{4}-\d{2}-\d{2}$/.test(evento.date) && Number.isFinite(data.getTime())
+      ? dataDoEvento.formatToParts(data)
+      : [];
+  const dia = partes.find(parte => parte.type === "day")?.value;
+  const mes = partes
+    .find(parte => parte.type === "month")
+    ?.value.replace(/\.$/, "")
+    .toUpperCase();
+
+  return {
+    evento: { ...evento, date: dia && mes ? `${dia} ${mes}` : evento.date || "A confirmar" },
+    item: {
+      titulo: evento.title,
+      tipo: [evento.category, evento.categoryDetail, ...evento.workshopTypes].filter(Boolean).join(" · "),
+      workshopTypes: evento.workshopTypes,
+      categoria: evento.category,
+      temaCartao: resolverTemaEvento(evento.temaCartao),
+      data: evento.date,
+      dataCurta: partes.map(parte => parte.value).join(""),
+      dia,
+      mes,
+      autor: evento.org,
+      local: evento.location,
+      hora: evento.time,
+      status: evento.status,
+      descricao: evento.description,
+      demonstracao: evento.demonstracao,
+      fotoDestaque: evento.demonstracao ? fotoEventoDemonstrativo(evento.id) : undefined,
+    },
+  };
 }
 
 function formularioDoEvento(
@@ -103,12 +129,14 @@ function formularioDoEvento(
     titulo: evento.title,
     categoria: evento.category,
     categoriaDetalhe: evento.categoryDetail,
+    tiposWorkshop: evento.workshopTypes ?? [],
     data: evento.date,
     horario: evento.time,
     local: evento.location,
     organizador: evento.org,
     situacao: evento.status,
     cor: evento.color,
+    temaCartao: resolverTemaEvento(evento.temaCartao),
     descricao: evento.description,
     formato: evento.format,
     inscricao: evento.registration,
@@ -118,19 +146,31 @@ function formularioDoEvento(
   };
 }
 
-function dadosDoFormulario(req: Request): ValoresFormularioEvento {
+function dadosDoFormulario(req: Request, temaAtual = temaEventoPadrao): ValoresFormularioEvento {
   const valor = (chave: string) => String(req.body[chave] ?? "").trim();
   return {
     titulo: valor("titulo"),
     categoria: valor("categoria"),
     categoriaDetalhe:
       valor("categoria") === "Outro" ? valor("categoriaDetalhe") : "",
+    tiposWorkshop:
+      valor("categoria") === "Workshop"
+        ? (Array.isArray(req.body.tiposWorkshop)
+            ? req.body.tiposWorkshop
+            : req.body.tiposWorkshop === undefined
+              ? []
+              : [req.body.tiposWorkshop]
+          )
+            .map((tipo: unknown) => String(tipo).trim())
+            .filter(Boolean)
+        : [],
     data: valor("data"),
     horario: valor("horario"),
     local: valor("local"),
     organizador: valor("organizador"),
     situacao: valor("situacao"),
     cor: valor("cor") || "yellow",
+    temaCartao: req.body.temaCartao === undefined ? temaAtual : valor("temaCartao"),
     descricao: valor("descricao"),
     formato: valor("formato"),
     inscricao: valor("inscricao"),
@@ -150,12 +190,14 @@ function dadosPersistidos(valores: ValoresFormularioEvento): DadosEventoCypher {
     category: valores.categoria,
     categoryDetail:
       valores.categoria === "Outro" ? valores.categoriaDetalhe : "",
+    workshopTypes: valores.tiposWorkshop,
     date: valores.data,
     time: valores.horario,
     location: valores.local,
     org: valores.organizador,
     status: valores.situacao,
     color: valores.cor,
+    temaCartao: valores.temaCartao,
     description: valores.descricao,
     format: valores.formato,
     registration: valores.inscricao,
@@ -177,7 +219,7 @@ function renderizarFormulario(
   const usuario = usuarioAtual(res);
   return res.status(erro ? 400 : 200).render("pages/cadastro-evento", {
     title: editando ? "Editar evento" : "Cadastrar evento",
-    path: req.path,
+    path: res.locals.origemEspaco ? "/espaco-de-trabalho" : req.path,
     stylesheet: "cadastro-obra",
     authenticated: true,
     usuario: usuarioParaView(usuario),
@@ -190,6 +232,9 @@ function renderizarFormulario(
     categoriasEvento,
     situacoesEvento,
     coresEvento,
+    tiposWorkshop,
+    temasEvento,
+    temaSelecionado: resolverTemaEvento(valores.temaCartao),
     tiposParticipacaoEvento,
   });
 }
@@ -211,7 +256,7 @@ function exigirResponsavelEvento(
   res: Response
 ): { usuario: UsuarioDaSessao; evento: EventoContaPersistido } | undefined {
   const usuario = usuarioAtual(res);
-  if (usuario.demonstracao) {
+  if (usuario.demonstracao || usuario.tipoConta !== "profissional") {
     res.redirect("/events?erro=permissao");
     return undefined;
   }
@@ -225,35 +270,79 @@ function exigirResponsavelEvento(
 
 export function oportunidades(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  const filtros = normalizarFiltros(req);
+  const preferencias = obterPreferenciasUsuario(usuario.id);
+  const localizacao =
+    req.query.localizacao === undefined
+      ? undefined
+      : textoQuery(req, "localizacao").slice(0, 100);
+  const filtros = normalizarFiltros(req, localizacao ?? preferencias.regiao);
+  const q = textoQuery(req, "q").slice(0, 120);
+  const termos = normalizarBusca(q).split(/\s+/).filter(Boolean);
   const todos = CypherModel.eventosDisponiveis(
     {
       categoria: "",
       localizacao: "",
       formato: "",
       periodo: "todos",
-      ordem: "titulo",
+      ordem: "recentes",
     },
     usuario.id
   );
-  const eventos = CypherModel.eventosDisponiveis(filtros, usuario.id);
-  const erro = textoQuery(req, "erro");
-  const mensagem = textoQuery(req, "mensagem");
+  const termosLocal = normalizarBusca(filtros.localizacao)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean);
+  const refinoAtivo = Boolean(
+    filtros.formato ||
+    filtros.periodo !== "todos" || filtros.ordem !== "recentes"
+  );
+  const fonte = refinoAtivo || filtros.categoria
+    ? CypherModel.eventosDisponiveis({ ...filtros, localizacao: "" }, usuario.id)
+    : todos;
+  const eventos = fonte.filter(evento => {
+    if (termosLocal.length) {
+      const local = normalizarBusca(evento.location);
+      if (!termosLocal.every(termo => local.includes(termo))) return false;
+    }
+    if (!termos.length) return true;
+    const campos = [
+      evento.title,
+      evento.org,
+      evento.category,
+      evento.categoryDetail,
+      evento.location,
+      evento.format,
+      evento.description,
+      ...evento.tags,
+    ];
+    const texto = normalizarBusca(campos.join(" "));
+    return termos.every(termo => texto.includes(termo));
+  });
+  const opcoesCategorias = [...new Set([
+    "Batalha", "Show", "Cypher", "Workshop",
+    ...todos.map(evento => evento.category), filtros.categoria,
+  ].filter(Boolean))];
+  const opcoesFormatos = [...new Set([
+    ...todos.map(evento => evento.format), filtros.formato,
+  ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
   return res.render("pages/oportunidades", {
-    title: "Oportunidades",
+    title: "Eventos",
     path: req.path,
     stylesheet: "oportunidades",
+    temaPreferido: preferencias.tema,
     authenticated: true,
     usuario: usuarioParaView(usuario),
     eventos: eventos.map(prepararEventoParaView),
+    q,
     filtros,
-    opcoesCategorias: [...new Set(todos.map(evento => evento.category))],
-    opcoesFormatos: [
-      ...new Set(todos.map(evento => evento.format).filter(Boolean)),
-    ],
-    podeGerenciar: podePublicar(usuario,"evento"),
-    erro,
-    mensagem,
+    refinoAtivo,
+    filtrado: Boolean(q || filtros.categoria || filtros.localizacao || refinoAtivo),
+    localizacaoSelecionada: localizacao,
+    opcoesCategorias,
+    opcoesFormatos,
+    podeGerenciar: podePublicar(usuario, "evento"),
+    erro: textoQuery(req, "erro"),
+    mensagem: textoQuery(req, "mensagem"),
   });
 }
 
@@ -371,7 +460,7 @@ export function criarEvento(req: Request, res: Response) {
     entidadeId: eventoId,
     chaveOrigem: `evento-criado:${eventoId}`,
   });
-  return res.redirect("/events?mensagem=Evento criado com sucesso.");
+  return res.redirect(res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoCriado" : "/events?mensagem=Evento criado com sucesso.");
 }
 
 export function editarEvento(req: Request, res: Response) {
@@ -393,7 +482,7 @@ export function atualizarEvento(req: Request, res: Response) {
   const responsavel = exigirResponsavelEvento(req, res);
   if (!responsavel) return;
   const { usuario, evento } = responsavel;
-  const valores = dadosDoFormulario(req);
+  const valores = dadosDoFormulario(req, resolverTemaEvento(evento.temaCartao));
   const categoriaOutroLegadaVazia =
     evento.category === "Outro" && !evento.categoryDetail;
   const erro = validarFormularioEvento(valores, categoriaOutroLegadaVazia);
@@ -426,7 +515,7 @@ export function atualizarEvento(req: Request, res: Response) {
   }
   return res.redirect(
     atualizado
-      ? "/events?mensagem=Evento atualizado com sucesso."
+      ? (res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoAtualizado" : "/events?mensagem=Evento atualizado com sucesso.")
       : "/events?erro=evento"
   );
 }
@@ -437,7 +526,7 @@ export function excluirEvento(req: Request, res: Response) {
   const { usuario } = responsavel;
   const excluido = CypherModel.excluirEvento(String(req.params.id), usuario.id);
   return res.redirect(
-    excluido ? "/events?mensagem=Evento excluído." : "/events?erro=evento"
+    excluido ? (res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoExcluido" : "/events?mensagem=Evento excluído.") : "/events?erro=evento"
   );
 }
 

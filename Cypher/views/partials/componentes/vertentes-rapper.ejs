@@ -1,5 +1,5 @@
 <fieldset class="profile-category-fieldset rapper-branches" data-rapper-branches hidden>
-  <legend>Vertentes do Rapper</legend><p>Selecione os estilos com que se identifica. Isso não limita os gêneros das suas obras.</p>
+  <legend>Vertentes do Rap</legend><p>Selecione os estilos com que se identifica. Isso não limita os gêneros das suas obras.</p>
   <input type="hidden" name="vertentesPresentes" value="1">
   <div class="category-grid"><% vertentesDisponiveis.forEach(vertente => { %>
     <label class="category-option"><input type="checkbox" name="vertentes" value="<%= vertente %>" <%= vertentesSelecionadas.includes(vertente) ? 'checked' : '' %>><span><%= vertente %></span></label>

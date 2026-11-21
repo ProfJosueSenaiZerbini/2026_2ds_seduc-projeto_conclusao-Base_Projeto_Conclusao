@@ -1,4 +1,5 @@
 /* View: busca de profissionais. */
+@import "./cartao-profissional.css";
 
 .search-input-wrap {
   display: flex;

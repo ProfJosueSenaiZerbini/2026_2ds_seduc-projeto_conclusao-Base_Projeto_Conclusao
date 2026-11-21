@@ -30,7 +30,8 @@
 <div class="profile-layout public-profile-layout">
 <section class="profile-hero" aria-labelledby="public-profile-name">
   <div class="profile-hero-main">
-    <div class="profile-avatar-frame" aria-hidden="true"><div class="avatar avatar-hero"><%= perfil.initials %></div></div>
+    <% const fotoPerfilDemo = imagemPerfilDemo(perfil.handle); %>
+    <div class="profile-avatar-frame" aria-hidden="true"><div class="avatar avatar-hero"><% if (fotoPerfilDemo) { %><img class="demo-profile-photo" src="/img/<%= fotoPerfilDemo %>" alt=""><% } else { %><%= perfil.initials %><% } %></div></div>
     <div class="profile-hero-copy">
       <p class="profile-hero-eyebrow">CYPHER · PERFIL PROFISSIONAL</p>
       <h1 id="public-profile-name"><%= perfil.name %></h1>
@@ -93,13 +94,15 @@
 <div class="eyebrow">
   CATÁLOGO PÚBLICO
 </div>
-<div class="profile-catalog-heading"><h3 id="public-works-title">Obras lançadas</h3><span class="profile-catalog-count"><%= obras.length %> <%= obras.length === 1 ? 'obra' : 'obras' %></span></div>
+<div class="profile-catalog-heading"><h3 id="public-works-title">Obras lançadas</h3><span class="profile-catalog-count cy-count-sticker"><%= obras.length %> <%= obras.length === 1 ? 'obra' : 'obras' %></span></div>
 <% if (obras.length) { %>
   <div class="public-works-list">
     <% obras.forEach((obra, index) => { %>
-      <article class="public-work-card">
+      <article class="public-work-card" id="obra-<%= obra.id %>">
+        <% const capa = imagemPublicacaoDemo(obra.id); const disco = discoDemo(obra.id); %>
         <div class="public-work-heading">
           <div>
+            <% if (capa) { %><img class="demo-work-cover" src="/img/<%= capa %>" alt="" loading="lazy" decoding="async"><% } %>
             <span class="work-index index-<%= index %>">
               0<%= index + 1 %>
             </span>
@@ -116,6 +119,10 @@
           <%= obra.releaseDate ? ` · ${obra.releaseDate.split('-').reverse().join('/')}` : '' %>
           <%= obra.role ? ` · ${obra.role}` : '' %><%= obra.roleDetail ? ` · ${obra.roleDetail}` : '' %>
         </p>
+        <% if (obra.demoCredits) { %><p class="public-work-meta"><%= obra.demoCredits %></p><% } %>
+        <% if (disco) { %><details class="demo-track-list"><summary>Ver <%= disco.faixas.length %> faixas</summary><ol>
+          <% disco.faixas.forEach((faixa, i) => { %><li><a href="#obra-<%= idFaixaDemo(disco.id, i) %>"><%= faixa %></a></li><% }) %>
+        </ol></details><% } %>
         <% if (obra.listenLink) { %>
           <a class="text-link" href="<%= obra.listenLink %>" target="_blank" rel="noopener noreferrer">
             Ouvir obra
@@ -141,7 +148,7 @@
 <%- include('../partials/componentes/estado-vazio', {
           classe: 'profile-empty-state',
           variacao: 'compacta',
-          titulo: 'Nenhuma obra lançada publicada'
+          titulo: 'Nenhuma obra pública'
         }) %>
 <% } %>
 </section>

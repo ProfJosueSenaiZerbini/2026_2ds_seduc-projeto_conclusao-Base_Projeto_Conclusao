@@ -1,0 +1,9 @@
+<div class="dc-search-field">
+  <input type="search" id="<%= campo.id %>" name="<%= campo.nome %>" value="<%= campo.valor %>" maxlength="<%= campo.limite %>" placeholder=" "<% if (campo.autocomplete) { %> autocomplete="<%= campo.autocomplete %>"<% } %>>
+  <span class="dc-search-wave" aria-hidden="true"></span>
+  <label for="<%= campo.id %>">
+    <span class="sr-only"><%= campo.rotulo %></span>
+    <span class="dc-search-label" aria-hidden="true"><% [...campo.rotulo].forEach((letra, indice) => { %><span style="--indice: <%= indice %>"><%= letra %></span><% }) %></span>
+  </label>
+  <button type="submit" aria-label="<%= campo.rotuloBotao ?? campo.rotulo %>"><%- icones.search %></button>
+</div>

@@ -471,18 +471,19 @@ try {
   restaurarDetalhePapelOutro.close();
 
   const catalogoObra = await fetch(
-    `${base}/works?resultado=criada&genero=analise`,
+    `${base}/espaco-de-trabalho?resultado=criada&genero=analise`,
     { headers: { cookie } }
   );
   const catalogoObraHtml = await catalogoObra.text();
   assert.equal(catalogoObra.status, 200);
   assert.match(
     catalogoObraHtml,
-    /data-work-type-detail="Coletivo audiovisual independente"/
+    /Coletivo audiovisual independente/
   );
   assert.match(catalogoObraHtml, /Gênero autoral Cypher/);
+  const fichaPapel = await fetch(`${base}/espaco-de-trabalho/obra/${obraPapelOutro.id}`, {headers:{cookie}});
   assert.match(
-    catalogoObraHtml,
+    await fichaPapel.text(),
     /Outro crédito · Direção de arte e visualizers/
   );
   assert.match(catalogoObraHtml, /enviada para análise/);
@@ -1206,6 +1207,8 @@ try {
       "Organizador(a) de eventos",
       adminId
     );
+  bancoOrganizador.prepare("UPDATE profissoes_usuario SET estado='inativa' WHERE usuario_id=?").run(adminId);
+  bancoOrganizador.prepare("INSERT INTO profissoes_usuario(id,usuario_id,profissao_id,valor_original) VALUES(?,?,?,?)").run("atuacao-organizador-ui",adminId,"organizador-eventos","Organizador(a) de eventos");
   bancoOrganizador.close();
   const formularioEventoResponse = await fetch(`${base}/events/new`, {
     headers: { cookie },
@@ -1243,6 +1246,7 @@ try {
     /Especifique a categoria do evento/
   );
   dadosEventoTeste.categoriaDetalhe = "Encontro de DJs independentes";
+  dadosEventoTeste.temaCartao = "cartaz-de-rua";
   const eventoOutroCriado = await fetch(`${base}/events/new`, {
     method: "POST",
     redirect: "manual",
@@ -1257,10 +1261,11 @@ try {
   const bancoEvento = new Database(arquivoBanco);
   const eventoSalvo = bancoEvento
     .prepare(
-      "SELECT id, categoria, categoria_detalhe FROM eventos WHERE proprietario_id = ? AND titulo = ?"
+      "SELECT id, categoria, categoria_detalhe, tema_cartao FROM eventos WHERE proprietario_id = ? AND titulo = ?"
     )
     .get(adminId, dadosEventoTeste.titulo);
   assert.equal(eventoSalvo.categoria, "Outro");
+  assert.equal(eventoSalvo.tema_cartao, "cartaz-de-rua");
   assert.equal(
     eventoSalvo.categoria_detalhe,
     dadosEventoTeste.categoriaDetalhe
@@ -1269,13 +1274,14 @@ try {
   const oportunidades = await fetch(`${base}/events`, { headers: { cookie } });
   const oportunidadesHtml = await oportunidades.text();
   assert.equal(oportunidades.status, 200);
+  assert.match(oportunidadesHtml, /data-event-theme="cartaz-de-rua"/);
   assert.match(
     oportunidadesHtml,
     /data-detail-category-detail="Encontro de DJs independentes"/
   );
   assert.match(
     oportunidadesHtml,
-    /data-detail-title="Encontro de DJs independentes de teste"[\s\S]*?class="event-date-large"[\s\S]*?<strong>\s*12\s*<\/strong>[\s\S]*?<span>\s*MAR\s*<\/span>/
+    /data-detail-title="Encontro de DJs independentes de teste"[\s\S]*?<time class="dc-event-date" datetime="\d{4}-03-12"[^>]*>\s*<span aria-hidden="true">MAR<\/span>\s*<strong aria-hidden="true">12<\/strong>/
   );
   assert.match(oportunidadesHtml, /Outro · Encontro de DJs independentes/);
   const formularioEdicaoEvento = await fetch(
@@ -1284,6 +1290,7 @@ try {
   );
   const formularioEdicaoEventoHtml = await formularioEdicaoEvento.text();
   assert.equal(formularioEdicaoEvento.status, 200);
+  assert.match(formularioEdicaoEventoHtml, /name="temaCartao" value="cartaz-de-rua" checked/);
   assert.match(
     formularioEdicaoEventoHtml,
     /name="categoriaDetalhe"[^>]*value="Encontro de DJs independentes"[^>]*required/
@@ -1324,11 +1331,16 @@ try {
       method: "POST",
       redirect: "manual",
       headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ ...dadosEventoTeste, categoriaDetalhe: "" }),
+      body: new URLSearchParams({ ...dadosEventoTeste, categoriaDetalhe: "", temaCartao: "classico" }),
     }
   );
   assert.equal(salvarEventoLegado.status, 302);
   const eventoLegadoAtualizado = new Database(arquivoBanco);
+  assert.equal(
+    eventoLegadoAtualizado.prepare("SELECT tema_cartao FROM eventos WHERE id = ?")
+      .get(eventoSalvo.id).tema_cartao,
+    "classico"
+  );
   assert.equal(
     eventoLegadoAtualizado
       .prepare("SELECT categoria_detalhe FROM eventos WHERE id = ?")

@@ -1,0 +1,20 @@
+<%- include('../partials/inicio-trabalhos', { breadcrumb: 'Espaço de Trabalho' }) %>
+<a class="et-back" href="<%= voltar %>"><%- icones.arrowLeft %> Voltar aos trabalhos</a>
+<article class="et-sheet">
+  <div class="et-sheet-head"><span class="et-sheet-icon" aria-hidden="true"><%- icones[item.icone] %></span>
+    <div class="et-heading"><h1><%= item.titulo %></h1><p><%= item.autor %> · <%= item.tipo %><%= item.metadados ? ' · ' + item.metadados : '' %></p></div></div>
+  <% if (item.papel) { %><p class="et-role"><%= item.proprio ? 'Seu papel' : 'Sua participação' %> · <%= item.papel %></p><% } %>
+  <% if (item.descricao) { %><p class="et-description"><%= item.descricao %></p><% } %>
+  <% if (item.fatos.length) { %><dl class="et-facts"><% item.fatos.forEach(([label,valor]) => { %><div><dt><%= label %></dt><dd><%= valor %></dd></div><% }) %></dl><% } %>
+  <% if (creditos.length) { %><h2>Créditos</h2><ul><% creditos.forEach(c => { %><li><strong><%= c.name %></strong> · <%= [c.role,c.participation].filter(Boolean).join(' · ') %> · <%= c.verified && c.userId ? 'Confirmado' : 'Não confirmado' %></li><% }) %></ul><% } %>
+  <% if (ofertas.length) { %><h2>Ofertas de licença</h2><ul><% ofertas.forEach(o => { %><li><strong><%= o.tipo %></strong><%= o.precoCentavos == null ? '' : ' · '+(o.precoCentavos/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) %><%= o.descricao ? ' · '+o.descricao : '' %></li><% }) %></ul><% } %>
+  <% if (item.link) { %><a class="et-more" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">Abrir link de escuta <%- icones.externalLink %></a><% } %>
+  <% if (item.modalidade === 'evento') { %><a class="et-more" href="/events?localizacao=#evento-<%= encodeURIComponent(item.id) %>">Abrir evento <%- icones.arrowRight %></a><% } %>
+  <% if (item.proprio) { %><footer class="et-sheet-actions">
+    <a class="et-action" href="<%= item.base %>/edit?origem=espaco">Editar <%= item.modalidade %></a>
+    <details><summary>Excluir <%= item.modalidade %></summary><form action="<%= item.base %>/delete" method="post">
+      <p>Excluir “<%= item.titulo %>” permanentemente?</p><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="origem" value="espaco"><button class="et-danger" type="submit">Confirmar exclusão</button>
+    </form></details>
+  </footer><% } %>
+</article>
+<%- include('../partials/fim-trabalhos') %>

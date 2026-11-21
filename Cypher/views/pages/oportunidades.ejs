@@ -1,392 +1,145 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
-<%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: 'Oportunidades' }) %>
-<div class="page-content">
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      OPORTUNIDADES
-    </div>
-    <h1>
-      A cena está chamando.
-    </h1>
-    <p>
-      Eventos, encontros e espaços para colocar seu trabalho em movimento.
-    </p>
-  </div>
-  <div class="page-header-actions">
-    <% if (podeGerenciar) { %>
-      <a class="button button-lime" href="/events/new">
-        <span class="lucide-icon" aria-hidden="true">
-          <%- icones.plus %>
-        </span>
-        Cadastrar evento
-      </a>
-    <% } %>
-  </div>
-</div>
-<% if (mensagem) { %>
-  <div class="form-feedback success-feedback" role="status">
-    <%= mensagem %>
-  </div>
-<% } %>
-<% if (erro) { %>
-  <div class="form-feedback error-feedback" role="alert">
-    <%= erro === 'permissao' ? 'Somente contas de organizador podem cadastrar e gerenciar eventos.' : erro === 'evento' ? 'O evento não foi encontrado ou não pertence à sua conta.' : erro %>
-  </div>
-<% } %>
-<p class="interest-explainer" data-interest-notice role="status" hidden>
-  Sua participação foi registrada para este evento.
-</p>
-<form class="events-filters" method="get" action="/events">
-  <label>
-    Categoria
-    <select name="categoria">
-      <option value="">
-        Todas
-      </option>
-      <% opcoesCategorias.forEach(categoria => { %>
-        <option value="<%= categoria %>"<%= filtros.categoria === categoria ? 'selected' : '' %>>
-          <%= categoria %>
-        </option>
-      <% }) %>
-    </select>
-  </label>
-  <label>
-    Localização
-    <input name="localizacao" value="<%= filtros.localizacao %>" placeholder="Cidade ou espaço">
-  </label>
-  <label>
-    Formato
-    <select name="formato">
-      <option value="">
-        Todos
-      </option>
-      <% opcoesFormatos.forEach(formato => { %>
-        <option value="<%= formato %>"<%= filtros.formato === formato ? 'selected' : '' %>>
-          <%= formato %>
-        </option>
-      <% }) %>
-    </select>
-  </label>
-  <label>
-    Período
-    <select name="periodo">
-      <option value="todos"<%= filtros.periodo === 'todos' ? 'selected' : '' %>>
-        Todos
-      </option>
-      <option value="proximos"<%= filtros.periodo === 'proximos' ? 'selected' : '' %>>
-        Próximos
-      </option>
-      <option value="passados"<%= filtros.periodo === 'passados' ? 'selected' : '' %>>
-        Passados
-      </option>
-    </select>
-  </label>
-  <label>
-    Ordenar
-    <select name="ordem">
-      <option value="recentes"<%= filtros.ordem === 'recentes' ? 'selected' : '' %>>
-        Mais recentes
-      </option>
-      <option value="data"<%= filtros.ordem === 'data' ? 'selected' : '' %>>
-        Data do evento
-      </option>
-      <option value="titulo"<%= filtros.ordem === 'titulo' ? 'selected' : '' %>>
-        Título
-      </option>
-    </select>
-  </label>
-  <div class="events-filter-actions">
-    <button class="button button-dark small" type="submit">
-      Filtrar
-    </button>
-    <a class="text-link" href="/events">
-      Limpar
-    </a>
-  </div>
-</form>
-<div class="tabs-row" role="group" aria-label="Filtrar oportunidades">
-  <button class="tab active" type="button" data-event-filter="Todos" aria-pressed="true">
-    Todos
-  </button>
-  <button class="tab" type="button" data-event-filter="Batalha" aria-pressed="false">
-    Batalhas
-  </button>
-  <button class="tab" type="button" data-event-filter="Show" aria-pressed="false">
-    Shows
-  </button>
-  <button class="tab" type="button" data-event-filter="Cypher" aria-pressed="false">
-    Cyphers
-  </button>
-  <button class="tab" type="button" data-event-filter="Workshop" aria-pressed="false">
-    Workshops
-  </button>
-</div>
-<div class="events-layout">
-  <div class="events-list<%= eventos.length === 1 ? ' events-list-single' : '' %>" data-events-list>
-    <% eventos.forEach((evento, i) => { %>
-      <div class="event-card-wrapper">
-        <button class="event-card event-card-trigger" type="button" data-event-card data-event-category="<%= evento.category %>" data-detail-id="<%= evento.id %>" data-detail-owned="<%= evento.owned %>" data-detail-demonstracao="<%= evento.demonstracao %>" data-detail-interest-status="<%= evento.interesseStatus ?? '' %>" data-detail-participation-type="<%= evento.participationType %>" data-detail-total-interested="<%= evento.totalInteressados %>" data-detail-interested="<%= encodeURIComponent(JSON.stringify(evento.interessados)) %>" data-detail-title="<%= evento.title %>" data-detail-category="<%= evento.category %>" data-detail-category-detail="<%= evento.categoryDetail %>" data-detail-date="<%= evento.date %>" data-detail-time="<%= evento.time %>" data-detail-location="<%= evento.location %>" data-detail-org="<%= evento.org %>" data-detail-status="<%= evento.status %>" data-detail-description="<%= evento.description %>" data-detail-format="<%= evento.format %>" data-detail-registration="<%= evento.registration %>" data-detail-prize="<%= evento.prize %>" data-detail-tags="<%= evento.tags.join('|') %>">
-          <span class="event-card-band band-<%= evento.color %>">
-            <span>
-              0<%= i + 1 %>
-            </span>
-            <span>
-                <%= evento.category %><%= evento.categoryDetail ? ` · ${evento.categoryDetail}` : '' %>
-            </span>
-            <% if (evento.demonstracao) { %>
-              <span>
-                EXEMPLO DEMONSTRATIVO
-              </span>
+<%
+  function urlCategoria(categoria) {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (categoria) params.set('categoria', categoria);
+    if (localizacaoSelecionada !== undefined) params.set('localizacao', localizacaoSelecionada);
+    if (filtros.formato) params.set('formato', filtros.formato);
+    if (filtros.periodo !== 'todos') params.set('periodo', filtros.periodo);
+    if (filtros.ordem !== 'recentes') params.set('ordem', filtros.ordem);
+    return '/events' + (params.size ? '?' + params : '');
+  }
+
+  const rotulosCategorias = new Map([
+    ['Batalha', 'Batalhas'], ['Show', 'Shows'], ['Cypher', 'Cyphers'],
+    ['Workshop', 'Workshops'], ['Outro', 'Outros'],
+  ]);
+  const limparFiltros = '/events?localizacao=';
+  const filtrosBusca = { ...filtros, localizacao: localizacaoSelecionada };
+  if (filtrosBusca.periodo === 'todos') delete filtrosBusca.periodo;
+  if (filtrosBusca.ordem === 'recentes') delete filtrosBusca.ordem;
+  const erros = {
+    permissao: 'Sua conta precisa ter permissão para cadastrar e gerenciar eventos.',
+    evento: 'O evento não foi encontrado ou não pertence à sua conta.',
+  };
+%>
+<div class="dc-shell events-page">
+  <a class="dc-skip" href="#conteudo-eventos">Pular para o conteúdo</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', {
+      titulo: 'Eventos',
+      tituloId: 'titulo-eventos',
+      descricao: 'Batalhas, shows, cyphers e encontros da cena.',
+      busca: {
+        acao: '/events',
+        termo: q,
+        limite: 120,
+        rotulo: 'Evento, local ou organizador',
+        filtros: filtrosBusca,
+        filtrosVazios: ['localizacao']
+      }
+    }) %>
+
+    <main class="dc-content" id="conteudo-eventos" aria-labelledby="titulo-eventos" tabindex="-1">
+      <% if (mensagem) { %>
+        <p class="events-feedback" role="status"><%= mensagem %></p>
+      <% } %>
+      <% if (erro) { %>
+        <p class="events-feedback" role="alert"><%= Object.hasOwn(erros, erro) ? erros[erro] : erro %></p>
+      <% } %>
+
+      <div class="dc-controls events-controls">
+        <nav class="dc-tabs events-categories" aria-label="Filtrar eventos por categoria" data-query-param="categoria">
+          <a href="<%= urlCategoria('') %>"<% if (!filtros.categoria) { %> aria-current="page"<% } %>><span aria-hidden="true"><%- icones.calendarDays %></span> Todos</a>
+          <% opcoesCategorias.forEach(categoria => { %>
+            <a href="<%= urlCategoria(categoria) %>"<% if (categoria === filtros.categoria) { %> aria-current="page"<% } %>><%= rotulosCategorias.get(categoria) ?? categoria %></a>
+          <% }) %>
+        </nav>
+
+        <form class="events-location-form" action="/events" method="get" role="search" aria-label="Localização dos eventos">
+          <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+          <% for (const [nome, valor] of Object.entries(filtrosBusca)) { if (nome !== 'localizacao' && valor) { %>
+            <input type="hidden" name="<%= nome %>" value="<%= valor %>">
+          <% }} %>
+          <%- include('../partials/componentes/campo-busca', { campo: { id: 'localizacao-eventos', nome: 'localizacao', valor: filtros.localizacao, limite: 100, rotulo: 'Cidade e bairro', rotuloBotao: 'Filtrar por cidade e bairro' } }) %>
+        </form>
+
+        <details class="dc-filter events-refinement<%= refinoAtivo ? ' events-refinement-active' : '' %>">
+          <summary aria-label="Filtros" title="Filtros"><span aria-hidden="true"><%- icones.sliders %></span></summary>
+          <form action="/events" method="get">
+            <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+            <% if (filtros.categoria) { %><input type="hidden" name="categoria" value="<%= filtros.categoria %>"><% } %>
+
+            <% if (localizacaoSelecionada !== undefined) { %>
+              <input type="hidden" name="localizacao" value="<%= localizacaoSelecionada %>">
             <% } %>
-          </span>
-          <span class="event-card-content">
-            <span class="event-date-large">
-              <strong>
-                <%= evento.date.split(' ')[0] %>
-              </strong>
-              <span>
-                <%= evento.date.split(' ')[1] %>
-              </span>
-            </span>
-            <span class="event-main">
-              <strong class="event-title">
-                <%= evento.title %>
-              </strong>
-              <span class="event-org">
-                <%= evento.org %>
-              </span>
-              <span class="event-meta">
-                <span>
-                  <i class="lucide-icon" aria-hidden="true">
-                    <%- icones.mapPin %>
-                  </i>
-                  <%= evento.location %>
-                </span>
-                <span>
-                  <i class="lucide-icon" aria-hidden="true">
-                    <%- icones.clock %>
-                  </i>
-                  <%= evento.status %>
-                </span>
-              </span>
-            </span>
-            <span class="event-open-hint">
-              <span>
-                Ver oportunidade
-              </span>
-              <i class="lucide-icon" aria-hidden="true">
-                <%- icones.arrowUpRight %>
-              </i>
-            </span>
-          </span>
-        </button>
+            <% if (opcoesFormatos.length) { %>
+              <label>Formato
+                <select name="formato">
+                  <option value="">Todos os formatos</option>
+                  <% opcoesFormatos.forEach(formato => { %>
+                    <option value="<%= formato %>"<% if (formato === filtros.formato) { %> selected<% } %>><%= formato %></option>
+                  <% }) %>
+                </select>
+              </label>
+            <% } %>
+            <label>Período
+              <select name="periodo">
+                <option value="todos">Todos os períodos</option>
+                <option value="proximos"<% if (filtros.periodo === 'proximos') { %> selected<% } %>>Próximos eventos</option>
+                <option value="passados"<% if (filtros.periodo === 'passados') { %> selected<% } %>>Eventos passados</option>
+              </select>
+            </label>
+            <label>Ordenar por
+              <select name="ordem">
+                <option value="recentes">Mais recentes</option>
+                <option value="data"<% if (filtros.ordem === 'data') { %> selected<% } %>>Data do evento</option>
+                <option value="titulo"<% if (filtros.ordem === 'titulo') { %> selected<% } %>>Título</option>
+              </select>
+            </label>
+            <button type="submit">Aplicar filtros</button>
+          </form>
+        </details>
+
+        <% if (podeGerenciar) { %>
+          <a class="dc-primary" href="/events/new"><span aria-hidden="true"><%- icones.plus %></span> Cadastrar evento</a>
+        <% } %>
       </div>
-    <% }) %>
-    <% if (!eventos.length) { %>
-    <%- include('../partials/componentes/estado-vazio', {
-        classe: 'events-empty-state',
-        variacao: 'destaque',
-        icone: icones.calendarDays,
-        titulo: 'Nenhum evento encontrado',
-        descricao: 'Ajuste os filtros ou cadastre uma nova oportunidade para a comunidade.',
-        acaoPrincipal: podeGerenciar ? { href: '/events/new', label: 'Cadastrar evento' } : null
-      }) %>
-  <% } %>
-  <% if (eventos.length) { %>
-    <div class="events-filter-empty" data-events-filter-empty hidden>
-      <span class="lucide-icon" aria-hidden="true">
-        <%- icones.calendarDays %>
-      </span>
-      <strong>
-        Nenhum evento nesta categoria
-      </strong>
-      <p>
-        Escolha outra aba ou limpe os filtros para ver mais oportunidades.
-      </p>
-    </div>
-  <% } %>
-</div>
-<aside class="event-side history-card">
-  <div class="history-card-top">
-    <span class="history-icon lucide-icon" aria-hidden="true">
-      <%- icones.chart %>
-    </span>
-    <span class="eyebrow">
-      HISTÓRICO
-    </span>
+
+      <section aria-labelledby="titulo-agenda-eventos">
+        <header class="dc-heading events-heading">
+          <h2 id="titulo-agenda-eventos"><%= q ? 'Resultados para “' + q + '”' : 'Agenda de eventos' %></h2>
+          <div class="events-heading-actions">
+            <span class="cy-count-sticker"><%= eventos.length %> <%= eventos.length === 1 ? 'evento' : 'eventos' %></span>
+            <% if (filtrado) { %>
+              <a href="<%= limparFiltros %>">Limpar filtros <span aria-hidden="true"><%- icones.x %></span></a>
+            <% } %>
+          </div>
+        </header>
+
+        <% if (eventos.length) { %>
+          <div class="events-catalog">
+            <% eventos.forEach(({ item, evento }) => { %>
+              <%- include('../partials/componentes/evento-descoberta', { item, evento }) %>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="dc-empty">
+            <%- filtrado ? icones.search : icones.calendarDays %>
+            <div>
+              <strong><%= filtrado ? 'Nenhum evento encontrado.' : 'Ainda não há eventos na agenda.' %></strong>
+              <% if (filtrado) { %><p>Tente outro termo ou ajuste os filtros.</p><% } %>
+            </div>
+          </div>
+        <% } %>
+      </section>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: '/events' }) %>
   </div>
-  <h2>
-    Seu rastro na cena
-  </h2>
-  <div class="history-number">
-    —
-    <span>
-      participações
-    </span>
-  </div>
-  <div class="history-meter" role="img" aria-label="Participações distribuídas em três categorias">
-    <i>
-    </i>
-    <i>
-    </i>
-    <i>
-    </i>
-  </div>
-  <p>
-    Suas participações registradas aparecerão nesta área conforme você participar de eventos.
-  </p>
-</aside>
+
+  <%- include('../partials/componentes/ficha-evento') %>
 </div>
-</div>
-</main>
-</div>
-<dialog class="detail-dialog" id="detalhe-oportunidade" aria-labelledby="detalhe-oportunidade-titulo">
-<div class="detail-dialog-header">
-<span class="detail-kicker" data-event-category-detail>
-OPORTUNIDADE
-</span>
-<button class="icon-button detail-close" type="button" data-dialog-close aria-label="Fechar detalhe">
-<span class="lucide-icon" aria-hidden="true">
-<%- icones.x %>
-</span>
-</button>
-</div>
-<div class="detail-tabs" data-event-detail-tabs role="tablist" aria-label="Seções do evento">
-<button class="detail-tab is-active" type="button" data-event-detail-tab="geral" role="tab" aria-selected="true">
-Informações gerais
-</button>
-<button class="detail-tab" type="button" data-event-detail-tab="gestao" role="tab" aria-selected="false" hidden>
-Gestão do evento
-</button>
-</div>
-<div data-event-detail-panel="geral">
-<h2 id="detalhe-oportunidade-titulo" data-event-title-detail>
-</h2>
-<div class="detail-meta">
-<span>
-<i class="lucide-icon" aria-hidden="true">
-  <%- icones.users %>
-</i>
-<b data-event-org-detail>
-</b>
-</span>
-<span>
-<i class="lucide-icon" aria-hidden="true">
-  <%- icones.calendarDays %>
-</i>
-<b>
-  <span data-event-date-detail>
-  </span>
-  ·
-  <span data-event-time-detail>
-  </span>
-</b>
-</span>
-<span>
-<i class="lucide-icon" aria-hidden="true">
-  <%- icones.mapPin %>
-</i>
-<b data-event-location-detail>
-</b>
-</span>
-</div>
-<div class="detail-banner">
-<span class="lucide-icon" aria-hidden="true">
-<%- icones.sparkles %>
-</span>
-<span data-event-category-detail>
-</span>
-</div>
-<section class="detail-section">
-<h3>
-Sobre a oportunidade
-</h3>
-<p data-event-description-detail>
-</p>
-</section>
-<div class="detail-facts">
-<div>
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.mic %>
-</span>
-<small>
-  FORMATO
-</small>
-<b data-event-format-detail>
-</b>
-</div>
-<div>
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.calendarCheck %>
-</span>
-<small>
-  INSCRIÇÕES
-</small>
-<b data-event-registration-detail>
-</b>
-</div>
-<div>
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.trophy %>
-</span>
-<small>
-  DESTAQUE
-</small>
-<b data-event-prize-detail>
-</b>
-</div>
-</div>
-<div class="detail-tags" data-event-tags-detail>
-</div>
-<p class="interest-count" role="status">
-<span data-event-interest-total>
-0
-</span>
-<span data-event-interest-count-label>
-participação(ões) registrada(s).
-</span>
-</p>
-<p class="interest-explainer" data-event-demo-notice role="status" hidden>
-Este evento é um exemplo demonstrativo. Ele não recebe inscrições ou interesses operacionais.
-</p>
-<div class="detail-actions">
-<form method="post" data-interest-form>
-<button class="button button-lime" type="submit" data-interest-button aria-pressed="false">
-  <span class="lucide-icon" aria-hidden="true">
-    <%- icones.calendarCheck %>
-  </span>
-  <span data-interest-label>
-    Quero participar
-  </span>
-</button>
-<input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-<button class="button button-outline" type="button" data-share-event>
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.share %>
-</span>
-Compartilhar
-</button>
-</div>
-</div>
-<div data-event-detail-panel="gestao" hidden>
-<div class="event-owner-actions">
-<a class="button button-outline" data-event-edit href="#">
-Editar evento
-</a>
-<form method="post" action="#" data-event-delete onsubmit="return confirm('Excluir este evento?')">
-<button class="button button-outline danger-button" type="submit">
-  Excluir evento
-</button>
-<input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-</div>
-<div class="event-interested-list" data-event-interested-list>
-</div>
-</div>
-</dialog>
+<script src="/js/descoberta.js" defer></script>
 <%- include('../partials/fim-pagina') %>

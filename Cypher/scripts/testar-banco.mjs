@@ -27,7 +27,7 @@ try {
   let r = bootstrap();
   assert.equal(r.status, 0, r.stderr);
   let db = new Database(arquivo);
-  assert.equal(db.pragma("user_version", { simple: true }), 24);
+  assert.equal(db.pragma("user_version", { simple: true }), 26);
   assert.deepEqual(db.pragma("integrity_check"), [{ integrity_check: "ok" }]);
   assert.deepEqual(db.pragma("foreign_key_check"), []);
   const tabelas = db
@@ -35,7 +35,7 @@ try {
       "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
     )
     .all();
-  assert.equal(tabelas.length, 29);
+  assert.equal(tabelas.length, 30);
   for (const { name } of tabelas)
     if (name !== "sequencias")
       assert.equal(
@@ -98,6 +98,16 @@ try {
     db.prepare("SELECT count(*) AS total FROM usuarios").get().total,
     1
   );
+  db.exec("DROP TABLE atuacoes_obra; ALTER TABLE eventos DROP COLUMN tema_cartao");
+  db.pragma("user_version = 24");
+  db.close();
+  r = bootstrap();
+  assert.equal(r.status, 0, r.stderr);
+  db = new Database(arquivo);
+  assert.equal(db.pragma("user_version", { simple: true }), 26);
+  assert.equal(db.pragma("table_info(eventos)").find(coluna => coluna.name === "tema_cartao").dflt_value, "'classico'");
+  assert.equal(db.prepare("SELECT count(*) AS n FROM atuacoes_obra").get().n, 0);
+  assert.equal(db.prepare("SELECT count(*) AS n FROM usuarios").get().n, 1);
   db.pragma("user_version = 20");
   db.close();
   r = bootstrap();
@@ -115,7 +125,7 @@ try {
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /mais recente/);
   console.log(
-    "OK: schema 24, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis."
+    "OK: schema 26, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis."
   );
 } finally {
   assert.equal(path.dirname(path.resolve(pasta)), path.resolve(os.tmpdir()));

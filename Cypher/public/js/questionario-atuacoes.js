@@ -178,6 +178,23 @@
   }
 
   function refreshProgress() {
+    form.querySelectorAll('.trajectory-options').forEach(options => {
+      const labels = [...options.querySelectorAll('.trajectory-option')];
+      const chosen = labels.findIndex(label => label.querySelector('input').checked);
+      const previous = Number(options.dataset.timeIndex ?? -1);
+      labels.forEach((label, index) => {
+        label.classList.toggle('is-past', index < chosen);
+        const fill = chosen < 0 || index > chosen ? 0 : index < chosen ? 1 : index === 0 ? 0 : index === labels.length - 1 ? 1 : .5;
+        label.style.setProperty('--time-fill', fill);
+        label.style.setProperty('--time-delay', `${Math.min(Math.abs(index - previous) * 35, 140)}ms`);
+      });
+      if (previous !== chosen && chosen >= 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        labels[chosen].querySelector('.trajectory-option-mark').animate([
+          {transform:'scale(1)'}, {transform:'scale(1.2)',offset:.45}, {transform:'scale(1)'}
+        ], {duration:320,easing:'ease-out'});
+      }
+      options.dataset.timeIndex = chosen;
+    });
     const answered = questions.filter(item => isAnswered(item.fieldset)).length;
     const total = questions.length;
     if (!total) {
@@ -230,7 +247,14 @@
     }
     active.fieldset.hidden = false;
     if (categoryContext) {
-      categoryContext.textContent = (form.querySelector(`[data-profissao="${CSS.escape(active.category)}"]`)?.textContent || active.category).trim();
+      categoryContext.replaceChildren();
+      [...new Set(questions.map(item => item.category))].forEach(category => {
+        const label = document.createElement('span');
+        label.className = 'trajectory-profession';
+        label.textContent = (form.querySelector(`[data-profissao="${CSS.escape(category)}"]`)?.textContent || category).trim();
+        if (category === active.category) label.setAttribute('aria-current', 'step');
+        categoryContext.append(label);
+      });
     }
     refreshProgress();
   }
@@ -360,7 +384,7 @@
         panel
           .querySelectorAll("[data-visibilidade-atuacao]")
           .forEach(control => {
-            if (!control.disabled && control.value)
+            if (!control.disabled && control.value && (control.type !== "radio" || control.checked))
               categoryVisibilities[control.dataset.visibilidadeAtuacao] =
                 control.value;
           });
@@ -653,7 +677,8 @@
     const count = form.querySelectorAll('[name="vertentes"]:checked').length;
     form.querySelector('[data-branches-status]').textContent = count
       ? `${count} ${count === 1 ? 'vertente selecionada' : 'vertentes selecionadas'} · Você pode mudar depois.`
-      : 'Escolha quantas quiser — ou continue sem selecionar.';
+      : 'Esta etapa é opcional. Pode pular se quiser.';
+    form.querySelector('[data-register-stage="vertentes"] [data-continue]').textContent = count ? 'Continuar →' : 'Pular →';
   }
   form.addEventListener('change', event => {
     if (event.target.matches('[name="vertentes"]')) syncBranch();

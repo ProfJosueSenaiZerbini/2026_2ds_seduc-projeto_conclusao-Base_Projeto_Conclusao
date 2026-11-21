@@ -4,7 +4,8 @@ import { podePublicar } from "../models/permissoes.js";
 import type { Request, Response } from "express";
 import { CypherModel, type DadosBeatCypher } from "../models/modeloCypher.js";
 import type { UsuarioDaSessao } from "../models/bancoDados.js";
-import { podeCriarBeat } from "../models/modeloPerfil.js";
+import { imagemPublicacaoDemo } from "../models/catalogoDemonstrativo.js";
+import { normalizarBusca } from "../models/espacoTrabalho.js";
 import {
   licencasBeat,
   validarBpm,
@@ -149,7 +150,7 @@ function renderizarFormularioBeat(
 ) {
   return res.status(opcoes.erro ? 422 : 200).render("pages/cadastro-beat", {
     title: opcoes.editando ? "Editar beat" : "Cadastrar beat",
-    path: "/beats",
+    path: res.locals.origemEspaco ? "/espaco-de-trabalho" : "/beats",
     stylesheet: "cadastro-obra",
     authenticated: true,
     valores: dados,
@@ -162,12 +163,43 @@ function renderizarFormularioBeat(
 
 export function bancoBeats(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
+  const catalogo = CypherModel.beats(usuario?.id);
+  const opcoes = (campo: "genre" | "license") =>
+    [...new Set(catalogo.map(beat => beat[campo]).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b, "pt-BR")
+    );
+  const generos = opcoes("genre");
+  const licencas = opcoes("license");
+  const genero = generos.find(valor => valor === req.query.genero) ?? "";
+  const licenca = licencas.find(valor => valor === req.query.licenca) ?? "";
+  const q = typeof req.query.q === "string" ? req.query.q.trim().slice(0, 120) : "";
+  const termos = normalizarBusca(q).split(/\s+/);
+  const filtrado = Boolean(q || genero || licenca);
+  const beats = catalogo.filter(beat => {
+    if ((genero && beat.genre !== genero) || (licenca && beat.license !== licenca)) return false;
+    const busca = normalizarBusca(
+      [beat.title, beat.producer, beat.genre, beat.bpm ? `${beat.bpm} BPM` : ""].join(" ")
+    );
+    return termos.every(termo => busca.includes(termo));
+  });
+  const destaque = filtrado
+    ? undefined
+    : catalogo.find(beat => beat.id === "demo-beat-visao-de-rua") ??
+      catalogo.find(beat => beat.demonstracao && imagemPublicacaoDemo(beat.id));
+
   return res.render("pages/banco-beats", {
     title: "Banco de Beats",
     path: "/beats",
     stylesheet: "banco-beats",
     authenticated: Boolean(usuario),
-    beats: CypherModel.beats(usuario?.id),
+    beats,
+    destaque,
+    filtrado,
+    q,
+    genero,
+    generos,
+    licenca,
+    licencas,
     podeCadastrarBeat: Boolean(
       usuario && !usuario.demonstracao && podePublicar(usuario,"beat")
     ),
@@ -202,12 +234,12 @@ export function criarBeat(req: Request, res: Response) {
     entidadeId: beatId,
     chaveOrigem: `beat-criado:${beatId}`,
   });
-  return res.redirect(303, "/beats?resultado=criado");
+  return res.redirect(303, res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=beatCriado" : "/beats?resultado=criado");
 }
 
 export function editarBeat(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  if (!usuario || usuario.demonstracao) return res.sendStatus(403);
+  if (!usuario || usuario.demonstracao || usuario.tipoConta !== "profissional") return res.sendStatus(403);
   const beat = CypherModel.obterBeat(req.params.id ?? "", usuario.id);
   if (!beat) return res.sendStatus(404);
   return renderizarFormularioBeat(
@@ -237,7 +269,8 @@ export function editarBeat(req: Request, res: Response) {
 
 export function atualizarBeat(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  if (!usuario || usuario.demonstracao) return res.sendStatus(403);
+  if (!usuario || usuario.demonstracao || usuario.tipoConta !== "profissional") return res.sendStatus(403);
+  if (!CypherModel.obterBeat(req.params.id ?? "", usuario.id)) return res.sendStatus(404);
   const dados = dadosBeat(req.body);
   const erro = validarBeat(dados);
   if (erro)
@@ -262,15 +295,15 @@ export function atualizarBeat(req: Request, res: Response) {
     entidadeId: req.params.id ?? "",
     chaveOrigem: `beat-atualizado:${req.params.id}:${dados.title}:${dados.license}`,
   });
-  return res.redirect(303, "/beats?resultado=atualizado");
+  return res.redirect(303, res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=beatAtualizado" : "/beats?resultado=atualizado");
 }
 
 export function excluirBeat(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  if (!usuario || usuario.demonstracao) return res.sendStatus(403);
+  if (!usuario || usuario.demonstracao || usuario.tipoConta !== "profissional") return res.sendStatus(403);
   const excluido = CypherModel.excluirBeat(req.params.id ?? "", usuario.id);
   if (!excluido) return res.sendStatus(404);
-  return res.redirect(303, "/beats?resultado=excluido");
+  return res.redirect(303, res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=beatExcluido" : "/beats?resultado=excluido");
 }
 
 export { licencasBeat };

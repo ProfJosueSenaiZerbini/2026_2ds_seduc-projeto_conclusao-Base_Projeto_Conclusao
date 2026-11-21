@@ -127,6 +127,7 @@ export type PerfilPublico = {
   createdAt: string;
 };
 export type ObraPublicaPerfil = {
+  id: string;
   title: string;
   type: string;
   typeDetail: string;
@@ -239,12 +240,14 @@ export type EventoContaPersistido = {
   title: string;
   category: string;
   categoryDetail: string;
+  workshopTypes: string[];
   date: string;
   time: string;
   location: string;
   org: string;
   status: string;
   color: string;
+  temaCartao: string;
   description: string;
   format: string;
   registration: string;
@@ -278,7 +281,8 @@ export type DadosEventoCypher = Omit<
   | "interesseStatus"
   | "totalInteressados"
   | "interessados"
->;
+  | "temaCartao"
+> & { temaCartao?: string };
 export type OfertaBeatPersistida = {
   id: string;
   beatId: string;
@@ -368,6 +372,8 @@ export type ObraPersistida = {
   published: boolean;
 };
 export type DadosObraCypher = {
+  published?: boolean;
+  atuacoes?: string[];
   title: string;
   type: string;
   typeDetail: string;
@@ -395,7 +401,7 @@ export type ObraContaPersistida = ObraPersistida & {
 };
 
 let banco;
-export const versaoEsquema = 24;
+export const versaoEsquema = 27;
 function iniciaisPublicas(nome) {
   const partes = nome
     .normalize("NFD")
@@ -507,6 +513,12 @@ const esquema = `
   CREATE INDEX IF NOT EXISTS indice_obras_proprietario
     ON obras(proprietario_id, criado_em);
 
+  CREATE TABLE IF NOT EXISTS atuacoes_obra (
+    obra_id TEXT NOT NULL REFERENCES obras(id) ON DELETE CASCADE,
+    profissao_id TEXT NOT NULL,
+    PRIMARY KEY (obra_id, profissao_id)
+  );
+
   CREATE TABLE IF NOT EXISTS creditos (
     id TEXT PRIMARY KEY,
     obra_id TEXT NOT NULL REFERENCES obras(id) ON DELETE CASCADE,
@@ -528,12 +540,14 @@ const esquema = `
     titulo TEXT NOT NULL,
     categoria TEXT NOT NULL,
     categoria_detalhe TEXT NOT NULL DEFAULT '',
+    tipos_workshop_json TEXT NOT NULL DEFAULT '[]',
     data_texto TEXT NOT NULL DEFAULT '',
     horario TEXT NOT NULL DEFAULT '',
     local TEXT NOT NULL DEFAULT '',
     organizador TEXT NOT NULL DEFAULT '',
     situacao TEXT NOT NULL DEFAULT '',
     cor TEXT NOT NULL DEFAULT 'yellow',
+    tema_cartao TEXT NOT NULL DEFAULT 'classico',
     descricao TEXT NOT NULL DEFAULT '',
     formato TEXT NOT NULL DEFAULT '',
     inscricao TEXT NOT NULL DEFAULT '',
@@ -1307,7 +1321,7 @@ export function inicializarBancoCypher() {
     conexao.transaction(() => {
       const versao = conexao.pragma("user_version", { simple: true });
       if (versao > versaoEsquema) throw new Error("O banco usa uma versão de esquema mais recente que a suportada.");
-      if (versao !== 0 && versao !== 21 && versao !== 22 && versao !== 23 && versao !== versaoEsquema) throw new Error("Banco de desenvolvimento anterior ao schema 21. Recrie a base de desenvolvimento antes de iniciar.");
+      if (versao !== 0 && versao < 21) throw new Error("Banco de desenvolvimento anterior ao schema 21. Recrie a base de desenvolvimento antes de iniciar.");
       if (versao === 0 && conexao.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'usuarios'").get()) throw new Error("Banco sem versão já contém usuários; recriação explícita necessária.");
       if (versao === 21) {
         conexao.exec(`ALTER TABLE perfis ADD COLUMN nome_informado TEXT NOT NULL DEFAULT '';
@@ -1331,6 +1345,12 @@ export function inicializarBancoCypher() {
         conexao.exec("ALTER TABLE usuarios ADD COLUMN email_confirmado_em TEXT");
       }
       conexao.exec(esquema);
+      if (!conexao.pragma("table_info(eventos)").some(coluna => coluna.name === "tema_cartao")) {
+        conexao.exec("ALTER TABLE eventos ADD COLUMN tema_cartao TEXT NOT NULL DEFAULT 'classico'");
+      }
+      if (!conexao.pragma("table_info(eventos)").some(coluna => coluna.name === "tipos_workshop_json")) {
+        conexao.exec("ALTER TABLE eventos ADD COLUMN tipos_workshop_json TEXT NOT NULL DEFAULT '[]'");
+      }
       conexao.exec(`
         CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_codigo_publico ON usuarios(codigo_publico);
         CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_numero_sequencial_real ON usuarios(numero_sequencial) WHERE demonstracao = 0 AND numero_sequencial IS NOT NULL;
@@ -1437,12 +1457,14 @@ export function listarEventosCypher(filtros, usuarioId) {
         e.titulo AS title,
         e.categoria AS category,
         e.categoria_detalhe AS categoryDetail,
+        e.tipos_workshop_json AS workshopTypesJson,
         e.data_texto AS date,
         e.horario AS time,
         e.local AS location,
         e.organizador AS org,
         e.situacao AS status,
         e.cor AS color,
+        e.tema_cartao AS temaCartao,
         e.descricao AS description,
         e.formato AS format,
         e.inscricao AS registration,
@@ -1473,6 +1495,7 @@ export function listarEventosCypher(filtros, usuarioId) {
   return linhas.map(
     ({
       tagsJson,
+      workshopTypesJson,
       demonstracao,
       owned,
       totalInteressados,
@@ -1481,6 +1504,7 @@ export function listarEventosCypher(filtros, usuarioId) {
     }) => ({
       ...evento,
       tags: JSON.parse(tagsJson),
+      workshopTypes: JSON.parse(workshopTypesJson),
       demonstracao: Boolean(demonstracao),
       owned: Boolean(owned),
       totalInteressados: Number(totalInteressados),
@@ -1500,12 +1524,14 @@ export function obterEventoCypher(id, usuarioId) {
         e.titulo AS title,
         e.categoria AS category,
         e.categoria_detalhe AS categoryDetail,
+        e.tipos_workshop_json AS workshopTypesJson,
         e.data_texto AS date,
         e.horario AS time,
         e.local AS location,
         e.organizador AS org,
         e.situacao AS status,
         e.cor AS color,
+        e.tema_cartao AS temaCartao,
         e.descricao AS description,
         e.formato AS format,
         e.inscricao AS registration,
@@ -1533,10 +1559,11 @@ export function obterEventoCypher(id, usuarioId) {
     )
     .get(usuarioId, usuarioId, id);
   if (!linha) return undefined;
-  const { tagsJson, demonstracao, owned, totalInteressados, ...evento } = linha;
+  const { tagsJson, workshopTypesJson, demonstracao, owned, totalInteressados, ...evento } = linha;
   return {
     ...evento,
     tags: JSON.parse(tagsJson),
+    workshopTypes: JSON.parse(workshopTypesJson),
     demonstracao: Boolean(demonstracao),
     owned: Boolean(owned),
     totalInteressados: Number(totalInteressados),
@@ -1668,10 +1695,18 @@ export function atualizarStatusInteresseEventoCypher(
     .run(status, eventoId, usuarioInteressadoId, organizadorId);
   return resultado.changes > 0;
 }
+function categoriasAtivas(usuarioId, categoriasJson) {
+  const registros = listarProfissoesUsuarioCypher(usuarioId, { incluirInativas: true });
+  const anteriores = JSON.parse(categoriasJson || "[]");
+  if (!registros.length) return anteriores.filter(categoria => categoriasGerais.includes(categoria));
+  const ativas = registros.filter(p => p.estado === "ativa").map(p => obterProfissaoCatalogo(p.profissaoId)?.rotulo).filter(Boolean);
+  return [...new Set([...anteriores.filter(c => ativas.includes(c)), ...ativas])];
+}
+
 function exigirPublicacao(usuarioId, modalidade, tipo) {
   const conta = bancoAtivo().prepare(`SELECT u.tipo_conta AS tipoConta, u.email_confirmado_em AS confirmado, p.categorias_json AS categorias FROM usuarios u
     LEFT JOIN perfis p ON p.usuario_id = u.id WHERE u.id = ? AND u.demonstracao = 0`).get(usuarioId);
-  if (!conta || !conta.confirmado || !podePublicar({ tipoConta: conta.tipoConta, categories: JSON.parse(conta.categorias || '[]') }, modalidade, tipo)) throw new Error("PUBLICACAO_NAO_PERMITIDA");
+  if (!conta || !conta.confirmado || !podePublicar({ tipoConta: conta.tipoConta, categories: categoriasAtivas(usuarioId, conta.categorias) }, modalidade, tipo)) throw new Error("PUBLICACAO_NAO_PERMITIDA");
 }
 export function criarEventoCypher(proprietarioId, dados) {
   exigirPublicacao(proprietarioId, "evento");
@@ -1680,10 +1715,10 @@ export function criarEventoCypher(proprietarioId, dados) {
     .prepare(
       `
       INSERT INTO eventos (
-        id, proprietario_id, titulo, categoria, categoria_detalhe, data_texto, horario, local,
+        id, proprietario_id, titulo, categoria, categoria_detalhe, tipos_workshop_json, data_texto, horario, local,
         organizador, situacao, cor, descricao, formato, inscricao, premio,
-        etiquetas_json, tipo_participacao, demonstracao
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+        etiquetas_json, tipo_participacao, tema_cartao, demonstracao
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, 'classico'), 0)
       `
     )
     .run(
@@ -1692,37 +1727,7 @@ export function criarEventoCypher(proprietarioId, dados) {
       dados.title,
       dados.category,
       dados.categoryDetail,
-      dados.date,
-      dados.time,
-      dados.location,
-      dados.org,
-      dados.status,
-      dados.color,
-      dados.description,
-      dados.format,
-      dados.registration,
-      dados.prize,
-      JSON.stringify(dados.tags),
-      dados.participationType
-    );
-  return id;
-}
-export function atualizarEventoCypher(id, proprietarioId, dados) {
-  exigirProfissional(proprietarioId);
-  const resultado = bancoAtivo()
-    .prepare(
-      `
-      UPDATE eventos
-      SET titulo = ?, categoria = ?, categoria_detalhe = ?, data_texto = ?, horario = ?, local = ?,
-          organizador = ?, situacao = ?, cor = ?, descricao = ?, formato = ?,
-          inscricao = ?, premio = ?, etiquetas_json = ?, tipo_participacao = ?, atualizado_em = CURRENT_TIMESTAMP
-      WHERE id = ? AND proprietario_id = ? AND demonstracao = 0
-      `
-    )
-    .run(
-      dados.title,
-      dados.category,
-      dados.categoryDetail,
+      JSON.stringify(dados.workshopTypes ?? []),
       dados.date,
       dados.time,
       dados.location,
@@ -1735,6 +1740,41 @@ export function atualizarEventoCypher(id, proprietarioId, dados) {
       dados.prize,
       JSON.stringify(dados.tags),
       dados.participationType,
+      dados.temaCartao ?? null
+    );
+  return id;
+}
+export function atualizarEventoCypher(id, proprietarioId, dados) {
+  exigirProfissional(proprietarioId);
+  const resultado = bancoAtivo()
+    .prepare(
+      `
+      UPDATE eventos
+      SET titulo = ?, categoria = ?, categoria_detalhe = ?, tipos_workshop_json = ?, data_texto = ?, horario = ?, local = ?,
+          organizador = ?, situacao = ?, cor = ?, descricao = ?, formato = ?,
+          inscricao = ?, premio = ?, etiquetas_json = ?, tipo_participacao = ?,
+          tema_cartao = COALESCE(?, tema_cartao), atualizado_em = CURRENT_TIMESTAMP
+      WHERE id = ? AND proprietario_id = ? AND demonstracao = 0
+      `
+    )
+    .run(
+      dados.title,
+      dados.category,
+      dados.categoryDetail,
+      JSON.stringify(dados.workshopTypes ?? []),
+      dados.date,
+      dados.time,
+      dados.location,
+      dados.org,
+      dados.status,
+      dados.color,
+      dados.description,
+      dados.format,
+      dados.registration,
+      dados.prize,
+      JSON.stringify(dados.tags),
+      dados.participationType,
+      dados.temaCartao ?? null,
       id,
       proprietarioId
     );
@@ -1758,6 +1798,7 @@ export function listarBeatsCypher(usuarioId) {
         b.produtor_id AS produtorId,
         b.titulo AS title,
         p.nome AS producer,
+        CASE WHEN b.demonstracao = 1 AND p.demonstracao = 1 AND p.perfil_publico = 1 THEN p.identificador ELSE '' END AS demoProducerHandle,
         b.bpm AS bpm,
         b.tom_musical AS key,
         b.genero AS genre,
@@ -2112,6 +2153,17 @@ export function buscarCredenciaisCypher(email) {
     )
     .get(email);
 }
+export function buscarEmailPorIdentificadorCypher(identificador: string): string | undefined {
+  const conta = bancoAtivo().prepare(`
+    SELECT u.email
+    FROM perfis p
+    JOIN usuarios u ON u.id = p.usuario_id
+    WHERE p.identificador = ? COLLATE NOCASE
+      AND u.demonstracao = 0
+      AND u.tipo_conta IN ('profissional', 'consumidor')
+  `).get(normalizarIdentificador(identificador)) as { email: string } | undefined;
+  return conta?.email;
+}
 export function criarSessaoCypher(usuarioId, tokenHash, expiraEm, agora) {
   const db = bancoAtivo();
   const criar = db.transaction(() => {
@@ -2182,7 +2234,7 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
     db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash);
     return undefined;
   }
-  const categories = JSON.parse(perfil.categoriesJson) as string[];
+  const categories = categoriasAtivas(perfil.id, perfil.categoriesJson);
   return {
     ...perfil,
     role: perfil.tipoConta === "consumidor" ? "Público" : categories.map(categoria => rotuloProfissional(categoria, perfil.tratamento)).join(" · ") || perfil.role,
@@ -3112,7 +3164,7 @@ function ehColaboradorDaConta(db, titularId, visitanteId) {
              JOIN creditos c ON c.obra_id = o.id
              WHERE o.proprietario_id = ? AND c.usuario_creditado_id = ?
                AND o.demonstracao = 0 AND c.demonstracao = 0
-               AND o.publicada = 1 AND o.situacao = 'Lançado' AND c.verificado = 1
+               AND o.publicada = 1 AND o.situacao IN ('', 'Lançado') AND c.verificado = 1
            ) AS colaborador`
       )
       .get(titularId, visitanteId).colaborador
@@ -3181,9 +3233,10 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
         p.criado_em AS createdAt
       FROM usuarios u
       JOIN perfis p ON p.usuario_id = u.id
-      WHERE u.demonstracao = 0
+      WHERE u.demonstracao = p.demonstracao
         AND p.perfil_publico = 1
-        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
+        AND u.tipo_conta = 'profissional'
+        AND (u.demonstracao = 1 OR u.email_confirmado_em IS NOT NULL)
         AND p.identificador = ? COLLATE NOCASE
     `
     )
@@ -3226,7 +3279,7 @@ function opcoesUnicasBusca(valores) {
     a.localeCompare(b, "pt-BR", { sensitivity: "base" })
   );
 }
-export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId) {
+export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): ResultadoBuscaPerfisPublicos {
   const db = bancoAtivo();
   const linhas = db
     .prepare(
@@ -3246,10 +3299,10 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId) {
         p.tom AS tone
       FROM usuarios u
       JOIN perfis p ON p.usuario_id = u.id
-      WHERE u.demonstracao = 0
-        AND p.demonstracao = 0
+      WHERE u.demonstracao = p.demonstracao
         AND p.perfil_publico = 1
-        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
+        AND u.tipo_conta = 'profissional'
+        AND (u.demonstracao = 1 OR u.email_confirmado_em IS NOT NULL)
         AND u.id <> ?
       ORDER BY p.nome COLLATE NOCASE ASC
     `
@@ -3378,7 +3431,7 @@ export function listarObrasPublicasPerfilCypher(identificador) {
     .prepare(
       `
       SELECT
-        o.titulo AS title,
+        o.id, o.titulo AS title,
         o.tipo AS type,
         o.tipo_detalhe AS typeDetail,
         o.genero AS genre,
@@ -3387,18 +3440,22 @@ export function listarObrasPublicasPerfilCypher(identificador) {
         o.funcao_detalhe AS roleDetail,
         o.data_lancamento AS releaseDate,
         o.link_escuta AS listenLink,
-        o.letra AS lyrics
+        o.letra AS lyrics,
+        CASE WHEN o.demonstracao = 1 THEN
+          (SELECT group_concat(c.nome_creditado || ' · ' || c.funcao, ', ')
+           FROM creditos c WHERE c.obra_id = o.id AND c.demonstracao = 1)
+        END AS demoCredits
       FROM obras o
       JOIN usuarios u ON u.id = o.proprietario_id
       JOIN perfis p ON p.usuario_id = u.id
-      WHERE u.demonstracao = 0
-        AND p.demonstracao = 0
+      WHERE u.demonstracao = p.demonstracao
         AND p.perfil_publico = 1
-        AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
+        AND u.tipo_conta = 'profissional'
+        AND (u.demonstracao = 1 OR u.email_confirmado_em IS NOT NULL)
         AND p.identificador = ? COLLATE NOCASE
-        AND o.demonstracao = 0
+        AND o.demonstracao = u.demonstracao
         AND o.publicada = 1
-        AND o.situacao = 'Lançado'
+        AND o.situacao IN ('', 'Lançado')
       ORDER BY
         CASE WHEN o.data_lancamento = '' THEN 1 ELSE 0 END,
         o.data_lancamento DESC,
@@ -3441,7 +3498,7 @@ function creditosDasObras(ids) {
   }
   return resultado;
 }
-export function listarObrasContaCypher(proprietarioId, filtros) {
+export function listarObrasContaCypher(proprietarioId, filtros, obraId = null) {
   const filtro = filtros ?? {
     status: "",
     type: "",
@@ -3492,7 +3549,7 @@ export function listarObrasContaCypher(proprietarioId, filtros) {
           ''
         ) AS participationRole
       FROM obras o
-      WHERE o.demonstracao = 0
+      WHERE o.demonstracao = 0 AND (@obraId IS NULL OR o.id = @obraId)
         AND (
           o.proprietario_id = @proprietarioId
           OR EXISTS (
@@ -3521,6 +3578,7 @@ export function listarObrasContaCypher(proprietarioId, filtros) {
     )
     .all({
       proprietarioId,
+      obraId,
       status: filtro.status,
       type: filtro.type,
       genre: filtro.genre,
@@ -3536,7 +3594,7 @@ export function listarObrasContaCypher(proprietarioId, filtros) {
   }));
 }
 export function obterObraContaCypher(id, proprietarioId) {
-  return listarObrasContaCypher(proprietarioId).find(
+  return listarObrasContaCypher(proprietarioId, undefined, id).find(
     obra => obra.id === id && obra.owned
   );
 }
@@ -3566,7 +3624,29 @@ function metadadosObra(dados) {
     : dados.genre;
   return [genero, data].filter(Boolean).join(" · ");
 }
+export function atuacoesDaObra(obraId) {
+  return bancoAtivo().prepare("SELECT profissao_id FROM atuacoes_obra WHERE obra_id=?").all(obraId).map(p => p.profissao_id);
+}
+
+function salvarAtuacoesObra(db, obraId, usuarioId, atuacoes) {
+  if (atuacoes === undefined) return;
+  const perfil = db.prepare("SELECT categorias_json FROM perfis WHERE usuario_id=?").get(usuarioId);
+  const categorias = categoriasAtivas(usuarioId, perfil.categorias_json);
+  const ativas = new Set(categorias.map(idProfissaoPorCategoria));
+  const inserir = db.prepare("INSERT OR IGNORE INTO atuacoes_obra (obra_id, profissao_id) VALUES (?,?)");
+  for (const id of new Set(atuacoes)) {
+    if (!ativas.has(id)) throw new Error("ATUACAO_INVALIDA");
+    inserir.run(obraId, id);
+  }
+  const remover = db.prepare("DELETE FROM atuacoes_obra WHERE obra_id=? AND profissao_id=?");
+  for (const id of atuacoesDaObra(obraId)) {
+    if (ativas.has(id) && !atuacoes.includes(id)) remover.run(obraId, id);
+  }
+}
+
 function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
+  const anteriores = db.prepare("SELECT id, usuario_creditado_id, nome_creditado, funcao, participacao FROM creditos WHERE obra_id=? AND demonstracao=0").all(obraId);
+  const preservados = new Set();
   const obterPerfil = db.prepare(`
     SELECT u.id, p.nome AS name
     FROM usuarios u
@@ -3602,6 +3682,13 @@ function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
     }
     if (creditosVistos.has(chave)) throw new Error("CREDITOS_DUPLICADOS");
     creditosVistos.add(chave);
+    const anterior = anteriores.find(c => c.usuario_creditado_id === usuarioCreditadoId &&
+      (usuarioCreditadoId || c.nome_creditado === nome) && c.funcao === credito.role.trim() &&
+      c.participacao === credito.participation.trim());
+    if (anterior) {
+      preservados.add(anterior.id);
+      continue;
+    }
     inserir.run(
       randomUUID(),
       obraId,
@@ -3611,6 +3698,8 @@ function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
       credito.participation.trim()
     );
   }
+  const remover = db.prepare("DELETE FROM creditos WHERE id=? AND obra_id=?");
+  for (const c of anteriores) if (!preservados.has(c.id)) remover.run(c.id, obraId);
 }
 export function criarObraCypher(proprietarioId, dados, creditos) {
   exigirPublicacao(proprietarioId, "obra", dados.type);
@@ -3651,8 +3740,9 @@ export function criarObraCypher(proprietarioId, dados, creditos) {
       iswc: dados.iswc,
       releaseDate: dados.releaseDate,
       listenLink: dados.listenLink,
-      published: Number(dados.status === "Lançado"),
+      published: Number(dados.published ?? (dados.status === "Lançado")),
     });
+    salvarAtuacoesObra(db, id, proprietarioId, dados.atuacoes);
     salvarCreditosObra(db, id, proprietarioId, creditos);
     if (dados.propostaGenero?.trim()) {
       db.prepare(
@@ -3719,12 +3809,10 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
         iswc: dados.iswc,
         releaseDate: dados.releaseDate,
         listenLink: dados.listenLink,
-        published: Number(dados.status === "Lançado"),
+        published: Number(dados.published ?? (dados.status === "Lançado")),
       });
     if (resultado.changes !== 1) return false;
-    db.prepare(
-      "DELETE FROM creditos WHERE obra_id = ? AND demonstracao = 0"
-    ).run(id);
+    salvarAtuacoesObra(db, id, proprietarioId, dados.atuacoes);
     salvarCreditosObra(db, id, proprietarioId, creditos);
     if (dados.propostaGenero?.trim()) {
       db.prepare(

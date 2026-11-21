@@ -1,0 +1,12 @@
+<article class="et-card et-card--<%= item.modalidade %>">
+  <a href="<%= href %>" class="et-card-link">
+    <span class="et-art" aria-hidden="true"><span><%- icones[item.icone] %></span></span>
+    <div class="et-card-copy">
+      <h3><%= item.titulo %></h3>
+      <p><%= item.autor %></p>
+      <small><%= [item.tipo, item.metadados].filter(Boolean).join(' · ') %></small>
+      <% if (participacao && item.papel) { %><small class="et-credit"><%- icones.mic %><%= item.papel %></small><% } %>
+    </div>
+    <span class="et-card-arrow" aria-hidden="true"><%- icones.arrowUpRight %></span>
+  </a>
+</article>

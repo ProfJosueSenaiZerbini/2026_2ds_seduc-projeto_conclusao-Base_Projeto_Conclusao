@@ -12,34 +12,8 @@
 }
 
 @media (max-width: 1120px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .accent-note {
-    grid-column: span 2;
-    min-height: 180px;
-  }
-  .accent-note p {
-    max-width: 390px;
-  }
   .people-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .cycle-line {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px 0;
-  }
-  .cycle-step:nth-child(3) {
-    border-right: 0;
-  }
-  .cycle-step:nth-child(4),
-  .cycle-step:nth-child(5),
-  .cycle-step:nth-child(6) {
-    padding-top: 5px;
-  }
-  .cycle-step:nth-child(4) > svg,
-  .cycle-step:nth-child(5) > svg {
-    display: none;
   }
 }
 
@@ -87,7 +61,7 @@
   .page-header h1 {
     font-size: 43px;
   }
-  .attention-grid,
+
   .events-layout,
   .central-layout,
   .profile-columns {
@@ -137,39 +111,10 @@
 }
 
 @media (max-width: 560px) {
-  .hero-grid {
-    grid-template-columns: 1fr;
-  }
-  .accent-note {
-    grid-column: auto;
-    min-height: 230px;
-  }
-  .stat-stack {
-    grid-template-columns: 1fr 1fr;
-  }
-  .stat-card {
-    min-height: 140px;
-  }
-  .stat-card small {
-    display: block;
-    margin: 3px 0 0;
-  }
-  .hero-card {
-    min-height: 325px;
-  }
   .section-heading {
     align-items: flex-start;
     gap: 15px;
     flex-direction: column;
-  }
-  .cycle-line {
-    grid-template-columns: 1fr 1fr;
-  }
-  .cycle-step {
-    border-right: 0;
-  }
-  .cycle-step > svg {
-    display: none;
   }
   .search-toolbar,
   .beats-toolbar {

@@ -1,6 +1,6 @@
 <%- include('../partials/cabecalho',{title,stylesheet}) %>
 <link rel="stylesheet" href="/css/entrada.css">
-<main class="tag-page registration-page" data-tag-page data-active="<%= erro || tipoInicial ? dados.tipoConta : '' %>">
+<main class="tag-page entrada-cypher registration-page" data-tag-page data-active="<%= erro || tipoInicial ? dados.tipoConta : '' %>">
 <a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell">
 <header class="tag-intro"><h1>Boas-vindas à Cypher!</h1><p>Como você participa da cena?</p></header>
 <nav class="tag-stack" aria-label="Tipo de conta">
@@ -14,13 +14,13 @@
 <div hidden><% for(const tipo of ['consumidor','profissional']){ %><input type="radio" name="tipoConta" value="<%= tipo %>" <%= dados.tipoConta===tipo?'checked':'' %>><% } %></div>
   <ol class="register-steps" aria-label="Dados da conta e etapas do cadastro">
     <% for (const [id, nome] of [['conta','Nome'],['contato','Contato'],['acesso','Acesso'],['categorias','Atuação'],['vertentes','Vertentes'],['questionarios','Trajetória']]) { %>
-      <li data-step-indicator="<%= id %>" <%= ['categorias','vertentes','questionarios'].includes(id) ? 'data-professional-only' : '' %>><% if(id === 'vertentes'){ %><svg class="register-branch-path" viewBox="0 0 100 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1 L50 47 L100 1"/></svg><% } %><%= nome %></li>
+      <li data-step-indicator="<%= id %>" <%= ['categorias','vertentes','questionarios'].includes(id) ? 'data-professional-only' : '' %>><span><%= nome %></span></li>
     <% } %>
   </ol>
   <section class="register-stage" data-register-stage="conta" aria-label="Nome e vulgo">
     <label>Nome Completo<input id="register-name" name="name" minlength="2" maxlength="80" value="<%= dados.nomeInformado %>" autocomplete="name" required></label>
     <label class="nickname-switch"><input type="checkbox" name="possuiVulgo" value="1" data-has-nickname <%= dados.vulgo ? 'checked' : '' %>> Possui vulgo?</label>
-    <div data-nickname-fields <%= dados.vulgo ? '' : 'hidden' %>><label>Vulgo / nome artístico<input name="vulgo" minlength="2" maxlength="80" value="<%= dados.vulgo %>" autocomplete="nickname"></label></div>
+    <div data-nickname-fields <%= dados.vulgo ? '' : 'hidden' %>><label>Vulgo<input name="vulgo" minlength="2" maxlength="80" value="<%= dados.vulgo %>" autocomplete="nickname"></label></div>
     <p class="register-inline-error" data-stage-error role="alert" hidden></p>
     <div class="register-navigation"><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
   </section>
@@ -42,13 +42,13 @@
   </section>
   <section class="register-stage register-branches-stage" data-register-stage="vertentes" aria-label="Vertentes do rap" hidden>
     <%- include('../partials/componentes/vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
-    <p class="branches-selection-status" data-branches-status aria-live="polite">Escolha quantas quiser — ou continue sem selecionar.</p>
+    <p class="branches-selection-status" data-branches-status aria-live="polite">Esta etapa é opcional. Pode pular se quiser.</p>
     <div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
   </section>
   <section class="register-stage" data-register-stage="questionarios" aria-label="Trajetória" hidden>
-    <div class="questionnaire-progress" data-questionnaire-progress aria-live="polite"><div class="questionnaire-progress__labels"><span data-question-current>Pergunta 1 de 1</span><span data-question-answered>0 respondidas</span></div><div class="questionnaire-progress__track" role="progressbar" aria-label="Progresso das perguntas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-question-progress-bar></span></div><span class="questionnaire-progress__percent" data-question-percent>0%</span></div><p class="questionnaire-category-context" data-question-category aria-live="polite"></p>
+    <div class="trajectory-professions" data-question-category aria-label="Suas profissões" aria-live="polite"></div>
     <section class="professional-questionnaires" aria-label="Tempo de atuação por profissão"><% questionariosAtuacao.forEach((questionario,indice)=>{ %><%- include('../partials/componentes/questionario-atuacao',{categoriaAtuacao:questionario.categoria,perguntasAtuacao:questionario.perguntas,idQuestionario:`cadastro-atuacao-${indice}`,cadastro:true,legada:false,atuacoesExistentes,formatarRespostaAtuacao}) %><% }) %></section>
-    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-outline" type="button" data-question-previous hidden>Profissão anterior</button><button class="button button-lime" type="button" data-question-next>Próxima profissão →</button><button class="button button-lime" type="submit" data-register-submit hidden>Finalizar cadastro →</button></div>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation register-navigation--trajectory"><button class="button button-outline" type="button" data-question-previous hidden>Profissão anterior</button><button class="button button-lime" type="button" data-question-next>Próxima profissão →</button><button class="button button-lime" type="submit" data-register-submit hidden>Finalizar cadastro →</button><button class="button button-outline" type="button" data-register-back>Voltar</button></div>
   </section>
   <noscript><style>[data-register-stage][hidden],[data-category-area-panel][hidden],[data-category-browser][hidden]{display:block!important}</style><p>Sem JavaScript, preencha os dados e, se for profissional, selecione as profissões e seus tempos de atuação abaixo.</p><button class="button button-lime" type="submit">Finalizar cadastro</button></noscript>
   <input type="hidden" name="respostasAtuacoesJson" data-respostas-atuacoes-json value="{}"><input type="hidden" name="visibilidadesAtuacoesJson" data-visibilidades-atuacoes-json value="{}"><div class="ctag-note" data-register-ctag hidden>Seu ID Cypher é único e permanece vinculado à mesma conta.</div><input type="hidden" name="_csrf" value="<%= csrfToken %>">

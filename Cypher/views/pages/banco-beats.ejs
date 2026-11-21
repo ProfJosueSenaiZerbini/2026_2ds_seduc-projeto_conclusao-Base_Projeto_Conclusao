@@ -1,229 +1,188 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
-<%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: 'Banco de Beats' }) %>
-<div class="page-content">
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      BANCO DE BEATS
-    </div>
-    <h1>
-      Encontre o som certo.
-    </h1>
-    <p>
-      Beats cadastrados por produtores da cena, com informações claras de uso e licença.
-    </p>
-  </div>
-  <% if (podeCadastrarBeat) { %>
-    <a class="button button-yellow" href="/beats/new">
-      <span class="lucide-icon" aria-hidden="true">
-        <%- icones.plus %>
-      </span>
-      Cadastrar beat
-    </a>
-  <% } %>
-</div>
-<% if (typeof resultado !== 'undefined' && resultado) { %>
-  <div class="form-feedback success-feedback" role="status">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.circleCheck %>
-    </span>
-    <%= resultado === 'criado' ? 'Beat cadastrado com sucesso.' : resultado === 'atualizado' ? 'Beat atualizado com sucesso.' : resultado === 'excluido' ? 'Beat excluído com sucesso.' : resultado === 'permissao' ? 'Sua conta precisa ter a categoria Beatmaker para cadastrar novos Beats.' : resultado %>
-  </div>
-<% } %>
-<div class="beats-toolbar">
-  <label class="search-field" for="buscar-beats">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.search %>
-    </span>
-    <input id="buscar-beats" type="search" data-filter placeholder="Buscar por nome, produtor, gênero ou BPM" aria-label="Buscar beats">
-  </label>
-</div>
-<div class="beats-grid">
-  <% beats.forEach((beat, i) => { %>
-    <article class="beat-card" data-search-item>
-      <div class="beat-art beat-art-<%= beat.color %>">
-        <div class="beat-art-lines" aria-hidden="true">
+<%
+  function urlGenero(valor) {
+    const parametros = new URLSearchParams();
+    if (q) parametros.set('q', q);
+    if (valor) parametros.set('genero', valor);
+    if (licenca) parametros.set('licenca', licenca);
+    return '/beats' + (parametros.size ? '?' + parametros : '');
+  }
+
+  const mensagens = {
+    criado: 'Beat cadastrado com sucesso.',
+    atualizado: 'Beat atualizado com sucesso.',
+    excluido: 'Beat excluído com sucesso.',
+    permissao: 'Sua conta precisa ter a categoria Beatmaker para cadastrar novos beats.'
+  };
+%>
+<div class="dc-shell banco-beats">
+  <a class="dc-skip" href="#conteudo-beats">Pular para o conteúdo</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', {
+      titulo: 'Banco de Beats', tituloId: 'titulo-banco-beats', descricao: 'Explore instrumentais, produtores e licenças da cena.',
+      busca: { acao: '/beats', termo: q, limite: 120, rotulo: 'Beatmaker, gênero ou BPM', filtros: { genero, licenca } }
+    }) %>
+    <main class="dc-content" id="conteudo-beats" aria-labelledby="titulo-banco-beats" tabindex="-1">
+      <% if (Object.hasOwn(mensagens, resultado)) { %>
+        <p class="beats-feedback" role="<%= resultado === 'permissao' ? 'alert' : 'status' %>"><%= mensagens[resultado] %></p>
+      <% } %>
+
+      <% if (generos.length || licencas.length || podeCadastrarBeat) { %>
+        <div class="dc-controls beats-controls">
+          <% if (generos.length) { %>
+            <nav class="dc-tabs beats-genres" aria-label="Filtrar beats por gênero">
+              <a href="<%= urlGenero('') %>"<% if (!genero) { %> aria-current="page"<% } %>><span aria-hidden="true"><%- icones.headphones %></span> Todos</a>
+              <% generos.forEach(opcao => { %>
+                <a href="<%= urlGenero(opcao) %>"<% if (opcao === genero) { %> aria-current="page"<% } %>><%= opcao %></a>
+              <% }) %>
+            </nav>
+          <% } %>
+          <% if (licencas.length) { %>
+            <details class="dc-filter beats-license-filter">
+              <summary><span aria-hidden="true"><%- icones.sliders %></span> <%= licenca || 'Licença' %></summary>
+              <form action="/beats">
+                <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+                <% if (genero) { %><input type="hidden" name="genero" value="<%= genero %>"><% } %>
+                <label>Tipo de licença
+                  <select name="licenca">
+                    <option value="">Todas as licenças</option>
+                    <% licencas.forEach(opcao => { %>
+                      <option value="<%= opcao %>"<% if (opcao === licenca) { %> selected<% } %>><%= opcao %></option>
+                    <% }) %>
+                  </select>
+                </label>
+                <button type="submit">Aplicar filtro</button>
+              </form>
+            </details>
+          <% } %>
+          <% if (podeCadastrarBeat) { %>
+            <a class="dc-primary beats-publish" href="/beats/new"><span aria-hidden="true"><%- icones.plus %></span> Cadastrar beat</a>
+          <% } %>
         </div>
-        <span class="beat-number">
-          0<%= i + 1 %>
-        </span>
-        <button class="play-button" type="button" data-toast="Player demonstrativo:<%= beat.title %>" aria-label="Prévia demonstrativa de<%= beat.title %>">
-          <span class="lucide-icon" aria-hidden="true">
-            <%- icones.music %>
-          </span>
-        </button>
-        <% if (beat.demonstracao) { %>
-          <span class="demo-label">
-            DEMO
-          </span>
+      <% } %>
+
+      <% if (destaque) { %>
+        <section class="dc-feature beats-feature" aria-labelledby="titulo-beat-destaque">
+          <div class="dc-slide">
+            <picture><img src="/img/<%= imagemPublicacaoDemo(destaque.id) %>" alt="" decoding="async" fetchpriority="high"></picture>
+            <div class="dc-slide-copy">
+              <span class="dc-stamp">Em destaque</span>
+              <h2 id="titulo-beat-destaque"><%= destaque.title %></h2>
+              <p><%= [destaque.producer, destaque.genre, destaque.bpm && destaque.bpm + '\u00a0BPM'].filter(Boolean).join(' · ') %></p>
+              <%- include('../partials/componentes/abrir-ficha-beat', { beat: destaque, classe: 'dc-primary', icone: 'arrowRight' }) %>
+            </div>
+          </div>
+        </section>
+      <% } %>
+
+      <section aria-labelledby="titulo-catalogo-beats">
+        <header class="dc-heading beats-heading">
+          <h2 id="titulo-catalogo-beats"><%= q ? 'Resultados para “' + q + '”' : 'Catálogo de beats' %></h2>
+          <div class="beats-heading-actions">
+            <span class="cy-count-sticker"><%= beats.length %> <%= beats.length === 1 ? 'beat' : 'beats' %></span>
+            <% if (filtrado) { %><a href="/beats">Limpar filtros <span aria-hidden="true"><%- icones.x %></span></a><% } %>
+          </div>
+        </header>
+
+        <% if (beats.length) { %>
+          <div class="beats-catalog">
+            <% beats.forEach(beat => { const capa = beat.demonstracao && imagemPublicacaoDemo(beat.id); %>
+              <article class="beats-card" id="beat-<%= beat.id %>">
+                <div class="beats-cover">
+                  <% if (capa) { %>
+                    <img src="/img/<%= capa %>" alt="" loading="lazy" decoding="async">
+                  <% } else { %>
+                    <span class="beats-cover-icon" aria-hidden="true"><%- icones.headphones %></span>
+                  <% } %>
+                </div>
+                <div class="beats-card-body">
+                  <h3><%= beat.title %></h3>
+                  <p>
+                    <% if (beat.demoProducerHandle) { %>
+                      <a href="/p/<%= encodeURIComponent(beat.demoProducerHandle.replace(/^@/, '')) %>"><%= beat.producer %></a>
+                    <% } else { %>
+                      <%= beat.producer %>
+                    <% } %>
+                  </p>
+                  <% if (beat.bpm || beat.key || beat.genre) { %>
+                    <ul class="beats-specs">
+                      <% if (beat.bpm) { %><li><span aria-hidden="true"><%- icones.audioLines %></span> <%= beat.bpm %> BPM</li><% } %>
+                      <% if (beat.key) { %><li aria-label="Tom <%= beat.key %>"><span aria-hidden="true"><%- icones.music2 %></span> <%= beat.key %></li><% } %>
+                      <% if (beat.genre) { %><li><%= beat.genre %></li><% } %>
+                    </ul>
+                  <% } %>
+                  <% if (beat.vendaExclusiva || beat.owned) { %>
+                    <div class="beats-badges">
+                      <% if (beat.vendaExclusiva) { %><span class="beats-exclusive">Venda exclusiva</span><% } %>
+                      <% if (beat.owned) { %><span>Seu beat</span><% } %>
+                    </div>
+                  <% } %>
+                  <div class="beats-card-footer">
+                    <span class="beats-license"><span aria-hidden="true"><%- icones.shieldCheck %></span> <%= !beat.license || beat.license === 'Não informada' ? 'Licença não informada' : beat.license %></span>
+                    <%- include('../partials/componentes/abrir-ficha-beat', { beat, classe: 'beats-link', icone: 'arrowUpRight' }) %>
+                  </div>
+                  <% if (beat.owned) { %>
+                    <div class="beats-owner-actions">
+                      <a class="beats-link" href="/beats/<%= encodeURIComponent(beat.id) %>/edit">Editar</a>
+                      <form method="post" action="/beats/<%= encodeURIComponent(beat.id) %>/delete" data-confirm="Excluir este beat do seu catálogo?">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="beats-link beats-delete" type="submit">Excluir</button>
+                      </form>
+                    </div>
+                  <% } %>
+                </div>
+              </article>
+            <% }) %>
+          </div>
         <% } else { %>
-          <span class="demo-label demo-label-real">
-            CYPHER
-          </span>
+          <div class="dc-empty">
+            <%- filtrado ? icones.search : icones.headphones %>
+            <div>
+              <strong><%= filtrado ? 'Nenhum beat encontrado.' : 'Ainda não há beats no catálogo.' %></strong>
+              <% if (filtrado) { %><p>Tente outro termo ou ajuste os filtros.</p><% } %>
+            </div>
+          </div>
         <% } %>
+      </section>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: '/beats' }) %>
+  </div>
+
+  <dialog class="detail-dialog beats-detail" id="detalhe-beat" aria-labelledby="detalhe-beat-titulo">
+    <header class="detail-dialog-header">
+      <span class="dc-stamp">Ficha do beat</span>
+      <button class="icon-button beats-detail-close" type="button" data-dialog-close aria-label="Fechar ficha" autofocus><%- icones.x %></button>
+    </header>
+    <h2 id="detalhe-beat-titulo" data-beat-title-detail></h2>
+    <p class="beats-detail-producer">Produzido por <strong data-beat-producer-detail></strong></p>
+    <span class="beats-exclusive" data-beat-exclusive-detail hidden>Venda exclusiva</span>
+
+    <dl class="beats-facts">
+      <div><dt>Andamento</dt><dd data-beat-bpm-detail></dd></div>
+      <div><dt>Tom</dt><dd data-beat-key-detail></dd></div>
+      <div><dt>Gênero</dt><dd data-beat-genre-detail></dd></div>
+      <div><dt>Duração</dt><dd data-beat-duration-detail></dd></div>
+    </dl>
+
+    <section class="beats-detail-section">
+      <h3>Sobre o beat</h3>
+      <p data-beat-description-detail></p>
+    </section>
+
+    <section class="beats-license-note">
+      <span class="beats-license-icon" aria-hidden="true"><%- icones.shieldCheck %></span>
+      <div>
+        <h3>Licença</h3>
+        <strong data-beat-license-detail></strong>
+        <p data-beat-usage-detail></p>
       </div>
-      <div class="beat-card-content">
-        <div class="beat-title-row">
-          <div>
-            <h3>
-              <%= beat.title %>
-            </h3>
-            <p>
-              por<%= beat.producer %>
-            </p>
-          </div>
-          <% if (beat.owned) { %>
-            <span class="beat-owner-badge">
-              SEU BEAT
-            </span>
-          <% } %>
-          <% if (beat.vendaExclusiva) { %>
-            <span class="beat-exclusive-badge">
-              VENDA EXCLUSIVA
-            </span>
-          <% } %>
-        </div>
-        <div class="beat-specs">
-          <span>
-            <i class="lucide-icon" aria-hidden="true">
-              <%- icones.audioLines %>
-            </i>
-            <%= beat.bpm %>
-          </span>
-          <span>
-            <i class="lucide-icon" aria-hidden="true">
-              <%- icones.music2 %>
-            </i>
-            <%= beat.key %>
-          </span>
-          <span>
-            <%= beat.genre %>
-          </span>
-        </div>
-        <div class="beat-bottom">
-          <span class="license license-<%= beat.color %>">
-            <%= beat.license %>
-          </span>
-          <div class="beat-actions">
-            <button class="text-link" type="button" data-beat-detail data-beat-title="<%= beat.title %>" data-beat-producer="<%= beat.producer %>" data-beat-bpm="<%= beat.bpm %>" data-beat-key="<%= beat.key %>" data-beat-genre="<%= beat.genre %>" data-beat-license="<%= beat.license %>" data-beat-duration="<%= beat.duration %>" data-beat-description="<%= beat.description %>" data-beat-usage="<%= beat.usage %>" data-beat-ofertas="<%= encodeURIComponent(JSON.stringify(beat.ofertas)) %>" data-beat-exclusive="<%= beat.vendaExclusiva ? 'true' : 'false' %>">
-              Ver detalhe
-              <span class="lucide-icon" aria-hidden="true">
-                <%- icones.arrowUpRight %>
-              </span>
-            </button>
-            <% if (beat.owned) { %>
-              <a class="text-link" href="/beats/<%= encodeURIComponent(beat.id) %>/edit">
-                Editar
-              </a>
-              <form method="post" action="/beats/<%= encodeURIComponent(beat.id) %>/delete" class="inline-form" data-confirm="Excluir este beat do seu catálogo?">
-                <button class="text-link danger-link" type="submit">
-                  Excluir
-                </button>
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-            <% } %>
-          </div>
-        </div>
-      </div>
-    </article>
-  <% }) %>
+    </section>
+
+    <section class="beats-detail-section">
+      <h3>Ofertas disponíveis</h3>
+      <div data-beat-ofertas-detail></div>
+    </section>
+  </dialog>
 </div>
-</div>
-</main>
-</div>
-<dialog class="detail-dialog beat-detail-dialog" id="detalhe-beat" aria-labelledby="detalhe-beat-titulo">
-<div class="detail-dialog-header">
-<span class="beat-exclusive-detail" data-beat-exclusive-detail hidden>
-VENDA EXCLUSIVA
-</span>
-<span class="detail-kicker">
-FICHA DO BEAT
-</span>
-<button class="icon-button detail-close" type="button" data-dialog-close aria-label="Fechar detalhe">
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.x %>
-</span>
-</button>
-</div>
-<h2 id="detalhe-beat-titulo" data-beat-title-detail>
-</h2>
-<p class="beat-detail-producer">
-Produzido por
-<strong data-beat-producer-detail>
-</strong>
-</p>
-<div class="detail-facts work-detail-facts">
-<div>
-<small>
-  ANDAMENTO
-</small>
-<b data-beat-bpm-detail>
-</b>
-</div>
-<div>
-<small>
-  TOM
-</small>
-<b data-beat-key-detail>
-</b>
-</div>
-<div>
-<small>
-  GÊNERO
-</small>
-<b data-beat-genre-detail>
-</b>
-</div>
-<div>
-<small>
-  DURAÇÃO
-</small>
-<b data-beat-duration-detail>
-</b>
-</div>
-</div>
-<section class="detail-section">
-<h3>
-Sobre o beat
-</h3>
-<p data-beat-description-detail>
-</p>
-</section>
-<div class="license-note">
-<span class="lucide-icon" aria-hidden="true">
-<%- icones.shieldCheck %>
-</span>
-<p>
-<strong data-beat-license-detail>
-</strong>
-<br>
-<span data-beat-usage-detail>
-</span>
-</p>
-</div>
-<section class="detail-section">
-<h3>
-Ofertas disponíveis
-</h3>
-<div data-beat-ofertas-detail>
-</div>
-</section>
-<div class="detail-actions">
-<button class="button button-dark" type="button" data-toast="Solicitação de contato demonstrativa">
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.user %>
-</span>
-Falar com produtor
-</button>
-<button class="button button-outline" type="button" data-toast="Prévia demonstrativa, sem arquivo de áudio">
-<span class="lucide-icon" aria-hidden="true">
-  <%- icones.headphones %>
-</span>
-Ouvir prévia
-</button>
-</div>
-</dialog>
 <%- include('../partials/fim-pagina') %>

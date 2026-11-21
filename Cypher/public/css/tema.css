@@ -32,11 +32,6 @@
   --input: var(--line);
 }
 
-.dark body {
-  background: var(--paper);
-  color: var(--ink);
-}
-
 .dark .breadcrumbs strong,
 .dark .page-header h1,
 .dark .section-heading h2,
@@ -150,7 +145,6 @@
 
 /* Auditoria dark — superfícies e componentes harmonizados */
 .dark .app-shell {
-  background: var(--paper);
   color: var(--ink);
 }
 
@@ -275,7 +269,7 @@
   box-shadow: 0 9px 18px rgba(0, 0, 0, 0.25);
 }
 
-.dark .stat-white,
+
 .dark .card-surface,
 .dark .profile-card,
 .dark .event-card,
@@ -290,17 +284,12 @@
   background: #1a2118;
 }
 
-.dark .stat-white {
-  color: var(--ink);
-}
 
-.dark .card-heading > svg,
-.dark .event-row > svg {
+.dark .card-heading > svg {
   color: #8c9b88;
 }
 
-.dark .event-row,
-.dark .person-row,
+
 .dark .card-footer-link,
 .dark .work-row,
 .dark .beat-bottom {
@@ -569,7 +558,7 @@
   background: #18241a;
 }
 
-.dark .accent-note,
+
 .dark .event-side,
 .dark .work-overview-card.dark,
 .dark .beat-art-black,
@@ -602,34 +591,11 @@
   color: #9cae99;
 }
 
-.dark .hero-card h2 span {
-  color: #10140f;
-}
 
-.dark .lime-card {
-  color: #10140f;
-}
 
-.dark .lime-card .hero-card h2,
-.dark .lime-card .hero-card h2 span,
-.dark .lime-card h2,
-.dark .lime-card h2 span {
-  color: #10140f;
-}
 
-.dark .lime-card p,
-.dark .lime-card .cycle-stamp strong {
-  color: rgba(16, 20, 15, 0.72);
-}
 
-.dark .lime-card .cycle-stamp {
-  border-color: rgba(16, 20, 15, 0.24);
-}
 
-.dark .lime-card .cycle-stamp > span {
-  color: #c8f22b;
-  background: #10140f;
-}
 
 .dark .topbar-avatar,
 .dark .avatar,
@@ -642,22 +608,13 @@
   background: linear-gradient(135deg, #8b6d10 0%, #477c28 54%, #1e4f2a 100%);
 }
 
-.dark .date-tile {
-  color: #f4faef;
-  background: linear-gradient(135deg, #8b6d10 0%, #477c28 54%, #1e4f2a 100%);
-}
 
-.dark .stat-yellow,
+
 .dark .band-yellow,
 .dark .date-yellow {
   color: #10140f;
 }
 
-.dark .date-tile.date-yellow,
-.dark .date-tile.date-green,
-.dark .date-tile.date-cream {
-  color: #f4faef;
-}
 
 .dark .profile-card-top.tone-cream,
 .dark .tone-cream {
@@ -683,10 +640,6 @@
   color: #10140f;
 }
 
-.dark .sidebar .workspace-select,
-.dark .sidebar .workspace-chip {
-  color: #b9c9b3;
-}
 
 .dark .sidebar .status-trigger small {
   color: #9aaa95;
@@ -786,13 +739,9 @@
 }
 
 /* Auth theme harmony — registration categories and panel adapt together */
-.dark .auth-page {
-  background: #0f150f;
-}
-
 .dark .auth-art {
   color: #eef5ea;
-  background: #0a100b;
+  background: color-mix(in srgb, var(--auth-art-bg) 56%, transparent);
 }
 
 .dark .auth-panel {
@@ -881,7 +830,6 @@
 html,
 body,
 #root {
-  background: var(--bg-primary);
   color: var(--text-primary);
   transition:
     background-color 0.22s ease,
@@ -890,7 +838,6 @@ body,
 
 /* Login / registration: both columns follow the global theme */
 .auth-page {
-  background: var(--bg-primary);
   color: var(--text-primary);
   transition:
     background-color 0.22s ease,
@@ -1580,4 +1527,114 @@ body,
 
 .dark .category-approval-note {
   color: #b7c7b0;
+}
+
+/* Switch de tema compartilhado — Claro/Escuro, sem modificar as paletas. */
+.entry-theme {
+  display: flex;
+  justify-self: center;
+  z-index: 3;
+  margin: 5px 0 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.entry-theme .theme-switch {
+  --switch-track: #e7e5d3;
+  --switch-border: #74865b;
+  --switch-mark: #526837;
+  --switch-icon: #435f26;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 3.5em;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: 400 17px/1 "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.dark .entry-theme .theme-switch {
+  --switch-track: #171717;
+  --switch-border: #91a173;
+  --switch-mark: #efcd52;
+  --switch-icon: #c4df8b;
+}
+.entry-theme .theme-switch > input {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.entry-theme .theme-switch__slider {
+  position: absolute;
+  inset: 5px 0;
+  overflow: hidden;
+  border: 1px solid var(--switch-border);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--switch-icon);
+  background: var(--switch-track);
+  box-shadow: inset 2px 5px 10px #00000035, 1px 2px 0 #080f0b35;
+  pointer-events: none;
+  transition: background-color .4s ease, border-color .4s ease;
+}
+.entry-theme .theme-switch__slider::before {
+  position: absolute;
+  content: "";
+  left: .3em;
+  bottom: .3em;
+  width: .1em;
+  height: 1.4em;
+  background: var(--switch-mark);
+  transition: transform .4s ease, background-color .4s ease;
+}
+.entry-theme .theme-switch__slider > span {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  transition: opacity .4s ease;
+}
+.entry-theme .theme-switch__slider svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+.entry-theme .theme-switch__sun { left: .6em; }
+.entry-theme .theme-switch__moon { right: .6em; opacity: .4; }
+.entry-theme .theme-switch > input:checked + .theme-switch__slider {
+  box-shadow: inset 2px 5px 10px #000000d9, 1px 2px 0 #080f0b35;
+}
+.entry-theme .theme-switch > input:checked + .theme-switch__slider::before {
+  transform: translateX(2.8em) rotate(360deg);
+}
+.entry-theme .theme-switch > input:checked + .theme-switch__slider .theme-switch__sun { opacity: .4; }
+.entry-theme .theme-switch > input:checked + .theme-switch__slider .theme-switch__moon { opacity: 1; color: var(--switch-mark); }
+.entry-theme .theme-switch > input:focus-visible { outline: none; }
+.entry-theme .theme-switch > input:focus-visible + .theme-switch__slider {
+  outline: 2px solid var(--switch-mark);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .entry-theme .theme-switch:hover .theme-switch__slider { border-color: var(--switch-mark); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .entry-theme .theme-switch__slider,
+  .entry-theme .theme-switch__slider::before,
+  .entry-theme .theme-switch__slider > span { transition: none; }
+}
+@media (forced-colors: active) {
+  .entry-theme .theme-switch__slider { color: CanvasText; background: Canvas; border-color: CanvasText; box-shadow: none; }
+  .entry-theme .theme-switch__slider::before { background: Highlight; }
+  .entry-theme .theme-switch > input:focus-visible + .theme-switch__slider { outline-color: Highlight; }
+  .entry-theme .theme-switch > input:checked + .theme-switch__slider { border-color: Highlight; }
 }

@@ -1,9 +1,23 @@
+import { temaEventoDisponivel } from "../models/temasEvento.js";
+
 export const categoriasEvento = [
   "Batalha",
   "Cypher",
   "Workshop",
   "Show",
   "Outro",
+] as const;
+
+export const tiposWorkshop = [
+  "Danças urbanas",
+  "MC e composição de rap",
+  "Grafite e arte urbana",
+  "DJ e produção musical",
+  "História, cultura e gestão",
+  "Beatbox e Percussão Vocal",
+  "Moda, Customização e Cultura Sneaker",
+  "Slam e Poesia Falada",
+  "Skate e Esportes Urbanos",
 ] as const;
 
 export const situacoesEvento = [
@@ -28,12 +42,14 @@ export type ValoresFormularioEvento = {
   titulo: string;
   categoria: string;
   categoriaDetalhe: string;
+  tiposWorkshop: string[];
   data: string;
   horario: string;
   local: string;
   organizador: string;
   situacao: string;
   cor: string;
+  temaCartao: string;
   descricao: string;
   formato: string;
   inscricao: string;
@@ -69,6 +85,15 @@ export function validarFormularioEvento(
         valores.categoriaDetalhe.length < 2))
   )
     return "Especifique a categoria do evento em 2 a 80 caracteres.";
+  if (
+    valores.categoria === "Workshop" &&
+    (!valores.tiposWorkshop.length ||
+      new Set(valores.tiposWorkshop).size !== valores.tiposWorkshop.length ||
+      valores.tiposWorkshop.some(
+        tipo => !tiposWorkshop.includes(tipo as (typeof tiposWorkshop)[number])
+      ))
+  )
+    return "Selecione pelo menos um tipo de workshop válido.";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(valores.data))
     return "Informe uma data válida para o evento.";
   const data = new Date(`${valores.data}T00:00:00Z`);
@@ -90,6 +115,8 @@ export function validarFormularioEvento(
     return "Selecione como a participação funcionará neste evento.";
   if (!coresEvento.includes(valores.cor as (typeof coresEvento)[number]))
     return "Selecione uma cor válida para o evento.";
+  if (!temaEventoDisponivel(valores.temaCartao))
+    return "Selecione um tema disponível para o cartão do evento.";
   if (valores.descricao.length > 1000)
     return "A descrição deve ter no máximo 1.000 caracteres.";
   if (valores.formato.length < 2 || valores.formato.length > 120)

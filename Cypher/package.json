@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/src/aplicacao.js",
     "check": "tsc --noEmit",
+    "seed:catalog": "node --import tsx scripts/inserir-catalogo-demonstrativo.mjs",
     "test:db": "node scripts/testar-banco.mjs && node scripts/testar-politicas-perfil.mjs",
     "test:admin-ui": "node scripts/testar-admin-ui.mjs",
     "test:catalog": "npm run build && node scripts/testar-catalogo-profissional.mjs",

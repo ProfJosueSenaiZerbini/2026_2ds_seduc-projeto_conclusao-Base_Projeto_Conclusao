@@ -1,0 +1,76 @@
+.work-form .event-theme-fieldset {
+  min-inline-size: 0;
+}
+
+.event-theme-fieldset legend {
+  padding-inline: 8px;
+  font-weight: 700;
+}
+
+.event-theme-options.dc-shell {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+  min-height: 0;
+}
+
+.event-theme-option {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid var(--dc-line);
+  border-radius: 4px 8px 3px 7px;
+  background: var(--dc-surface);
+}
+
+.event-theme-option:has(:checked) {
+  border-color: var(--dc-olive);
+  outline: 1px solid var(--dc-olive);
+}
+
+.work-form .event-theme-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px;
+  color: var(--dc-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.work-form .event-theme-choice input {
+  flex: 0 0 auto;
+  width: 18px;
+  min-height: 0;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--dc-accent);
+}
+
+.event-theme-choice small {
+  display: block;
+  color: var(--dc-muted);
+}
+
+.event-theme-preview {
+  margin: auto 10px 10px;
+}
+
+.event-theme-preview .events-card-placeholder[data-event-theme="classico"] {
+  background:
+    url("marcas-acrilico.svg") top left / 140px auto no-repeat,
+    var(--dc-art);
+}
+
+.event-theme-preview .events-cover-icon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: var(--dc-accent);
+}
+
+.event-theme-preview .dc-event-title {
+  font-size: clamp(20px, 3vw, 28px);
+}

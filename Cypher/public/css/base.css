@@ -33,15 +33,36 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--mural-base);
 }
 
 body {
   margin: 0;
-  background: var(--paper);
+  isolation: isolate;
+  min-height: 100svh;
   color: var(--ink);
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
+}
+
+/* O mural acompanha a janela, inclusive nas páginas que rolam internamente. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--mural-contraste), var(--mural-imagem);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 600px) {
+  body::before {
+    background-position: center, 22% center;
+  }
 }
 
 button,
@@ -220,14 +241,6 @@ textarea {
   font-weight: 500;
 }
 
-.lime-card {
-  position: relative;
-  color: var(--ink);
-  background: var(--lime);
-  background-image:
-    radial-gradient(circle at 96% 6%, rgba(255, 213, 41, 0.7), transparent 26%),
-    linear-gradient(125deg, transparent 50%, rgba(255, 255, 255, 0.13) 50%);
-}
 
 .section-heading {
   display: flex;
@@ -236,11 +249,6 @@ textarea {
   margin: 62px 0 20px;
 }
 
-.attention-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
 
 .row-info {
   flex: 1;

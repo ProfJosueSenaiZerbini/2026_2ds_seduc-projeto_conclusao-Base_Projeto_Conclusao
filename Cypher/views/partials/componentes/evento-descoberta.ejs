@@ -1,0 +1,78 @@
+<%
+  const ficha = typeof evento !== 'undefined' && evento;
+  const amostra = typeof previa !== 'undefined' && previa;
+  const elemento = amostra ? 'div' : ficha ? 'button' : 'a';
+  const capaVazia = (ficha || amostra) && !item.fotoDestaque;
+  const metadados = [item.autor, item.local, item.hora, item.status].filter(Boolean);
+  const cartazWorkshop = item.temaCartao === 'cartaz-de-rua' && item.categoria === 'Workshop';
+  const tiposWorkshop = item.workshopTypes?.length
+    ? item.workshopTypes
+    : String(item.tipo || '').replace(/^Workshop\s*·\s*/, '').split(' · ').filter(tipo => tipo && tipo !== 'Workshop');
+%>
+<div class="dc-event-frame">
+  <<%= elemento %> class="dc-event-card<%= capaVazia ? ' events-card-placeholder' : '' %>"
+    data-event-theme="<%= item.temaCartao ?? 'classico' %>"
+    data-event-category="<%= item.categoria %>"
+    <% if (item.fotoDestaque) { %>data-event-cover data-event-cover-src="/img/descoberta/<%= item.fotoDestaque %>" style="--dc-event-photo: url('/img/descoberta/<%= item.fotoDestaque %>')"<% } %>
+    <% if (ficha) { %>
+      type="button"
+      id="evento-<%= ficha.id %>"
+      aria-haspopup="dialog"
+      aria-controls="detalhe-oportunidade"
+      data-event-card
+      data-detail-id="<%= ficha.id %>"
+      data-detail-owned="<%= ficha.owned %>"
+      data-detail-demonstracao="<%= ficha.demonstracao %>"
+      data-detail-interest-status="<%= ficha.interesseStatus ?? '' %>"
+      data-detail-participation-type="<%= ficha.participationType %>"
+      data-detail-total-interested="<%= ficha.totalInteressados %>"
+      data-detail-interested="<%= encodeURIComponent(JSON.stringify(ficha.interessados)) %>"
+      data-detail-title="<%= ficha.title %>"
+      data-detail-category="<%= ficha.category %>"
+      data-detail-category-detail="<%= ficha.categoryDetail %>"
+      data-detail-workshop-types="<%= (ficha.workshopTypes ?? []).join('|') %>"
+      data-detail-date="<%= ficha.date %>"
+      data-detail-time="<%= ficha.time %>"
+      data-detail-location="<%= ficha.location %>"
+      data-detail-org="<%= ficha.org %>"
+      data-detail-status="<%= ficha.status %>"
+      data-detail-description="<%= ficha.description %>"
+      data-detail-format="<%= ficha.format %>"
+      data-detail-registration="<%= ficha.registration %>"
+      data-detail-prize="<%= ficha.prize %>"
+      data-detail-tags="<%= ficha.tags.join('|') %>"
+    <% } else if (!amostra) { %>href="<%= item.url %>"<% } %>
+  >
+    <% if (capaVazia) { %>
+      <span class="events-cover-icon" aria-hidden="true"><%- icones.calendarDays %></span>
+    <% } %>
+    <% if (item.dia && item.mes) { %>
+      <time class="dc-event-date" datetime="<%= item.data %>" aria-label="<%= item.dataCurta %>">
+        <span aria-hidden="true"><%= item.mes %></span>
+        <strong aria-hidden="true"><%= item.dia %></strong>
+        <span class="dc-event-countdown" role="tooltip" hidden></span>
+      </time>
+    <% } else { %>
+      <% if (ficha) { %>
+        <span class="dc-event-date events-date-pending">A confirmar</span>
+      <% } else { %>
+        <span class="dc-event-date" role="img" aria-label="Data a confirmar"><%- icones.calendarDays %></span>
+      <% } %>
+    <% } %>
+    <span class="dc-event-body">
+      <% if (ficha || amostra || item.temaCartao === 'cartaz-de-rua') { %><span class="events-card-accent band-<%= ficha ? ficha.color : item.cor || 'yellow' %>" aria-hidden="true"></span><% } %>
+      <span class="dc-event-copy">
+        <span class="dc-event-heading">
+          <span class="dc-event-type"><%= cartazWorkshop ? 'Workshop' : item.tipo %></span>
+          <% if (item.temaCartao === 'cartaz-de-rua') { %><span class="dc-event-workshop-category"<%= cartazWorkshop ? '' : ' hidden' %>><%= tiposWorkshop.join(' · ') || 'Categoria do workshop' %></span><% } %>
+          <strong class="dc-event-title"><%= item.titulo %></strong>
+        </span>
+        <% if (metadados.length) { %>
+          <span class="dc-event-meta"><%= metadados.join(' · ') %></span>
+        <% } %>
+        <% if (item.descricao) { %><span class="dc-event-description"><%= item.descricao %></span><% } %>
+        <span class="dc-event-action">Ver evento <%- icones.arrowUpRight %></span>
+      </span>
+    </span>
+  </<%= elemento %>>
+</div>

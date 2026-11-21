@@ -1,0 +1,5 @@
+<%- include('../partials/inicio-trabalhos', { breadcrumb:'Criar obra' }) %>
+<a class="et-back" href="/espaco-de-trabalho"><%- icones.arrowLeft %> Voltar ao Espaço de Trabalho</a>
+<div class="et-heading"><h1>Criar obra</h1><p>Escolha o formato que deseja cadastrar.</p></div>
+<div class="et-formats"><% tipos.forEach(tipo => { %><a href="/works/new?tipo=<%= encodeURIComponent(tipo) %>&amp;origem=espaco"><%- icones[tipo === 'Instrumental' ? 'audioLines' : 'fileMusic'] %><strong><%= tipo %></strong><%- icones.arrowRight %></a><% }) %></div>
+<%- include('../partials/fim-trabalhos') %>

@@ -1,5 +1,5 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<link rel="stylesheet" href="/css/entrada.css"><main class="tag-page"><a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell"><section class="tag-panel auth-panel"><h1>Vamo movimentar essa <em class="login-cena">cena</em></h1><%- include('../partials/componentes/olhos-senha') %><% if (mensagem) { %>
+<link rel="stylesheet" href="/css/entrada.css"><main class="tag-page entrada-cypher"><a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell"><section class="tag-panel auth-panel"><h1>Vamo movimentar essa <em class="login-cena">cena</em></h1><%- include('../partials/componentes/olhos-senha') %><% if (mensagem) { %>
       <p class="auth-message auth-message-success" role="status">
         <%= mensagem %>
       </p>
@@ -11,8 +11,8 @@
     <% } %>
     <form method="post" action="/login">
       <label>
-        E-mail
-        <input type="email" name="email" value="<%= email ?? '' %>" placeholder="voce@email.com" autocomplete="email" required>
+        E-mail ou usuário
+        <input type="text" name="identificador" value="<%= email ?? '' %>" placeholder="voce@email.com ou @usuario" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required>
       </label>
       <label>
         Senha

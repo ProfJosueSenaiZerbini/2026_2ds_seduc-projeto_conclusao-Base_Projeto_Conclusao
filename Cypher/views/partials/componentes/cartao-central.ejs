@@ -1,0 +1,15 @@
+<% if (href) { %>
+<a class="central-glass-card" href="<%= href %>">
+<% } else { %>
+<article class="central-glass-card" tabindex="0">
+<% } %>
+  <span class="central-glass-top">
+    <span class="central-glass-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <small><%= rotulo %></small>
+  </span>
+  <h3><%= titulo %></h3>
+  <div class="central-glass-reveal"><p><%= descricao %></p></div>
+  <% if (href) { %>
+    <span class="central-glass-link">Ler na Central <%- icones.arrowRight %></span>
+  <% } %>
+<% if (href) { %></a><% } else { %></article><% } %>

@@ -136,7 +136,7 @@
       <div class="eyebrow">
         CATÁLOGO
       </div>
-      <a href="/works" class="button button-outline profile-catalog-link">
+      <a href="/espaco-de-trabalho?secao=proprios" class="button button-outline profile-catalog-link">
         Ver catálogo <span class="lucide-icon" aria-hidden="true"><%- icones.arrowUpRight %></span>
       </a>
     </div>
@@ -145,11 +145,10 @@
     <% if (obras.length) { %>
       <div class="profile-work-grid">
       <% obras.slice(0, 4).forEach((obra, i) => { %>
-        <a class="profile-work-card" href="/works" aria-label="Abrir catálogo: <%= obra.title %>">
+        <a class="profile-work-card" href="/espaco-de-trabalho/obra/<%= encodeURIComponent(obra.id) %>" aria-label="Abrir ficha: <%= obra.title %>">
           <span class="profile-work-art profile-work-art-<%= i %>" aria-hidden="true"><span><%= String(obra.type || 'OBRA').slice(0, 2).toLocaleUpperCase('pt-BR') %></span><i> CYPHER </i></span>
           <span class="profile-work-title"><%= obra.title %></span>
           <span class="profile-work-meta"><%= obra.type %><%= obra.typeDetail ? ` · ${obra.typeDetail}` : '' %><%= obra.meta ? ` · ${obra.meta}` : '' %></span>
-          <span class="profile-work-status<%= obra.status === 'Lançado' ? ' is-released' : '' %>"><%= obra.status %></span>
           <% if (obra.role) { %><span class="profile-work-credit"><%= obra.role %><%= obra.roleDetail ? ` · ${obra.roleDetail}` : '' %></span><% } %>
         </a>
       <% }) %>

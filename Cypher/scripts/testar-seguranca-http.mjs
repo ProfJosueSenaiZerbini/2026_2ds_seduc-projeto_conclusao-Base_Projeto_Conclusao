@@ -1,3 +1,4 @@
+import { verificarEspacoTrabalho } from "./verificar-espaco-trabalho.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -346,6 +347,7 @@ try {
       .get().total,
     0
   );
+  await verificarEspacoTrabalho({ request, banco:b, rapper, letrista, consumidor });
   b.fecharBancoCypher();
   console.log(
     "OK: HTTP compilado, CSRF, limite de login, permissões contextuais, consumidor privado, sessões separadas, RBAC e equipe sem perfil público."

@@ -1,0 +1,300 @@
+/* Ficha da agenda, com os mesmos materiais do Banco de Beats. */
+.dc-shell dialog.ficha-evento {
+  width: min(540px, 100vw);
+  padding: 24px clamp(16px, 4vw, 38px) 32px;
+  border-left: 1px solid var(--dc-line);
+  color: var(--dc-ink);
+  background:
+    url("marcas-acrilico.svg") top left / 180px auto no-repeat,
+    var(--dc-panel),
+    var(--dc-surface);
+  overflow-wrap: anywhere;
+}
+
+.ficha-evento .event-detail-close {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--dc-line);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-accent);
+  background: var(--dc-card);
+}
+
+.ficha-evento .event-detail-close:hover {
+  border-color: var(--dc-olive);
+  background: var(--dc-hover);
+}
+
+.dc-shell .ficha-evento h2 {
+  margin-block: 20px 16px;
+  color: var(--dc-ink);
+  line-height: 1.1;
+}
+
+.event-detail-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--dc-line);
+}
+
+.event-detail-tabs:not(:has([data-event-detail-tab="gestao"]:not([hidden]))) {
+  display: none;
+}
+
+.event-detail-tabs button {
+  min-height: 44px;
+  padding: 0 2px;
+  border-bottom: 2px solid transparent;
+  color: var(--dc-muted);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.event-detail-tabs button:is(:hover, .is-active) {
+  color: var(--dc-ink);
+}
+
+.event-detail-tabs button.is-active {
+  border-bottom-color: var(--dc-olive);
+}
+
+.event-detail-meta {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--dc-muted);
+  font-size: 14px;
+}
+
+.event-detail-meta li,
+.event-detail-facts dt {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.event-detail-meta [aria-hidden],
+.event-detail-facts dt [aria-hidden] {
+  display: inline-flex;
+  color: var(--dc-accent);
+}
+
+[data-event-date-detail]:not(:empty)
+  + [data-event-time-detail]:not(:empty)::before {
+  content: " · ";
+}
+
+.event-detail-meta
+  li:has(
+    > :is(
+        [data-event-org-detail],
+        [data-event-location-detail],
+        [data-event-status-detail]
+      ):empty
+  ),
+.event-detail-meta
+  li:has([data-event-date-detail]:empty):has([data-event-time-detail]:empty),
+.event-detail-section:has(p:empty),
+.event-detail-facts:not(:has(dd:not(:empty))),
+.event-detail-facts > div:has(dd:empty),
+.event-detail-tags:empty {
+  display: none;
+}
+
+.event-detail-section,
+.event-detail-facts,
+.event-detail-tags {
+  margin: 20px 0 0;
+}
+
+.dc-shell .event-detail-section h3 {
+  margin-bottom: 6px;
+  font:
+    700 17px/1.2 "Space Grotesk",
+    sans-serif;
+}
+
+.event-detail-section p {
+  color: var(--dc-muted);
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.event-detail-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr));
+  gap: 8px;
+}
+
+.event-detail-facts > div,
+.event-interested-list {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--dc-line);
+  border-radius: 2px 5px 1px 4px;
+  background: var(--dc-card);
+}
+
+.event-detail-facts dt {
+  color: var(--dc-muted);
+  font-size: 13px;
+}
+
+.event-detail-facts dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.event-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.event-detail-tags > span {
+  padding: 4px 8px;
+  border: 1px solid var(--dc-line);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-muted);
+  background: var(--dc-field);
+  font-size: 12px;
+}
+
+.dc-shell .ficha-evento p:is(.event-detail-count, .event-detail-notice) {
+  margin-top: 16px;
+  color: var(--dc-muted);
+  font-size: 13px;
+}
+
+.event-detail-notice {
+  padding: 9px 12px;
+  border-left: 2px solid var(--dc-olive);
+  border-radius: 0 5px 1px 0;
+  background: var(--dc-card);
+}
+
+.event-detail-actions,
+.event-owner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.event-detail-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dc-line);
+}
+
+.event-detail-actions > * {
+  flex: 1 1 165px;
+}
+
+.dc-shell .ficha-evento .button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 2px 5px 1px 4px;
+  font-size: 13px;
+  white-space: normal;
+}
+
+.ficha-evento .button [aria-hidden] {
+  display: inline-flex;
+}
+
+.dc-shell .ficha-evento .button-lime {
+  width: 100%;
+  border: 1px solid var(--dc-olive);
+  color: var(--dc-button-ink);
+  background:
+    url("marcas-botao.svg") top left / 140px 48px no-repeat,
+    var(--dc-button);
+}
+
+.ficha-evento .button-lime:not(:disabled):hover {
+  filter: brightness(1.12);
+}
+
+.dc-shell .ficha-evento .button-lime:disabled {
+  border-color: var(--dc-line);
+  color: var(--dc-muted);
+  background: var(--dc-field);
+  box-shadow: none;
+  cursor: default;
+}
+
+.dc-shell .ficha-evento .button-outline {
+  border: 1px solid var(--dc-line);
+  color: var(--dc-accent);
+  background: var(--dc-card);
+}
+
+.dc-shell .ficha-evento .button-outline:hover {
+  border-color: var(--dc-olive);
+  background: var(--dc-hover);
+}
+
+.dc-shell .ficha-evento .danger-button {
+  color: #8c3a30;
+}
+
+.dark .dc-shell .ficha-evento .danger-button {
+  color: #f4a795;
+}
+
+.event-interested-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.event-interested-list p,
+.event-interested-row small {
+  color: var(--dc-muted);
+  font-size: 13px;
+}
+
+.event-interested-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--dc-line);
+}
+
+.event-interested-row > span {
+  display: grid;
+}
+
+.event-interested-row form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.event-interested-row select {
+  min-width: 0;
+  min-height: 40px;
+  padding-inline: 8px;
+  border: 1px solid var(--dc-line);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-ink);
+  background: var(--dc-field);
+  font-size: 13px;
+}
+
+.ficha-evento .event-interested-row .text-link {
+  min-height: 40px;
+  color: var(--dc-accent);
+  font-size: 13px;
+}

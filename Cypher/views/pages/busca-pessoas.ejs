@@ -94,58 +94,13 @@
 <% if (pessoas.length) { %>
   <div class="people-grid">
     <% pessoas.forEach(pessoa => { %>
-      <article class="profile-card">
-        <div class="profile-card-top tone-<%= pessoa.tone %>">
-          <div class="avatar avatar-<%= pessoa.tone %>">
-            <%= pessoa.initials %>
-          </div>
-          <span class="availability status-<%= pessoa.statusClass %>" title="<%= pessoa.availabilityLabel %>">
-            <i aria-hidden="true">
-            </i>
-            <%= pessoa.availabilityLabel %>
-          </span>
-        </div>
-        <div class="profile-card-body">
-          <h3>
-            <a href="/p/<%= encodeURIComponent(pessoa.publicSlug) %>">
-              <%= pessoa.name %>
-            </a>
-          </h3>
-          <p class="role-line">
-            <%= pessoa.role %>
-          </p>
-          <% if (pessoa.city) { %>
-            <div class="profile-detail">
-              <span class="lucide-icon" aria-hidden="true">
-                <%- icones.mapPin %>
-              </span>
-              <%= pessoa.city %>
-            </div>
-          <% } %>
-          <% if (pessoa.categoryLabels.length || pessoa.genres.length) { %>
-            <div class="tag-line" aria-label="Categorias e gêneros musicais">
-              <% pessoa.categoryLabels.slice(0, 2).forEach(categoria => { %>
-                <span>
-                  <%= categoria %>
-                </span>
-              <% }) %>
-              <% pessoa.genres.slice(0, 2).forEach(genero => { %>
-                <span>
-                  <%= genero %>
-                </span>
-              <% }) %>
-            </div>
-          <% } %>
-          <div class="profile-card-actions">
-            <a class="button button-dark small" href="/p/<%= encodeURIComponent(pessoa.publicSlug) %>">
-              Ver perfil
-              <span class="lucide-icon" aria-hidden="true">
-                <%- icones.arrowUpRight %>
-              </span>
-            </a>
-          </div>
-        </div>
-      </article>
+      <%- include('../partials/componentes/cartao-profissional', {
+        perfil: {
+          nome: pessoa.name, handle: pessoa.handle, funcao: pessoa.role, iniciais: pessoa.initials,
+          local: pessoa.city, detalhes: pessoa.genres, status: pessoa.availabilityLabel,
+          url: '/p/' + encodeURIComponent(pessoa.publicSlug)
+        }
+      }) %>
     <% }) %>
   </div>
 <% } else { %>

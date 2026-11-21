@@ -1,0 +1,22 @@
+<%
+  const profissional = usuario.tipoConta === 'profissional' && !usuario.demonstracao;
+  const destinos = [
+    { href: '/dashboard', nome: 'Descoberta', icone: 'house' },
+    { href: '/works', nome: 'Obras', icone: 'music' },
+    profissional
+      ? { href: '/espaco-de-trabalho', nome: 'Trabalho', icone: 'briefcase' }
+      : { href: '/beats', nome: 'Beats', icone: 'headphones' },
+    { href: '/events', nome: 'Eventos', icone: 'calendarDays' },
+    { href: '/profile', nome: 'Perfil', icone: 'user' },
+  ];
+  const ativo = destinos.findIndex(destino => destino.href === rotaAtual);
+%>
+<nav class="dc-bottom" aria-label="Navegação rápida" style="--dc-nav-current: <%= ativo %>">
+  <% destinos.forEach((destino, indice) => { %>
+    <a href="<%= destino.href %>"<% if (indice === ativo) { %> aria-current="page"<% } %>>
+      <span aria-hidden="true"><%- icones[destino.icone] %></span>
+      <%= destino.nome %>
+    </a>
+  <% }) %>
+  <% if (ativo >= 0) { %><span class="dc-nav-glider" aria-hidden="true"></span><% } %>
+</nav>

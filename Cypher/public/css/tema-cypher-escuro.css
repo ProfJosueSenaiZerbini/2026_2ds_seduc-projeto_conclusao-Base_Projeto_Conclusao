@@ -1,0 +1,32 @@
+/* Variação escura da identidade visual da Cypher. */
+:root.dark {
+  --mural-base: #050505;
+  --mural-imagem: url("../img/entrada/mural-grafite-escuro.jpg");
+  --mural-contraste: none;
+}
+
+.dark :is(.dc-shell, .entrada-cypher) {
+  --dc-bg: #050505;
+  --dc-ink: #f8faef;
+  --dc-muted: #d1dac3;
+  --dc-line: #91a17373;
+  --dc-accent: #c4df8b;
+  --dc-olive: #b0c978;
+  --dc-surface: #101010;
+  --dc-panel:
+    linear-gradient(177deg, #b9cba00b, transparent 22%),
+    linear-gradient(130deg, #121212d9, #080808e6 58%, #101310d9);
+  --dc-card: #0c0f0cbf;
+  --dc-field: #0a0d0ae6;
+  --dc-hover: #293923;
+  --dc-selected: #304126;
+  --dc-button: linear-gradient(112deg, #b9ce7a, #a2be5d 66%, #94b150);
+  --dc-button-ink: #11190e;
+  --dc-yellow: #efcd52;
+  --dc-paper: var(--dc-yellow);
+  --dc-paper-ink: #22271c;
+  --dc-shadow: 3px 5px 0 #080f0b9c, 0 12px 28px #050b0745;
+  --dc-wall: url("parede-cypher.svg");
+  --dc-art: #283623;
+  color-scheme: dark;
+}

@@ -1,4 +1,5 @@
 import { rotuloProfissional } from "./app/models/tratamentoProfissional.js";
+import { discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo } from "./app/models/catalogoDemonstrativo.js";
 import { protegerEscrita } from "./app/middlewares/seguranca.js";
 import { prepararSuperAdminLocal } from "./app/models/administracao.js";
 import express from "express";
@@ -6,6 +7,7 @@ import path from "node:path";
 import routes from "./app/routes/rotasCypher.js";
 import { inicializarAplicacaoCypher } from "./app/models/modeloCypher.js";
 import {
+  BriefcaseBusiness, Clapperboard, PenLine, Camera, Paintbrush, Footprints, Newspaper, PencilRuler, Scissors, Podcast, Drum, PenTool, SprayCan, Video,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
@@ -22,6 +24,8 @@ import {
   CircleHelp,
   CircleUserRound,
   Clock3,
+  Crown,
+  SlidersHorizontal,
   Disc3,
   Eye,
   EyeOff,
@@ -62,6 +66,7 @@ const port = Number(process.env.PORT ?? 3000);
 app.set("trust proxy", process.env.CYPHER_TRUST_PROXY === "1" ? 1 : false);
 
 const icones = {
+  briefcase: BriefcaseBusiness, clapperboard: Clapperboard, pen: PenLine, camera: Camera, brush: Paintbrush, footprints: Footprints, newspaper: Newspaper, design: PencilRuler, scissors: Scissors, podcast: Podcast, drum: Drum, penTool: PenTool, spray: SprayCan, video: Video,
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   arrowUpRight: ArrowUpRight,
@@ -78,6 +83,8 @@ const icones = {
   circleHelp: CircleHelp,
   circleUser: CircleUserRound,
   clock: Clock3,
+  crown: Crown,
+  sliders: SlidersHorizontal,
   disc: Disc3,
   eye: Eye,
   eyeOff: EyeOff,
@@ -113,6 +120,7 @@ app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), "views"));
 app.locals.icones = icones;
 app.locals.rotuloProfissional = rotuloProfissional;
+Object.assign(app.locals, { discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(protegerEscrita);

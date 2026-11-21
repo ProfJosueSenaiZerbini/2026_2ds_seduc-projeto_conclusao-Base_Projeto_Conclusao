@@ -76,7 +76,7 @@ As rotas são compostas por entry points separados por domínio. `controladorCyp
 | POST     | `/register`                                   | funcional                   | cadastro de usuário/perfil                                |
 | POST     | `/logout`                                     | funcional                   | revogação da sessão                                       |
 | POST     | `/categories/analyze`                         | demonstrativo               | pré-análise simulada de categoria                         |
-| GET      | `/`, `/dashboard`                             | funcional + dados demo      | visão geral                                               |
+| GET      | `/`, `/dashboard`                             | funcional                  | Descoberta com busca, filtros e vitrines públicas          |
 | GET      | `/search`                                     | funcional                   | busca persistida de perfis públicos                       |
 | GET      | `/events`                                     | funcional                   | descoberta de eventos reais, com filtros |
 | GET/POST | `/events/new`                                 | funcional                   | criação de evento por organizador                         |
@@ -242,7 +242,6 @@ A execução gerou apenas o aviso conhecido da dependência transitiva `prebuild
 - confirmação/rejeição de créditos;
 - player e upload de áudio;
 - pré-análise de categorias;
-- destaque/hit do mês e parte dos dados da visão geral.
 
 ### Hardening técnico ainda não implementado
 

@@ -1,0 +1,559 @@
+@import "./contador-sticker.css";
+
+/* Espaço de Trabalho e catálogo de Obras — base visual da Descoberta.
+   Reutilizada pelos dois layouts; fichas e formulários mantêm seus estilos atuais. */
+.et-workspace .et-page {
+  --et-ink: var(--dc-ink);
+  --et-muted: var(--dc-muted);
+  --et-gold: var(--dc-accent);
+  --et-line: var(--dc-line);
+  --et-inset: clamp(20px, 2.7vw, 42px);
+  max-width: 1640px;
+  min-height: calc(100svh - 108px);
+  margin: auto;
+  padding: 25px var(--et-inset) 130px;
+  color: var(--dc-ink);
+  background: transparent;
+  color-scheme: light;
+}
+.dark .et-workspace .et-page {
+  --et-gold: var(--dc-yellow);
+  color-scheme: dark;
+}
+.et-workspace .et-page :is(h1, h2, h3) {
+  color: var(--dc-ink);
+}
+.et-workspace .et-page :is(a, button, input, summary):focus-visible {
+  outline-color: var(--et-gold);
+}
+.et-workspace .et-page h2 {
+  font-size: clamp(20px, 1.8vw, 29px);
+  letter-spacing: -0.04em;
+}
+.et-workspace .et-heading {
+  padding-left: 16px;
+}
+.et-workspace .et-heading::before {
+  width: 4px;
+  height: 1.2em;
+  border-radius: 0;
+  background: var(--et-gold);
+  transform: rotate(-4deg);
+}
+.et-workspace .et-section header .et-heading::before {
+  height: 1.2em;
+}
+.et-workspace .et-heading p {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.et-search-controls {
+  margin: 20px 0 0;
+}
+.et-search-controls > .dc-search-field {
+  flex: 1 1 20rem;
+  max-width: 20rem;
+}
+.et-search-controls .dc-filter {
+  margin: 0;
+}
+.et-search-controls .dc-filter summary {
+  gap: 8px;
+  white-space: nowrap;
+}
+.et-search-controls .dc-filter:has(option:checked:not([value=""], [value="todas"])) summary {
+  border-color: var(--dc-olive);
+  background: var(--dc-hover);
+}
+.et-search-controls .dc-filter-panel label + label {
+  margin-top: 12px;
+}
+.et-workspace .et-section {
+  margin-top: 28px;
+  padding-top: 23px;
+  border-color: var(--dc-line);
+}
+.et-workspace .et-section header {
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.et-workspace :is(.et-more, .et-back) {
+  color: var(--et-gold);
+  font-size: 12px;
+}
+.et-workspace .et-grid {
+  gap: clamp(10px, 1.15vw, 18px);
+}
+.et-workspace .et-card {
+  border-color: var(--dc-line);
+  border-radius: 2px 6px 1px 4px;
+  background: var(--dc-panel);
+  box-shadow: 2px 3px 0 #080f0b30;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+.et-workspace .et-art {
+  color: var(--dc-accent);
+  border-color: var(--dc-line);
+  background: var(--dc-field) url("marcas-acrilico.svg") top left / 180px auto
+    no-repeat;
+}
+.et-workspace .et-card--beat .et-art {
+  background:
+    repeating-linear-gradient(90deg, #91a17315 0 2px, transparent 2px 9px),
+    var(--dc-field);
+}
+.et-workspace .et-card--evento .et-art {
+  background:
+    repeating-linear-gradient(132deg, transparent 0 18px, #d3b7651f 19px 21px),
+    var(--dc-field);
+}
+.et-workspace :is(.et-art > span, .et-empty-icon) {
+  width: 48px;
+  height: 48px;
+  border-color: var(--dc-line);
+  border-radius: 2px 6px 1px 4px;
+  color: var(--dc-accent);
+  background: var(--dc-card);
+}
+.et-workspace .et-card-copy {
+  padding: 14px 28px 16px 14px;
+}
+.et-workspace .et-card h3 {
+  font-size: 16px;
+  letter-spacing: -0.025em;
+}
+.et-workspace .et-card :is(p, small) {
+  color: var(--dc-muted);
+}
+.et-workspace .et-empty {
+  gap: 15px;
+  min-height: 100px;
+  padding: 20px;
+  border: 1px solid var(--dc-line);
+  border-left: 3px solid var(--et-gold);
+  border-radius: 2px 5px 1px 4px;
+  background: var(--dc-panel);
+  box-shadow: 2px 3px 0 #080f0b24;
+}
+/* O estado vazio não é um destaque: elimina a foto e a altura do banner antigo. */
+.et-workspace .et-empty-main::after {
+  content: none;
+}
+.et-workspace .et-empty > div {
+  min-width: 0;
+}
+.et-workspace .et-empty h3 {
+  font-size: clamp(16px, 1.3vw, 18px);
+  line-height: 1.3;
+}
+.et-workspace .et-empty .et-more {
+  min-height: 44px;
+  margin-top: 4px;
+}
+.et-workspace .et-empty :is(p, small) {
+  color: var(--dc-muted);
+}
+.et-workspace .et-feedback {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--dc-line);
+  border-left: 3px solid var(--dc-olive);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-ink);
+  background: var(--dc-card);
+}
+.et-workspace .sidebar.sidebar .reputation-mini {
+  border-color: var(--dc-line);
+  border-radius: 2px 6px 1px 4px;
+  background: var(--dc-card);
+}
+.et-workspace
+  .sidebar.sidebar
+  :is(.mini-heading, .reputation-mini p, .rep-number span) {
+  color: var(--dc-muted);
+}
+.et-workspace .sidebar.sidebar :is(.rep-number, .reputation-mini svg) {
+  color: var(--dc-accent);
+}
+.et-workspace .sidebar .rep-bar {
+  background: var(--dc-selected);
+}
+.et-workspace .sidebar .rep-bar i {
+  background: var(--dc-button);
+}
+.et-workspace .sidebar .mobile-close {
+  border-color: var(--dc-line);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-ink);
+  background: var(--dc-surface);
+}
+/* Placa de criação com as mesmas superfícies e cores da Descoberta.
+   O giro e a saída radial usam camadas distintas, com a mesma curva de movimento. */
+.et-workspace .et-create {
+  --et-create-radius: 104px;
+  --et-create-duration: 650ms;
+  --et-create-stagger: 65ms;
+  --et-create-easing: cubic-bezier(0.22, 0.72, 0.18, 1);
+  --et-create-origin-turn: 60deg;
+  --et-plate-shape: polygon(
+    21% 0,
+    79% 0,
+    100% 21%,
+    100% 79%,
+    79% 100%,
+    21% 100%,
+    0 79%,
+    0 21%
+  );
+  position: fixed;
+  z-index: 30;
+  left: calc(var(--rail) + var(--et-inset) + 16px);
+  bottom: 48px;
+  width: 60px;
+  height: 60px;
+  isolation: isolate;
+}
+.et-workspace .et-create summary {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--dc-ink);
+  background: var(--dc-olive);
+  clip-path: var(--et-plate-shape);
+  isolation: isolate;
+  filter: drop-shadow(2px 3px 1px #050b0745);
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.et-workspace .et-create summary::-webkit-details-marker {
+  display: none;
+}
+.et-workspace .et-create summary::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -2;
+  background: var(--dc-surface);
+  clip-path: var(--et-plate-shape);
+  pointer-events: none;
+}
+.et-workspace .et-create summary::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  background:
+    url("marcas-botao.svg") top left / 96px 48px no-repeat,
+    var(--dc-panel);
+  clip-path: var(--et-plate-shape);
+  pointer-events: none;
+}
+.et-workspace .et-create-symbol {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  transition: transform var(--et-create-duration) var(--et-create-easing);
+}
+.et-workspace .et-create-symbol svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 3.5px;
+  stroke-linecap: square;
+}
+.et-workspace .et-create-symbol::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 17px;
+  width: 2px;
+  height: 5px;
+  background: currentColor;
+  transform: rotate(5deg);
+  pointer-events: none;
+}
+.et-workspace .et-create-mark {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  color: var(--et-gold);
+  transform: rotate(16deg);
+  pointer-events: none;
+}
+.et-workspace .et-create-mark svg {
+  width: 13px;
+  height: 13px;
+}
+.et-workspace .et-create[open] .et-create-symbol {
+  transform: rotate(315deg);
+}
+.dark .et-workspace .et-create summary {
+  filter: drop-shadow(2px 3px 1px #050b0799);
+}
+.et-workspace .et-create:has(summary:focus-visible) {
+  outline: 2px solid var(--et-gold);
+  outline-offset: 6px;
+}
+.et-workspace .et-create nav {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+.et-workspace .et-create-orbit {
+  --et-orbit-turn: calc(-1 * var(--angle));
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--et-orbit-turn));
+  transform-origin: 0 0;
+}
+.et-workspace .et-create-carrier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform: translateX(var(--et-create-radius))
+    rotate(calc(-1 * var(--et-orbit-turn))) scale(1);
+  transform-origin: 0 0;
+}
+.et-workspace .et-create-action {
+  --et-action-edge: var(--dc-olive);
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--et-action-edge);
+  border-radius: 48% 52% 47% 53% / 53% 47% 52% 48%;
+  color: var(--dc-ink);
+  background:
+    url("marcas-botao.svg") top left / 96px 48px no-repeat,
+    var(--dc-panel),
+    var(--dc-surface);
+  box-shadow:
+    2px 3px 0 #050b0745,
+    inset 0 0 0 1px var(--dc-line);
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+  transition: border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.et-workspace .et-create-action[data-create-kind="beats"] {
+  --et-action-edge: var(--dc-paper);
+}
+.et-workspace .et-create-action[data-create-kind="events"] {
+  --et-action-edge: var(--dc-accent);
+}
+.et-workspace .et-create-action::before {
+  content: "";
+  position: absolute;
+  inset: -4px -3px -3px -4px;
+  z-index: -1;
+  border: 1px solid var(--et-action-edge);
+  border-radius: 53% 47% 51% 49% / 47% 54% 46% 53%;
+  opacity: 0.7;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  transition:
+    inset 0.2s ease,
+    opacity 0.2s ease;
+}
+.et-workspace .et-create-icon {
+  display: grid;
+  place-items: center;
+}
+.et-workspace .et-create-icon svg {
+  width: 25px;
+  height: 25px;
+}
+.et-workspace .et-create-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  width: max-content;
+  max-width: 104px;
+  padding: 4px 6px;
+  border: 1px solid var(--dc-line);
+  border-left: 2px solid var(--et-action-edge);
+  border-radius: 1px 3px 1px 2px;
+  color: var(--dc-ink);
+  background:
+    url("marcas-botao.svg") top left / 108px 44px no-repeat,
+    var(--dc-panel),
+    var(--dc-surface);
+  font:
+    700 11px/1.2 "Space Grotesk",
+    "DM Sans",
+    sans-serif;
+  text-align: center;
+  box-shadow: 2px 2px 0 #050b0766;
+  transform: translateX(-50%);
+}
+/* O último rótulo fica acima para não encostar no anterior na órbita compacta. */
+.et-workspace .et-create-orbit:last-child:not(:first-child) .et-create-label {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+/* Sem JavaScript, details continua utilizável, apenas sem a transição de saída. */
+.et-workspace .et-create[data-create-enhanced] .et-create-orbit {
+  transform: rotate(var(--et-create-origin-turn));
+  pointer-events: none;
+  transition: transform var(--et-create-duration) var(--et-create-easing);
+  transition-delay: calc(
+    (var(--et-action-count) - 1 - var(--i)) * var(--et-create-stagger)
+  );
+}
+.et-workspace .et-create[data-create-enhanced] .et-create-carrier {
+  transform: translateX(0px) rotate(calc(-1 * var(--et-create-origin-turn)))
+    scale(0.22);
+  transition: transform var(--et-create-duration) var(--et-create-easing);
+  transition-delay: inherit;
+}
+.et-workspace .et-create[data-create-enhanced] .et-create-label {
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.et-workspace .et-create[data-create-expanded] .et-create-orbit {
+  transform: rotate(var(--et-orbit-turn));
+  pointer-events: auto;
+  transition-delay: calc(var(--i) * var(--et-create-stagger));
+}
+.et-workspace .et-create[data-create-expanded] .et-create-carrier {
+  transform: translateX(var(--et-create-radius))
+    rotate(calc(-1 * var(--et-orbit-turn))) scale(1);
+}
+.et-workspace .et-create[data-create-expanded] .et-create-label {
+  opacity: 1;
+  transition-delay: calc(
+    var(--et-create-duration) * 0.7 + var(--i) * var(--et-create-stagger)
+  );
+}
+.et-workspace
+  .et-create[data-create-enhanced]:not([data-create-expanded])
+  .et-create-symbol {
+  transform: rotate(0deg);
+}
+.et-workspace .et-create-action:focus-visible .et-create-label {
+  opacity: 1;
+  transition-delay: 0s;
+}
+.et-workspace .et-create-action:is(:hover, :focus-visible) {
+  border-color: var(--dc-ink);
+}
+.et-workspace .et-create-action:is(:hover, :focus-visible)::before {
+  inset: -6px -5px -5px -6px;
+  opacity: 1;
+}
+@media (min-width: 901px) {
+  .et-workspace .dc-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+}
+@media (hover: hover) {
+  .et-workspace .et-card:hover {
+    border-color: var(--dc-olive);
+    transform: translateY(-2px);
+  }
+}
+.et-workspace .et-card:focus-within {
+  border-color: var(--dc-olive);
+}
+@media (max-width: 900px) {
+  /* O overlay global é irmão do shell: a sidebar precisa alcançar seu z-index. */
+  .et-workspace {
+    isolation: auto;
+  }
+  .et-workspace .et-page {
+    --et-inset: 18px;
+    padding-top: 20px;
+    padding-bottom: calc(148px + env(safe-area-inset-bottom));
+  }
+  .et-workspace .et-create {
+    left: auto;
+    right: max(20px, env(safe-area-inset-right));
+    bottom: calc(86px + env(safe-area-inset-bottom));
+    --et-create-radius: min(104px, 30vw);
+    --et-create-origin-turn: 120deg;
+  }
+  .et-workspace .et-create-orbit {
+    --et-orbit-turn: calc(180deg + var(--angle));
+  }
+}
+@media (max-width: 680px) {
+  .et-workspace .et-card-copy {
+    padding: 12px 14px 16px;
+  }
+  .et-workspace .et-section header {
+    gap: 10px;
+  }
+  .et-workspace .et-empty {
+    gap: 12px;
+    padding: 18px 14px;
+  }
+  .et-workspace :is(.et-art > span, .et-empty-icon) {
+    width: 42px;
+    height: 42px;
+  }
+}
+@media (max-width: 560px) {
+  .et-workspace .et-page {
+    --et-inset: 14px;
+  }
+}
+@media (max-width: 380px) {
+  .et-workspace .et-page {
+    --et-inset: 12px;
+  }
+  .et-workspace .et-section header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .et-workspace .et-create[data-create-enhanced] .et-create-orbit,
+  .et-workspace .et-create[data-create-enhanced] .et-create-carrier,
+  .et-workspace .et-create[data-create-enhanced] .et-create-label,
+  .et-workspace .et-create .et-create-symbol,
+  .et-workspace .et-create-action,
+  .et-workspace .et-create-action::before {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .et-workspace .et-create summary,
+  .et-workspace .et-create-action {
+    border-color: ButtonText;
+  }
+  .et-workspace .et-create summary {
+    border: 2px solid ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
+    clip-path: none;
+    filter: none;
+  }
+  .et-workspace .et-create summary::before,
+  .et-workspace .et-create summary::after,
+  .et-workspace .et-create-mark {
+    display: none;
+  }
+}

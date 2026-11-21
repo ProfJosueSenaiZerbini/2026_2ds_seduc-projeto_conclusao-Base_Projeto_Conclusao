@@ -1,4 +1,8 @@
 /* View: cadastro de obra. */
+.work-form .work-roles { display:flex; flex-wrap:wrap; gap:8px 18px; margin:0; border:1px solid var(--line); border-radius:8px; padding:12px; }
+.work-form .work-roles legend { font-weight:700; }
+.work-form .work-roles label { display:inline-flex; flex-direction:row; gap:7px; align-items:center; min-height:32px; }
+.work-form .work-roles input[type="checkbox"] { width:17px; height:17px; min-height:0; accent-color:#788d31; }
 .work-form-page {
   max-width: 1120px;
 }
@@ -279,6 +283,60 @@
 .work-form .field-full {
   grid-column: 1 / -1;
 }
+.workshop-type-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.workshop-type-fieldset legend {
+  margin-bottom: 5px;
+  color: #697568;
+  font-size: 10px;
+  font-weight: 700;
+}
+.workshop-type-fieldset > p {
+  margin: 0 0 10px;
+  color: #8b9589;
+  font-size: 10px;
+}
+.workshop-type-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.work-form .workshop-type-option {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--bg-surface, #fff) 68%, transparent);
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1.35;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.work-form .workshop-type-option.selected {
+  border-color: #9eb263;
+  background: color-mix(in srgb, #b7cf7a 20%, transparent);
+}
+.work-form .workshop-type-option input[type="checkbox"] {
+  width: 16px;
+  min-height: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 0 8px 0 0;
+  padding: 0;
+  accent-color: #788d31;
+}
+.workshop-type-fieldset [data-workshop-types-error] {
+  margin-top: 8px;
+  color: #b97058;
+  font-size: 10px;
+}
 .required-mark {
   color: #b97058;
 }
@@ -436,6 +494,18 @@
   }
 }
 
+@media (max-width: 760px) {
+  .workshop-type-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .workshop-type-options {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Auditoria de contraste v18 — formulário de beat no tema escuro. */
 .dark .work-type-picker,
 .dark .form-section {
@@ -490,6 +560,22 @@
 .dark .work-type-context {
   color: #e4f2b6;
   background: #304421;
+}
+
+.dark .workshop-type-fieldset legend,
+.dark .work-form .workshop-type-option {
+  color: #eef5ea;
+}
+.dark .workshop-type-fieldset > p {
+  color: #adbea7;
+}
+.dark .work-form .workshop-type-option {
+  border-color: #465944;
+  background: #202b1f;
+}
+.dark .work-form .workshop-type-option.selected {
+  border-color: #8eae45;
+  background: #293a24;
 }
 
 .dark .work-form-notice,

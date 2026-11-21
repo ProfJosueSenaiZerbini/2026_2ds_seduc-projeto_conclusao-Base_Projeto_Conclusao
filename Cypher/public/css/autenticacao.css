@@ -29,7 +29,6 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: var(--paper);
 }
 
 .auth-art {
@@ -373,7 +372,7 @@
 
 .auth-art {
   color: var(--auth-art-text);
-  background: var(--auth-art-bg);
+  background: color-mix(in srgb, var(--auth-art-bg) 56%, transparent);
   transition:
     background-color 0.22s ease,
     color 0.22s ease;

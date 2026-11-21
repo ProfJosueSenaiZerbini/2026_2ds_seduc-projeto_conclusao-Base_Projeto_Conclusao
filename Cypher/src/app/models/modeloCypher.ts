@@ -72,7 +72,6 @@ export function inicializarAplicacaoCypher(): void {
 
 export const CypherModel = {
   usuario: () => null,
-  pessoas: () => [],
   buscarPessoasPublicas: (
     filtros: FiltrosBuscaPerfisPublicos,
     usuarioId: string
@@ -123,11 +122,6 @@ export const CypherModel = {
   excluirBeat: (id: string, produtorId: string) =>
     excluirBeatCypher(id, produtorId),
   obras: () => [],
-  estatisticasObras: () => ({
-    publicadasComoArtista: 0,
-    participacoesComoFeat: 0,
-    emAndamento: 0,
-  }),
   obrasDoUsuario: (usuarioId: string, filtros?: FiltrosCatalogoObras) =>
     listarObrasContaCypher(usuarioId, filtros),
   obraDoUsuario: (id: string, usuarioId: string) =>

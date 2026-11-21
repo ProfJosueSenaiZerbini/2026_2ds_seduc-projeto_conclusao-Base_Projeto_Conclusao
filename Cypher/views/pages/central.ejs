@@ -56,17 +56,12 @@
     </div>
   </div>
   <aside class="knowledge-aside">
-    <div class="knowledge-pattern">
-      <span>
-        GUIA RÁPIDO
-      </span>
-      <h3>
-        Organize antes de lançar.
-      </h3>
-      <p>
-        Um bom registro de créditos evita ruído lá na frente.
-      </p>
-    </div>
+    <%- include('../partials/componentes/cartao-central', {
+      rotulo: 'Guia rápido',
+      titulo: 'Organize antes de lançar.',
+      descricao: 'Um bom registro de créditos evita ruído lá na frente.',
+      href: ''
+    }) %>
     <div class="article-list">
       <div class="eyebrow">
         ARTIGOS RECENTES

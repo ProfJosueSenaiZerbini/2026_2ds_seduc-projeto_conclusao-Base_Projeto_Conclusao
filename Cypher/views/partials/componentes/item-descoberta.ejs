@@ -1,0 +1,22 @@
+<% if (item.grupo === 'eventos') { %>
+  <%- include('evento-descoberta', { item }) %>
+<% } else if (item.grupo === 'profissionais') { %>
+  <%- include('cartao-profissional', { perfil: { nome: item.titulo, handle: item.autor, funcao: item.tipo, iniciais: item.iniciais, local: item.local, detalhes: item.estilos, url: item.url, status: '' } }) %>
+<% } else { %>
+<% const icone = item.grupo === 'beats' ? 'headphones' : 'disc';
+   const imagem = item.demonstracao && imagemPublicacaoDemo(item.id); %>
+<a class="dc-item dc-<%= item.grupo %>" href="<%= item.url %>">
+  <span class="dc-art" aria-hidden="true">
+    <% if (imagem) { %><img class="dc-release-art" src="/img/<%= imagem %>" alt="" loading="lazy" decoding="async">
+    <% } else { %><%- icones[icone] %><% } %>
+  </span>
+  <span class="dc-item-info">
+    <strong><%= item.titulo %></strong>
+    <small><%= item.autor %></small>
+    <% const contexto = [item.tipo, item.genero].filter(Boolean).join(' · '); %>
+    <% if (contexto) { %><small><%= contexto %></small><% } %>
+  </span>
+  <span class="dc-item-arrow" aria-hidden="true"><%- icones.arrowUpRight %></span>
+</a>
+<% } %>
+

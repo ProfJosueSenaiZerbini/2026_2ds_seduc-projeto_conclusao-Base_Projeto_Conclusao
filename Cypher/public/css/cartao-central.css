@@ -1,0 +1,110 @@
+.central-glass-card {
+  --central-glass-surface: linear-gradient(145deg, #fbfaeedb, #d6dfc2a8);
+  --central-glass-edge: #78836491;
+  --central-glass-text: #27321f;
+  --central-glass-accent: #435e27;
+  display: block;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--central-glass-edge);
+  border-left-width: 2px;
+  border-bottom-width: 3px;
+  border-radius: 7px 11px 8px 5px;
+  background: var(--central-glass-surface);
+  box-shadow: -5px 10px 18px #1a21162b, inset 0 1px #ffffff36;
+  backdrop-filter: blur(5px);
+  color: var(--central-glass-text);
+  text-decoration: none;
+}
+.dark .central-glass-card {
+  --central-glass-surface: linear-gradient(145deg, #333c2bd9, #131911db);
+  --central-glass-edge: #aab58969;
+  --central-glass-text: #f3f4e9;
+  --central-glass-accent: #efcd68;
+}
+.central-glass-card:focus-visible {
+  outline: 2px solid var(--central-glass-accent);
+  outline-offset: 3px;
+}
+.central-glass-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--central-glass-edge);
+}
+.central-glass-top small {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.central-glass-dots {
+  display: flex;
+  gap: 5px;
+}
+.central-glass-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c27262;
+  box-shadow: -1px 2px 3px #0004;
+}
+.central-glass-dots i:nth-child(2) {
+  background: #d8b651;
+}
+.central-glass-dots i:nth-child(3) {
+  background: #85a35b;
+}
+.central-glass-card h3 {
+  margin: 12px 0 0;
+  font: 700 clamp(19px, 2vw, 25px)/1.16 "Space Grotesk", sans-serif;
+  letter-spacing: -0.035em;
+}
+.central-glass-reveal p {
+  margin: 0;
+  padding-top: 9px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.central-glass-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  color: var(--central-glass-accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+.central-glass-link svg {
+  width: 14px;
+  height: 14px;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .central-glass-card {
+    transform: skewX(3deg);
+    transition: transform 280ms ease;
+  }
+  .central-glass-card:is(:hover, :focus-within) {
+    transform: none;
+  }
+  .central-glass-reveal {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 280ms ease;
+  }
+  .central-glass-reveal p {
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .central-glass-card:is(:hover, :focus-within) .central-glass-reveal {
+    grid-template-rows: 1fr;
+  }
+  .central-glass-reveal p::before {
+    content: "";
+    display: block;
+    height: 9px;
+  }
+}

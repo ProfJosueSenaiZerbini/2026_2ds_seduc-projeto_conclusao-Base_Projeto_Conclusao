@@ -1,0 +1,9 @@
+<button class="<%= classe %>" type="button" aria-haspopup="dialog" aria-controls="detalhe-beat" aria-label="Ver ficha de <%= beat.title %>"
+  data-beat-detail data-beat-title="<%= beat.title %>" data-beat-producer="<%= beat.producer %>"
+  data-beat-bpm="<%= beat.bpm ? `${beat.bpm} BPM` : 'Não informado' %>" data-beat-key="<%= beat.key || 'Não informado' %>"
+  data-beat-genre="<%= beat.genre || 'Não informado' %>" data-beat-license="<%= beat.license || 'Não informada' %>"
+  data-beat-duration="<%= beat.duration || 'Não informada' %>" data-beat-description="<%= beat.description || 'Sem descrição cadastrada.' %>"
+  data-beat-usage="<%= beat.usage || 'Sem condições adicionais cadastradas.' %>" data-beat-ofertas="<%= encodeURIComponent(JSON.stringify(beat.ofertas)) %>"
+  data-beat-exclusive="<%= Boolean(beat.vendaExclusiva) %>">
+  Ver ficha <span aria-hidden="true"><%- icones[icone] %></span>
+</button>

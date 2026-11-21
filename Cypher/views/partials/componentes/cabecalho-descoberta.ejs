@@ -1,0 +1,15 @@
+<header class="dc-header">
+  <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
+  <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
+  <div class="dc-title"><h1 id="<%= tituloId %>"><%= titulo %></h1><p><%= descricao %></p></div>
+  <form class="dc-search" action="<%= busca.acao %>" role="search">
+    <%- include('campo-busca', { campo: { id: `busca-${tituloId}`, nome: 'q', valor: busca.termo, limite: busca.limite, rotulo: busca.rotulo, rotuloBotao: 'Buscar' } }) %>
+    <% for (const [nome, valor] of Object.entries(busca.filtros)) { if (valor || (valor === '' && busca.filtrosVazios?.includes(nome))) { %>
+      <input type="hidden" name="<%= nome %>" value="<%= valor %>">
+    <% }} %>
+  </form>
+  <div class="dc-account">
+    <%- include('tema-entrada') %>
+    <%- include('acoes-conta') %>
+  </div>
+</header>

@@ -1,0 +1,79 @@
+<dialog class="detail-dialog ficha-evento" id="detalhe-oportunidade" aria-labelledby="detalhe-oportunidade-titulo">
+  <header class="detail-dialog-header">
+    <span class="dc-stamp" data-event-category-detail>Evento</span>
+    <button class="icon-button event-detail-close" type="button" data-dialog-close aria-label="Fechar ficha" autofocus><%- icones.x %></button>
+  </header>
+  <h2 id="detalhe-oportunidade-titulo" data-event-title-detail></h2>
+
+  <div class="event-detail-tabs" data-event-detail-tabs role="tablist" aria-label="Seções do evento">
+    <button class="is-active" id="evento-aba-geral" type="button" data-event-detail-tab="geral" role="tab" aria-selected="true" aria-controls="evento-painel-geral">Informações gerais</button>
+    <button id="evento-aba-gestao" type="button" data-event-detail-tab="gestao" role="tab" aria-selected="false" aria-controls="evento-painel-gestao" tabindex="-1" hidden>Gestão do evento</button>
+  </div>
+
+  <div id="evento-painel-geral" data-event-detail-panel="geral" role="tabpanel" aria-labelledby="evento-aba-geral">
+    <ul class="event-detail-meta">
+      <li>
+        <span aria-hidden="true"><%- icones.users %></span>
+        <span data-event-org-detail></span>
+      </li>
+      <li>
+        <span aria-hidden="true"><%- icones.calendarDays %></span>
+        <span><span data-event-date-detail></span><span data-event-time-detail></span></span>
+      </li>
+      <li>
+        <span aria-hidden="true"><%- icones.mapPin %></span>
+        <span data-event-location-detail></span>
+      </li>
+      <li>
+        <span aria-hidden="true"><%- icones.listChecks %></span>
+        <span data-event-status-detail></span>
+      </li>
+    </ul>
+
+    <section class="event-detail-section">
+      <h3>Sobre o evento</h3>
+      <p data-event-description-detail></p>
+    </section>
+
+    <dl class="event-detail-facts">
+      <div>
+        <dt><span aria-hidden="true"><%- icones.mic %></span> Formato</dt>
+        <dd data-event-format-detail></dd>
+      </div>
+      <div>
+        <dt><span aria-hidden="true"><%- icones.calendarCheck %></span> Inscrições</dt>
+        <dd data-event-registration-detail></dd>
+      </div>
+      <div>
+        <dt><span aria-hidden="true"><%- icones.trophy %></span> Destaque</dt>
+        <dd data-event-prize-detail></dd>
+      </div>
+    </dl>
+
+    <div class="event-detail-tags" data-event-tags-detail></div>
+    <p class="event-detail-count" role="status"><span data-event-interest-total>0</span> <span data-event-interest-count-label>participações registradas.</span></p>
+    <p class="event-detail-notice" data-interest-notice role="status" hidden>Você já registrou interesse neste evento.</p>
+
+    <div class="event-detail-actions">
+      <form method="post" data-interest-form>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="button button-lime" type="submit" data-interest-button aria-pressed="false" disabled>
+          <span aria-hidden="true"><%- icones.calendarCheck %></span>
+          <span data-interest-label>Quero participar</span>
+        </button>
+      </form>
+      <button class="button button-outline" type="button" data-share-event><span aria-hidden="true"><%- icones.share %></span> Compartilhar</button>
+    </div>
+  </div>
+
+  <div id="evento-painel-gestao" data-event-detail-panel="gestao" role="tabpanel" aria-labelledby="evento-aba-gestao" hidden>
+    <div class="event-owner-actions">
+      <a class="button button-outline" data-event-edit href="#">Editar evento</a>
+      <form method="post" action="#" data-event-delete onsubmit="return confirm('Excluir este evento?')">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="button button-outline danger-button" type="submit">Excluir evento</button>
+      </form>
+    </div>
+    <div class="event-interested-list" data-event-interested-list></div>
+  </div>
+</dialog>

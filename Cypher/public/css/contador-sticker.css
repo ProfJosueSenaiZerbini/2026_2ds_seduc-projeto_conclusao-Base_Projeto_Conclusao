@@ -1,0 +1,75 @@
+.cy-count-sticker {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.85em;
+  margin-inline-start: 0.3em;
+  padding: 0.26em 0.48em 0.3em;
+  vertical-align: 0.08em;
+  color: #1e241b;
+  font:
+    italic 900 max(15px, 0.85em)/1.1 "Space Grotesk",
+    "DM Sans",
+    sans-serif;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  text-shadow: 1px 1px #e6ddbd;
+  transform: rotate(-4deg);
+  filter: drop-shadow(1px 2px 1px #050a0659);
+}
+.cy-count-sticker::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 3px solid #ded0ad;
+  background:
+    url("desgaste-sticker.svg") center / 90px 48px,
+    linear-gradient(
+      154deg,
+      transparent 44%,
+      #3b342823 44.5%,
+      #fff9dc70 45%,
+      transparent 46%
+    ),
+    #eeb541;
+  clip-path: polygon(
+    1% 2%,
+    19% 1%,
+    20% 3%,
+    21% 1%,
+    56% 0,
+    58% 2%,
+    83% 1%,
+    94% 0,
+    100% 14%,
+    99% 53%,
+    98% 55%,
+    99% 58%,
+    100% 97%,
+    82% 99%,
+    80% 97%,
+    79% 100%,
+    44% 98%,
+    42% 100%,
+    12% 98%,
+    11% 96%,
+    10% 99%,
+    0 97%,
+    1% 72%,
+    0 70%
+  );
+  pointer-events: none;
+}
+.cy-count-sticker::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10%;
+  height: 18%;
+  background: linear-gradient(45deg, #8a815f, #eee7cf 52%, #a49875);
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}

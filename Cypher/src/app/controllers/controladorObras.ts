@@ -1,6 +1,6 @@
+export { catalogoObras as obras } from "./controladorEspacoTrabalho.js";
 /** Entry points do domínio de obras e seus créditos. */
 export {
-  obras,
   novaObra,
   editarObra,
   criarObra,

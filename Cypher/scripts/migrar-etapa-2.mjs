@@ -15,7 +15,7 @@ const banco=await import('../dist/src/app/models/bancoDados.js');
 try {
   banco.inicializarBancoCypher();banco.fecharBancoCypher();
   const teste=new Database(copia,{readonly:true});
-  assert.equal(teste.pragma('user_version',{simple:true}), 24);
+  assert.equal(teste.pragma('user_version',{simple:true}), banco.versaoEsquema);
   assert.ok(teste.pragma('table_info(usuarios)').some(coluna=>coluna.name==='email_confirmado_em'));
   assert.deepEqual(teste.prepare('SELECT * FROM administradores ORDER BY usuario_id').all(),administradores);
   assert.deepEqual(teste.pragma('foreign_key_check'),[]);teste.close();
@@ -24,11 +24,11 @@ try {
     process.env.CYPHER_DB_PATH=origem;
     banco.inicializarBancoCypher();banco.fecharBancoCypher();
     const real=new Database(origem,{readonly:true});
-    assert.equal(real.pragma('user_version',{simple:true}), 24);
+    assert.equal(real.pragma('user_version',{simple:true}), banco.versaoEsquema);
     assert.ok(real.pragma('table_info(usuarios)').some(coluna=>coluna.name==='email_confirmado_em'));
     assert.deepEqual(real.prepare('SELECT * FROM administradores ORDER BY usuario_id').all(),administradores);
     assert.deepEqual(real.pragma('foreign_key_check'),[]);real.close();
-    console.log('OK: banco local atualizado para schema 24, com confirmação de e-mail e sem alterar acesso administrativo.');
+    console.log(`OK: banco local atualizado para schema ${banco.versaoEsquema}, com confirmação de e-mail e sem alterar acesso administrativo.`);
   }
 } finally {banco.fecharBancoCypher();assert.equal(path.dirname(temporaria),path.resolve(os.tmpdir()));fs.rmSync(temporaria,{recursive:true,force:true});}
 

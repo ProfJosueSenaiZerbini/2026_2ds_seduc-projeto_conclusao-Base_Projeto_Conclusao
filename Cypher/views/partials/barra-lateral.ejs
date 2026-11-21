@@ -2,163 +2,159 @@
 <%- include('navegacao-administrativa',{path,usuario}) %>
 <% } else { %>
 <aside class="sidebar" id="navegacao-principal">
-  <div class="sidebar-top">
-    <div class="sidebar-brand-row">
-      <a class="logo logo-compact" href="/dashboard" aria-label="Cypher — início">
-        <span class="logo-mark" aria-hidden="true">
-          <span>
+  <div class="sidebar-scroll">
+    <div class="sidebar-top">
+      <div class="sidebar-brand-row">
+        <a class="logo logo-compact" href="/dashboard" aria-label="Cypher — início">
+          <span class="discovery-rail-mark" hidden aria-hidden="true"><%- icones.crown %></span>
+          <span class="logo-mark" aria-hidden="true">
+            <span>
+            </span>
+            <span>
+            </span>
+            <span>
+            </span>
           </span>
-          <span>
-          </span>
-          <span>
-          </span>
-        </span>
-        <span class="logo-word">
-          CYPHER
-        </span>
-      </a>
-      <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">
-        <span class="lucide-icon" aria-hidden="true">
-          <%- icones.x %>
-        </span>
-      </button>
-    </div>
-    <% if (usuario.tipoConta === 'profissional') { %><div class="workspace-chip">
-      <span class="status-dot" aria-hidden="true">
-      </span>
-      <span>
-        <%= usuario.availabilityLabel %>
-      </span>
-    </div>
-    <% } %>
-  </div>
-  <nav class="side-nav" aria-label="Navegação principal">
-    <div class="nav-label">
-      WORKSPACE
-    </div>
-    <% const links = [
-      { href: '/dashboard', label: 'Visão geral', icon: icones.house },
-      { href: '/search', label: 'Buscar pessoas', icon: icones.search },
-      { href: '/events', label: 'Oportunidades', icon: icones.calendarDays },
-      { href: '/works', label: 'Obras', icon: icones.fileMusic },
-      { href: '/beats', label: 'Banco de Beats', icon: icones.music2 },
-    ]; %>
-    <% links.forEach(link => { %>
-      <% const ativo = path === link.href || (link.href === '/dashboard' && path === '/') || (link.href === '/works' && path.startsWith('/works/')); %>
-      <a class="side-link<%= ativo ? ' active' : '' %>" href="<%= link.href %>"<%- ativo ? 'aria-current="page"' : '' %>>
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- link.icon %>
-        </span>
-        <span class="side-link-label">
-          <%= link.label %>
-        </span>
-        <% if (link.count) { %>
-          <b>
-            <%= link.count %>
-          </b>
-        <% } %>
-      </a>
-    <% }) %>
-    <% const recursosAtivos = ['/central', '/profile', '/settings', '/notificacoes'].includes(path) || path.startsWith('/admin/revisao'); %>
-    <div class="nav-label nav-label-spaced">
-      RECURSOS
-    </div>
-    <button class="side-link resources-toggle" type="button" data-menu-toggle="recursos-menu" aria-controls="recursos-menu" aria-expanded="<%= recursosAtivos ? 'true' : 'false' %>">
-      <span class="side-icon lucide-icon" aria-hidden="true">
-        <%- icones.circleHelp %>
-      </span>
-      <span class="side-link-label">
-        Recursos
-      </span>
-      <span class="resources-chevron lucide-icon" aria-hidden="true">
-        <%- icones.chevronDown %>
-      </span>
-    </button>
-    <div class="resource-links" id="recursos-menu"<%= recursosAtivos ? '' : 'hidden' %>>
-      <a class="side-link<%= path === '/profile' ? ' active' : '' %>" href="/profile">
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- icones.user %>
-        </span>
-        <span class="side-link-label">
-          Meu perfil
-        </span>
-      </a>
-      <a class="side-link<%= path === '/settings' ? ' active' : '' %>" href="/settings">
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- icones.settings %>
-        </span>
-        <span class="side-link-label">
-          Configurações
-        </span>
-      </a>
-      <a class="side-link<%= path === '/central' ? ' active' : '' %>" href="/central">
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- icones.lightbulb %>
-        </span>
-        <span class="side-link-label">
-          Cypher Central
-        </span>
-      </a>
-      <a class="side-link<%= path === '/notificacoes' ? ' active' : '' %>" href="/notificacoes">
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- icones.bell %>
-        </span>
-        <span class="side-link-label">
-          Notificações
-        </span>
-      </a>
-      <% if (usuario.ehAdministrador) { %>
-        <a class="side-link<%= path.startsWith('/admin/revisao') ? ' active' : '' %>" href="/admin/revisao">
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- icones.shieldCheck %>
-          </span>
-          <span class="side-link-label">
-            Administrador
+          <span class="logo-word">
+            CYPHER
           </span>
         </a>
-      <% } %>
+        <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">
+          <span class="lucide-icon" aria-hidden="true">
+            <%- icones.x %>
+          </span>
+        </button>
+      </div>
     </div>
-  </nav>
-  <div class="sidebar-bottom">
-    <% if (usuario.tipoConta === 'profissional') { %><a class="reputation-mini reputation-link" href="/profile" aria-label="Ver reputação profissional de<%= usuario.name %>">
-      <div class="mini-heading">
-        <span>
-          REPUTAÇÃO
+    <nav class="side-nav" aria-label="Navegação principal">
+      <div class="nav-label">
+        WORKSPACE
+      </div>
+      <% const links = [
+        { href: '/dashboard', label: 'Descoberta', icon: icones.house },
+        ...(usuario.tipoConta === 'profissional' && !usuario.demonstracao ? [{ href: '/espaco-de-trabalho', label: 'Espaço de Trabalho', icon: icones.briefcase }] : []),
+        { href: '/works', label: 'Obras', icon: icones.music },
+        { href: '/beats', label: 'Banco de Beats', icon: icones.headphones },
+        { href: '/events', label: 'Eventos', icon: icones.calendarDays },
+        { href: '/search', label: 'Buscar pessoas', icon: icones.users },
+      ]; %>
+      <% links.forEach(link => { %>
+        <% const ativo = path === link.href || (link.href === '/dashboard' && path === '/') || (link.href === '/works' && path.startsWith('/works/')); %>
+        <a class="side-link<%= ativo ? ' active' : '' %>" aria-label="<%= link.label %>" href="<%= link.href %>" <%- ativo ? 'aria-current="page"' : '' %>>
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            <%- link.icon %>
+          </span>
+          <span class="side-link-label">
+            <%= link.label %>
+          </span>
+          <% if (link.count) { %>
+            <b>
+              <%= link.count %>
+            </b>
+          <% } %>
+        </a>
+      <% }) %>
+      <% const recursosAtivos = ['/central', '/profile', '/settings', '/notificacoes'].includes(path) || path.startsWith('/admin/revisao'); %>
+      <div class="nav-label nav-label-spaced">
+        RECURSOS
+      </div>
+      <button class="side-link resources-toggle" aria-label="Mais recursos" type="button" data-menu-toggle="recursos-menu" aria-controls="recursos-menu" aria-expanded="<%= recursosAtivos ? 'true' : 'false' %>">
+        <span class="side-icon lucide-icon" aria-hidden="true">
+          <%- icones.circleHelp %>
         </span>
-        <span class="lucide-icon" aria-hidden="true">
-          <%- icones.badgeCheck %>
+        <span class="side-link-label">
+          Recursos
         </span>
-      </div>
-      <div class="rep-number">
-        <%= usuario.reputation %>
-        <span>
-          profissional
+        <span class="resources-chevron lucide-icon" aria-hidden="true">
+          <%- icones.chevronDown %>
         </span>
+      </button>
+      <div class="resource-links" id="recursos-menu"<%= recursosAtivos ? '' : 'hidden' %>>
+        <a class="side-link<%= path === '/profile' ? ' active' : '' %>" href="/profile">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            <%- icones.user %>
+          </span>
+          <span class="side-link-label">
+            Meu perfil
+          </span>
+        </a>
+        <a class="side-link<%= path === '/settings' ? ' active' : '' %>" href="/settings">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            <%- icones.settings %>
+          </span>
+          <span class="side-link-label">
+            Configurações
+          </span>
+        </a>
+        <a class="side-link<%= path === '/central' ? ' active' : '' %>" href="/central">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            <%- icones.lightbulb %>
+          </span>
+          <span class="side-link-label">
+            Cypher Central
+          </span>
+        </a>
+        <a class="side-link<%= path === '/notificacoes' ? ' active' : '' %>" href="/notificacoes">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            <%- icones.bell %>
+          </span>
+          <span class="side-link-label">
+            Notificações
+          </span>
+        </a>
+        <% if (usuario.ehAdministrador) { %>
+          <a class="side-link<%= path.startsWith('/admin/revisao') ? ' active' : '' %>" href="/admin/revisao">
+            <span class="side-icon lucide-icon" aria-hidden="true">
+              <%- icones.shieldCheck %>
+            </span>
+            <span class="side-link-label">
+              Administrador
+            </span>
+          </a>
+        <% } %>
       </div>
-      <div class="rep-bar" role="progressbar" aria-label="Reputação profissional" aria-valuenow="<%= usuario.reputation %>" aria-valuemin="0" aria-valuemax="100">
-        <i style="width:<%= usuario.reputation %>%">
-        </i>
-      </div>
-      <p>
-        Você está construindo presença.
-      </p>
-    </a>
-    <% } %><a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
-      <div class="avatar avatar-yellow">
-        <%= usuario.initials %>
-      </div>
-      <div>
-        <strong>
-          <%= usuario.name %>
-        </strong>
-        <span>
-          <%= usuario.role %>
+    </nav>
+    <div class="sidebar-bottom">
+      <% if (usuario.tipoConta === 'profissional') { %><a class="reputation-mini reputation-link" href="/profile" aria-label="Ver reputação profissional de<%= usuario.name %>">
+        <div class="mini-heading">
+          <span>
+            REPUTAÇÃO
+          </span>
+          <span class="lucide-icon" aria-hidden="true">
+            <%- icones.badgeCheck %>
+          </span>
+        </div>
+        <div class="rep-number">
+          <%= usuario.reputation %>
+          <span>
+            profissional
+          </span>
+        </div>
+        <div class="rep-bar" role="progressbar" aria-label="Reputação profissional" aria-valuenow="<%= usuario.reputation %>" aria-valuemin="0" aria-valuemax="100">
+          <i style="width:<%= usuario.reputation %>%">
+          </i>
+        </div>
+        <p>
+          Você está construindo presença.
+        </p>
+      </a>
+      <% } %><a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
+        <div class="avatar avatar-yellow">
+          <%= usuario.initials %>
+        </div>
+        <div>
+          <strong>
+            <%= usuario.name %>
+          </strong>
+          <span>
+            <%= usuario.role %>
+          </span>
+        </div>
+        <span class="lucide-icon user-mini-arrow" aria-hidden="true">
+          <%- icones.chevronRight %>
         </span>
-      </div>
-      <span class="lucide-icon user-mini-arrow" aria-hidden="true">
-        <%- icones.chevronRight %>
-      </span>
-    </a>
+      </a>
+    </div>
   </div>
 </aside>
 

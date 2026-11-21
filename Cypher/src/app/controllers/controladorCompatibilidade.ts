@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { rotuloProfissional } from "../models/tratamentoProfissional.js";
 import { resolverPerfilPublico, obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
-import { normalizarIdentificador } from "../validators/validarIdentidade.js";
+import { normalizarIdentificador, validarIdentificador } from "../validators/validarIdentidade.js";
 import { listaTextual } from "../validators/validarAtuacao.js";
-import { salvarVertentesProfissionaisUsuarioCypher } from "../models/bancoDados.js";
+import { atuacoesDaObra, salvarVertentesProfissionaisUsuarioCypher } from "../models/bancoDados.js";
 import { vertentesProfissionais } from "../models/modeloProfissionalPersistido.js";
 import { podeAdministrar, podePublicar, tiposObraPermitidos } from "../models/permissoes.js";
 
@@ -52,8 +52,8 @@ import {
   listarProfissoesUsuarioCypher,
   listarVertentesProfissionaisUsuarioCypher,
   buscarCredenciaisCypher,
+  buscarEmailPorIdentificadorCypher,
   obterPerfilPublicoCypher,
-  type FiltrosCatalogoObras,
   type AtuacaoProfissionalPersistida,
   type RespostasAtuacao,
   type VisibilidadesAtuacao,
@@ -89,6 +89,7 @@ const nomeCookieSessao = "cypher_session";
 const caminhosProtegidos = new Set([
   "/",
   "/dashboard",
+  "/espaco-de-trabalho",
   "/search",
   "/events",
   "/events/new",
@@ -111,8 +112,9 @@ const caminhosProtegidos = new Set([
 ]);
 
 function caminhoProtegido(caminho: string): boolean {
+  caminho = caminho.toLowerCase().replace(/\/+$/, "") || "/";
   return (
-    caminhosProtegidos.has(caminho) || caminho.startsWith("/profile/") || caminho.startsWith("/settings/") || caminho.startsWith("/admin/") || caminho === "/admin" ||
+    caminhosProtegidos.has(caminho) || caminho.startsWith("/espaco-de-trabalho/") || caminho.startsWith("/profile/") || caminho.startsWith("/settings/") || caminho.startsWith("/admin/") || caminho === "/admin" ||
     /^\/(?:works|events|beats)\/[^/]+\/(?:edit|delete)$/.test(caminho) ||
     /^\/events\/[^/]+\/(?:interest|interest\/cancel|interests\/[^/]+\/status)$/.test(
       caminho
@@ -125,7 +127,7 @@ function caminhoProtegido(caminho: string): boolean {
 }
 
 function tokenDaRequisicao(req: Request): string | undefined {
-  const nomeCookie = req.path.startsWith("/admin") ? "cypher_admin_session" : nomeCookieSessao;
+  const nomeCookie = req.path.toLowerCase().startsWith("/admin") ? "cypher_admin_session" : nomeCookieSessao;
   const cookie = req.headers.cookie
     ?.split(";")
     .map(valor => valor.trim())
@@ -165,14 +167,6 @@ function usuarioParaView(usuario: UsuarioDaSessao) {
   };
 }
 
-const ordensCatalogo = [
-  { value: "recentes", label: "Mais recentes" },
-  { value: "antigas", label: "Mais antigas" },
-  { value: "titulo", label: "Título (A–Z)" },
-  { value: "lancamento", label: "Data de lançamento" },
-  { value: "status", label: "Status" },
-] as const;
-
 function chaveCatalogo(valor: string): string {
   return valor
     .normalize("NFD")
@@ -186,86 +180,15 @@ function valorCatalogo(opcoes: readonly string[], recebido: string): string {
   return opcoes.find(opcao => chaveCatalogo(opcao) === recebido) ?? "";
 }
 
-function filtrosCatalogo(req: Request): FiltrosCatalogoObras {
-  const ordemRecebida = parametroTexto(req, "ordem");
-  const ordem: FiltrosCatalogoObras["order"] = ordensCatalogo.some(
-    opcao => opcao.value === ordemRecebida
-  )
-    ? (ordemRecebida as FiltrosCatalogoObras["order"])
-    : "recentes";
-  return {
-    status: valorCatalogo(statusObra, parametroTexto(req, "status")),
-    type: valorCatalogo(tiposObra, parametroTexto(req, "tipo")),
-    genre: valorCatalogo(generosObra, parametroTexto(req, "genero")),
-    role: valorCatalogo(papeisObra, parametroTexto(req, "papel")),
-    order: ordem,
-  };
-}
-
-function gruposCatalogo(obras: ReturnType<typeof CypherModel.obrasDoUsuario>) {
-  const grupos = [
-    {
-      id: "lancadas",
-      titulo: "Lançadas",
-      descricao: "Obras disponibilizadas publicamente",
-      obras: [] as typeof obras,
-    },
-    {
-      id: "producao",
-      titulo: "Em produção",
-      descricao: "Obras em desenvolvimento",
-      obras: [] as typeof obras,
-    },
-    {
-      id: "rascunhos",
-      titulo: "Rascunhos",
-      descricao: "Obras ainda não finalizadas",
-      obras: [] as typeof obras,
-    },
-    {
-      id: "participacoes",
-      titulo: "Participações",
-      descricao: "Obras de terceiros com seus créditos",
-      obras: [] as typeof obras,
-    },
-    {
-      id: "beats",
-      titulo: "Beats",
-      descricao: "Instrumentais cadastrados",
-      obras: [] as typeof obras,
-    },
-    {
-      id: "outros",
-      titulo: "Outros projetos",
-      descricao: "Demais tipos de trabalho",
-      obras: [] as typeof obras,
-    },
-  ];
-  for (const obra of obras) {
-    const grupo = !obra.owned
-      ? grupos[3]
-      : obra.type === "Beat" || obra.type === "Instrumental"
-        ? grupos[4]
-        : obra.status === "Rascunho"
-          ? grupos[2]
-          : obra.status === "Em produção"
-            ? grupos[1]
-            : obra.status === "Lançado" && obra.published
-              ? grupos[0]
-              : grupos[5];
-    grupo.obras.push(obra);
-  }
-  return grupos;
-}
-
 export function middlewareAutorizacao(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  if (req.path === "/admin/login") return next();
-  if (!caminhoProtegido(req.path)) return next();
-  const interno = req.path === "/admin" || req.path.startsWith("/admin/");
+  const caminho = req.path.toLowerCase().replace(/\/+$/, "") || "/";
+  if (caminho === "/admin/login") return next();
+  if (!caminhoProtegido(caminho)) return next();
+  const interno = caminho === "/admin" || caminho.startsWith("/admin/");
   const usuario = usuarioDaRequisicao(req);
   if (!usuario) {
     if (interno && req.headers.cookie?.split(";").some(item => item.trim().startsWith("cypher_session="))) return res.sendStatus(403);
@@ -273,10 +196,11 @@ export function middlewareAutorizacao(
   }
   if (interno && !ehAdministrador(usuario)) return res.sendStatus(403);
   if (!interno && usuario.tipoConta === "administrativo") return res.sendStatus(403);
-  if (interno && req.path.startsWith("/admin/revisao")) {
-    const acao = req.path.includes("excecoes") || req.path.includes("solicitacoes-excecao") ? "excecoes" : "taxonomia";
+  if (interno && caminho.startsWith("/admin/revisao")) {
+    const acao = caminho.includes("excecoes") || caminho.includes("solicitacoes-excecao") ? "excecoes" : "taxonomia";
     if (!podeAdministrar(usuario,acao)) return res.sendStatus(403);
   }
+  res.locals.origemEspaco = req.query.origem === "espaco" || req.body?.origem === "espaco";
   res.locals.usuario = usuarioParaView(usuario);
   res.locals.temaPreferido = interno ? "light" : obterPreferenciasUsuario(usuario.id).tema;
   res.locals.notificacoesRecentes = interno ? [] : CypherModel.notificacoes(usuario.id, 5);
@@ -561,41 +485,35 @@ function classeStatusBusca(status: string): string {
 }
 
 export async function login(req: Request, res: Response) {
-  const email = String(req.body.email ?? "")
+  const identificador = String(req.body.identificador ?? req.body.email ?? "")
     .trim()
     .toLowerCase();
   const senha = String(req.body.password ?? "");
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!emailValido || !senha || senha.length > 128 || email.length > 254) {
-    return res.status(401).render("pages/entrar", {
-      title: "Entrar",
-      path: "/login",
-      stylesheet: "autenticacao",
-      authenticated: false,
-      erro: "E-mail ou senha inválidos. Confira os dados e tente novamente.",
-      mensagem: null,
-      email,
-    });
-  }
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identificador);
+  const acessoInvalido = () => res.status(401).render("pages/entrar", {
+    title: "Entrar",
+    path: "/login",
+    stylesheet: "autenticacao",
+    authenticated: false,
+    erro: "E-mail, usuário ou senha inválidos. Confira os dados e tente novamente.",
+    mensagem: null,
+    email: identificador,
+  });
+  if (
+    !senha || senha.length > 128 || identificador.length > 254 ||
+    (!emailValido && validarIdentificador(identificador))
+  ) return acessoInvalido();
 
   try {
+    const email = emailValido ? identificador : buscarEmailPorIdentificadorCypher(identificador);
+    if (!email) return acessoInvalido();
     const usuarioId = await autenticarUsuario(email, senha);
-    if (!usuarioId) {
-      return res.status(401).render("pages/entrar", {
-        title: "Entrar",
-        path: "/login",
-        stylesheet: "autenticacao",
-        authenticated: false,
-        erro: "E-mail ou senha inválidos. Confira os dados e tente novamente.",
-        mensagem: null,
-        email,
-      });
-    }
+    if (!usuarioId) return acessoInvalido();
 
     const tokenVerificacao = iniciarSessao(usuarioId);
     const contaVerificacao = usuarioDaSessao(tokenVerificacao);
     encerrarSessao(tokenVerificacao);
-    if (contaVerificacao?.tipoConta === "administrativo") return res.status(401).render("pages/entrar", { title:"Entrar",path:"/login",stylesheet:"autenticacao",authenticated:false,erro:"E-mail ou senha inválidos.",mensagem:null,email });
+    if (contaVerificacao?.tipoConta === "administrativo") return acessoInvalido();
     substituirSessao(req, res, usuarioId);
     return res.redirect("/dashboard");
   } catch (erro) {
@@ -607,7 +525,7 @@ export async function login(req: Request, res: Response) {
       authenticated: false,
       erro: "Não foi possível concluir o acesso agora. Tente novamente.",
       mensagem: null,
-      email,
+      email: identificador,
     });
   }
 }
@@ -802,15 +720,6 @@ export const analisarCategoria = (req: Request, res: Response) => {
   });
 };
 
-export const visaoGeral = renderizarPagina(
-  "pages/visao-geral",
-  "Visão geral",
-  () => ({
-    eventos: CypherModel.eventos(),
-    pessoas: CypherModel.pessoas(),
-    estatisticasObras: CypherModel.estatisticasObras(),
-  })
-);
 export const buscarPessoas = (req: Request, res: Response) => {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
@@ -861,6 +770,8 @@ export const oportunidades = renderizarPagina(
   () => ({ eventos: CypherModel.eventos() })
 );
 type ValoresFormularioObra = {
+  visibilidade?: string;
+  atuacoes?: string[];
   titulo: string;
   tipo: string;
   tipoOutro: string;
@@ -896,7 +807,8 @@ const formularioObraVazio: ValoresFormularioObra = {
   tipoOutro: "",
   genero: "",
   generoOutro: "",
-  status: "Em produção",
+  status: "",
+  visibilidade: "privada",
   descricao: "",
   letra: "",
   bpm: "",
@@ -910,12 +822,14 @@ const formularioObraVazio: ValoresFormularioObra = {
 
 function formularioObraRecebido(req: Request): ValoresFormularioObra {
   return {
+    atuacoes: req.body.selecionarAtuacoes === "1" || req.body.atuacao !== undefined ? camposRepetidos(req, "atuacao").filter(Boolean) : undefined,
     titulo: String(req.body.titulo ?? "").trim(),
     tipo: String(req.body.tipo ?? "").trim(),
     tipoOutro: String(req.body.tipoOutro ?? "").trim(),
     genero: String(req.body.genero ?? "").trim(),
     generoOutro: String(req.body.generoOutro ?? "").trim(),
     status: String(req.body.status ?? "").trim(),
+    visibilidade: req.body.visibilidade === undefined ? undefined : String(req.body.visibilidade),
     descricao: String(req.body.descricao ?? "").trim(),
     letra: String(req.body.letra ?? "").trim(),
     bpm: String(req.body.bpm ?? "").trim(),
@@ -975,6 +889,7 @@ function preencherFormularioObra(
       ? obra.genreDetail
       : obra.genreDetail || obra.genre,
     status: obra.status,
+    visibilidade: obra.published && ["", "Lançado"].includes(obra.status) ? "publica" : "privada",
     descricao: obra.description,
     letra: obra.lyrics,
     bpm: obra.bpm,
@@ -1028,7 +943,7 @@ function renderizarFormularioObra(
   const editando = opcoes.editando ?? false;
   return res.status(opcoes.status ?? 200).render("pages/cadastro-obra", {
     title: editando ? "Editar obra" : "Cadastrar obra",
-    path: "/works",
+    path: "/espaco-de-trabalho",
     stylesheet: "cadastro-obra",
     authenticated: true,
     usuario: usuarioParaView(usuario),
@@ -1040,9 +955,10 @@ function renderizarFormularioObra(
     tipoOutroLegadoVazio: opcoes.tipoOutroLegadoVazio ?? false,
     generoOutroLegadoVazio: opcoes.generoOutroLegadoVazio ?? false,
     papelOutroLegadoVazio: opcoes.papelOutroLegadoVazio ?? false,
+    profissoes: listarProfissoesCatalogo().filter(p => usuario.categories.includes(p.rotulo)),
+    atuacoes: opcoes.valores?.atuacoes ?? (opcoes.obraId ? atuacoesDaObra(opcoes.obraId) : []),
     tiposObra: editando ? [...new Set([...tiposObraPermitidos(usuario.categories), opcoes.valores?.tipo].filter(Boolean))] : tiposObraPermitidos(usuario.categories),
     generosObra,
-    statusObra,
     papeisObra,
     podeCadastrarBeat: podePublicar(usuario, "beat"),
     perfisParaCredito: CypherModel.perfisParaCredito(usuario.id),
@@ -1085,8 +1001,8 @@ function validarFormularioObra(
       (!opcoes.generoOutroLegadoVazio && valores.generoOutro.length < 2))
   )
     return "Especifique o gênero em 2 a 40 caracteres.";
-  if (!statusObra.includes(valores.status))
-    return "Selecione um status válido.";
+  if (valores.visibilidade !== undefined ? !["privada", "publica"].includes(valores.visibilidade) : !statusObra.includes(valores.status))
+    return "Selecione a visibilidade da obra.";
   if (!papeisObra.includes(valores.papel))
     return "Selecione seu papel principal na obra.";
   if (
@@ -1175,7 +1091,8 @@ function dadosPersistidosObra(valores: ValoresFormularioObra): DadosObraCypher {
     typeDetail: valores.tipo === "Outro" ? valores.tipoOutro : "",
     genre: valores.genero,
     genreDetail: valores.genero === "Outro" ? valores.generoOutro : "",
-    status: valores.status,
+    status: valores.visibilidade === undefined ? valores.status : "",
+    published: valores.visibilidade === undefined ? valores.status === "Lançado" : valores.visibilidade === "publica",
     role: valores.papel,
     roleDetail: valores.papel === "Outro crédito" ? valores.papelOutro : "",
     description: valores.descricao,
@@ -1231,65 +1148,6 @@ function valoresDeCreditosRecebidos(req: Request) {
   };
 }
 
-export const obras = (req: Request, res: Response) => {
-  const usuario = exigeAcesso(req, res);
-  if (!usuario) return;
-  const mensagens: Record<string, string> = {
-    criada: "A obra foi cadastrada.",
-    atualizada: "As alterações da obra foram salvas.",
-    excluida: "A obra e seus créditos associados foram removidos.",
-    permissao: "Seu cargo atual não permite cadastrar ou gerenciar obras.",
-  };
-  const resultado =
-    parametroTexto(req, "resultado") || parametroTexto(req, "erro");
-  const mensagem = mensagens[resultado] ?? null;
-  const filtros = filtrosCatalogo(req);
-  const obrasDoCatalogo = CypherModel.obrasDoUsuario(usuario.id, filtros);
-  return res.render("pages/obras", {
-    title: "Obras",
-    path: req.path,
-    stylesheet: "obras",
-    authenticated: true,
-    usuario: usuarioParaView(usuario),
-    podeCadastrarBeat: podePublicar(usuario, "beat"),
-    podeCadastrarObra: podePublicar(usuario, "obra"),
-    tiposPermitidos: tiposObraPermitidos(usuario.categories),
-    obras: obrasDoCatalogo,
-    catalogoGrupos: gruposCatalogo(obrasDoCatalogo),
-    filtrosCatalogo: {
-      status: filtros.status ? chaveCatalogo(filtros.status) : "",
-      tipo: filtros.type ? chaveCatalogo(filtros.type) : "",
-      genero: filtros.genre ? chaveCatalogo(filtros.genre) : "",
-      papel: filtros.role ? chaveCatalogo(filtros.role) : "",
-      ordem: filtros.order,
-    },
-    opcoesFiltroCatalogo: {
-      status: statusObra.map(valor => ({
-        label: valor,
-        value: chaveCatalogo(valor),
-      })),
-      tipo: tiposObra.map(valor => ({
-        label: valor,
-        value: chaveCatalogo(valor),
-      })),
-      genero: generosObra.map(valor => ({
-        label: valor,
-        value: chaveCatalogo(valor),
-      })),
-      papel: papeisObra.map(valor => ({
-        label: valor,
-        value: chaveCatalogo(valor),
-      })),
-      ordem: ordensCatalogo,
-    },
-    estatisticasObras: CypherModel.estatisticasObrasDoUsuario(usuario.id),
-    mensagem:
-      req.query.genero === "analise" && mensagem
-        ? `${mensagem} A especificação de gênero foi enviada para análise e só será aprovada após revisão.`
-        : mensagem,
-  });
-};
-
 export const novaObra = (req: Request, res: Response) => {
   const usuario = exigeAcesso(req, res);
   if (!usuario) return;
@@ -1300,7 +1158,9 @@ export const novaObra = (req: Request, res: Response) => {
   const tipo =
     tiposObra.find(opcao => opcao === tipoRecebido) ??
     valorCatalogo(tiposObra, tipoRecebido);
-  if (!tipo) return res.redirect(303, "/works#cadastro-obra");
+  if (!tipo) {
+    return res.render("pages/formato-obra", {title:"Escolher formato", stylesheet:"espaco-trabalho", path:"/espaco-de-trabalho", tipos:tiposObraPermitidos(usuario.categories)});
+  }
   if (tipo === "Beat") {
     if (!podePublicar(usuario, "beat")) {
       return res.redirect(303, "/works?erro=permissao");
@@ -1342,6 +1202,7 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
   }
 
   const valores = formularioObraRecebido(req);
+  if (valores.atuacoes?.some(id => !listarProfissoesCatalogo().some(p => p.id === id && usuario.categories.includes(p.rotulo)))) return res.sendStatus(400);
   if (!editar && !podePublicar(usuario,"obra",valores.tipo)) return res.sendStatus(403);
   if (valores.tipo === "Beat") {
     if (!podePublicar(usuario, "beat")) {
@@ -1392,6 +1253,7 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
 
   try {
     const dados = dadosPersistidosObra(valores);
+    dados.atuacoes = valores.atuacoes;
     if (valores.genero === "Outro" && valores.generoOutro) {
       const detalheNormalizado = valores.generoOutro.toLocaleLowerCase("pt-BR");
       const generoCanonico = generosObra.find(
@@ -1427,14 +1289,14 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
         tipo: "obra_atualizada",
         titulo: "Obra atualizada",
         mensagem: `As informações de “${valores.titulo}” foram salvas.`,
-        url: "/works",
+        url: "/espaco-de-trabalho/obra/" + encodeURIComponent(obraId),
         entidadeTipo: "obra",
         entidadeId: obraId,
         chaveOrigem: `obra-atualizada:${obraId}:${valores.titulo}:${valores.status}`,
       });
       const parametros = new URLSearchParams({ resultado: "atualizada" });
       if (dados.propostaGenero) parametros.set("genero", "analise");
-      return res.redirect(303, `/works?${parametros.toString()}`);
+      return res.redirect(303, `/espaco-de-trabalho?${parametros.toString()}`);
     }
     const obraIdCriada = CypherModel.criarObra(usuario.id, dados, entradas);
     CypherModel.criarNotificacao({
@@ -1442,14 +1304,14 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
       tipo: "obra_criada",
       titulo: "Nova obra cadastrada",
       mensagem: `“${valores.titulo}” foi adicionada ao seu catálogo.`,
-      url: "/works",
+      url: "/espaco-de-trabalho/obra/" + encodeURIComponent(obraIdCriada),
       entidadeTipo: "obra",
       entidadeId: obraIdCriada,
       chaveOrigem: `obra-criada:${obraIdCriada}`,
     });
     const parametros = new URLSearchParams({ resultado: "criada" });
     if (dados.propostaGenero) parametros.set("genero", "analise");
-    return res.redirect(303, `/works?${parametros.toString()}`);
+    return res.redirect(303, `/espaco-de-trabalho?${parametros.toString()}`);
   } catch (erroGravacao) {
     const mensagemCredito = mensagemErroCredito(erroGravacao);
     if (!mensagemCredito) {
@@ -1486,7 +1348,7 @@ export const excluirObra = (req: Request, res: Response) => {
   }
   const excluida = CypherModel.excluirObra(req.params.id ?? "", usuario.id);
   if (!excluida) return res.sendStatus(404);
-  return res.redirect(303, "/works?resultado=excluida");
+  return res.redirect(303, "/espaco-de-trabalho?resultado=excluida");
 };
 export const bancoBeats = renderizarPagina(
   "pages/banco-beats",

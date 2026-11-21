@@ -12,6 +12,8 @@ import * as perfis from "../controllers/controladorPerfis.js";
 import * as notificacoes from "../controllers/controladorNotificacoes.js";
 import { middlewareAutorizacao } from "../controllers/controladorCompartilhado.js";
 
+import { espacoTrabalho, fichaTrabalho } from "../controllers/controladorEspacoTrabalho.js";
+
 const router = Router();
 
 router.use(middlewareAutorizacao);
@@ -36,7 +38,7 @@ router.get("/notificacoes", notificacoes.notificacoes);
 router.post("/notificacoes/marcar-todas-lidas", notificacoes.marcarTodasLidas);
 router.post("/notificacoes/:id/lida", notificacoes.marcarLida);
 router.post("/categories/analyze", dashboard.analisarCategoria);
-router.get(["/", "/dashboard"], dashboard.visaoGeral);
+router.get(["/", "/dashboard"], dashboard.descoberta);
 router.get("/search", perfis.buscarPessoas);
 router.get("/events", eventos.oportunidades);
 router.get("/events/new", eventos.novoEvento);
@@ -50,6 +52,8 @@ router.post(
 router.get("/events/:id/edit", eventos.editarEvento);
 router.post("/events/:id/edit", eventos.atualizarEvento);
 router.post("/events/:id/delete", eventos.excluirEvento);
+router.get("/espaco-de-trabalho", espacoTrabalho);
+router.get("/espaco-de-trabalho/:modalidade/:id", fichaTrabalho);
 router.get("/works", obras.obras);
 router.get("/works/new", obras.novaObra);
 router.post("/works/new", obras.criarObra);

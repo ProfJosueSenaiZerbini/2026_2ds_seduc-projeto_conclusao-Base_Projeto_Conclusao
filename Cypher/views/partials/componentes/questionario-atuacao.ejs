@@ -16,7 +16,7 @@
         <p>Respostas desta função ficam separadas das demais categorias. As informações de trajetória não comprovam experiência.</p>
       <% } %>
     </div>
-    <% if (!legada) { %>
+    <% if (!legada && !(typeof cadastro !== 'undefined' && cadastro)) { %>
       <label class="professional-questionnaire__category-visibility">
         <span>Quem pode ver esta categoria?</span>
         <select data-visibilidade-categoria="__categoria__" aria-label="Visibilidade da categoria <%= rotulo %>">
@@ -43,7 +43,7 @@
               <% (pergunta.opcoes ?? []).forEach(opcao => { %>
                 <label class="trajectory-option">
                   <input type="radio" name="respostas[<%= pergunta.profissaoId %>][<%= pergunta.campo %>]" value="<%= opcao %>" data-resposta-atuacao="<%= pergunta.campo %>" <%= valor === opcao ? 'checked' : '' %>>
-                  <span><%= formatarRespostaAtuacao(opcao) %></span>
+                  <span class="trajectory-time-label"><strong><%= ({iniciando:'Começando','<6m':'Até 6 meses','6m-1a':'6 meses a 1 ano','1-3a':'1 a 3 anos','3-5a':'3 a 5 anos','>5a':'+ de 5 anos'})[opcao] || formatarRespostaAtuacao(opcao) %></strong></span>
                   <span class="trajectory-option-mark" aria-hidden="true"></span>
                 </label>
               <% }) %>
@@ -70,6 +70,16 @@
               <label class="professional-questionnaire__choice"><input type="radio" name="<%= idQuestionario %>-<%= pergunta.campo %>" value="false" data-resposta-atuacao="<%= pergunta.campo %>" data-tipo-resposta-atuacao="booleano" <%= valor === false ? 'checked' : '' %>><span>Não</span></label>
             </div>
           <% } %>
+          <% if(typeof cadastro !== 'undefined' && cadastro){ %>
+          <fieldset class="trajectory-privacy">
+            <legend>Quem pode ver seu tempo de atuação?</legend>
+            <div class="trajectory-privacy-options">
+            <% for(const [valorPrivacidade,rotuloPrivacidade] of [['publico','Público'],['colaboradores','Colaboradores'],['privado','Só eu']]){ %>
+              <label><input type="radio" name="privacidade-<%= idQuestionario %>-<%= pergunta.campo %>" data-visibilidade-atuacao="<%= pergunta.campo %>" value="<%= valorPrivacidade %>" <%= valorVisibilidade(pergunta) === valorPrivacidade ? 'checked' : '' %>><span><%= rotuloPrivacidade %></span></label>
+            <% } %>
+            </div>
+          </fieldset>
+          <% } else { %>
           <label class="professional-questionnaire__answer-visibility">
             <span>Visibilidade desta resposta</span>
             <select data-visibilidade-atuacao="<%= pergunta.campo %>">
@@ -78,6 +88,7 @@
               <option value="privado" <%= valorVisibilidade(pergunta) === 'privado' ? 'selected' : '' %>>Privado</option>
             </select>
           </label>
+          <% } %>
         </fieldset>
       <% }) %>
     </div>

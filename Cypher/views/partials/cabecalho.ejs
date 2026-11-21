@@ -3,7 +3,36 @@
     <head>
       <meta charset="UTF-8" />
       <meta name="cypher-theme" content="<%= typeof temaPreferido !== 'undefined' ? temaPreferido : '' %>">
-      <script>try{const preferido=document.querySelector('meta[name="cypher-theme"]').content||localStorage.getItem('cypher-tema')||'dark';document.documentElement.classList.toggle('dark',preferido==='dark');}catch{document.documentElement.classList.add('dark');}</script>
+      <script>
+        (() => {
+          const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
+          let tema = temaConta === "light" ? "light" : "dark";
+          try {
+            const salvo = localStorage.getItem("cypher-tema");
+            if (salvo === "light" || salvo === "dark") tema = salvo;
+          } catch {}
+          document.documentElement.classList.toggle("dark", tema === "dark");
+        })();
+      </script>
+      <script>
+        // Consome apenas a próxima navegação feita com o mouse na sidebar.
+        try {
+          const chave = "cypher-sidebar-percurso";
+          const percurso = JSON.parse(sessionStorage.getItem(chave) || "null");
+          sessionStorage.removeItem(chave);
+          const destino = (location.pathname === "/" ? "/dashboard" : location.pathname) + location.search;
+          if (
+            percurso &&
+            window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)").matches &&
+            percurso.destino === destino &&
+            Number.isFinite(percurso.instante) &&
+            Date.now() - percurso.instante >= 0 &&
+            Date.now() - percurso.instante < 15000
+          ) {
+            document.documentElement.classList.add("sidebar-em-transicao");
+          }
+        } catch {}
+      </script>
       <meta name="csrf-token" content="<%= csrfToken %>">
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#10140f" />
@@ -14,6 +43,8 @@
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/css/estilos.css">
+      <link rel="stylesheet" href="/css/tema-cypher-claro.css">
+      <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
       <% if (stylesheet) { %>
         <link rel="stylesheet" href="/css/<%= stylesheet %>.css">
       <% } %>

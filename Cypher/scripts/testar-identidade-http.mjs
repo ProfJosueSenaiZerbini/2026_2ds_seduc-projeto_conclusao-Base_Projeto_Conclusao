@@ -38,7 +38,7 @@ try{
   const post=(rota,body,cookie='')=>req(rota,{method:'POST',body,cookie});
   const dados=(email,identificador,tipoConta='consumidor')=>({name:'Pessoa Consumidora',email,identificador,tipoConta,nascimento:'1990-06-15',password:senha,passwordConfirmation:senha});
   const tokenEmail=email=>{const mensagens=fs.readdirSync(caixa).filter(n=>n.endsWith('.eml')).sort().reverse().map(n=>fs.readFileSync(path.join(caixa,n),'utf8'));const mensagem=mensagens.find(m=>m.startsWith(`To: ${email}\n`)&&m.includes('/confirmar-email?'));assert.ok(mensagem);return mensagem.match(/token=([a-f0-9]{64})/)[1];};
-  const login=async(email,interno=false)=>{const r=await post(interno?'/admin/login':'/login',{email,password:senha});assert.equal(r.status,interno?303:302);const prefixo=interno?'cypher_admin_session=':'cypher_session=';return r.headers.getSetCookie().find(c=>c.startsWith(prefixo))?.split(';')[0];};
+  const login=async(identificador,interno=false)=>{const r=await post(interno?'/admin/login':'/login',{[interno?'email':'identificador']:identificador,password:senha});assert.equal(r.status,interno?303:302);const prefixo=interno?'cypher_admin_session=':'cypher_session=';return r.headers.getSetCookie().find(c=>c.startsWith(prefixo))?.split(';')[0];};
   db=new Database(arquivo);
   for(const alteracao of [{nascimento:'2012-01-01'},{nascimento:'2099-01-01'},{nascimento:'2025-02-29'},{identificador:'admin'},{identificador:'nome-com-hifen'},{identificador:'a'.repeat(25)},{passwordConfirmation:'OutraSenha2026'}]){const r=await post('/register',{...dados('invalido@teste.local','invalido'),...alteracao});assert.equal(r.status,400);}
   assert.equal(db.prepare("SELECT count(*) AS total FROM usuarios WHERE tipo_conta<>'administrativo'").get().total,0,'Cadastro inválido não pode criar conta parcial');
@@ -50,7 +50,7 @@ try{
   assert.equal((await post('/login',{email:pro.email,password:senha})).status,401);assert.equal((await req('/p/artista.teste')).status,404);
   const codigo=tokenEmail(pro.email);const salvo=db.prepare('SELECT token_hash,expira_em,criado_em FROM tokens_confirmacao_email WHERE usuario_id=?').get(idPro.id);assert.equal(salvo.token_hash,createHash('sha256').update(codigo).digest('hex'));assert.notEqual(salvo.token_hash,codigo);assert.equal(salvo.expira_em-salvo.criado_em,30*60*1000);
   assert.equal((await post('/confirmar-email',{token:codigo})).status,200);assert.equal((await post('/confirmar-email',{token:codigo})).status,400);
-  let cookiePro=await login(pro.email);
+  let cookiePro=await login('@ARTISTA.TESTE');
   const nomeInicial = await (await req('/p/artista.teste')).text();
   assert.match(nomeInicial,/Nome Civil Totalmente Privado/);
   assert.doesNotMatch(nomeInicial,/Artista Singular/);
@@ -63,11 +63,17 @@ try{
   const duplicado=await post('/register',dados('duplicado@teste.local','ARTISTA.TESTE'));assert.equal(duplicado.status,409);
   assert.equal((await post('/register',{...dados('consumidor@teste.local','consumidor'),categorias:'Rapper'})).status,400);
   assert.equal((await post('/register',dados('consumidor@teste.local','consumidor'))).status,303);assert.equal((await post('/confirmar-email',{token:tokenEmail('consumidor@teste.local')})).status,200);
-  const cookieConsumidor=await login('consumidor@teste.local');const antes=db.prepare("SELECT id,codigo_publico,email,senha_hash FROM usuarios WHERE email='consumidor@teste.local'").get();
+  const cookieConsumidor=await login('consumidor');const antes=db.prepare("SELECT id,codigo_publico,email,senha_hash FROM usuarios WHERE email='consumidor@teste.local'").get();
   const perfilCons=await req('/profile',{cookie:cookieConsumidor});assert.equal(perfilCons.status,200);const perfilConsHtml=await perfilCons.text();assert.match(perfilConsHtml,/SEU ESPAÇO PRIVADO/);assert.doesNotMatch(perfilConsHtml,/reputation-mini|data-atuacao-questionario|Suas categorias/);
   assert.equal((await req('/p/consumidor')).status,404);
   await post('/settings/privacy',{perfilPublico:'on',localizacaoPublica:'on',contatoPublico:'on'},cookieConsumidor);assert.equal(db.prepare('SELECT perfil_publico FROM perfis WHERE usuario_id=?').get(antes.id).perfil_publico,0);
   const busca=await req('/search',{cookie:cookieConsumidor});const buscaHtml=await busca.text();assert.doesNotMatch(buscaHtml,/Nome Civil Totalmente Privado|href="\/p\/consumidor"/);assert.match(buscaHtml,/Artista Singular/);
+  const descoberta = await req('/dashboard?tipo=profissionais&q=artista', {cookie:cookieConsumidor});
+  const htmlDescoberta = await descoberta.text();
+  assert.equal(descoberta.status,200);
+  assert.match(htmlDescoberta,/class="dc-result-grid"/);
+  assert.match(htmlDescoberta,/href="\/p\/artista\.teste"/);
+  assert.doesNotMatch(htmlDescoberta,/Nome Civil Totalmente Privado|class="dc-create"/);
   const ativacao={categorias:['Rapper','Letrista'],respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'<6m'},Letrista:{tempoAtuacao:'iniciando'}}),visibilidadesAtuacoesJson:'{}'};
   assert.equal((await post('/profile/profissionalizar',ativacao,cookieConsumidor)).status,400);assert.equal(db.prepare('SELECT tipo_conta FROM usuarios WHERE id=?').get(antes.id).tipo_conta,'consumidor');
   assert.equal((await post('/profile/profissionalizar',{...ativacao,confirmar:'1'},cookieConsumidor)).status,303);
@@ -98,8 +104,14 @@ try{
   await post('/settings/privacy',{},cookiePro);assert.equal((await req('/p/artista.teste')).status,404);assert.equal((await req('/p/artista.final')).status,404);
   assert.equal((await post('/settings/preferencias',{regiao:'São Paulo',generos:['Trap','Rap'],tema:'dark'},cookiePro)).status,303);
   const configuracoes=await req('/settings',{cookie:cookiePro});const cfgHtml=await configuracoes.text();assert.match(cfgHtml,/name="cypher-theme" content="dark"/);assert.match(cfgHtml,/value="São Paulo"/);assert.doesNotMatch(cfgHtml,/Ajuda e sobre/);
-  db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('sp',?,'Evento da região','Show','2030-01-01','São Paulo')").run(idPro.id);db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('rj',?,'Evento em outra região','Show','2030-01-01','Rio de Janeiro')").run(idPro.id);
+  db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('sp',?,'Evento da região','Show','2030-01-01','República, São Paulo')").run(idPro.id);db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('rj',?,'Evento em outra região','Show','2030-01-01','Rio de Janeiro')").run(idPro.id);
+  const vitrinePrivada = await req('/dashboard?tipo=eventos',{cookie:cookieConsumidor});
+  assert.doesNotMatch(await vitrinePrivada.text(),/Evento da região|Evento em outra região/);
   const eventos=await req('/events',{cookie:cookiePro});const eventosHtml=await eventos.text();assert.match(eventosHtml,/Evento da região/);assert.doesNotMatch(eventosHtml,/Evento em outra região/);
+  const cidadeEBairro = new URLSearchParams({ localizacao: 'Sao Paulo, Republica', categoria: 'Show' });
+  const eventosBairro = await (await req('/events?' + cidadeEBairro, { cookie: cookiePro })).text();
+  assert.match(eventosBairro, /Evento da região/);
+  assert.doesNotMatch(eventosBairro, /Evento em outra região/);
   db.prepare('UPDATE tokens_confirmacao_email SET criado_em=criado_em-61000 WHERE usuario_id=?').run(idPro.id);
   const troca=await post('/settings/email',{email:'novo@teste.local',senha},cookiePro);assert.equal(troca.status,303);assert.equal(db.prepare('SELECT email FROM usuarios WHERE id=?').get(idPro.id).email,'pro@teste.local');
   assert.equal((await post('/confirmar-email',{token:tokenEmail('novo@teste.local')})).status,200);assert.equal(db.prepare('SELECT email FROM usuarios WHERE id=?').get(idPro.id).email,'novo@teste.local');assert.equal((await req('/settings',{cookie:cookiePro})).status,302);cookiePro=await login('novo@teste.local');assert.ok(cookiePro);

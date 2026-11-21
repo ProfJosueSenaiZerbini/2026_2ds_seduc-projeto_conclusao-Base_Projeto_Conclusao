@@ -1,2 +1,2 @@
-/** Entry points do dashboard e das ações demonstrativas associadas. */
-export { visaoGeral, analisarCategoria } from "./controladorCompatibilidade.js";
+export { descoberta } from "./controladorDescoberta.js";
+export { analisarCategoria } from "./controladorCompatibilidade.js";

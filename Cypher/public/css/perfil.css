@@ -1,3 +1,4 @@
+@import "./contador-sticker.css";
 /* View: perfil profissional. */
 
 .profile-hero {
@@ -1550,10 +1551,6 @@
   justify-content: space-between;
   align-items: center;
 }
-.public-profile-layout .profile-catalog-count {
-  color: var(--text-muted);
-  font-size: 11px;
-}
 .public-profile-layout .professional-category-section {
   grid-area: activity;
 }
@@ -2165,3 +2162,11 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+.public-work-card:target { scroll-margin-top: 20px; outline: 2px solid var(--lime); }
+.demo-profile-photo { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.demo-work-cover { width: 64px; height: 64px; object-fit: cover; border-radius: 5px; }
+.demo-track-list { margin-block: 12px; font-size: 13px; }
+.demo-track-list summary { cursor: pointer; font-weight: 700; }
+.demo-track-list ol { padding-inline-start: 24px; }
+.demo-track-list a { text-decoration: underline; }

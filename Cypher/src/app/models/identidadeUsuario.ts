@@ -93,9 +93,9 @@ export function profissionalizarUsuario(usuarioId:string,categorias:string[],res
 }
 
 export const generosInteresse=["Rap",...vertentesProfissionais];
-export function obterPreferenciasUsuario(usuarioId:string) {
+export function obterPreferenciasUsuario(usuarioId:string, temaPadrao = "light") {
   const r=conexaoInternaCypher().prepare("SELECT regiao,generos_json AS generosJson,tema FROM preferencias_usuario WHERE usuario_id=?").get(usuarioId) as {regiao:string;generosJson:string;tema:string}|undefined;
-  return {regiao:r?.regiao ?? "",generos:r?JSON.parse(r.generosJson) as string[]:[],tema:r?.tema ?? "light"};
+  return {regiao:r?.regiao ?? "",generos:r?JSON.parse(r.generosJson) as string[]:[],tema:r?.tema ?? temaPadrao};
 }
 export function salvarPreferenciasUsuario(usuarioId:string, regiao:string, generos:string[], tema:string) {
   if(regiao.length>100 || !["light","dark"].includes(tema) || generos.some(item=>!generosInteresse.includes(item as typeof generosInteresse[number]))) throw new Error("Confira suas preferências.");

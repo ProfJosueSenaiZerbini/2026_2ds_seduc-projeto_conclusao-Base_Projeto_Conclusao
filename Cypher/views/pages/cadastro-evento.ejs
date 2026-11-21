@@ -1,14 +1,16 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
+<link rel="stylesheet" href="/css/descoberta.css">
+<link rel="stylesheet" href="/css/temas-evento-form.css">
 <div class="app-shell">
 <%- include('../partials/barra-lateral', { path }) %>
 <main class="main-shell">
 <%- include('../partials/barra-superior', { breadcrumb: editando ? 'Oportunidades / Editar' : 'Oportunidades / Cadastrar' }) %>
 <div class="page-content work-form-page">
-<a href="/events" class="back-link">
+<a href="<%= origemEspaco ? '/espaco-de-trabalho' : '/events' %>" class="back-link">
   <span class="lucide-icon" aria-hidden="true">
     <%- icones.arrowLeft %>
   </span>
-  Voltar para Oportunidades
+  <%= origemEspaco ? 'Voltar ao Espaço de Trabalho' : 'Voltar para Oportunidades' %>
 </a>
 <div class="page-header">
   <div>
@@ -89,6 +91,19 @@
         <input name="categoriaDetalhe" data-event-category-other-input minlength="2" maxlength="80" value="<%= valores.categoriaDetalhe %>"<%= valores.categoria === 'Outro' && !categoriaOutroLegadaVazia ? ' required' : '' %><%= valores.categoria === 'Outro' ? '' : ' disabled' %> placeholder="Ex.: encontro de DJs, feira de música independente">
         <small>O detalhe será exibido junto ao evento; a categoria continua “Outro” para os filtros e relatórios.</small>
       </label>
+      <fieldset class="workshop-type-fieldset field-full" data-workshop-types-field<%= valores.categoria === 'Workshop' ? '' : ' hidden' %> aria-describedby="workshop-types-help workshop-types-error">
+        <legend>Tipo de workshop <span class="required-mark">*</span></legend>
+        <p id="workshop-types-help">Selecione uma ou mais áreas.</p>
+        <div class="workshop-type-options">
+          <% tiposWorkshop.forEach(tipo => { %>
+            <label class="workshop-type-option<%= valores.tiposWorkshop.includes(tipo) ? ' selected' : '' %>">
+              <input type="checkbox" name="tiposWorkshop" value="<%= tipo %>"<%= valores.tiposWorkshop.includes(tipo) ? ' checked' : '' %>>
+              <span><%= tipo %></span>
+            </label>
+          <% }) %>
+        </div>
+        <small id="workshop-types-error" data-workshop-types-error role="status" hidden>Selecione pelo menos um tipo de workshop.</small>
+      </fieldset>
       <label>
         Situação
         <span class="required-mark">
@@ -213,8 +228,32 @@
       </label>
     </div>
   </section>
+  <fieldset class="form-section event-theme-fieldset">
+    <legend>Tema do cartão</legend>
+    <div class="event-theme-options dc-shell">
+      <% temasEvento.forEach(tema => { %>
+        <div class="event-theme-option">
+          <label class="event-theme-choice">
+            <input type="radio" name="temaCartao" value="<%= tema.id %>"<% if (temaSelecionado === tema.id) { %> checked<% } %> required>
+            <span><strong><%= tema.nome %></strong><small><%= tema.descricao %></small></span>
+          </label>
+          <div class="event-theme-preview" aria-hidden="true">
+            <%- include('../partials/componentes/evento-descoberta', {
+              previa: true,
+              item: {
+                temaCartao: tema.id, categoria: valores.categoria, tipo: valores.categoria || 'Batalha de rima', workshopTypes: valores.tiposWorkshop,
+                titulo: valores.titulo || 'Batalha da Praça', autor: valores.organizador,
+                local: valores.local || 'Praça Roosevelt, São Paulo', hora: valores.horario || '19h30',
+                data: '2026-11-23', dia: '23', mes: 'NOV', dataCurta: '23 de novembro', cor: valores.cor
+              }
+            }) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </fieldset>
   <div class="work-form-actions">
-    <a class="button button-outline" href="/events">
+    <a class="button button-outline" href="<%= origemEspaco ? '/espaco-de-trabalho' : '/events' %>">
       Cancelar
     </a>
     <button class="button button-lime" type="submit">
@@ -224,9 +263,12 @@
       <%= editando ? 'Salvar alterações' : 'Publicar evento' %>
     </button>
   </div>
-<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% if (origemEspaco) { %><input type="hidden" name="origem" value="espaco"><% } %>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 </div>
 </main>
 </div>
+<script src="/js/temas-evento.js" defer></script>
+<script src="/js/descoberta.js" defer></script>
 <%- include('../partials/fim-pagina') %>

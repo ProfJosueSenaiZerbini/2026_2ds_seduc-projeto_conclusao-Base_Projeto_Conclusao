@@ -1,4 +1,5 @@
 /* View: Cypher Central. */
+@import "./cartao-central.css";
 
 .section-heading h2,
 .works-toolbar h2,
@@ -111,66 +112,6 @@
   display: grid;
   align-content: start;
   gap: 28px;
-}
-
-.knowledge-pattern {
-  position: relative;
-  min-height: 252px;
-  padding: 21px;
-  overflow: hidden;
-  border-radius: var(--radius);
-  color: var(--white);
-  background: var(--ink);
-}
-
-.knowledge-pattern::after {
-  content: "";
-  position: absolute;
-  width: 170px;
-  height: 170px;
-  right: -26px;
-  bottom: -78px;
-  border: 1px solid #44503d;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 19px #1a2118,
-    0 0 0 20px #44503d,
-    0 0 0 39px #1a2118,
-    0 0 0 40px #44503d;
-}
-
-.knowledge-pattern svg {
-  color: var(--yellow);
-}
-
-.knowledge-pattern span {
-  display: block;
-  margin-top: 27px;
-  color: #8b9786;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-}
-
-.knowledge-pattern h3 {
-  position: relative;
-  z-index: 1;
-  max-width: 190px;
-  margin: 14px 0 8px;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 28px;
-  line-height: 0.98;
-  letter-spacing: -0.07em;
-}
-
-.knowledge-pattern p {
-  position: relative;
-  z-index: 1;
-  max-width: 190px;
-  margin: 0;
-  color: #a0ab9c;
-  font-size: 11px;
-  line-height: 1.45;
 }
 
 .article-list {

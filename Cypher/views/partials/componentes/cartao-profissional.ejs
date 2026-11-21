@@ -1,0 +1,16 @@
+<% const foto = imagemPerfilDemo(perfil.handle); %>
+<a class="cy-profile-card" href="<%= perfil.url %>">
+  <span class="cy-profile-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span class="cy-profile-portrait" aria-hidden="true">
+    <% if (foto) { %><img src="/img/<%= foto %>" alt="" loading="lazy" decoding="async">
+    <% } else { %><%= perfil.iniciais %><% } %>
+  </span>
+  <strong class="cy-profile-name"><%= perfil.nome %></strong>
+  <span class="cy-profile-role"><%= perfil.funcao %></span>
+  <% if (perfil.local || perfil.status || perfil.detalhes.length) { %>
+    <span class="cy-profile-info">
+      <span><%= [perfil.local, foto ? '' : perfil.status, ...perfil.detalhes.slice(0, 2)].filter(Boolean).join(' · ') %></span>
+    </span>
+  <% } %>
+  <span class="cy-profile-action">Ver perfil <span aria-hidden="true"><%- icones.arrowUpRight %></span></span>
+</a>

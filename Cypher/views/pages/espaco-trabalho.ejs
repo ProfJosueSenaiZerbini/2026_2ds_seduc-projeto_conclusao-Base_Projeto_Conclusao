@@ -1,0 +1,85 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<link rel="stylesheet" href="/css/descoberta.css">
+<link rel="stylesheet" href="/css/espaco-trabalho-identidade.css">
+<div class="dc-shell et-workspace">
+  <a class="dc-skip" href="#conteudo-trabalho">Pular para o conteúdo</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <header class="dc-header">
+      <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
+      <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
+      <div class="dc-title"><h1 id="et-titulo">Espaço de Trabalho</h1><p>Suas criações, projetos e participações na cena.</p></div>
+      <div class="dc-account">
+        <%- include('../partials/componentes/tema-entrada') %>
+        <%- include('../partials/componentes/acoes-conta') %>
+      </div>
+    </header>
+    <main class="et-page" id="conteudo-trabalho" aria-labelledby="et-titulo" tabindex="-1">
+      <form class="dc-controls et-search-controls et-filter" method="get" action="<%= path %>" role="search" aria-label="Buscar no Espaço de Trabalho">
+        <% if (secao) { %><input type="hidden" name="secao" value="<%= secao %>"><% } %>
+        <%- include('../partials/componentes/campo-busca', { campo: { id: 'busca-trabalhos', nome: 'q', valor: q, limite: 120, rotulo: 'Título, autor ou tipo', rotuloBotao: 'Buscar meus trabalhos', autocomplete: 'off' } }) %>
+        <details class="dc-filter">
+          <summary><span aria-hidden="true"><%- icones.sliders %></span> Filtros</summary>
+          <div class="dc-filter-panel">
+            <label>Atuação
+              <select name="profissao">
+                <option value="todas">Todas as atuações</option>
+                <% profissoes.forEach(p => { %>
+                  <option value="<%= p.id %>"<%= profissao === p.id ? ' selected' : '' %>><%= p.nome %></option>
+                <% }) %>
+              </select>
+            </label>
+            <button type="submit">Aplicar filtros</button>
+          </div>
+        </details>
+      </form>
+      <% if (mensagem) { %><p class="et-feedback" role="status"><%- icones.circleCheck %><%= mensagem %></p><% } %>
+      <% if (secao) { %><a class="et-back" href="<%= url() %>"><%- icones.arrowLeft %> Voltar à visão geral</a><% } %>
+      <span id="et-aviso" class="et-sr" aria-live="polite"></span>
+      <div id="et-resultados">
+      <% grupos.forEach(g => { %>
+        <section class="et-section" aria-labelledby="titulo-<%= g.id %>">
+          <header><div class="et-heading"><h2 id="titulo-<%= g.id %>"><%= g.nome %> <span class="cy-count-sticker"><%= g.quantidade %></span></h2><p><%= g.descricao %></p></div>
+          <% if (!secao && g.quantidade) { %><a class="et-more" href="<%= url(g.id) %>"><%= g.todos %> <%- icones.arrowRight %></a><% } %></header>
+          <% if (g.quantidade) { %>
+            <div class="et-grid <%= g.proprio ? '' : 'et-participacoes' %> <%= secao ? 'et-completa' : '' %>" aria-label="<%= g.nome %>">
+              <% g.itens.forEach(item => { %><%- include('../partials/cartao-trabalho',{item, href:item.detalhes + url(secao).slice(path.length), participacao:!g.proprio}) %><% }) %>
+            </div>
+          <% } else { %>
+            <div class="et-empty <%= g.proprio ? 'et-empty-main' : '' %>">
+              <span class="et-empty-icon" aria-hidden="true"><%- q ? icones.search : g.proprio ? icones.disc : icones.users %></span>
+              <div><h3><%= g.vazio %></h3>
+                <% if (!q && profissao === 'todas' && !g.proprio) { %><p>Os créditos confirmados e as participações em eventos aparecem aqui.</p><% } %>
+                <% if (!q && profissao === 'todas' && g.proprio && acoes.length) { %><a class="et-more" href="<%= acoes[0].base %>/new?origem=espaco"><%= acoes[0].nome %> <%- icones.arrowRight %></a><% } %>
+              </div>
+            </div>
+          <% } %>
+        </section>
+      <% }) %>
+      </div>
+      <% if (acoes.length) { %>
+        <details class="et-create" style="--et-action-count:<%= acoes.length %>">
+          <summary aria-label="Abrir menu de criação" aria-controls="et-acoes">
+            <span class="et-create-symbol" aria-hidden="true"><%- icones.plus %></span>
+            <span class="et-create-mark" aria-hidden="true"><%- icones.crown %></span>
+          </summary>
+          <nav id="et-acoes" aria-label="Ações de criação">
+            <% acoes.forEach((a,i) => { const angulo = acoes.length === 1 ? 48 : 12+i*72/(acoes.length-1); %>
+              <span class="et-create-orbit" style="--i:<%= i %>;--angle:<%= angulo %>deg">
+                <span class="et-create-carrier">
+                  <a class="et-create-action" data-create-kind="<%= a.base.slice(1) %>" href="<%= a.base %>/new?origem=espaco">
+                    <span class="et-create-icon" aria-hidden="true"><%- icones[a.icone] %></span>
+                    <span class="et-create-label"><%= a.nome %></span>
+                  </a>
+                </span>
+              </span>
+            <% }) %>
+          </nav>
+        </details>
+      <% } %>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: path }) %>
+  </div>
+</div>
+<script src="/js/espaco-trabalho.js" defer></script>
+<%- include('../partials/fim-pagina') %>
