@@ -18,14 +18,14 @@
     <% } %>
   </ol>
   <section class="register-stage" data-register-stage="conta" aria-label="Nome e vulgo">
-    <label>Nome Completo<input id="register-name" name="name" minlength="2" maxlength="80" value="<%= dados.nomeInformado %>" autocomplete="name" required></label>
-    <label class="nickname-switch"><input type="checkbox" name="possuiVulgo" value="1" data-has-nickname <%= dados.vulgo ? 'checked' : '' %>> Possui vulgo?</label>
+    <label>Nome completo<input id="register-name" name="name" minlength="2" maxlength="80" value="<%= dados.nomeInformado %>" autocomplete="name" required></label>
+    <label class="nickname-switch"><input type="checkbox" name="possuiVulgo" value="1" data-has-nickname <%= dados.vulgo ? 'checked' : '' %>> Quero informar meu vulgo</label>
     <div data-nickname-fields <%= dados.vulgo ? '' : 'hidden' %>><label>Vulgo<input name="vulgo" minlength="2" maxlength="80" value="<%= dados.vulgo %>" autocomplete="nickname"></label></div>
     <p class="register-inline-error" data-stage-error role="alert" hidden></p>
     <div class="register-navigation"><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
   </section>
-  <section class="register-stage" data-register-stage="contato" aria-label="Username e e-mail" hidden>
-    <label>Username<input name="identificador" value="<%= dados.identificador === '@' ? '' : dados.identificador %>" minlength="3" maxlength="25" placeholder="@seu.identificador" autocomplete="username" autocapitalize="none" spellcheck="false" pattern="@?[a-zA-Z0-9_.]{3,24}" required data-handle-input aria-describedby="handle-help handle-state"><small id="handle-help">De 3 a 24 letras, números, ponto ou sublinhado. É exclusivo e diferente do nome e do vulgo.</small></label><p id="handle-state" data-handle-state role="status" aria-live="polite"></p>
+  <section class="register-stage" data-register-stage="contato" aria-label="Nome de usuário e e-mail" hidden>
+    <label>Nome de usuário<input name="identificador" value="<%= dados.identificador === '@' ? '' : dados.identificador %>" minlength="3" maxlength="25" placeholder="@seu.identificador" autocomplete="username" autocapitalize="none" spellcheck="false" pattern="@?[a-zA-Z0-9_.]{3,24}" required data-handle-input aria-describedby="handle-help handle-state"><small id="handle-help">De 3 a 24 letras, números, ponto ou sublinhado. Seu @ é único e identifica seu perfil.</small></label><p id="handle-state" data-handle-state role="status" aria-live="polite"></p>
     <label>E-mail<input name="email" type="email" maxlength="254" value="<%= dados.email %>" autocomplete="email" required><small>Você precisará confirmar este endereço para ativar a conta.</small></label>
     <p class="register-inline-error" data-stage-error role="alert" hidden></p>
     <div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
@@ -34,7 +34,7 @@
     <%- include('../partials/componentes/olhos-senha') %>
     <div class="form-grid"><label>Data de nascimento<input name="nascimento" type="date" value="<%= dados.nascimento %>" max="<%= hoje %>" required autocomplete="bday"><small>Você precisa ter 18 anos ou mais.</small></label><%- include('../partials/componentes/genero',{identidade:dados}) %></div>
     <div class="form-grid"><label>Senha<input type="password" name="password" minlength="8" maxlength="128" autocomplete="new-password" required></label><label>Confirmar senha<input type="password" name="passwordConfirmation" minlength="8" maxlength="128" autocomplete="new-password" required></label></div>
-    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-account-next>Próximo <span aria-hidden="true">→</span></button></div>
+    <p class="register-inline-error" data-stage-error role="alert" hidden></p><div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-account-next>Continuar <span aria-hidden="true">→</span></button></div>
   </section>
   <section class="register-stage" data-register-stage="categorias" aria-label="Atuação" hidden>
     <%- include('../partials/componentes/selecao-profissional',{gruposProfissionais,categoriasSelecionadas,vertentesDisponiveis,vertentesSelecionadas,mostrarVertentes:false}) %>
@@ -42,7 +42,7 @@
   </section>
   <section class="register-stage register-branches-stage" data-register-stage="vertentes" aria-label="Vertentes do rap" hidden>
     <%- include('../partials/componentes/vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
-    <p class="branches-selection-status" data-branches-status aria-live="polite">Esta etapa é opcional. Pode pular se quiser.</p>
+    <p class="branches-selection-status" data-branches-status aria-live="polite">Nenhuma vertente selecionada.</p>
     <div class="register-navigation"><button class="button button-outline" type="button" data-register-back>Voltar</button><button class="button button-lime" type="button" data-continue>Continuar →</button></div>
   </section>
   <section class="register-stage" data-register-stage="questionarios" aria-label="Trajetória" hidden>

@@ -1,9 +1,9 @@
 <fieldset class="category-fieldset">
   <legend>Quais profissões representam sua atuação?</legend>
-  <p class="category-selection-summary" data-category-summary>Nenhuma profissão selecionada</p>
+  <p class="category-selection-summary" data-category-summary role="status">Nenhuma profissão selecionada</p>
   <div class="professional-area-picker" data-category-area-picker aria-label="Áreas profissionais">
     <% const iconesArea={musica:icones.mic,danca:icones.users,'artes-visuais':icones.sparkles,audiovisual:icones.disc,'producao-tecnica':icones.headphones,'gestao-producao':icones.calendarDays,'comunicacao-cultura':icones.radio}; %>
-    <% gruposProfissionais.forEach(grupo => { %><button type="button" class="professional-area-choice" data-category-area="<%= grupo.id %>" aria-pressed="false"><span class="lucide-icon" aria-hidden="true"><%- iconesArea[grupo.id] %></span><span><%= grupo.rotulo %></span><small data-category-area-count hidden>0</small></button><% }) %>
+    <% gruposProfissionais.forEach(grupo => { %><button type="button" class="professional-area-choice" data-category-area="<%= grupo.id %>"><span class="lucide-icon" aria-hidden="true"><%- iconesArea[grupo.id] %></span><span><%= grupo.rotulo %></span><small data-category-area-count hidden>0</small></button><% }) %>
   </div>
   <div class="professional-category-browser" data-category-browser hidden>
     <button class="professional-category-back" type="button" data-category-back-to-areas>← Escolher outra área</button>

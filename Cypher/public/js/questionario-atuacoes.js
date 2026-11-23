@@ -36,12 +36,12 @@
   let questions = [];
   let pendingQuestion = null;
   const pageByStage = {
-    conta: ["Como você se chama?", "Seu nome completo aparece no perfil. Você pode escolher seu vulgo depois."],
+    conta: ["Como você se chama?", "Seu nome completo aparece no perfil. Se você usa um vulgo, pode informá-lo agora."],
     contato: ["Como te encontrar?", "Escolha seu @ e informe seu e-mail."],
-    acesso: ["Crie seu acesso", "Informe sua data de nascimento e escolha sua senha."],
-    categorias: ["Como você movimenta a cena?", "Abra uma área e marque o que você faz. Pode escolher mais de uma."],
-    vertentes: ["Qual é a sua sonoridade?", "Marque as vertentes que fazem parte da sua identidade no rap."],
-    questionarios: ["Conte sua trajetória", "Cada caminho conta. Conte um pouco do seu tempo na cena."],
+    acesso: ["Crie seu acesso", "Informe sua data de nascimento, escolha uma senha e, se quiser, indique seu gênero."],
+    categorias: ["Como você movimenta a cena?", "Selecione uma ou mais profissões. Você pode escolher em áreas diferentes."],
+    vertentes: ["Qual é a sua sonoridade?", "Esta etapa é opcional. Você pode mudar suas escolhas depois."],
+    questionarios: ["Conte sua trajetória", "Informe seu tempo de atuação em cada profissão selecionada."],
 
   };
 
@@ -104,7 +104,9 @@
       showQuestion();
     }
     if (page.dataset.active) {
-      const target = form.querySelector(`[data-register-stage="${stage}"] :is(input:not([type=hidden]),select,button):not(:disabled)`);
+      const target = stage === "categorias"
+        ? title
+        : form.querySelector(`[data-register-stage="${stage}"] :is(input:not([type=hidden]),select,button):not(:disabled)`);
       requestAnimationFrame(() => {
         if (!form.querySelector("[aria-invalid=true]:focus")) target?.focus({preventScroll:true});
       });
@@ -290,7 +292,6 @@
         : 0;
       const counter = button.querySelector("[data-category-area-count]");
       button.classList.toggle("has-selection", count > 0);
-      button.setAttribute("aria-pressed", count > 0 ? "true" : "false");
       if (counter) {
         counter.textContent = String(count);
         counter.hidden = count === 0;
@@ -307,23 +308,21 @@
     });
     if (picker) picker.hidden = true;
     if (browser) browser.hidden = false;
-    targetForm
-      .querySelector(
-        `[data-category-area-panel="${CSS.escape(areaId)}"] [name="categorias"]`
-      )
-      ?.focus({ preventScroll: true });
+    browser?.querySelector("[data-category-back-to-areas]")?.focus({ preventScroll: true });
   }
 
   function showCategoryAreas(targetForm = form) {
     if (!targetForm) return;
     const picker = targetForm.querySelector("[data-category-area-picker]");
     const browser = targetForm.querySelector("[data-category-browser]");
-    targetForm.querySelectorAll("[data-category-area-panel]").forEach(panel => {
-      panel.hidden = true;
-    });
+    const openArea = targetForm.querySelector("[data-category-area-panel]:not([hidden])");
+    if (openArea) openArea.hidden = true;
     if (picker) picker.hidden = false;
     if (browser) browser.hidden = true;
-    targetForm.querySelector("[data-category-area]")?.focus({ preventScroll: true });
+    if (openArea) {
+      picker?.querySelector(`[data-category-area="${CSS.escape(openArea.dataset.categoryAreaPanel)}"]`)
+        ?.focus({ preventScroll: true });
+    }
   }
 
   function bindCategoryAreaNavigation(targetForm = form) {
@@ -583,7 +582,7 @@
     const selected = selectedCategories();
     if (!selected.size) {
       categoryValidation.hidden = false;
-      form.querySelector("[data-category-area]")?.focus();
+      categoryValidation.scrollIntoView({ block: "nearest" });
       return;
     }
     categoryValidation.hidden = true;
@@ -676,9 +675,9 @@
     form.querySelector('.register-steps').classList.toggle('has-rap-branch', enabled);
     const count = form.querySelectorAll('[name="vertentes"]:checked').length;
     form.querySelector('[data-branches-status]').textContent = count
-      ? `${count} ${count === 1 ? 'vertente selecionada' : 'vertentes selecionadas'} · Você pode mudar depois.`
-      : 'Esta etapa é opcional. Pode pular se quiser.';
-    form.querySelector('[data-register-stage="vertentes"] [data-continue]').textContent = count ? 'Continuar →' : 'Pular →';
+      ? `${count} ${count === 1 ? 'vertente selecionada' : 'vertentes selecionadas'}`
+      : 'Nenhuma vertente selecionada.';
+    form.querySelector('[data-register-stage="vertentes"] [data-continue]').textContent = count ? 'Continuar →' : 'Pular etapa →';
   }
   form.addEventListener('change', event => {
     if (event.target.matches('[name="vertentes"]')) syncBranch();

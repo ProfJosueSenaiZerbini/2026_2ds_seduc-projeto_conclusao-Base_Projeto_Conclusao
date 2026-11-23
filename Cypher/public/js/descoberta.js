@@ -139,10 +139,9 @@ if (conteudoDestaques && navegacao) {
   }
 }
 
-const faixaEventos = document.querySelector("#eventos-destaque-conteudo");
-const navegacaoEventos = document.querySelector(".dc-event-nav");
-if (faixaEventos && navegacaoEventos) {
+document.querySelectorAll(".dc-event-carousel .dc-event-nav").forEach(navegacaoEventos => {
   const anterior = navegacaoEventos.querySelector(".dc-event-prev");
+  const faixaEventos = document.getElementById(anterior.getAttribute("aria-controls"));
   const proximo = navegacaoEventos.querySelector(".dc-event-next");
   const progresso = navegacaoEventos.querySelector(".dc-event-progress");
   const [primeiro, segundo] = faixaEventos.children;
@@ -173,7 +172,7 @@ if (faixaEventos && navegacaoEventos) {
   faixaEventos.addEventListener("scroll", atualizarNavegacao, { passive: true });
   new ResizeObserver(atualizarNavegacao).observe(faixaEventos);
   atualizarNavegacao();
-}
+});
 
 const filtros = document.querySelector(".dc-tabs");
 if (filtros && document.referrer && !movimentoReduzido.matches) {

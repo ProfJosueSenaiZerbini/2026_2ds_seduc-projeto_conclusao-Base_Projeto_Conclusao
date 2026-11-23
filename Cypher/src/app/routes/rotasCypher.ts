@@ -68,6 +68,8 @@ router.post("/beats/:id/edit", beats.atualizarBeat);
 router.post("/beats/:id/delete", beats.excluirBeat);
 router.get("/central", beats.central);
 router.get("/profile", identidade.meuPerfil);
+router.get("/profile/completar", identidade.completarPerfil);
+router.post("/profile/completar", identidade.salvarPerfilPendente);
 router.get("/profile/profissionalizar", identidade.ativarProfissional);
 router.post("/profile/profissionalizar", identidade.confirmarProfissionalizacao);
 router.post("/profile/apresentacao", identidade.salvarApresentacao);

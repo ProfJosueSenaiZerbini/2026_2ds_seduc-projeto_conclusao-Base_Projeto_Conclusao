@@ -1,7 +1,7 @@
-<% if (usuario.tipoConta !== 'administrativo' && !usuario.identidadeRevisada) { %>
-  <aside class="profile-completion">
-    <strong>Complete seu perfil</strong>
-    <p>Você aparece como <b><%= usuario.name %></b>. Escolha se prefere usar seu nome ou vulgo.</p>
-    <a href="/settings#identidade">Revisar identidade pública →</a>
-  </aside>
-<% } %>
+<% { const faltam = pendenciasPerfil(usuario).length; if (faltam && (typeof apenasIdentidade === 'undefined' || !usuario.identidadeRevisada)) { %>
+  <a class="profile-completion" href="/profile/completar">
+    <span class="profile-completion-icon" aria-hidden="true"><%- icones.listChecks %></span>
+    <span><strong>Complete seu perfil</strong><small><%= faltam === 1 ? 'Falta 1 informação' : 'Faltam ' + faltam + ' informações' %></small></span>
+    <span class="profile-completion-arrow" aria-hidden="true"><%- icones.arrowRight %></span>
+  </a>
+<% } } %>

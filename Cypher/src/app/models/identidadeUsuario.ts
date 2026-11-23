@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { conexaoInternaCypher, salvarProfissoesUsuarioCypher, salvarRespostasAtuacaoProfissaoCypher, salvarVertentesProfissionaisUsuarioCypher } from "./bancoDados.js";
+import { conexaoInternaCypher, salvarProfissoesUsuarioCypher, salvarRespostasAtuacaoProfissaoCypher, salvarVertentesProfissionaisUsuarioCypher, type UsuarioDaSessao } from "./bancoDados.js";
 import { idProfissaoPorCategoria } from "./questionarioAtuacao.js";
 import { vertentesProfissionais } from "./modeloProfissionalPersistido.js";
 import { exigirAdministrador } from "./administracao.js";
@@ -7,6 +7,17 @@ import { normalizarIdentificador, validarIdentificador, validarDadosIdentidade, 
 import { validarSelecaoProfissional } from "../validators/validarAtuacao.js";
 
 export type DadosIdentidade = {nomeInformado:string;vulgo:string;usarVulgo:boolean;nascimento:string;tratamento:string;generoPersonalizado?:string};
+
+export function pendenciasPerfil(usuario: UsuarioDaSessao) {
+  if (usuario.tipoConta === "administrativo" || usuario.demonstracao) return [];
+  return [
+    !usuario.nomeInformado?.trim() && "nome",
+    !usuario.nascimento && "nascimento",
+    !usuario.identidadeRevisada && "nomePublico",
+    !usuario.city.trim() && "cidade",
+    !usuario.biography.trim() && "biografia",
+  ].filter(Boolean);
+}
 
 export function identificadorDisponivel(valor: string, usuarioId?: string): boolean {
   if (validarIdentificador(valor)) return false;

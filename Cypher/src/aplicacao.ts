@@ -1,4 +1,5 @@
 import { rotuloProfissional } from "./app/models/tratamentoProfissional.js";
+import { pendenciasPerfil } from "./app/models/identidadeUsuario.js";
 import { discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo } from "./app/models/catalogoDemonstrativo.js";
 import { protegerEscrita } from "./app/middlewares/seguranca.js";
 import { prepararSuperAdminLocal } from "./app/models/administracao.js";
@@ -120,7 +121,7 @@ app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), "views"));
 app.locals.icones = icones;
 app.locals.rotuloProfissional = rotuloProfissional;
-Object.assign(app.locals, { discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo });
+Object.assign(app.locals, { pendenciasPerfil, discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(protegerEscrita);

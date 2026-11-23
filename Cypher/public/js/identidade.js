@@ -6,7 +6,7 @@
       form.dataset.mode=consumidor?'consumidor':'profissional';
       form.querySelectorAll('[data-professional-only]').forEach(item=>{item.hidden=consumidor || (item.dataset.stepIndicator==='vertentes' && !form.querySelector('[name="categorias"][value="Rapper"]:checked'));});
       form.querySelectorAll('[data-register-stage="vertentes"] input,[data-register-stage="categorias"] input,[data-register-stage="categorias"] select,[data-register-stage="questionarios"] input,[data-register-stage="questionarios"] select').forEach(input=>{input.disabled=consumidor;});
-      const proximo=form.querySelector('[data-account-next]');if(proximo)proximo.textContent=consumidor?'Finalizar cadastro':'Próximo →';
+      const proximo=form.querySelector('[data-account-next]');if(proximo)proximo.textContent=consumidor?'Finalizar cadastro':'Continuar →';
 
 
       if(reiniciar)form.dispatchEvent(new CustomEvent('cypher:modalidade'));

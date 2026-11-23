@@ -69,6 +69,13 @@
       <% }) %>
     </select>
   </label>
+  <label class="people-search-filter" for="filtro-ordem">
+    <span>Ordenar por</span>
+    <select id="filtro-ordem" name="ordem">
+      <option value="">Ordem alfabética</option>
+      <option value="populares"<%= filtros.ordem === 'populares' ? ' selected' : '' %>>Populares</option>
+    </select>
+  </label>
   <div class="people-search-actions">
     <button class="button button-dark" type="submit">
       Buscar
@@ -88,7 +95,7 @@
     <%= pessoas.length === 1 ? 'perfil público encontrado' : 'perfis públicos encontrados' %>
   </span>
   <span>
-    Ordem alfabética
+    <%= filtros.ordem === 'populares' ? 'Popularidade' : 'Ordem alfabética' %>
   </span>
 </div>
 <% if (pessoas.length) { %>

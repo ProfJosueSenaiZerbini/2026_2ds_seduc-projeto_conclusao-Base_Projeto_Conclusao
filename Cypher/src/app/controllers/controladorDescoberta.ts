@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import type { Request, Response } from "express";
 import type { UsuarioDaSessao } from "../models/bancoDados.js";
 import { CypherModel } from "../models/modeloCypher.js";
@@ -7,8 +8,28 @@ import {
   type PublicacaoDescoberta,
 } from "../models/modeloDescoberta.js";
 import { obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
-import { discoDemo } from "../models/catalogoDemonstrativo.js";
+import {
+  discoDemo,
+  idFaixaDemo,
+  imagemPerfilDemo,
+  imagemPublicacaoDemo,
+} from "../models/catalogoDemonstrativo.js";
+import { dataAtualCadastro } from "../validators/validarIdentidade.js";
 import { resolverTemaEvento } from "../models/temasEvento.js";
+
+const albumAteAUltimaRima = "demo-obra-ate-a-ultima-rima";
+const faixaAlice = idFaixaDemo(albumAteAUltimaRima, 7);
+const slugsPerfisDestacados = new Set(["@lezin.demo", "@levinsk.demo"]);
+const acoesPublicacoesDestacadas = new Map([
+  ["demo-workshop-dj-producao", "Ver evento"],
+  ["demo-destaque-roda-da-madrugada", "Ver evento"],
+  ["demo-obra-lmc-vol-1", "Ver lançamento"],
+  [albumAteAUltimaRima, "Ver lançamento"],
+  ["demo-obra-profetiza", "Ver faixa"],
+  [faixaAlice, "Ver faixa"],
+  ["demo-beat-caos", "Ver beat"],
+  ["demo-beat-parece-sorte", "Ver beat"],
+]);
 
 const categorias = [
   { id: "tudo", nome: "Tudo", icone: "" },
@@ -91,11 +112,7 @@ export function descoberta(req: Request, res: Response) {
     if (usuario.categories.some(c => producao.includes(c)))
       criadoresMusicais.forEach(c => complementares.add(c));
   }
-  const pessoas = CypherModel.buscarPessoasPublicas(
-    { q, categoria: "", genero: "", localizacao: "" },
-    usuario.id
-  )
-    .pessoas.map(p => ({
+  const cartaoPerfil = (p: ReturnType<typeof CypherModel.buscarPessoasPublicas>["pessoas"][number]) => ({
       grupo: "profissionais",
       titulo: p.name,
       autor: p.handle,
@@ -108,13 +125,17 @@ export function descoberta(req: Request, res: Response) {
       estilos: p.genres,
       afinidade: afinidade(p.city, p.genres),
       complementar: p.categories.some(c => complementares.has(c)),
-    }))
+    });
+  const filtrosPessoas = { q, categoria: "", genero: "", localizacao: "" };
+  const pessoas = CypherModel.buscarPessoasPublicas(filtrosPessoas, usuario.id)
+    .pessoas.map(cartaoPerfil)
     .sort(
       (a, b) =>
         Number(b.complementar) - Number(a.complementar) ||
         b.afinidade - a.afinidade
     );
-  const publicacoes = publicacoesDescoberta()
+  const filtrado = Boolean(q || detalhe || categoria !== "tudo");
+  const publicacoesComDestaques = publicacoesDescoberta("", filtrado ? "" : faixaAlice)
     .filter(item => {
       const campos = normalizar(
         [
@@ -155,16 +176,50 @@ export function descoberta(req: Request, res: Response) {
       };
     })
     .sort((a, b) => b.afinidade - a.afinidade);
+  const destaques = filtrado ? [] : [
+    ...publicacoesComDestaques.flatMap(item => {
+      const acao = acoesPublicacoesDestacadas.get(item.id);
+      if (!item.demonstracao || !acao) return [];
+      const disco = discoDemo(item.id);
+      const detalhes = item.grupo === "eventos"
+        ? [item.dataCurta, item.hora, item.local]
+        : [item.autor, item.grupo === "beats" ? item.genero : item.tipo,
+           disco && disco.faixas.length + " faixas"];
+      return [{
+        titulo: item.titulo,
+        texto: detalhes.filter(Boolean).join(" · "),
+        foto: item.fotoDestaque
+          ? "descoberta/" + item.fotoDestaque
+          : imagemPublicacaoDemo(item.id),
+        url: item.url,
+        acao,
+      }];
+    }),
+    ...pessoas.filter(item => slugsPerfisDestacados.has(item.autor)).map(item => ({
+      titulo: item.titulo,
+      texto: [item.tipo, item.local].filter(Boolean).join(" · "),
+      foto: imagemPerfilDemo(item.autor),
+      url: item.url,
+      acao: "Ver perfil",
+    })),
+  ];
+  for (let i = destaques.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [destaques[i], destaques[j]] = [destaques[j], destaques[i]];
+  }
+  const publicacoes = publicacoesComDestaques.filter(item => item.id !== faixaAlice);
   const musica = publicacoes.filter(item => item.grupo !== "eventos");
-  const hoje = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "America/Sao_Paulo",
-  }).format(new Date());
+  const hoje = dataAtualCadastro();
   const agenda = publicacoes
     .filter(
       item =>
-        item.grupo === "eventos" && !item.fotoDestaque && item.data >= hoje
+        item.grupo === "eventos" && item.dataCurta && item.data >= hoje
     )
-    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+    .sort((a, b) => a.data.localeCompare(b.data) || a.hora.localeCompare(b.hora) || a.id.localeCompare(b.id));
+  const populares = filtrado ? [] : CypherModel.buscarPessoasPublicas(
+    { ...filtrosPessoas, ordem: "populares" },
+    usuario.id
+  ).pessoas.slice(0, 3).map(cartaoPerfil);
   const candidatos = [...publicacoes, ...pessoas].filter(
     item =>
       categoria === "tudo" ||
@@ -210,20 +265,19 @@ export function descoberta(req: Request, res: Response) {
     q,
     detalhe,
     opcoes,
-    filtrado: Boolean(q || detalhe || categoria !== "tudo"),
+    filtrado,
+    destaques,
     resultados: resultados.slice((pagina - 1) * 24, pagina * 24),
     total: resultados.length,
     paginas,
     pagina,
     musica: musica.slice(0, 4),
-    discosDestacados: musica.filter(item => item.grupo === "obras" && item.demonstracao && discoDemo(item.id)),
-    obraDestacada: musica.find(item => item.grupo === "obras" && !item.demonstracao),
-    beatDestacado: musica.find(item => item.grupo === "beats"),
     pessoas: pessoas.slice(0, 6),
-    agenda: agenda.slice(0, 3),
+    populares,
+    agenda: agenda.slice(0, 4),
     eventosDestacados: publicacoes
       .filter(item => item.fotoDestaque)
       .sort((a, b) => a.data.localeCompare(b.data)),
-    guia: CypherModel.faqs()[0],
+    guias: CypherModel.faqs().slice(0, 3),
   });
 }

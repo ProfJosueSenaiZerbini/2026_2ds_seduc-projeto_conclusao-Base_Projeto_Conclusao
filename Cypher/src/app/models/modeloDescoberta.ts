@@ -35,7 +35,8 @@ export type PublicacaoDescoberta = {
 
 // Projeção pública da vitrine. Letras, contatos e inscrições ficam nas fichas.
 export function publicacoesDescoberta(
-  grupo: PublicacaoDescoberta["grupo"] | "" = ""
+  grupo: PublicacaoDescoberta["grupo"] | "" = "",
+  faixaDemonstrativa = ""
 ): PublicacaoDescoberta[] {
   return conexaoInternaCypher()
     .prepare(
@@ -55,7 +56,7 @@ export function publicacoesDescoberta(
            '' AS categoria, o.demonstracao, '' AS temaCartao, '' AS cor
     FROM obras o JOIN autores a ON a.usuario_id = o.proprietario_id
     WHERE o.publicada = 1 AND o.situacao IN ('', 'Lançado') AND o.demonstracao = a.demonstracao
-      AND (o.demonstracao = 0 OR o.id NOT LIKE '%-faixa-%')
+      AND (o.demonstracao = 0 OR o.id NOT LIKE '%-faixa-%' OR o.id = @faixaDemonstrativa)
     UNION ALL
     SELECT 'beats', b.id, b.titulo, a.nome, a.identificador, 'Beat', b.genero, a.cidade,
            '', '', '', b.criado_em, '', b.demonstracao, '', ''
@@ -74,5 +75,5 @@ export function publicacoesDescoberta(
     ORDER BY criado DESC, id DESC
   `
     )
-    .all({ grupo }) as PublicacaoDescoberta[];
+    .all({ grupo, faixaDemonstrativa }) as PublicacaoDescoberta[];
 }

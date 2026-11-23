@@ -2,7 +2,7 @@
 import Database from "better-sqlite3";
 import { rotuloProfissional } from "./tratamentoProfissional.js";
 import { randomUUID } from "node:crypto";
-import { normalizarIdentificador, nomePublico, iniciaisPublicas, validarDadosIdentidade, validarIdentificador } from "../validators/validarIdentidade.js";
+import { dataAtualCadastro, normalizarIdentificador, nomePublico, iniciaisPublicas, validarDadosIdentidade, validarIdentificador } from "../validators/validarIdentidade.js";
 import fs from "node:fs";
 import path from "node:path";
 import { podePublicar, type TipoConta, type PapelAdministrativo } from "./permissoes.js";
@@ -140,6 +140,7 @@ export type ObraPublicaPerfil = {
   lyrics: string;
 };
 export type FiltrosBuscaPerfisPublicos = {
+  ordem?: "populares";
   q: string;
   categoria: string;
   genero: string;
@@ -401,7 +402,7 @@ export type ObraContaPersistida = ObraPersistida & {
 };
 
 let banco;
-export const versaoEsquema = 27;
+export const versaoEsquema = 28;
 function iniciaisPublicas(nome) {
   const partes = nome
     .normalize("NFD")
@@ -623,6 +624,12 @@ const esquema = `
   );
 
   CREATE INDEX IF NOT EXISTS indice_sessoes_expiracao ON sessoes(expira_em);
+
+  CREATE TABLE IF NOT EXISTS atividade_perfis (
+    usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    dia TEXT NOT NULL,
+    PRIMARY KEY (usuario_id, dia)
+  );
 
   CREATE TABLE IF NOT EXISTS notificacoes (
     id TEXT PRIMARY KEY,
@@ -1439,9 +1446,11 @@ export function listarEventosCypher(filtros, usuarioId) {
     parametros.formato = filtros.formato;
   }
   if (filtros.periodo === "proximos") {
-    filtrosSql.push("(e.data_texto = '' OR e.data_texto >= date('now'))");
+    filtrosSql.push("(e.data_texto = '' OR e.data_texto >= @hoje)");
+    parametros.hoje = dataAtualCadastro();
   } else if (filtros.periodo === "passados") {
-    filtrosSql.push("e.data_texto <> '' AND e.data_texto < date('now')");
+    filtrosSql.push("e.data_texto <> '' AND e.data_texto < @hoje");
+    parametros.hoje = dataAtualCadastro();
   }
   const ordenacao = {
     recentes: "e.criado_em DESC, e.id DESC",
@@ -2233,6 +2242,16 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
   if (!perfil || !perfil.emailConfirmado) {
     db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash);
     return undefined;
+  }
+  if (perfil.tipoConta === "profissional" && !perfil.demonstracao) {
+    const hoje = dataAtualCadastro();
+    const novoDia = db.prepare(
+      "INSERT INTO atividade_perfis (usuario_id, dia) VALUES (?, ?) ON CONFLICT DO NOTHING"
+    ).run(perfil.id, hoje);
+    if (novoDia.changes) {
+      db.prepare("DELETE FROM atividade_perfis WHERE usuario_id = ? AND dia < date(?, '-29 days')")
+        .run(perfil.id, hoje);
+    }
   }
   const categories = categoriasAtivas(perfil.id, perfil.categoriesJson);
   return {
@@ -3281,11 +3300,30 @@ function opcoesUnicasBusca(valores) {
 }
 export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): ResultadoBuscaPerfisPublicos {
   const db = bancoAtivo();
+  const populares = filtrosRecebidos.ordem === "populares";
+  const pontuacao = populares ? `
+    p.reputacao +
+    (SELECT COUNT(*) FROM atividade_perfis ap
+      WHERE ap.usuario_id = u.id AND ap.dia BETWEEN date(@hoje, '-29 days') AND @hoje) +
+    (SELECT COUNT(*) FROM (
+      SELECT o.proprietario_id AS parceiro
+      FROM creditos c JOIN obras o ON o.id = c.obra_id
+      WHERE c.usuario_creditado_id = u.id AND o.proprietario_id <> u.id
+        AND c.verificado = 1 AND c.demonstracao = u.demonstracao
+        AND o.demonstracao = u.demonstracao AND o.publicada = 1
+      UNION
+      SELECT c.usuario_creditado_id
+      FROM obras o JOIN creditos c ON c.obra_id = o.id
+      WHERE o.proprietario_id = u.id AND c.usuario_creditado_id <> u.id
+        AND c.verificado = 1 AND c.demonstracao = u.demonstracao
+        AND o.demonstracao = u.demonstracao AND o.publicada = 1
+    ))` : "0";
   const linhas = db
     .prepare(
       `
       SELECT
         u.id AS userId,
+        ${pontuacao} AS pontuacao,
         p.nome AS name, p.tratamento,
         p.funcao AS role,
         p.cidade AS city,
@@ -3303,11 +3341,12 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
         AND p.perfil_publico = 1
         AND u.tipo_conta = 'profissional'
         AND (u.demonstracao = 1 OR u.email_confirmado_em IS NOT NULL)
-        AND u.id <> ?
-      ORDER BY p.nome COLLATE NOCASE ASC
+        AND u.id <> @usuarioId
+        ${populares ? "AND pontuacao > 0" : ""}
+      ORDER BY pontuacao DESC, p.nome COLLATE NOCASE ASC, u.id ASC
     `
     )
-    .all(usuarioId);
+    .all(populares ? { usuarioId, hoje: dataAtualCadastro() } : { usuarioId });
   const tonsPermitidos = new Set(["yellow", "green", "black", "cream"]);
   const perfis = linhas.map(linha => {
     const categories = atuacoesVisiveis(
@@ -3350,6 +3389,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
       valor => normalizarTextoBusca(valor) === normalizarTextoBusca(recebido)
     ) ?? "";
   const filtros = {
+    ...(populares ? { ordem: "populares" } : {}),
     q: filtrosRecebidos.q.trim().slice(0, 100),
     categoria: selecionarOpcao(opcoes.categorias, filtrosRecebidos.categoria),
     genero: selecionarOpcao(opcoes.generos, filtrosRecebidos.genero),

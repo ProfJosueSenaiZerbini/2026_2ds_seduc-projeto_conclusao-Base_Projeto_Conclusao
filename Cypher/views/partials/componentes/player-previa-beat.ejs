@@ -1,0 +1,12 @@
+<% const fontePrevia = typeof beat.previewUrl === 'string' && /^(\/[^/]|https:\/\/)/.test(beat.previewUrl) ? beat.previewUrl : ''; %>
+<div class="beats-preview" data-beat-preview data-preview-id="<%= beat.id %>" data-preview-title="<%= beat.title %>"<% if (fontePrevia) { %> data-preview-src="<%= fontePrevia %>"<% } %>>
+  <button class="beats-play" type="button" data-preview-play aria-label="<%= fontePrevia ? 'Ouvir prévia de ' + beat.title : 'Prévia de ' + beat.title + ' ainda não disponível' %>" aria-pressed="false"<% if (!fontePrevia) { %> disabled<% } %>>
+    <span class="beats-play-icon" aria-hidden="true"><%- include('icone-beat', { tipo: 'play' }) %></span>
+    <span class="beats-pause-icon" aria-hidden="true"><%- include('icone-beat', { tipo: 'pause' }) %></span>
+  </button>
+  <div class="beats-preview-track">
+    <div class="beats-wave" aria-hidden="true"><% for (let barra = 0; barra < 36; barra++) { %><i style="--bar-height: <%= 18 + ((barra * 17 + beat.title.length * 11) % 67) %>%; --bar-delay: <%= (barra % 7) * -0.12 %>s"></i><% } %></div>
+    <progress class="beats-progress" data-preview-progress max="100" value="0" aria-label="Progresso da prévia de <%= beat.title %>" hidden></progress>
+    <span class="beats-preview-caption"><span data-preview-label><%= fontePrevia ? 'Ouvir prévia' : 'Prévia em breve' %></span><span data-preview-time><%= fontePrevia ? '0:00' : '—:—' %></span></span>
+  </div>
+</div>

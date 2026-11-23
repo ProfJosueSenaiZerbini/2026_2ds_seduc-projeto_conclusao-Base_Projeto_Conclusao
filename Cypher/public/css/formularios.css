@@ -87,3 +87,186 @@ form .button, .tag-panel .button {
   background-color: color-mix(in srgb, var(--bg-surface, var(--card)) 91%, transparent);
   backdrop-filter: blur(8px);
 }
+
+/* Caixas de seleção da Cypher. O seletor de tema tem seu próprio controle. */
+:root {
+  --checkbox-paper: #f4f1df;
+  --checkbox-edge: #52643e;
+  --checkbox-fill: #638133;
+  --checkbox-mark: #fffdf2;
+}
+
+:root.dark {
+  --checkbox-paper: #202b1d;
+  --checkbox-edge: #9eaf7b;
+  --checkbox-fill: #b0c978;
+  --checkbox-mark: #17210e;
+}
+
+:root body input[type="checkbox"]:not([role="switch"]) {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  min-height: 0;
+  flex: 0 0 auto;
+  padding: 0;
+  vertical-align: middle;
+  background: var(--checkbox-paper);
+  border: 2px solid var(--checkbox-edge);
+  border-radius: 18% 64% 22% 48% / 55% 20% 60% 22%;
+  box-shadow: 2px 2px 0 var(--checkbox-edge);
+  cursor: pointer;
+  transition: transform .2s ease, border-radius .2s ease, box-shadow .2s ease;
+}
+
+:root body input[type="checkbox"]:not([role="switch"]):checked {
+  background: var(--checkbox-fill);
+  border-radius: 58% 24% 56% 24% / 22% 55% 24% 56%;
+  transform: rotate(-4deg);
+}
+
+:root body input[type="checkbox"]:not([role="switch"]):checked::after {
+  content: "";
+  width: .34rem;
+  height: .58rem;
+  border: solid var(--checkbox-mark);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(42deg);
+  animation: cypher-checkbox-mark .24s ease-out;
+}
+
+@keyframes cypher-checkbox-mark {
+  from { scale: 0; opacity: 0; }
+  70% { scale: 1.2; }
+  to { scale: 1; opacity: 1; }
+}
+
+@media (hover: hover) {
+  :root body label:hover input[type="checkbox"]:not([role="switch"], :disabled) {
+    transform: scale(1.07) rotate(3deg);
+  }
+}
+
+:root body label:active input[type="checkbox"]:not([role="switch"], :disabled) {
+  transform: translate(2px, 2px) scale(.94);
+  box-shadow: none;
+}
+
+:root body input[type="checkbox"]:not([role="switch"]):focus-visible {
+  outline: 2px solid var(--checkbox-edge);
+  outline-offset: 4px;
+}
+
+:root body input[type="checkbox"]:not([role="switch"]):disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.category-option:has(> input[type="checkbox"]) > .category-check {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root body input[type="checkbox"]:not([role="switch"]) {
+    transition: none;
+  }
+
+  :root body input[type="checkbox"]:not([role="switch"]):checked::after {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :root body input[type="checkbox"]:not([role="switch"]) {
+    appearance: auto;
+    accent-color: auto;
+  }
+
+  :root body input[type="checkbox"]:not([role="switch"]):checked::after {
+    content: none;
+  }
+}
+
+a.profile-completion {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  margin: 0 0 16px;
+  border: 1px solid #758643;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #e7f7ad, #f3f6df 66%, #fcf3cd);
+  color: #24300f;
+  text-decoration: none;
+}
+
+.profile-completion strong,
+.profile-completion small {
+  display: block;
+}
+
+.profile-completion small {
+  margin-top: 3px;
+}
+
+.profile-completion-icon,
+.profile-completion-arrow {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #d3ee79;
+}
+
+.profile-completion-arrow {
+  margin-left: auto;
+  background: #24300f;
+  color: #e7f7ad;
+}
+
+a.profile-completion:hover .profile-completion-arrow,
+a.profile-completion:focus-visible .profile-completion-arrow {
+  background: #45551d;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .profile-completion-arrow { transition: transform .18s ease; }
+  a.profile-completion:hover .profile-completion-arrow { transform: translateX(3px); }
+}
+
+.profile-completion-form {
+  max-width: 660px;
+}
+
+.profile-completion-choice {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line, #bdc6b1);
+  border-radius: 8px;
+}
+
+.profile-completion-form .profile-completion-choice label:has(input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-completion-choice input[type="radio"] {
+  width: auto;
+  min-height: auto;
+}
+
+.profile-completion-form .profile-completion-vulgo[hidden] {
+  display: none;
+}
+
+.profile-completion-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

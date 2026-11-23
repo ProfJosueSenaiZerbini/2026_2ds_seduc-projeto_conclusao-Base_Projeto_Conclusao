@@ -5,5 +5,5 @@
   data-beat-duration="<%= beat.duration || 'Não informada' %>" data-beat-description="<%= beat.description || 'Sem descrição cadastrada.' %>"
   data-beat-usage="<%= beat.usage || 'Sem condições adicionais cadastradas.' %>" data-beat-ofertas="<%= encodeURIComponent(JSON.stringify(beat.ofertas)) %>"
   data-beat-exclusive="<%= Boolean(beat.vendaExclusiva) %>">
-  Ver ficha <span aria-hidden="true"><%- icones[icone] %></span>
+  <%= typeof rotulo !== 'undefined' ? rotulo : 'Ver ficha' %> <span aria-hidden="true"><%- icones[icone] %></span>
 </button>

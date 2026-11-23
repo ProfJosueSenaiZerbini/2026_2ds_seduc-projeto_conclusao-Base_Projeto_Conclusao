@@ -40,6 +40,7 @@ import {
 import {
   identificadorDisponivel,
   atualizarIdentidadeUsuario,
+  pendenciasPerfil,
   estadoAlteracaoIdentificador,
   alterarIdentificadorUsuario,
   profissionalizarUsuario,
@@ -347,6 +348,79 @@ export function meuPerfil(req: Request, res: Response) {
     salvo: req.query.salvo === "1",
   });
 }
+function renderizarPerfilPendente(
+  res: Response,
+  erro: string | null = null,
+  valores: Record<string, unknown> = {}
+) {
+  const usuario = atual(res);
+  const pendencias = pendenciasPerfil(usuario);
+  if (!pendencias.length) return res.redirect(303, "/dashboard");
+  return res.status(erro ? 400 : 200).render("pages/completar-perfil", {
+    title: "Complete seu perfil",
+    stylesheet: "perfil",
+    path: "/profile",
+    usuario,
+    pendencias,
+    valores: Object.fromEntries(
+      ["nomeInformado", "nascimento", "nomePublico", "vulgo", "cidade", "biografia"]
+        .map(campo => [campo, texto(valores[campo]).slice(0, 500)])
+    ),
+    hoje: dataAtualCadastro(),
+    erro,
+  });
+}
+
+export function completarPerfil(_req: Request, res: Response) {
+  return renderizarPerfilPendente(res);
+}
+
+export function salvarPerfilPendente(req: Request, res: Response) {
+  const usuario = atual(res);
+  const pendencias = pendenciasPerfil(usuario);
+  if (!pendencias.length) return res.redirect(303, "/dashboard");
+
+  const cidade = pendencias.includes("cidade") ? texto(req.body.cidade) : null;
+  const biografia = pendencias.includes("biografia") ? texto(req.body.biografia) : null;
+  const revisarNomePublico = pendencias.includes("nomePublico");
+  const escolha = texto(req.body.nomePublico);
+
+  try {
+    if (cidade !== null && (!cidade || cidade.length > 100))
+      throw new Error("Informe uma cidade com até 100 caracteres.");
+    if (biografia !== null && (!biografia || biografia.length > 500))
+      throw new Error("Escreva uma biografia com até 500 caracteres.");
+    if (revisarNomePublico && !["nome", "vulgo"].includes(escolha))
+      throw new Error("Escolha o nome que deseja mostrar no seu perfil.");
+
+    const db = conexaoInternaCypher();
+    db.transaction(() => {
+      if (revisarNomePublico || pendencias.includes("nome") || pendencias.includes("nascimento")) {
+        atualizarIdentidadeUsuario(usuario.id, {
+          nomeInformado: pendencias.includes("nome") ? texto(req.body.nomeInformado) : usuario.nomeInformado ?? "",
+          nascimento: pendencias.includes("nascimento") ? texto(req.body.nascimento) : usuario.nascimento ?? "",
+          tratamento: usuario.tratamento ?? "",
+          generoPersonalizado: usuario.generoPersonalizado,
+          usarVulgo: revisarNomePublico ? escolha === "vulgo" : Boolean(usuario.usarVulgo),
+          vulgo: usuario.vulgo || (revisarNomePublico && escolha === "vulgo" ? texto(req.body.vulgo) : ""),
+        });
+      }
+      if (cidade !== null || biografia !== null) {
+        db.prepare(`
+          UPDATE perfis
+          SET cidade = CASE WHEN trim(cidade) = '' THEN coalesce(@cidade, cidade) ELSE cidade END,
+              biografia = CASE WHEN trim(biografia) = '' THEN coalesce(@biografia, biografia) ELSE biografia END,
+              atualizado_em = CURRENT_TIMESTAMP
+          WHERE usuario_id = @id
+        `).run({ cidade, biografia, id: usuario.id });
+      }
+    })();
+    return res.redirect(303, "/dashboard");
+  } catch (erro) {
+    return renderizarPerfilPendente(res, (erro as Error).message, req.body);
+  }
+}
+
 export function salvarApresentacao(req: Request, res: Response) {
   try {
     atualizarApresentacaoConsumidor(

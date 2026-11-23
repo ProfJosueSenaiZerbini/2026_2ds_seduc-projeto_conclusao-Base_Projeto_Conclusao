@@ -2075,3 +2075,31 @@
     outline: 2px solid Highlight;
   }
 }
+
+.dc-agenda-pages {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.dc-agenda-pages > .dc-event-stack {
+  scroll-snap-align: start;
+  align-content: start;
+  min-width: 0;
+}
+
+.dc-event-carousel:has(.dc-event-nav:not([hidden])) .dc-agenda-pages {
+  scrollbar-width: none;
+}
+
+.dc-guide .dc-central-info {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.dc-guide > .central-glass-card + .central-glass-card {
+  margin-top: 12px;
+}

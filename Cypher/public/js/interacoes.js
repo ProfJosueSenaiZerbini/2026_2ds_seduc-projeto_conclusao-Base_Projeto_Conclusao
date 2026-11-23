@@ -895,7 +895,8 @@
   function abrirFichaVinculada() {
     const item = document.getElementById(location.hash.slice(1));
     if (item?.matches("[data-event-card]")) item.click();
-    else item?.querySelector("[data-beat-detail]")?.click();
+    else if (item?.matches(".beats-card"))
+      item.querySelector("[data-beat-detail]")?.click();
   }
   abrirFichaVinculada();
   window.addEventListener("hashchange", abrirFichaVinculada);

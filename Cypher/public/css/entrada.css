@@ -238,6 +238,28 @@
 .tag-panel form { min-width: 0; width: 100%; }
 .tag-page:not(.registration-page) .tag-panel form { max-width: 400px; margin: 26px auto; }
 .tag-panel :is(h1,h2,[data-register-description],.auth-switch) { text-align: center; }
+.registration-page .tag-panel h2 {
+  font-size: clamp(30px, 5vw, 48px);
+  text-wrap: balance;
+}
+.registration-page[data-active]:not([data-active=""]) .tag-login {
+  width: fit-content;
+  max-width: 100%;
+  margin: 20px auto 26px;
+  padding: 8px 14px;
+  color: var(--dc-muted);
+  background: var(--dc-panel), var(--dc-surface);
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 7px 2px 5px;
+  text-align: center;
+}
+.registration-page .tag-panel [data-register-description] {
+  max-width: 48ch;
+  margin-inline: auto;
+  color: var(--dc-muted);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
 .tag-page .auth-switch, .tag-panel small { color: var(--text-secondary); }
 .tag-page .auth-switch a { color: #b6df65; }
 .tag-panel .login-cena {
@@ -343,44 +365,6 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-}
-.tag-page .tag-panel label.nickname-switch input[type="checkbox"] {
-  appearance: none;
-  display: grid;
-  flex: 0 0 26px;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
-  min-height: 26px;
-  margin: 0;
-  border: 1px solid #a0aa806e;
-  border-radius: 2px 5px 1px 3px;
-  background: url("marcas-botao.svg") left top / 100px 35px no-repeat, #111a14;
-  box-shadow: inset 1px 2px 4px #050b0870, 2px 2px 0 #080e0a99;
-  cursor: pointer;
-  transition: background-color .14s, border-color .14s, transform .14s;
-}
-.tag-page .tag-panel label.nickname-switch input[type="checkbox"]:checked {
-  border-color: #c1d58a;
-  background-color: #a2be5d;
-  box-shadow: inset 0 0 0 3px #172018, 2px 2px 0 #080e0a99;
-}
-.tag-page .tag-panel label.nickname-switch input[type="checkbox"]:checked::after {
-  content: "";
-  width: 7px;
-  height: 12px;
-  margin-top: -3px;
-  border: solid #ecf2db;
-  border-width: 0 3px 3px 0;
-  transform: rotate(45deg);
-}
-.tag-page .tag-panel label.nickname-switch input[type="checkbox"]:focus-visible {
-  outline: 2px solid #c4df8b;
-  outline-offset: 3px;
-}
-.tag-page .tag-panel label.nickname-switch:active input[type="checkbox"] {
-  transform: translate(1px, 1px);
 }
 .tag-panel .category-approval-note { color: #e2efd6; background: #395133; }
 .tag-panel .professional-area-choice,.tag-panel .professional-category-browser,.tag-panel .category-option--card {
@@ -498,35 +482,55 @@
 @media(prefers-reduced-motion:reduce) { .join-cypher a span { transition: none; } }
 
 /* Cadastro: áreas como entradas de catálogo e profissões como lista de seleção. */
-.registration-page .tag-panel :is(.category-fieldset,.professional-category-browser,.professional-catalog-group,.rapper-branches) {
+.registration-page .tag-panel :is(.category-fieldset,.professional-catalog-group,.rapper-branches) {
   min-width: 0; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none;
 }
 .registration-page .category-fieldset > legend {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);
 }
 .registration-page .tag-panel .category-selection-summary {
-  margin: 0 0 16px; padding: 0; color: #e3ead5; font-size: 14px; background: transparent; border: 0;
+  display: inline-flex;
+  margin: 0 0 16px;
+  padding: 5px 10px;
+  color: var(--dc-muted);
+  font-size: 13px;
+  background: var(--dc-card);
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 7px 2px 5px;
 }
 .registration-page .professional-area-picker {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px 16px;
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px;
 }
 .registration-page .tag-panel .professional-area-choice {
   display: flex; align-items: center; gap: 10px; min-height: 50px;
-  padding: 9px 6px; text-align: left; color: #eff2e6;
-  border: 0; border-bottom: 1px solid #85936a80; border-radius: 0;
+  padding: 9px 12px; text-align: left; color: var(--dc-ink);
+  border: 1px solid var(--dc-line); border-radius: 2px 5px 1px 3px;
   background: #131e163d; box-shadow: none;
 }
-.registration-page .professional-area-choice::after { content: "›"; margin-left: auto; color: #c3d889; font-size: 22px; }
-.registration-page .professional-area-choice .lucide-icon { color: #bad37e; }
+.registration-page .professional-area-choice::after { content: "›"; margin-left: auto; color: var(--dc-accent); font-size: 22px; }
+.registration-page .tag-panel .professional-area-choice .lucide-icon { color: var(--dc-accent); }
 .registration-page .tag-panel .professional-area-choice:is(:hover,:focus-visible,.has-selection) {
   background: #34432c99; color: #edffcb;
 }
+.registration-page .tag-panel .professional-category-browser {
+  min-width: 0;
+  padding: clamp(12px, 3vw, 20px);
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 9px 2px 7px;
+  background: var(--dc-field);
+}
 .registration-page .tag-panel .professional-category-back {
-  padding: 9px 0; min-height: 44px; color: #c5da90; background: transparent; border: 0;
+  min-height: 44px;
+  margin: 0 0 4px;
+  padding: 6px 2px;
+  color: var(--dc-accent);
+  background: transparent;
+  border: 0;
+  font-size: 14px;
 }
 .registration-page .tag-panel .professional-catalog-group h4 {
-  color: #f3f5ea; font: 700 22px/1.2 "Space Grotesk",sans-serif;
-  margin: 8px 0; padding: 0; border: 0;
+  color: var(--dc-ink); font: 700 20px/1.25 "Space Grotesk",sans-serif;
+  margin: 4px 0 14px; padding: 0; border: 0;
 }
 .registration-page .professional-catalog-group__options {
   display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px;
@@ -588,7 +592,7 @@
   .registration-page [data-category-area-panel="musica"] .professional-catalog-group__options {
     grid-template-columns: minmax(0,1fr);
   }
-  .registration-page .tag-panel .category-option--card { min-height: 56px; }
+  .registration-page .tag-panel .category-option--card { min-height: 52px; }
 }
 /* Vertentes nasce no eixo como uma extensão menor de Atuação. */
 .registration-page .register-steps { position: relative; }
@@ -623,10 +627,8 @@
   color: #f0f3e8; background: #101b14a6; font-size: 15px; font-weight: 700;
   cursor: pointer; transition: background .18s, border-color .18s, transform .18s;
 }
-.registration-page .tag-panel .register-branches-stage .category-option::after { content: '+'; color: #a8ba92; font-size: 20px; font-weight: 400; }
 .registration-page .tag-panel .register-branches-stage .category-option:hover { background: #293923d9; border-color: #acbd89; transform: translateY(-1px); }
 .registration-page .tag-panel .register-branches-stage .category-option:has(input:checked) { background: #304126d9; border-color: #b0c978; color: #f7ffe8; box-shadow: inset 3px 0 #b0c978; }
-.registration-page .tag-panel .register-branches-stage .category-option:has(input:checked)::after { content: '✓'; color: #c4df8b; font-size: 17px; }
 .registration-page .tag-panel .register-branches-stage .category-option:has(input:focus-visible) { outline: 2px solid #c4df8b; outline-offset: 3px; }
 .registration-page .branches-selection-status { color: #d1dac3; font-size: 13px; margin: 18px 0 0; }
 @media(max-width:540px) {
@@ -721,8 +723,6 @@
 :root:not(.dark) .tag-page .tag-panel :is(.auth-message-error,.register-inline-error,.category-validation) { color:#702d19; background:#f0d9c8e6; border-color:#ac694d; }
 :root:not(.dark) .tag-page .tag-panel .auth-message-success { color:#304a20; background:#dce6c7e6; border-color:#6c874a; }
 :root:not(.dark) .tag-page .login-cena { color:#435f26; background-image:linear-gradient(110deg,#3d5723,#728a3f,#3d5723); }
-:root:not(.dark) .tag-page .nickname-switch input { background-color:#ecebd8; border-color:#788b58; }
-:root:not(.dark) .tag-page .nickname-switch input:checked { background-color:#526b35; }
 :root:not(.dark) .tag-page .tag-panel .button { background:linear-gradient(115deg,#5b733c,#485f30); }
 :root:not(.dark) .tag-page .tag-panel .button-outline { background:#e7e8d5ad; }
 :root:not(.dark) .tag-page .tag-panel .button:hover { filter:brightness(1.08); }
@@ -880,13 +880,12 @@
 }
 
 :root .registration-page.entrada-cypher .tag-panel {
-  --entrada-card: color-mix(in srgb, var(--dc-card) 20%, transparent);
-  background: linear-gradient(
-    130deg,
-    color-mix(in srgb, var(--dc-surface) 22%, transparent),
-    color-mix(in srgb, var(--dc-surface) 12%, transparent)
-  );
-  backdrop-filter: blur(1px);
+  background: var(--dc-panel), var(--dc-surface);
+  box-shadow: var(--dc-shadow), 0 18px 48px #050b073d;
+}
+
+:root.dark .registration-page.entrada-cypher .tag-panel {
+  background: var(--dc-panel), color-mix(in srgb, var(--dc-surface) 30%, transparent);
 }
 
 :root .entrada-cypher .tag-panel::before {
@@ -938,13 +937,13 @@
   border-color: var(--dc-line);
 }
 
-:root .entrada-cypher .tag-panel :is(.button-outline:hover, .professional-category-browser) {
+:root .entrada-cypher .tag-panel .button-outline:hover {
   background-color: var(--dc-hover);
 }
 
 :root .entrada-cypher .tag-panel :is(.category-option, .professional-area-choice) {
   color: var(--dc-ink);
-  background-color: var(--entrada-card, var(--dc-card));
+  background-color: var(--dc-card);
   border-color: var(--dc-line);
 }
 

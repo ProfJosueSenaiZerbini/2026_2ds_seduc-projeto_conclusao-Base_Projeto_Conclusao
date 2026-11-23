@@ -726,6 +726,7 @@ export const buscarPessoas = (req: Request, res: Response) => {
 
   const resultado = CypherModel.buscarPessoasPublicas(
     {
+      ordem: req.query.ordem === "populares" ? "populares" : undefined,
       q: parametroTexto(req, "q"),
       categoria: parametroTexto(req, "categoria"),
       genero: parametroTexto(req, "genero"),

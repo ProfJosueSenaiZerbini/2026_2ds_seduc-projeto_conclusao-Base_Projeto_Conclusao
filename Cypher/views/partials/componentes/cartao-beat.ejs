@@ -1,0 +1,56 @@
+<%
+  const capaBeat = beat.demonstracao && imagemPublicacaoDemo(beat.id);
+  const precosBeat = (beat.ofertas || []).filter(oferta => oferta.ativa !== false).map(oferta => oferta.precoCentavos).filter(preco => typeof preco === 'number' && Number.isFinite(preco) && preco >= 0);
+  const menorPrecoBeat = precosBeat.length ? Math.min(...precosBeat) : null;
+  const livreBeat = menorPrecoBeat === 0 || (menorPrecoBeat === null && /^(free use|uso livre|gratuita?)$/i.test(beat.license || ''));
+  const vendidoBeat = beat.vendido === true || beat.disponibilidade === 'vendido';
+  const numeroBeat = typeof indice !== 'undefined' ? String(indice + 1).padStart(2, '0') : '01';
+%>
+<article class="beats-card<%= vendidoBeat ? ' is-sold' : '' %>" id="beat-<%= beat.id %>" data-beat-card data-beat-id="<%= beat.id %>" data-title="<%= beat.title %>" data-bpm="<%= Number(beat.bpm) || 0 %>" data-price="<%= livreBeat ? 0 : menorPrecoBeat ?? '' %>" aria-labelledby="beat-titulo-<%= beat.id %>">
+  <div class="beats-sleeve">
+    <div class="beats-vinyl" aria-hidden="true"><span>CYPHER<br>BEAT SIDE</span></div>
+    <div class="beats-cover">
+      <% if (capaBeat) { %>
+        <img src="/img/<%= capaBeat %>" alt="Capa de <%= beat.title %>" loading="lazy" decoding="async">
+      <% } else { %>
+        <div class="beats-cover-art" aria-hidden="true"><span>CYPHER<br>ORIGINAL BEAT</span><%- icones.disc %><strong><%= beat.title %></strong></div>
+      <% } %>
+      <span class="beats-cover-shade" aria-hidden="true"></span>
+      <span class="beats-genre"><%= beat.genre || 'Gênero não informado' %></span>
+      <button class="beats-favorite" type="button" data-beat-favorite aria-pressed="false" aria-label="Favoritar <%= beat.title %>" hidden><%- include('icone-beat', { tipo: 'heart' }) %></button>
+      <div class="beats-cover-bottom">
+        <span class="beats-availability<%= vendidoBeat ? ' beats-availability-sold' : '' %>"><i aria-hidden="true"></i><%= vendidoBeat ? 'Vendido' : 'Disponível' %></span>
+        <% if (beat.vendaExclusiva) { %><span class="beats-edition">Exclusivo</span><% } %>
+      </div>
+    </div>
+    <span class="beats-catalog-number" aria-hidden="true">CX / <%= numeroBeat %> <span>SIDE A</span></span>
+  </div>
+  <div class="beats-card-body">
+    <div class="beats-track-heading">
+      <h3 id="beat-titulo-<%= beat.id %>"><%= beat.title %></h3>
+      <p class="beats-producer"><span>por</span> <% if (beat.demoProducerHandle) { %><a href="/p/<%= encodeURIComponent(beat.demoProducerHandle.replace(/^@/, '')) %>"><%= beat.producer %></a><% } else { %><%= beat.producer %><% } %></p>
+    </div>
+    <div class="beats-specs">
+      <span><span aria-hidden="true"><%- icones.audioLines %></span> <%= beat.bpm ? beat.bpm + ' BPM' : 'BPM não informado' %></span>
+      <% if (beat.key) { %><span aria-label="Tom <%= beat.key %>"><%= beat.key %></span><% } %>
+      <% if (beat.owned) { %><span class="beats-owned">Seu beat</span><% } %>
+    </div>
+    <%- include('player-previa-beat', { beat }) %>
+    <div class="beats-card-footer">
+      <div class="beats-price<%= livreBeat ? ' beats-price-free' : '' %>">
+        <span><%= vendidoBeat ? 'Indisponível para compra' : livreBeat ? 'Crie no seu ritmo' : menorPrecoBeat !== null ? 'A partir de' : 'Fale com o beatmaker' %></span>
+        <strong><%= livreBeat ? 'Free Use' : menorPrecoBeat !== null ? (menorPrecoBeat / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta' %></strong>
+      </div>
+      <%- include('abrir-ficha-beat', { beat, classe: 'beats-details-button', icone: 'arrowUpRight', rotulo: 'Ver beat' }) %>
+    </div>
+    <% if (beat.owned) { %>
+      <div class="beats-owner-actions">
+        <a class="beats-link" href="/beats/<%= encodeURIComponent(beat.id) %>/edit">Editar</a>
+        <form method="post" action="/beats/<%= encodeURIComponent(beat.id) %>/delete" data-confirm="Excluir este beat do seu catálogo?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="beats-link beats-delete" type="submit">Excluir</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</article>

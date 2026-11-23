@@ -4,7 +4,7 @@
 <main class="main-shell">
 <%- include('../partials/barra-superior', { breadcrumb: 'Meu perfil' }) %>
 <div class="page-content profile-page-content">
-<%- include('../partials/componentes/completar-identidade', {usuario}) %>
+<%- include('../partials/componentes/completar-identidade', { usuario, apenasIdentidade: true }) %>
 <% if (privacidadeSalva) { %>
   <p class="profile-message profile-message-success" role="status">
     Preferências de visibilidade atualizadas.
