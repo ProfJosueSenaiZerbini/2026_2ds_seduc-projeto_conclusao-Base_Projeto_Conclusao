@@ -183,6 +183,10 @@ test.describe('Saldo do menu lateral', () => {
         // Aceitar candidato: reserva de R$ 150.
         const bicoId = await publicarBico(contratante.ctx, titulo, VALOR);
         expect((await candidatar(trabalhador.ctx, bicoId)).status()).toBe(302);
+        // Confirma que a candidatura existe antes de navegar pela tela (se faltar, o erro aponta aqui).
+        const candidatos = await listarCandidatos(contratante.ctx, bicoId);
+        expect(candidatos).toHaveLength(1);
+        expect(candidatos[0].status).toBe('Pendente');
         await irPara(pc, 'Bicos');
         await pc
             .locator('.job-card', { hasText: titulo })
