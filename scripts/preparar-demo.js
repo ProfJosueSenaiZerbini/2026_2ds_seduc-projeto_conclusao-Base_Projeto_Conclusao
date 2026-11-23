@@ -228,6 +228,10 @@ const COLA = [
         email: USUARIOS.carla.email,
         testes: [
             {
+                texto: 'Publicar Bico: digite um CEP (com internet, qualquer CEP real; offline, 01310-100) e veja rua, bairro, cidade e UF preenchidos sozinhos. Informe o número, publique e abra o detalhe: o endereço completo aparece para a dona.',
+                ct: 'CT05, CT25'
+            },
+            {
                 texto: 'Início > Bicos > "Montagem de guarda-roupa": 2 candidatos Pendentes. Aceitar um: o valor (R$ 120,00) é reservado no saldo e no extrato e o outro candidato fica Recusado.',
                 ct: 'CT08, CT19, CT21'
             },
@@ -254,6 +258,10 @@ const COLA = [
             {
                 texto: 'Detalhe de qualquer bico dela: endereço completo (rua, número, complemento, CEP) para a dona.',
                 ct: 'CT25, CT26'
+            },
+            {
+                texto: 'Meu Perfil > "Ver como os outros veem meu perfil": depois de o Diego avaliar, a nota dele aparece (avaliação mútua completa).',
+                ct: 'CT17, CT19'
             }
         ]
     },
@@ -306,7 +314,7 @@ const COLA = [
         email: USUARIOS.diego.email,
         testes: [
             {
-                texto: 'Bico "Ajudante para evento": chat com a contratante, endereço completo liberado (aceito) e, depois da finalização, avaliar a contratante.',
+                texto: 'Depois de a Carla finalizar "Ajudante para evento": Histórico > aba Concluídos > Abrir conversa (o chat continua liberado, com envio de mensagens) e Ver detalhes (endereço completo liberado). Avaliar a contratante; a nota aparece no perfil público da Carla.',
                 ct: 'CT12, CT17, CT26'
             },
             {
@@ -317,16 +325,46 @@ const COLA = [
     }
 ];
 
-// Ordem sugerida (~10 minutos).
+// Ordem sugerida: cada passo traz o tempo estimado (em minutos); o total do título é a soma.
 const ROTEIRO = [
-    'Contratante principal: abra "Montagem de guarda-roupa" e aceite um dos 2 candidatos (saldo e extrato, recusa automática do outro). ~2 min',
-    'Mesma conta: cancele "Pintura de muro externo" (sem estorno) e olhe a aba Cancelados (a "Instalação de prateleiras" mostra o estorno). ~2 min',
-    'Mesma conta: abra "Ajudante para evento", converse no chat, Finalize e avalie o trabalhador. ~2 min',
-    'Mesma conta: em "Troca de resistência do chuveiro" avalie e edite a nota; em "Conserto de torneira" veja o selo "Prazo encerrado". ~1 min',
-    'Contratante sem saldo: tente aceitar o candidato de R$ 200,00 e veja o alerta "Saldo insuficiente". ~1 min',
-    'Trabalhador novo: veja o feed, candidate-se a "Poda de cerca viva" e confira o perfil público do Rafael (média e reputação). ~1 min',
-    'Trabalhador aceito: veja o chat do evento e o endereço completo liberado. ~1 min'
+    {
+        min: 2,
+        texto: 'Contratante principal: Publicar Bico digitando um CEP (com internet, qualquer CEP real; offline, 01310-100). Veja rua, bairro, cidade e UF preenchidos sozinhos, informe o número, publique e abra o detalhe com o endereço completo. [CT05, CT25]'
+    },
+    {
+        min: 1,
+        texto: 'Mesma conta: abra "Montagem de guarda-roupa" e aceite um dos 2 candidatos (saldo e extrato, recusa automática do outro). [CT08]'
+    },
+    {
+        min: 1,
+        texto: 'Mesma conta: cancele "Pintura de muro externo" (sem estorno) e olhe a aba Cancelados (a "Instalação de prateleiras" mostra o estorno). [CT14, CT15]'
+    },
+    {
+        min: 2,
+        texto: 'Mesma conta: abra "Ajudante para evento", converse no chat e Finalize (R$ 100,00 creditados ao trabalhador). [CT12, CT10]'
+    },
+    {
+        min: 2,
+        texto: 'Trabalhador aceito (Diego): em Histórico > aba Concluídos, abra a conversa do evento (o chat segue liberado depois de finalizado, dá para enviar mensagem) e o detalhe, com o endereço completo. Avalie a contratante. [CT17, CT12, CT26]'
+    },
+    {
+        min: 1,
+        texto: 'Volte à contratante principal: Meu Perfil > "Ver como os outros veem meu perfil" e veja a nota recebida do Diego (avaliação mútua completa). [CT17, CT19]'
+    },
+    {
+        min: 1,
+        texto: 'Mesma conta: em "Troca de resistência do chuveiro" (aba Concluídos) avalie e edite a nota; em "Conserto de torneira" veja o selo "Prazo encerrado". [CT13, CT18]'
+    },
+    {
+        min: 1,
+        texto: 'Contratante sem saldo: tente aceitar o candidato de R$ 200,00 e veja o alerta "Saldo insuficiente". [CT09, CT21]'
+    },
+    {
+        min: 1,
+        texto: 'Trabalhador novo: veja o feed, candidate-se a "Poda de cerca viva" e confira o perfil público do Rafael (média e reputação). [CT07, CT23]'
+    }
 ];
+const TOTAL_MINUTOS = ROTEIRO.reduce((soma, passo) => soma + passo.min, 0);
 
 // ---------------------------------------------------------------- saída: tabela no terminal e Markdown
 const linhasCola = () =>
@@ -380,9 +418,9 @@ Gerado por \`scripts/preparar-demo.js\` (não edite à mão: rode o script de no
 | --- | --- | --- | --- | --- |
 ${tabela}
 
-## Ordem sugerida (cerca de 10 minutos)
+## Ordem sugerida (cerca de ${TOTAL_MINUTOS} minutos)
 
-${ROTEIRO.map((r, i) => `${i + 1}. ${r}`).join('\n')}
+${ROTEIRO.map((r, i) => `${i + 1}. ${r.texto} ~${r.min} min`).join('\n')}
 
 ## Estado inicial dos saldos
 
