@@ -1,0 +1,402 @@
+<mxfile host="Electron">
+  <diagram name="Página-1" id="e0huEfy9uIzIMWbeZYpg">
+    <mxGraphModel dx="2403" dy="3088" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=#E2EBE1;fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size:13px;letter-spacing:2px;color:#B5CBA7&quot;&gt;CYPHER  •  DOCUMENTAÇÃO DE NAVEGAÇÃO&lt;/b&gt;" vertex="1">
+          <mxGeometry height="24" width="1800" x="22" y="414" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-2" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size: 29px;&quot;&gt;FN-08  |  Interações, comunicação e notificações&lt;/b&gt;" vertex="1">
+          <mxGeometry height="46" width="2200" x="22" y="443" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-3" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#F3F6EE);fontSize=13;spacing=0;" value="&lt;span style=&quot;font-size:14px&quot;&gt;Ações autorizadas, conversas privadas e avisos persistentes · RN-160–175 / RF-105–118 conforme escopo fornecido.&lt;/span&gt;" vertex="1">
+          <mxGeometry height="24" width="2200" x="22" y="494" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-4" parent="1" style="rounded=1;arcSize=10;html=1;fillColor=light-dark(#FFFFFF,#141310);strokeColor=#718269;strokeWidth=1.2;dashed=1;dashPattern=5 5;" value="" vertex="1">
+          <mxGeometry height="620" width="2284" x="20" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-5" parent="1" style="rounded=1;arcSize=10;html=1;fillColor=light-dark(#FFFFFF,#141310);strokeColor=#718269;strokeWidth=1.2;dashed=1;dashPattern=5 5;" value="" vertex="1">
+          <mxGeometry height="650" width="2284" x="20" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-6" parent="1" style="rounded=1;arcSize=10;html=1;fillColor=light-dark(#FFFFFF,#141310);strokeColor=#718269;strokeWidth=1.2;dashed=1;dashPattern=5 5;" value="" vertex="1">
+          <mxGeometry height="1130" width="2284" x="20" y="1850" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-7" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#E2EBE1,#92A88C);fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size: 13px; letter-spacing: 1px;&quot;&gt;INTERAÇÕES COM PERFIS E CONTEÚDOS&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="850" x="54" y="553" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-8" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#E2EBE1,#92A88C);fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size: 13px; letter-spacing: 1px;&quot;&gt;MENSAGENS PRIVADAS E CONTROLE DE CONTATO&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="850" x="54" y="1193" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-9" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#E2EBE1,#92A88C);fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size: 13px; letter-spacing: 1px;&quot;&gt;NOTIFICAÇÕES E LEMBRETES&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="850" x="70" y="1871" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-10" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Perfil / Conteúdo acessível&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;Descoberta e perfil · FN-02 / FN-03&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="290" x="57" y="609" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-11" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Selecionar interação&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="245" x="407" y="609" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-12" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Interação&lt;br&gt;permitida?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="717" y="602" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-13" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Executar a interação escolhida&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;&lt;b&gt;Seguir / deixar de seguir&lt;/b&gt; profissional · registrar ou remover acompanhamento&lt;br&gt;&lt;b&gt;Curtir / descurtir&lt;/b&gt; perfil ou conteúdo elegível · atualizar contagem&lt;br&gt;&lt;b&gt;Salvar / remover dos salvos&lt;/b&gt; · coleção pessoal sem duplicação&lt;br&gt;&lt;b&gt;Comentar&lt;/b&gt; quando permitido · autoria e vínculo com o conteúdo&lt;br&gt;&lt;b&gt;Denunciar&lt;/b&gt; perfil, conteúdo ou comentário · encaminhamento [C]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="760" x="1002" y="587" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-14" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Atualizar estado&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Seguir, curtir e salvar são reversíveis&lt;br&gt;Sem relações ativas duplicadas&lt;br&gt;Voltar à seleção para desfazer a ação&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="360" x="1842" y="609" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-15" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Informar restrição&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Acesso e permissões atuais&lt;br&gt;Bloqueios e restrições aplicáveis&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="270" x="687" y="776" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-16" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Área pessoal · FN-00&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="250" x="57" y="776" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-17" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Seguindo / Salvos&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Consultar coleção privada&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="260" x="357" y="776" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-18" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Abrir item ou desfazer interação&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Abertura exige permissão atual · [A]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="370" x="1002" y="776" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-19" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="[A] Reavaliar acesso antes de abrir item. Comentário próprio: editar ou excluir conforme regras. Remoção de comentário alheio exige autoridade específica." vertex="1">
+          <mxGeometry height="25" width="2130" x="67" y="881" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-20" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Bloquear usuário · [B]&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Perfil acessível ou contato na conversa&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="290" x="57" y="957" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-21" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Confirmar&lt;br&gt;bloqueio?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="407" y="946" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-22" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Aplicar restrições&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Novas interações e contatos incompatíveis&lt;br&gt;Histórico de mensagens preservado&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="370" x="687" y="957" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-23" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Manter estado anterior&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="270" x="377" y="1081" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-24" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Desbloquear usuário · [B]&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Acesso pela gestão de bloqueios&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="340" x="1252" y="957" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-25" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Registrar desbloqueio&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Vínculos desfeitos não são restaurados automaticamente&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="450" x="1662" y="957" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-26" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#E2EBE1,#92A88C);fontSize=13;spacing=0;" value="Consumidor: coleções pessoais privadas, sem vitrine profissional ou seguidores próprios de perfil profissional." vertex="1">
+          <mxGeometry height="25" width="1120" x="1082" y="1098" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-27" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Mensagens / Contato pelo perfil&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;Perfis, pedidos e negociações · FN-07&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="310" x="57" y="1247" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-28" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Selecionar conversa ou destinatário&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Caixa vazia: iniciar contato autorizado&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="320" x="422" y="1247" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-29" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-31" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;defaultLabelBackgroundColor=page;labelPadding=0 4;resizable=0;dashed=1;fillColor=#d5e8d4;strokeColor=light-dark(#E2EBE1,#415143);" target="d2-EIA6ScOhoEcGh-Ipc-35" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-30" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-31" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;defaultLabelBackgroundColor=page;labelPadding=0 4;resizable=0;strokeColor=light-dark(#000000,#415143);" target="d2-EIA6ScOhoEcGh-Ipc-114" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-31" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Abrir conversa&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Participantes autorizados&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="220" x="787" y="1248" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-32" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Escrever e enviar mensagem&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="320" x="1362" y="1247" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-33" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Mensagem registrada&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Consultar histórico persistente entre sessões&lt;br&gt;Leitura, quando aplicável, independente do envio&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="460" x="1742" y="1247" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-34" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Informar restrição de contato&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="280" x="1150" y="1405" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-35" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Gestão opcional da conversa&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Ocultar ou gerir mensagem própria&lt;br&gt;Bloquear ou denunciar&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="88" width="400" x="697" y="1405" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-36" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Ocultar conversa&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Retirar da própria visualização&lt;br&gt;Preservar histórico do outro participante&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="360" x="79" y="1574" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-37" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Gerenciar mensagem própria&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Editar ou remover quando permitido&lt;br&gt;Respeitar preservação e integridade&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="360" x="474" y="1574" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-38" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Bloquear contato&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Confirmar e aplicar restrições · [B]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="360" x="964" y="1574" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-39" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Denunciar conversa / mensagem&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Registrar denúncia e encaminhar · [C]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="400" x="1354" y="1574" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-40" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="Contato exige autenticação (FN-01), remetente e destinatário autorizados, preferências compatíveis e ausência de bloqueios; Consumidor requer autorização aplicável." vertex="1">
+          <mxGeometry height="25" width="2150" x="70" y="1691" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-41" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="Mensagens privadas aos participantes. Administração sem acesso livre: evidência denunciada só é analisada excepcionalmente por responsável competente, com justificativa e auditoria." vertex="1">
+          <mxGeometry height="25" width="2150" x="70" y="1721" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-42" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="Ocultação preserva mensagens. Conversa não formaliza contratação, conclusão de colaboração, crédito ou uso de obra. Proposta e aceite bilateral permanecem no FN-07." vertex="1">
+          <mxGeometry height="25" width="2150" x="70" y="1751" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-43" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="[C] Denúncia registrada → análise competente no FN-09. O relato fica sujeito a apuração." vertex="1">
+          <mxGeometry height="25" width="2150" x="70" y="1781" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-44" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Central de Notificações&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;Navegação principal · FN-00&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="265" x="57" y="1919" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-45" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Consultar caixa&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="220" x="377" y="1919" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-46" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Existem&lt;br&gt;notificações?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="657" y="1911" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-47" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Exibir notificações persistentes&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Estado de leitura, conteúdo autorizado&lt;br&gt;e referência ao fato de origem&lt;br&gt;Selecionar uma ação&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="405" x="937" y="1906" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-48" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Exibir caixa vazia&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="280" x="622" y="2064" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-49" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Marcar lida / não lida&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Atualizar leitura e contador&lt;br&gt;Preservar a notificação · retorno [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="335" x="57" y="2204" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-50" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Abrir conteúdo associado&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Verificar autorização atual&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="335" x="452" y="2204" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-51" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Remover notificação&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Somente aviso selecionado do destinatário&lt;br&gt;Atualizar caixa e indicadores · [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="335" x="847" y="2204" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-52" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Limpar caixa&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Solicitar confirmação expressa&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="260" x="1242" y="2204" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-53" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Confirmar&lt;br&gt;limpeza?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="1552" y="2194" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-54" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Remover avisos abrangidos&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Atualizar caixa e indicadores · [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="370" x="1832" y="2204" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-55" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Manter notificações&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Retornar à caixa · [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="270" x="1522" y="2349" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-56" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Acesso atual&lt;br&gt;permitido?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="514.5" y="2334" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-57" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Abrir conteúdo de origem&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="340" x="57" y="2349" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-58" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Informar impossibilidade de acesso&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Removido, privado, indisponível ou bloqueado&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="380" x="792" y="2349" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-59" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Configurações&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="265" x="57" y="2489" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-60" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Preferências de notificações&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Selecionar categorias opcionais&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="355" x="377" y="2489" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-61" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Salvar preferências&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Persistir e orientar futuras notificações&lt;br&gt;Segurança e ciência administrativa obrigatória&lt;br&gt;mantêm os avisos exigidos&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="380" x="792" y="2489" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-62" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Atividade relevante confirmada&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;Mensagens, interações, créditos ou solicitações&lt;br&gt;Eventos · FN-06 / Oportunidades · FN-07&lt;br&gt;Beats e pedidos · FN-05 / Decisões · FN-09&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="340" x="57" y="2659" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-63" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Verificar destinatário e preferências&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Respeitar avisos obrigatórios&lt;br&gt;Somente fatos registrados, sem avisos duplicados&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="380" x="457" y="2659" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-64" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#294833;strokeColor=#799272;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Registrar notificação&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#E3ECDD;margin-top:4px&quot;&gt;Disponibilizar na caixa · [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="335" x="897" y="2659" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-65" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Evento acompanhado · FN-06&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;24 horas antes e no dia do evento&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="330" x="1332" y="2499" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-66" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Lembrete&lt;br&gt;aplicável?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="1732" y="2489" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-67" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Considerar preferências e contexto&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F1F6EC;margin-top:4px&quot;&gt;Horário local e situação atual do evento&lt;br&gt;Registrar lembrete e disponibilizar aviso · [D]&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="360" x="1657" y="2659" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-68" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#64805A;strokeColor=#9EB394;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Não gerar lembrete opcional&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="320" x="1282" y="2799" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-69" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="Mudança de data, horário ou cancelamento atualiza ou cancela lembretes pendentes. Avisos já persistidos seguem a retenção e as permissões vigentes." vertex="1">
+          <mxGeometry height="25" width="2150" x="72" y="2902" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-70" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="[D] Após ações sobre avisos ou novos registros, a caixa reflete o estado atual. Ler, marcar como não lida e remover são operações distintas." vertex="1">
+          <mxGeometry height="25" width="2150" x="72" y="2932" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-71" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="&lt;b&gt;RETENÇÃO:&lt;/b&gt; Notificações não expiram por tempo, leitura, fechamento da interface ou fim da sessão. Remoção pelo destinatário ou medida excepcional justificada." vertex="1">
+          <mxGeometry height="25" width="2250" x="22" y="2996" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-72" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="&lt;b&gt;INTEGRIDADE:&lt;/b&gt; Remover avisos preserva os registros originais. A notificação não concede acesso privilegiado nem substitui mensagem, candidatura, evento ou registro." vertex="1">
+          <mxGeometry height="25" width="2250" x="22" y="3026" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-73" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#A8C2A1);fontSize=13;spacing=0;" value="&lt;b&gt;CONTINUIDADE:&lt;/b&gt; [A] Acesso ao item · [B] Bloqueio e desbloqueio · [C] Denúncias e moderação · [D] Caixa de notificações." vertex="1">
+          <mxGeometry height="25" width="2250" x="22" y="3056" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-74" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-10" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-75" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-11" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-76" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-12" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-13" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-77" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-13" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-78" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-12" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-15" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-79" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-16" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-17" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-80" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-17" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" target="d2-EIA6ScOhoEcGh-Ipc-18" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="487" y="874" />
+              <mxPoint x="1187" y="874" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-81" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-20" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-82" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-21" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-22" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-83" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-21" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-23" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-84" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-24" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-25" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-85" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-27" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-28" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-86" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-28" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="d2-EIA6ScOhoEcGh-Ipc-31" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-87" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-32" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-33" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-88" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-114" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;edgeStyle=orthogonalEdgeStyle;entryDx=0;entryDy=0;" target="d2-EIA6ScOhoEcGh-Ipc-34" value="Não">
+          <mxGeometry relative="1" x="-0.0064" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-89" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-35" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.127;exitY=0.989;entryX=0.5;entryY=0;edgeStyle=orthogonalEdgeStyle;exitDx=0;exitDy=0;exitPerimeter=0;entryDx=0;entryDy=0;" target="d2-EIA6ScOhoEcGh-Ipc-36" value="">
+          <mxGeometry relative="1" x="0.0512" as="geometry">
+            <Array as="points">
+              <mxPoint x="747.8" y="1521" />
+              <mxPoint x="259" y="1521" />
+            </Array>
+            <mxPoint x="750" y="1481" as="sourcePoint" />
+            <mxPoint x="240" y="1562" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-90" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-35" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.375;exitY=1;entryX=0.5;entryY=0;edgeStyle=orthogonalEdgeStyle;" target="d2-EIA6ScOhoEcGh-Ipc-37" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-91" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-35" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.625;exitY=1;entryX=0.5;entryY=0;edgeStyle=orthogonalEdgeStyle;" target="d2-EIA6ScOhoEcGh-Ipc-38" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-92" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-35" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.871;exitY=1.01;entryX=0.5;entryY=0;edgeStyle=orthogonalEdgeStyle;exitDx=0;exitDy=0;exitPerimeter=0;entryDx=0;entryDy=0;" target="d2-EIA6ScOhoEcGh-Ipc-39" value="">
+          <mxGeometry relative="1" x="0.0158" as="geometry">
+            <Array as="points">
+              <mxPoint x="1045.4" y="1521" />
+              <mxPoint x="1554" y="1521" />
+            </Array>
+            <mxPoint x="1047" y="1503" as="sourcePoint" />
+            <mxPoint x="1532" y="1584" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-93" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-44" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-45" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-94" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-45" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-46" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-95" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-46" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-47" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-96" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-46" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-48" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-97" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-47" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.125;exitY=1;entryX=0.5;entryY=0;" target="d2-EIA6ScOhoEcGh-Ipc-49" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="987.625" y="2159" />
+              <mxPoint x="224.5" y="2159" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-98" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-47" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.375;exitY=1;entryX=0.5;entryY=0;" target="d2-EIA6ScOhoEcGh-Ipc-50" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1088.875" y="2169" />
+              <mxPoint x="619.5" y="2169" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-99" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-47" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.625;exitY=1;entryX=0.5;entryY=0;" target="d2-EIA6ScOhoEcGh-Ipc-51" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1190.125" y="2179" />
+              <mxPoint x="1014.5" y="2179" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-100" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-47" style="rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.875;exitY=1;entryX=0.5;entryY=0;edgeStyle=orthogonalEdgeStyle;" target="d2-EIA6ScOhoEcGh-Ipc-52" value="">
+          <mxGeometry relative="1" x="-0.4432" as="geometry">
+            <Array as="points">
+              <mxPoint x="1291.4" y="2171" />
+              <mxPoint x="1372" y="2171" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-101" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-52" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-53" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-102" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-53" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-54" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-103" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-53" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-55" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-104" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-50" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="d2-EIA6ScOhoEcGh-Ipc-56" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-105" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-56" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0;exitY=0.5;entryX=1;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-57" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-106" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-56" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-58" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-107" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-59" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-60" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-108" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-60" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-61" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-109" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-62" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-63" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-110" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-63" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-64" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-111" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-65" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2-EIA6ScOhoEcGh-Ipc-66" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-112" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-66" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-67" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-113" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-66" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=0.25;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="d2-EIA6ScOhoEcGh-Ipc-68" value="Não">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1784.5" y="2624" />
+              <mxPoint x="1442" y="2624" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-114" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#C8B55D;strokeColor=#9C8B43;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Envio Permitido?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="110" width="210" x="1082" y="1241" as="geometry" />
+        </mxCell>
+        <mxCell id="d2-EIA6ScOhoEcGh-Ipc-115" edge="1" parent="1" source="d2-EIA6ScOhoEcGh-Ipc-114" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#E2EBE1,#C2E0BA);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;exitDx=0;exitDy=0;entryDx=0;entryDy=0;" target="d2-EIA6ScOhoEcGh-Ipc-32" value="Sim">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1320" y="1291" as="sourcePoint" />
+            <mxPoint x="1385" y="1291" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

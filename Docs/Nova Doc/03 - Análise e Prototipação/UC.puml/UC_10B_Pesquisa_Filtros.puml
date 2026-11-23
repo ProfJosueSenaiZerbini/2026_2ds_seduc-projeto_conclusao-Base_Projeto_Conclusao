@@ -1,0 +1,44 @@
+
+@startuml UC_10B_Pesquisa_Filtros
+
+title CYPHER - Pesquisa e Filtros
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Pesquisa" {
+
+  usecase "Pesquisar profissionais\npor nome ou @username" as U01
+
+  usecase "Pesquisar obras,\nbeats e projetos" as U02
+
+  usecase "Pesquisar eventos\ne oportunidades" as U03
+
+  usecase "Aplicar filtros\nespecíficos" as U04
+
+  usecase "Consultar resultados\ne abrir registros" as U05
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+
+@enduml

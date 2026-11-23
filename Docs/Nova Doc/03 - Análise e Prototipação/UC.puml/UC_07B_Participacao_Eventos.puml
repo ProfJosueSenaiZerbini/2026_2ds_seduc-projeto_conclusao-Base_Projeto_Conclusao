@@ -1,0 +1,47 @@
+
+@startuml UC_07B_Participacao_Eventos
+
+title CYPHER - Descoberta e Participação em Eventos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Participação em Eventos" {
+
+  usecase "Pesquisar eventos\npor lista ou mapa" as U01
+
+  usecase "Consultar informações\ndo evento" as U02
+
+  usecase "Salvar evento" as U03
+
+  usecase "Demonstrar interesse\nem evento" as U04
+
+  usecase "Inscrever-se\nem evento" as U05
+
+  usecase "Acompanhar situação\nda inscrição" as U06
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+USER -- U06
+
+@enduml

@@ -1,0 +1,50 @@
+
+@startuml UC_03B_EspacoTrabalho
+
+title CYPHER — Espaço de Trabalho
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 25
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional" as PRO
+
+rectangle "CYPHER — Espaço de Trabalho" {
+
+  usecase "Consultar\nMeus Trabalhos" as U01
+
+  usecase "Consultar\nParticipações" as U02
+
+  usecase "Filtrar acervo\npor profissão" as U03
+
+  usecase "Cadastrar projetos\ne experiências" as U04
+
+  usecase "Publicar galerias\ne trabalhos multimídia" as U05
+
+  usecase "Vincular trabalhos\ne mídias existentes" as U06
+
+  usecase "Gerenciar visibilidade\ndos registros" as U07
+
+}
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+PRO -- U06
+PRO -- U07
+
+@enduml

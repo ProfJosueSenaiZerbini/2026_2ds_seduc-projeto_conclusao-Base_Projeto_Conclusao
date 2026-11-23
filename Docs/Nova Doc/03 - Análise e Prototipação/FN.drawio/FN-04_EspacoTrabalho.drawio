@@ -1,0 +1,192 @@
+<mxfile host="Electron">
+  <diagram name="Página-1" id="Vqfj5eCgSqOcQdYpTW1q">
+    <mxGraphModel dx="3715" dy="3742" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-2" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=#E2EBE1;fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size:13px;letter-spacing:2px;color:#A8C2A1&quot;&gt;CYPHER  •  DOCUMENTAÇÃO DE NAVEGAÇÃO&lt;/b&gt;" vertex="1">
+          <mxGeometry height="24" width="1400" x="252" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-3" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#AFC7B7);fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size: 29px;&quot;&gt;FN-04  |  Espaço de Trabalho e publicação&lt;/b&gt;" vertex="1">
+          <mxGeometry height="46" width="1700" x="252" y="199" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-4" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#AFC7B7);fontSize=13;spacing=0;" value="&lt;span style=&quot;font-size:14px&quot;&gt;Consultar o acervo e criar registros conforme a atuação e os direitos sobre o conteúdo.&lt;/span&gt;" vertex="1">
+          <mxGeometry height="24" width="1700" x="252" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-5" parent="1" style="rounded=1;arcSize=10;html=1;fillColor=light-dark(#1B2C21,#141310);strokeColor=#607963;strokeWidth=1.2;dashed=1;dashPattern=5 5;" value="" vertex="1">
+          <mxGeometry height="405" width="1830" x="250" y="423" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-6" parent="1" style="rounded=1;arcSize=10;html=1;fillColor=light-dark(#1B2C21,#141310);strokeColor=#607963;strokeWidth=1.2;dashed=1;dashPattern=5 5;" value="" vertex="1">
+          <mxGeometry height="542" width="1830" x="250" y="843" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-7" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=#E2EBE1;fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size:13px;letter-spacing:1px;color:#A8C2A1&quot;&gt;ACERVO DO PROFISSIONAL&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="410" x="542" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-8" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=#E2EBE1;fontSize=13;spacing=0;" value="&lt;b style=&quot;font-size:13px;letter-spacing:1px;color:#A8C2A1&quot;&gt;CRIAÇÃO DE TRABALHOS&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="410" x="292" y="858" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-9" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#426447;strokeColor=#88A483;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Profissional autenticado&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#DBEBDD;margin-top:4px&quot;&gt;Conta Profissional ativa · FN-00&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="78" width="264" x="952" y="321" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-10" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#537A51;strokeColor=#A0B99A;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Espaço de Trabalho&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="78" width="270" x="612" y="321" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-11" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Consultar acervo&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="220" x="287" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-12" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Meus Trabalhos / Participações&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;&lt;b&gt;Meus Trabalhos&lt;/b&gt; · registros próprios ou sob gestão legítima&lt;br&gt;&lt;b&gt;Participações&lt;/b&gt; · contribuições em trabalhos de terceiros&lt;br&gt;Filtros por profissão, modalidade e vínculo&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="410" x="542" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-13" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Selecionar registro&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="173" x="992" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-14" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#537A51;strokeColor=#A0B99A;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Ficha do registro&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="96" width="190" x="1207" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-15" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DBBF66;strokeColor=#AA8C3F;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Pode gerenciar&lt;br&gt;o registro?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="116" width="190" x="1442" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-16" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Gerenciar registro&lt;/b&gt;&lt;div style=&quot;color: rgb(215, 226, 215); margin-top: 4px;&quot;&gt;&lt;span style=&quot;font-size: 13px;&quot;&gt;Opções: editar dados, mídias, vínculos ou visibilidade&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size: 13px;&quot;&gt;Retirar ou excluir com autorização e confirmação&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size: 13px;&quot;&gt;Preservar direitos, vínculos e créditos de terceiros&lt;/span&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;&lt;b style=&quot;&quot;&gt;(&lt;/b&gt;&lt;strong style=&quot;background-color: transparent; color: light-dark(rgb(243, 246, 238), rgb(26, 28, 22));&quot;&gt;Alterações inválidas devem ser corrigidas antes de salvar.&lt;/strong&gt;&lt;b style=&quot;color: light-dark(rgb(215, 226, 215), rgb(39, 48, 39)); background-color: transparent;&quot;&gt;)&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="116" width="339" x="1697" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-17" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Consultar registro&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;Dados visíveis e ações autorizadas&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="290" x="1392" y="638" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-18" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Salvar edição válida&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="339" x="1697" y="619" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-19" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#537A51;strokeColor=#A0B99A;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Ficha atualizada&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="339" x="1697" y="729" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-20" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#AFC7B7);fontSize=13;spacing=0;" value="O acervo respeita a visibilidade. Participação pendente não confirma crédito, e projeto autodeclarado não comprova colaboração concluída · FN-08." vertex="1">
+          <mxGeometry height="38" width="1130" x="287" y="745" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-21" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Criar novo trabalho&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="104" width="220" x="287" y="889" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-22" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Escolher modalidade&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;&lt;b&gt;Musicais&lt;/b&gt; · obra, composição, letra, gravação ou lançamento&lt;br&gt;&lt;b&gt;Multimídia&lt;/b&gt; · projeto, galeria, fotografia ou vídeo&lt;br&gt;&lt;b&gt;Específicos&lt;/b&gt; · beat, evento, oportunidade ou chamada&lt;br&gt;Lista limitada às modalidades das profissões ativas&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="132" width="390" x="537" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-23" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DBBF66;strokeColor=#AA8C3F;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Modalidade&lt;br&gt;autorizada?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="116" width="206" x="972" y="883" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-24" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Formulário específico&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;Dados, mídias e créditos da modalidade&lt;br&gt;Beats · FN-05  |  Eventos · FN-06&lt;br&gt;Chamadas · FN-07&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="104" width="285" x="1242" y="889" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-25" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DBBF66;strokeColor=#AA8C3F;strokeWidth=1.8;fontColor=#30250E;fontFamily=Arial;fontSize=16;align=center;verticalAlign=middle;" value="&lt;b&gt;Dados e autorizações&lt;br&gt;válidos?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="116" width="230" x="1572" y="883" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-26" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#20392A;strokeColor=#5C795F;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Salvar registro&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="104" width="160" x="1862" y="889" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-27" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Modalidade indisponível&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;Informar impedimento e rever a escolha&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="84" width="256" x="947" y="1069" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-28" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Exibir impedimentos&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;Corrigir dados ou autorizações&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="84" width="270" x="1552" y="1069" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-29" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#537A51;strokeColor=#A0B99A;strokeWidth=1.8;fontColor=#FFFFFF;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Ficha do registro criado&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#F4F7ED;margin-top:4px&quot;&gt;Consultar resultado&lt;br&gt;Gerenciar se autorizado&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="98" width="250" x="1817" y="1195" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-30" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#293D2E;strokeColor=#829781;strokeWidth=1.8;fontColor=#F3F6EE;fontFamily=Arial;fontSize=16;spacing=8;" value="&lt;div style=&quot;font-family:Arial;line-height:1.24&quot;&gt;&lt;b style=&quot;font-size:17px&quot;&gt;Voltar ao Espaço de Trabalho&lt;/b&gt;&lt;div style=&quot;font-size:13px;color:#D7E2D7;margin-top:4px&quot;&gt;O acervo pode ser consultado novamente&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="98" width="285" x="1472" y="1195" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-31" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#A8C2A1,#8A9E8F);fontSize=13;spacing=0;" value="&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;AUTORIZAÇÃO:&lt;/strong&gt; A criação e a gestão exigem profissão compatível quando aplicável, vínculo legítimo e direitos sobre o conteúdo. Múltiplas profissões acumulam somente suas permissões específicas.&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="25" width="1293" x="252" y="1350" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-32" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#AFC7B7);fontSize=13;spacing=0;" value="&lt;b&gt;LEITURA:&lt;/b&gt; Acervo e criação são jornadas independentes. Modalidades e ações dependem das permissões do profissional." vertex="1">
+          <mxGeometry height="24" width="1800" x="252" y="1397" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-33" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#E2EBE1,#8A9E8F);fontSize=13;spacing=0;" value="&lt;b&gt;ACESSO:&lt;/b&gt; A criação exige profissão compatível, vínculo legítimo e autorização." vertex="1">
+          <mxGeometry height="24" width="1800" x="252" y="1423" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-34" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontFamily=Arial;fontColor=light-dark(#F3F6EE,#AFC7B7);fontSize=13;spacing=0;" value="&lt;b&gt;INTEGRIDADE:&lt;/b&gt; Participação não concede edição. Cadastro não comprova lançamento, participação confirmada ou execução. A exposição segue as regras de visibilidade." vertex="1">
+          <mxGeometry height="24" width="1800" x="252" y="1449" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-35" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-9" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-10" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-36" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-10" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.75;entryX=0.5;entryY=0;" target="cjObFRWR_jDsMLeoMFRe-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="397" y="379.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-37" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-10" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.25;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-21" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="268" y="340.5" />
+              <mxPoint x="268" y="941" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-38" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-11" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-39" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-12" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-13" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-40" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-13" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-41" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-14" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-42" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-15" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-16" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-43" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-15" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-17" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-44" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-16" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-18" value="Edição">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-45" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-18" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="cjObFRWR_jDsMLeoMFRe-19" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-46" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-21" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-47" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-22" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-48" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-23" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-24" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-49" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-23" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-27" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-50" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-27" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.5;entryX=0.5;entryY=1;dashed=1;dashPattern=5 4;" target="cjObFRWR_jDsMLeoMFRe-22" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="732" y="1111" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-51" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-24" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="cjObFRWR_jDsMLeoMFRe-25" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-52" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-25" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=1;exitY=0.5;entryX=0;entryY=0.5;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-26" value="Sim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-53" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-25" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=light-dark(#A8C2A1,#8A9E8F);labelBackgroundColor=default;exitX=0.5;exitY=1;entryX=0.5;entryY=0;defaultLabelBackgroundColor=page;" target="cjObFRWR_jDsMLeoMFRe-28" value="Não">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-54" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-28" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.5;entryX=0.5;entryY=1;dashed=1;dashPattern=5 4;" target="cjObFRWR_jDsMLeoMFRe-24" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1384.5" y="1111" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-55" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-26" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="cjObFRWR_jDsMLeoMFRe-29" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cjObFRWR_jDsMLeoMFRe-56" edge="1" parent="1" source="cjObFRWR_jDsMLeoMFRe-29" style="noEdgeStyle=1;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#AEC0B0;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#F3F6EE;labelBackgroundColor=#1B2C21;exitX=0;exitY=0.5;entryX=1;entryY=0.5;dashed=1;dashPattern=5 4;" target="cjObFRWR_jDsMLeoMFRe-30" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

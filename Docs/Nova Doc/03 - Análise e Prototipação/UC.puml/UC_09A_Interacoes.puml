@@ -1,0 +1,47 @@
+
+@startuml UC_09A_Interacoes
+
+title CYPHER - Interações com Perfis e Conteúdos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Interações" {
+
+  usecase "Seguir ou deixar de\nseguir profissionais" as U01
+
+  usecase "Curtir ou descurtir\nconteúdos e perfis" as U02
+
+  usecase "Salvar ou remover\nconteúdos salvos" as U03
+
+  usecase "Consultar profissionais\nseguidos e itens salvos" as U04
+
+  usecase "Publicar comentário" as U05
+
+  usecase "Editar ou excluir\ncomentário próprio" as U06
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+USER -- U06
+
+@enduml

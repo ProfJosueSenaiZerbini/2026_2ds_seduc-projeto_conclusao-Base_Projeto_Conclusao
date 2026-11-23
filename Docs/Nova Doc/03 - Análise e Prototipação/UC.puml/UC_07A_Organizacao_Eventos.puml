@@ -1,0 +1,47 @@
+
+@startuml UC_07A_Organizacao_Eventos
+
+title CYPHER - Organização de Eventos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Organizador(a) de Eventos\nhabilitado(a)" as ORG
+
+rectangle "CYPHER - Organização de Eventos" {
+
+  usecase "Cadastrar evento" as U01
+
+  usecase "Definir modalidade de inscrição,\ncritérios e vagas" as U02
+
+  usecase "Analisar solicitações\nde participação" as U03
+
+  usecase "Registrar presença\ndos participantes" as U04
+
+  usecase "Atualizar ou\ncancelar evento" as U05
+
+  usecase "Gerenciar edições e\nconsultar indicadores" as U06
+
+}
+
+ORG -- U01
+ORG -- U02
+ORG -- U03
+ORG -- U04
+ORG -- U05
+ORG -- U06
+
+@enduml

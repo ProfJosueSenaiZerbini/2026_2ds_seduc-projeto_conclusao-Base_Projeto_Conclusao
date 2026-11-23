@@ -1,0 +1,41 @@
+
+@startuml UC_10C_Compartilhamento
+
+title CYPHER - Compartilhamento de Conteúdos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Compartilhamento" {
+
+  usecase "Obter link\ncompartilhável" as U01
+
+  usecase "Compartilhar referência\nde perfil ou conteúdo" as U02
+
+  usecase "Abrir conteúdo\npor link recebido" as U03
+
+  usecase "Consultar conteúdo\nconforme permissões" as U04
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+
+@enduml

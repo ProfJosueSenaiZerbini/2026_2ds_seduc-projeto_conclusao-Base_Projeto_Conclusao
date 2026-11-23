@@ -1,0 +1,47 @@
+
+@startuml UC_09B_Mensagens
+
+title CYPHER - Mensagens Privadas e Bloqueios
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Comunicação Privada" {
+
+  usecase "Iniciar conversa\ncom usuário autorizado" as U01
+
+  usecase "Enviar e consultar\nmensagens" as U02
+
+  usecase "Consultar histórico\nde conversas" as U03
+
+  usecase "Ocultar conversa\nda própria caixa" as U04
+
+  usecase "Configurar preferências\nde contato" as U05
+
+  usecase "Bloquear ou\ndesbloquear usuário" as U06
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+USER -- U06
+
+@enduml

@@ -1,0 +1,50 @@
+
+@startuml UC_05B_Consulta_Beats
+
+title CYPHER — Exploração e Utilização de Beats
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+rectangle "CYPHER — Banco de Beats" {
+
+  package "Consulta ao catálogo" {
+
+    usecase "Pesquisar e\nfiltrar beats" as U01
+
+    usecase "Ouvir prévia\ndo instrumental" as U02
+
+    usecase "Consultar ficha\ne ofertas" as U03
+  }
+
+  package "Utilização e licenciamento" {
+
+    usecase "Aceitar condições\nde Free Use" as U04
+
+    usecase "Acessar arquivos\nautorizados" as U05
+  }
+
+}
+
+actor "Usuário\nautenticado" as USER
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+
+@enduml

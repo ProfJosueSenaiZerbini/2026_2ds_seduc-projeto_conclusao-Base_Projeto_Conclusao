@@ -1,0 +1,47 @@
+
+@startuml UC_07E_Pedidos_Excepcionais
+
+title CYPHER - Pedidos Excepcionais de Consumidores
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Consumidor" as CON
+
+rectangle "CYPHER - Pedidos Excepcionais" {
+
+  usecase "Solicitar orientação por\nprofissional mediador" as U01
+
+  usecase "Enviar pedido excepcional\nde serviço" as U02
+
+  usecase "Acompanhar análise\ndo pedido" as U03
+
+  usecase "Analisar pedido\nexcepcional" as U04
+
+  usecase "Autorizar ou recusar\na publicação" as U05
+
+}
+
+actor "Moderador" as MOD
+
+CON -- U01
+CON -- U02
+CON -- U03
+
+U04 -- MOD
+U05 -- MOD
+
+@enduml

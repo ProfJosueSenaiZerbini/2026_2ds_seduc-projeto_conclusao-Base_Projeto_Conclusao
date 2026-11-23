@@ -1,0 +1,57 @@
+
+@startuml UC_07D_Oportunidades
+
+title CYPHER - Oportunidades Profissionais
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional responsável\npela oportunidade" as RESP
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Oportunidades" {
+
+  usecase "Publicar oportunidade\nprofissional" as U01
+
+  usecase "Analisar e responder\ncandidaturas" as U02
+
+  usecase "Encerrar uma\noportunidade" as U03
+
+  usecase "Pesquisar e consultar\noportunidades" as U04
+
+  usecase "Candidatar-se a uma\noportunidade" as U05
+
+  usecase "Acompanhar situação\nda candidatura" as U06
+
+  usecase "Confirmar acordo\nsobre condições da oportunidade" as U07
+
+}
+
+actor "Profissional\ncandidato" as CAND
+
+RESP -- U01
+RESP -- U02
+RESP -- U03
+RESP -- U07
+
+USER -- U04
+
+U05 -- CAND
+U06 -- CAND
+U07 -- CAND
+
+@enduml

@@ -1,0 +1,44 @@
+
+@startuml UC_05A_Gestao_Beats
+
+title CYPHER — Cadastro e Gestão de Beats
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 25
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Produtor de beats\nhabilitado" as PROD
+
+rectangle "CYPHER — Gestão de Beats" {
+
+  usecase "Cadastrar beat" as U01
+
+  usecase "Editar ficha e\narquivos do beat" as U02
+
+  usecase "Cadastrar ofertas\nFree Use e Premium" as U03
+
+  usecase "Gerenciar ofertas\ne disponibilidade" as U04
+
+  usecase "Informar condições para\nnegociação exclusiva" as U05
+
+}
+
+PROD -- U01
+PROD -- U02
+PROD -- U03
+PROD -- U04
+PROD -- U05
+
+@enduml

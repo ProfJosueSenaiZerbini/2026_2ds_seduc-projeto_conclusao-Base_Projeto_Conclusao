@@ -1,0 +1,49 @@
+
+@startuml UC_04B_Lancamentos
+
+title CYPHER — Lançamentos e Discografia
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 35
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Responsável autorizado\npelo lançamento" as RESP
+
+rectangle "CYPHER — Lançamentos" {
+
+  usecase "Cadastrar single, EP,\nálbum ou mixtape" as U01
+
+  usecase "Adicionar e ordenar\nfaixas" as U02
+
+  usecase "Reutilizar fonograma\njá cadastrado" as U03
+
+  usecase "Atualizar dados\ndo lançamento" as U04
+
+  usecase "Registrar evidência\nde lançamento público" as U05
+
+  usecase "Consultar catálogo\ne discografia" as U06
+}
+
+actor "Usuário\nautenticado" as USER
+
+RESP -- U01
+RESP -- U02
+RESP -- U03
+RESP -- U04
+RESP -- U05
+
+U06 -- USER
+
+@enduml

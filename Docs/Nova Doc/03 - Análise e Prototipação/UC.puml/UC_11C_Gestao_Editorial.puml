@@ -1,0 +1,47 @@
+
+@startuml UC_11C_Gestao_Editorial
+
+title CYPHER - Gestão Editorial da Cypher Central
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Editor" as EDIT
+
+rectangle "CYPHER - Administração Editorial" {
+
+  usecase "Criar artigo\neducativo" as U01
+
+  usecase "Revisar e\natualizar artigos" as U02
+
+  usecase "Publicar ou\narquivar artigos" as U03
+
+  usecase "Consultar avaliações\ne motivos de feedback" as U04
+
+  usecase "Analisar indicadores\nde qualidade" as U05
+
+  usecase "Consultar pesquisas\nsem resultado" as U06
+
+}
+
+EDIT -- U01
+EDIT -- U02
+EDIT -- U03
+EDIT -- U04
+EDIT -- U05
+EDIT -- U06
+
+@enduml

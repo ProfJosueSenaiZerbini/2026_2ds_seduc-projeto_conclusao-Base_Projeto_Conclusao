@@ -1,0 +1,106 @@
+<mxfile host="Electron">
+  <diagram name="Página-1" id="fUELkunQjvooAhrM92II">
+    <mxGraphModel dx="1777" dy="1790" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="FUoIh5L09QGOf55NgNaO-2" parent="1" style="rounded=0;arcSize=8;html=1;fillColor=#EEF3EA;strokeColor=#D2DDD0;strokeWidth=1.2;fontFamily=Arial;" value="" vertex="1">
+          <mxGeometry height="212" width="1038" x="90" y="224" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-3" parent="1" style="rounded=0;arcSize=8;html=1;fillColor=#F2F2EB;strokeColor=#D4D9CE;strokeWidth=1.2;fontFamily=Arial;" value="" vertex="1">
+          <mxGeometry height="212" width="570" x="1154" y="224" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-4" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#23412F;fontSize=14;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b style=&#39;font-size:13px;letter-spacing:1.5px;color:#537A51&#39;&gt;CYPHER  •  DOCUMENTAÇÃO DE NAVEGAÇÃO&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="1600" x="90" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-5" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#23412F;fontSize=14;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b style=&#39;font-size:30px;color:#203C29&#39;&gt;FN-00  |  Mapa geral de navegação&lt;/b&gt;" vertex="1">
+          <mxGeometry height="53" width="1600" x="90" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-6" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#23412F;fontSize=14;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;span style=&#39;font-size:15px;color:#526957&#39;&gt;Visão macro dos acessos e destinos • referência para FN-01 a FN-09&lt;/span&gt;" vertex="1">
+          <mxGeometry height="35" width="1600" x="90" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-7" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#23412F;fontSize=14;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b style=&#39;font-size:13px;letter-spacing:1px;color:#56705A&#39;&gt;ACESSO CONVENCIONAL  ·  CONSUMIDOR OU PROFISSIONAL&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="960" x="110" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-8" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#23412F;fontSize=14;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b style=&#39;font-size:13px;letter-spacing:1px;color:#56705A&#39;&gt;ACESSO ADMINISTRATIVO  ·  INDEPENDENTE&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="515" x="1172" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-9" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#294A35;strokeColor=#294A35;strokeWidth=1.6;fontColor=#FFFFFF;fontSize=16;spacing=10;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial;font-weight:700;font-size:16px;line-height:1.3&quot;&gt;Login / Cadastro&lt;/div&gt;&lt;div style=&quot;font-family:Arial;font-size:11px;line-height:1.3;margin-top:5px;color:#E0EDE0&quot;&gt;/login • /register&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="210" x="116" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-10" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#DCE8DA;strokeColor=#A3B8A2;strokeWidth=1.6;fontColor=#183322;fontSize=15;spacing=10;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial;font-weight:700;font-size:16px;line-height:1.3&quot;&gt;Acesso autorizado&lt;/div&gt;&lt;div style=&quot;font-family:Arial;font-size:11px;line-height:1.3;margin-top:5px;color:#46664D&quot;&gt;Conta ativa + e-mail confirmado&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="208" x="370" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-11" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#537A51;strokeColor=#537A51;strokeWidth=1.6;fontColor=#FFFFFF;fontSize=16;spacing=10;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial;font-weight:700;font-size:16px;line-height:1.3&quot;&gt;Descoberta&lt;/div&gt;&lt;div style=&quot;font-family:Arial;font-size:11px;line-height:1.3;margin-top:5px;color:#E0EDE0&quot;&gt;Página inicial&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="190" x="620" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-12" parent="1" style="rounded=0;arcSize=7;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFEFA;strokeColor=#8AA18E;strokeWidth=1.6;dashed=1;dashPattern=5 4;fontColor=#27432D;fontSize=16;spacing=8;fontFamily=Arial;" value="&lt;div style=&quot;font-size:17px;font-weight:700&quot;&gt;Navegação Global&lt;/div&gt;&lt;div style=&quot;font-size:12px;margin-top:4px&quot;&gt;&lt;strong&gt;Sidebar / barra inferior&lt;/strong&gt;&lt;/div&gt;&lt;div style=&quot;font-size:12px;margin-top:4px&quot;&gt;&lt;strong&gt;acesso persistente&lt;/strong&gt;&lt;strong&gt;&lt;/strong&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="228" x="854" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-13" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontColor=#596C5D;fontSize=13;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;span style=&#39;font-size:12px&#39;&gt;Cadastro, recuperação e conversão são detalhados no FN-01. O menu permanece disponível nas áreas autorizadas.&lt;/span&gt;" vertex="1">
+          <mxGeometry height="38" width="987" x="113" y="382" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-14" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#294A35;strokeColor=#294A35;strokeWidth=1.6;fontColor=#FFFFFF;fontSize=16;spacing=10;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial;font-weight:700;font-size:16px;line-height:1.3&quot;&gt;Login administrativo&lt;/div&gt;&lt;div style=&quot;font-family:Arial;font-size:11px;line-height:1.3;margin-top:5px;color:#E0EDE0&quot;&gt;/admin/login&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="220" x="1177" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-15" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#294A35;strokeColor=#294A35;strokeWidth=1.6;fontColor=#FFFFFF;fontSize=16;spacing=10;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial;font-weight:700;font-size:16px;line-height:1.3&quot;&gt;Painel administrativo&lt;/div&gt;&lt;div style=&quot;font-family:Arial;font-size:11px;line-height:1.3;margin-top:5px;color:#E0EDE0&quot;&gt;/admin&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="240" x="1440" y="292" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-16" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontColor=#596C5D;fontSize=13;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;span style=&#39;font-size:12px&#39;&gt;Gestão por papel: Administrador Geral, Moderador e Editor (FN-09). Sem perfil público profissional.&lt;/span&gt;" vertex="1">
+          <mxGeometry height="47" width="520" x="1176" y="378" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-17" parent="1" style="rounded=0;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fillColor=#FFFEFA;strokeColor=#C6D5C4;strokeWidth=1.5;fontColor=#1C3224;fontSize=15;spacing=22;spacingTop=19;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial&quot;&gt;&lt;div style=&quot;font-size:17px;font-weight:700;color:#294A35&quot;&gt;EXPLORAR&lt;/div&gt;&lt;div style=&quot;font-size:12px;color:#627666;margin-top:4px&quot;&gt;Acessível às contas convencionais autenticadas&lt;/div&gt;&lt;div style=&quot;margin-top:15px&quot;&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Buscar pessoas → Perfil profissional → Portfólio&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-02 / FN-03&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Obras e lançamentos → Ficha&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-02 / FN-04&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Banco de Beats → Ficha / Ofertas&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-05&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Eventos → Ficha / Participação&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-06&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Oportunidades → Ficha / Candidatura&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-07&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Cypher Central → Guias&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · RF-126–131&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size:12px;line-height:1.45;color:#5E725F;margin-top:13px&quot;&gt;Cada linha representa um destino próprio; não uma sequência entre os conteúdos.&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="428" width="508" x="90" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-18" parent="1" style="rounded=0;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fillColor=#FFFEFA;strokeColor=#C6D5C4;strokeWidth=1.5;fontColor=#1C3224;fontSize=15;spacing=22;spacingTop=19;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial&quot;&gt;&lt;div style=&quot;font-size:17px;font-weight:700;color:#294A35&quot;&gt;CONTA E INTERAÇÕES&lt;/div&gt;&lt;div style=&quot;font-size:12px;color:#627666;margin-top:4px&quot;&gt;Ações pessoais; disponibilidade sujeita à permissão&lt;/div&gt;&lt;div style=&quot;margin-top:15px&quot;&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Meu perfil → Editar / Privacidade&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-03&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Configurações da conta&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · RF-019&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Seguindo / Salvos&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-08&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Mensagens privadas / Notificações&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-08&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Minhas Compras → Licenças de teste&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-05&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.35;padding:10px 0;border-bottom:1px solid #E1E7DF;color:#1D3326&quot;&gt;Consumidor → Ativação profissional&lt;span style=&quot;font-size:12px;color:#67816C&quot;&gt;  · FN-01&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size:12px;line-height:1.45;color:#5E725F;margin-top:13px&quot;&gt;Perfil de Consumidor é privado; não existe uma segunda conta ao profissionalizar.&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="428" width="506" x="651" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-19" parent="1" style="rounded=0;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fillColor=#FFFEFA;strokeColor=#C6D5C4;strokeWidth=1.5;fontColor=#1C3224;fontSize=15;spacing=22;spacingTop=19;fontFamily=Arial;" value="&lt;div style=&quot;font-family:Arial&quot;&gt;&lt;div style=&quot;font-size: 17px; font-weight: 700; color: rgb(41, 74, 53);&quot;&gt;ÁREA PROFISSIONAL&lt;/div&gt;&lt;div style=&quot;font-size: 12px; color: rgb(98, 118, 102); margin-top: 4px;&quot;&gt;Acesso profissional; ações condicionadas às permissões.&lt;/div&gt;&lt;div style=&quot;margin-top:15px&quot;&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Espaço de Trabalho → Acervo / Fichas&lt;span style=&quot;font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;  · FN-04&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Publicar → Escolher modalidade permitida&lt;span style=&quot;font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;  · FN-04&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Obras, beats, eventos, projetos e galerias&lt;span style=&quot;font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;  · FN-04–06&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Chamadas e oportunidades próprias&lt;span style=&quot;font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;  · FN-07&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Meu Perfil&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(28, 50, 36), rgb(185, 204, 192));&quot;&gt;→&lt;/span&gt;&lt;span style=&quot;color: light-dark(rgb(29, 51, 38), rgb(184, 203, 192)); background-color: transparent;&quot;&gt;&amp;nbsp;Portfólio / Selo Profissional&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;· FN-03&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 15px; line-height: 1.35; padding: 10px 0px; border-bottom: 1px solid rgb(225, 231, 223); color: rgb(29, 51, 38);&quot;&gt;Collabs / Avaliações profissionais&lt;span style=&quot;font-size: 12px; color: rgb(103, 129, 108);&quot;&gt;  · FN-08&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 12px; line-height: 1.45; color: rgb(94, 114, 95); margin-top: 13px;&quot;&gt;&lt;blockquote&gt;&lt;p&gt;Cada publicação exige profissão ativa compatível, vínculo legítimo e autorização. As modalidades são alternativas, não etapas sucessivas.&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="428" width="516" x="1208" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-20" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontColor=#596C5D;fontSize=13;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b&gt;LEITURA:&lt;/b&gt; Setas indicam o acesso entre áreas. Os três cartões inferiores agrupam destinos independentes (não representam uma página adicional)." vertex="1">
+          <mxGeometry height="29" width="1620" x="90" y="1017" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-21" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontColor=#596C5D;fontSize=13;spacing=0;fontFamily=Arial;rounded=0;" value="&lt;b&gt;BASE:&lt;/b&gt; RN-001–046; RF-001–029, RF-056–069 e RF-088–146. Fluxo da versão final documentada; não comprova que todas as telas já estejam implementadas. Consumidor só solicita publicação excepcional mediante mediação/triagem (FN-07)." vertex="1">
+          <mxGeometry height="42" width="1640" x="90" y="1048" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-22" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#83998A;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-10" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-23" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#83998A;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-24" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#83998A;strokeWidth=2;endArrow=none;endFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;flowAnimation=0;dashed=1;" target="FUoIh5L09QGOf55NgNaO-12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-25" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#83998A;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-26" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#819788;strokeWidth=2;endArrow=block;endFill=1;exitX=0.22;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-17" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="905" y="466" />
+              <mxPoint x="344" y="466" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-27" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#819788;strokeWidth=2;endArrow=block;endFill=1;exitX=0.51;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-18" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="970" y="493" />
+              <mxPoint x="904" y="493" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FUoIh5L09QGOf55NgNaO-28" edge="1" parent="1" source="FUoIh5L09QGOf55NgNaO-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#819788;strokeWidth=2;endArrow=block;endFill=1;exitX=0.78;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="FUoIh5L09QGOf55NgNaO-19" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1039" y="466" />
+              <mxPoint x="1466" y="466" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

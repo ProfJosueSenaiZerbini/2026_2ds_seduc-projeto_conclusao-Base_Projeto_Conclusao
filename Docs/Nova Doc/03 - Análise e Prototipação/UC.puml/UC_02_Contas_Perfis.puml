@@ -1,0 +1,123 @@
+
+@startuml UC_02_Contas_Perfis
+
+title CYPHER — Contas, Cadastro e Perfis
+
+left to right direction
+
+' CONFIGURAÇÃO VISUAL
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 18
+skinparam nodesep 38
+skinparam ranksep 35
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam actorFontColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam usecaseFontColor #18231B
+skinparam packageBorderColor #849086
+skinparam rectangleBorderColor #27362A
+
+' ATORES
+
+actor "Solicitante de cadastro\nou autenticação" as SOL
+
+actor "Usuário\nautenticado" as USU
+
+actor "Consumidor" as CON
+
+actor "Profissional" as PRO
+
+' SISTEMA
+
+rectangle "CYPHER" {
+
+  package "01 — Cadastro e acesso" {
+
+    usecase "Cadastrar\nconta" as UC01
+
+    usecase "Confirmar\ne-mail" as UC02
+
+    usecase "Autenticar-se" as UC03
+
+    usecase "Recuperar\nacesso" as UC04
+
+    UC01 -[hidden]down- UC02
+    UC02 -[hidden]down- UC03
+    UC03 -[hidden]down- UC04
+  }
+
+  package "02 — Gestão da conta" {
+
+    usecase "Gerenciar dados\ne segurança" as UC05
+
+    usecase "Alterar e-mail\ne @username" as UC06
+
+    usecase "Configurar\nprivacidade" as UC07
+
+    usecase "Encerrar\nconta" as UC08
+
+    UC05 -[hidden]down- UC06
+    UC06 -[hidden]down- UC07
+    UC07 -[hidden]down- UC08
+  }
+
+  package "03 — Perfil profissional" {
+
+    usecase "Editar perfil\nprofissional" as UC09
+
+    usecase "Organizar apresentação\npor profissão" as UC10
+
+    usecase "Gerenciar vínculos\nde representação" as UC11
+
+    UC09 -[hidden]down- UC10
+    UC10 -[hidden]down- UC11
+  }
+
+  package "04 — Conversão de conta" {
+
+    usecase "Tornar-se\nProfissional" as UC12
+  }
+
+  ' DISTRIBUIÇÃO EM DUAS COLUNAS
+
+  UC01 -[hidden]right- UC09
+  UC04 -[hidden]down- UC05
+
+  UC11 -[hidden]down- UC12
+  UC05 -[hidden]right- UC12
+
+}
+
+' CONEXÕES — CADASTRO E AUTENTICAÇÃO
+
+SOL -right- UC01
+SOL -right- UC02
+SOL -right- UC03
+SOL -right- UC04
+
+' CONEXÕES — USUÁRIO AUTENTICADO
+
+USU -right- UC05
+USU -right- UC06
+USU -right- UC07
+USU -right- UC08
+
+' CONEXÕES — PROFISSIONAL
+
+UC09 -right- PRO
+UC10 -right- PRO
+UC11 -right- PRO
+
+' CONEXÃO — CONSUMIDOR
+
+UC12 -right- CON
+
+@enduml

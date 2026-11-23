@@ -1,0 +1,50 @@
+
+@startuml UC_12A_Administracao_Geral
+
+title CYPHER - Administração de Acessos e Catálogos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Administrador\nGeral" as ADM
+
+rectangle "CYPHER - Administração Geral" {
+
+  usecase "Convidar novos\nadministradores" as U01
+
+  usecase "Atribuir ou revogar\nacessos administrativos" as U02
+
+  usecase "Consultar acessos\ne permissões" as U03
+
+  usecase "Analisar propostas\nde catálogo" as U04
+
+  usecase "Aprovar alterações\nde catálogos globais" as U05
+
+  usecase "Gerenciar configurações\nestruturais" as U06
+
+  usecase "Consultar registros\nde auditoria" as U07
+
+}
+
+ADM -- U01
+ADM -- U02
+ADM -- U03
+ADM -- U04
+ADM -- U05
+ADM -- U06
+ADM -- U07
+
+@enduml

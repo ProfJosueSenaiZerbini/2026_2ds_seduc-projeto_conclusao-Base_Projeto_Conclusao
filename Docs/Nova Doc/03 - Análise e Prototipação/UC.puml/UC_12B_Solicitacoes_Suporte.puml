@@ -1,0 +1,52 @@
+
+@startuml UC_12B_Solicitacoes_Suporte
+
+title CYPHER - Solicitações e Atendimento
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+actor "Profissional" as PRO
+
+rectangle "CYPHER - Solicitações e Suporte" {
+
+  usecase "Solicitar ajuda\nà Cypher" as U01
+
+  usecase "Sugerir alteração\nde catálogo" as U02
+
+  usecase "Acompanhar situação\nda solicitação" as U03
+
+  usecase "Solicitar exceção\nprofissional" as U04
+
+  usecase "Analisar solicitações\nde sua competência" as U05
+
+  usecase "Responder e registrar\ndecisão" as U06
+
+}
+
+actor "Moderador" as MOD
+
+USER -- U01
+USER -- U02
+USER -- U03
+
+PRO -- U04
+
+U05 -- MOD
+U06 -- MOD
+
+@enduml

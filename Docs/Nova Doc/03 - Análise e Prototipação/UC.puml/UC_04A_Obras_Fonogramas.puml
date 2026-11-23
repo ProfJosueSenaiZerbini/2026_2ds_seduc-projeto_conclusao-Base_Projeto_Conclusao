@@ -1,0 +1,49 @@
+
+@startuml UC_04A_Obras_Fonogramas
+
+title CYPHER — Obras e Fonogramas
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 35
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional autor\nhabilitado" as AUT
+
+rectangle "CYPHER — Obras e Fonogramas" {
+
+  usecase "Registrar\ncomposição musical" as U01
+
+  usecase "Registrar\nletra independente" as U02
+
+  usecase "Cadastrar\nfonograma" as U03
+
+  usecase "Associar composição\na fonograma" as U04
+
+  usecase "Vincular beat, clipe\nou mídia relacionada" as U05
+
+  usecase "Editar ficha e\ndados técnicos" as U06
+}
+
+actor "Responsável autorizado\npelo fonograma" as FON
+
+AUT -- U01
+AUT -- U02
+
+U03 -- FON
+U04 -- FON
+U05 -- FON
+U06 -- FON
+
+@enduml

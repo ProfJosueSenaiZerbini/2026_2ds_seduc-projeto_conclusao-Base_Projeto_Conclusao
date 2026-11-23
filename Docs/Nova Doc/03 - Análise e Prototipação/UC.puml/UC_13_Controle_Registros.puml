@@ -1,0 +1,53 @@
+
+@startuml UC_13_Controle_Registros
+
+title CYPHER - Controle de Registros
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Controle de Registros" {
+
+  usecase "Consultar registro\nautorizado" as U01
+
+  usecase "Abrir registro por\nlink compartilhado" as U02
+
+  usecase "Acessar arquivos\npermitidos" as U03
+
+  usecase "Editar registro\nsob sua responsabilidade" as U04
+
+  usecase "Alterar visibilidade\ndo registro" as U05
+
+  usecase "Retirar conteúdo\nde uma apresentação" as U06
+
+  usecase "Solicitar exclusão\nde registro" as U07
+
+}
+
+actor "Responsável autorizado\npelo registro" as RESP
+
+USER -- U01
+USER -- U02
+USER -- U03
+
+U04 -- RESP
+U05 -- RESP
+U06 -- RESP
+U07 -- RESP
+
+@enduml

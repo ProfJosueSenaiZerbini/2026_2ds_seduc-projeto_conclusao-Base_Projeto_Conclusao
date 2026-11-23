@@ -1,0 +1,44 @@
+
+@startuml UC_06C_Selo_Profissional
+
+title CYPHER — Selo Profissional
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional" as PRO
+
+rectangle "CYPHER — Selo Profissional" {
+
+  usecase "Criar selo no\neditor da Cypher" as U01
+
+  usecase "Pré-visualizar\nselo" as U02
+
+  usecase "Editar ou substituir\nselo ativo" as U03
+
+  usecase "Solicitar uso de\nidentidade externa" as U04
+
+  usecase "Consultar aplicação\ndo selo nos trabalhos" as U05
+
+}
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+
+@enduml

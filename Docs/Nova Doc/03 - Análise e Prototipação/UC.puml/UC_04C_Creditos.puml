@@ -1,0 +1,46 @@
+
+@startuml UC_04C_Creditos
+
+title CYPHER — Créditos e Participações
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 35
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Responsável\npelo registro" as RESP
+
+rectangle "CYPHER — Créditos" {
+
+  usecase "Indicar colaboradores\ne funções exercidas" as U01
+
+  usecase "Consultar situação\ndos créditos" as U02
+
+  usecase "Corrigir créditos\natribuídos" as U03
+
+  usecase "Reconhecer\nparticipação" as U04
+
+  usecase "Recusar ou\ncontestar crédito" as U05
+}
+
+actor "Profissional\nmencionado" as CIT
+
+RESP -- U01
+RESP -- U02
+RESP -- U03
+
+U04 -- CIT
+U05 -- CIT
+
+@enduml

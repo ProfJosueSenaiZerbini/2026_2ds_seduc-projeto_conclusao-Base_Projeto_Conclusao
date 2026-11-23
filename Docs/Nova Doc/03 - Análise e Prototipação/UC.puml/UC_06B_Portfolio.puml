@@ -1,0 +1,53 @@
+
+@startuml UC_06B_Portfolio
+
+title CYPHER — Portfólio Profissional
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional" as PRO
+
+rectangle "CYPHER — Portfólio Profissional" {
+
+  usecase "Selecionar modo\nManual ou Inteligente" as U01
+
+  usecase "Selecionar e ordenar\ntrabalhos manualmente" as U02
+
+  usecase "Ativar atualização\nautomática" as U03
+
+  usecase "Escolher molde\nde apresentação" as U04
+
+  usecase "Ocultar ou reexibir\ntrabalhos" as U05
+
+  usecase "Pré-visualizar\nportfólio" as U06
+
+  usecase "Consultar portfólio\npúblico" as U07
+
+}
+
+actor "Usuário\nautenticado" as USER
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+PRO -- U06
+
+U07 -- USER
+
+@enduml

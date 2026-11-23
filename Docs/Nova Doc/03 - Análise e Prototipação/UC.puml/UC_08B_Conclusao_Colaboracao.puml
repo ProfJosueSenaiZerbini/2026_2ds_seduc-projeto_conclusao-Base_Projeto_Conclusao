@@ -1,0 +1,50 @@
+
+@startuml UC_08B_Conclusao_Colaboracao
+
+title CYPHER - Conclusão de Colaborações
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional\nparticipante" as PRO
+
+rectangle "CYPHER - Gestão de Colaborações" {
+
+  usecase "Consultar situação\nda colaboração" as U01
+
+  usecase "Solicitar conclusão\nda colaboração" as U02
+
+  usecase "Confirmar conclusão" as U03
+
+  usecase "Contestar conclusão" as U04
+
+  usecase "Gerenciar privacidade\ndo vínculo" as U05
+
+  usecase "Analisar contestação\ne decidir conclusão" as U06
+
+}
+
+actor "Moderador" as MOD
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+
+U06 -- MOD
+
+@enduml

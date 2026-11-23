@@ -1,0 +1,126 @@
+
+@startuml UC_01_Geral_Cypher
+
+title CYPHER — Diagrama Geral de Casos de Uso
+
+left to right direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam titleFontSize 18
+skinparam nodesep 25
+skinparam ranksep 25
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam usecaseFontColor #18231B
+skinparam packageBorderColor #849086
+skinparam rectangleBorderColor #27362A
+
+' ATORES
+
+actor "Solicitante de cadastro" as SOL
+
+actor "Usuário autenticado\n(Consumidor ou Profissional)" as USU
+
+actor "Profissional habilitado" as PRO
+
+actor "Administrador Geral" as ADM
+actor "Moderador" as MOD
+actor "Editor" as EDI
+
+' LIMITES DO SISTEMA
+
+rectangle "CYPHER" {
+
+  package "01 — Acesso e descoberta" {
+    usecase "Cadastrar conta" as U01
+    usecase "Explorar conteúdos\nacessíveis" as U02
+    usecase "Consultar\nCypher Central" as U03
+
+    U01 -[hidden]down- U02
+    U02 -[hidden]down- U03
+  }
+
+  package "02 — Uso da plataforma" {
+    usecase "Acessar e gerenciar\nconta e perfil" as U04
+    usecase "Interagir e\nconversar" as U05
+    usecase "Participar de\neventos" as U06
+    usecase "Consultar beats\ne oportunidades" as U07
+    usecase "Adquirir licença\nde beat" as U08
+
+    U04 -[hidden]down- U05
+    U05 -[hidden]down- U06
+    U06 -[hidden]down- U07
+    U07 -[hidden]down- U08
+  }
+
+  package "03 — Atuação profissional" {
+    usecase "Publicar obras,\nprojetos e galerias" as U09
+    usecase "Gerenciar portfólio\ne selo profissional" as U10
+    usecase "Gerenciar beats\ne ofertas" as U11
+    usecase "Organizar eventos" as U12
+    usecase "Publicar oportunidades" as U13
+    usecase "Formalizar colaborações\ne avaliações" as U14
+
+    U09 -[hidden]down- U10
+    U10 -[hidden]down- U11
+    U11 -[hidden]down- U12
+    U12 -[hidden]down- U13
+    U13 -[hidden]down- U14
+  }
+
+  package "04 — Administração" {
+    usecase "Administrar acessos\ne catálogos" as U15
+    usecase "Moderar denúncias\ne solicitações" as U16
+    usecase "Gerenciar artigos\nda Cypher Central" as U17
+
+    U15 -[hidden]down- U16
+    U16 -[hidden]down- U17
+  }
+
+  ' ORGANIZAÇÃO EM DUAS COLUNAS
+
+  U02 -[hidden]right- U10
+  U07 -[hidden]right- U16
+
+  U03 -[hidden]down- U04
+  U14 -[hidden]down- U15
+
+}
+
+' CONEXÕES LOCAIS — CADASTRO
+
+SOL -right- U01
+
+' CONEXÕES LOCAIS — USUÁRIO AUTENTICADO
+
+USU -right- U02
+USU -right- U03
+USU -right- U04
+USU -right- U05
+USU -right- U06
+USU -right- U07
+USU -right- U08
+
+' CONEXÕES LOCAIS — PROFISSIONAL
+
+U09 -right- PRO
+U10 -right- PRO
+U11 -right- PRO
+U12 -right- PRO
+U13 -right- PRO
+U14 -right- PRO
+
+' CONEXÕES LOCAIS — ADMINISTRAÇÃO
+
+U15 -right- ADM
+U16 -right- MOD
+U17 -right- EDI
+
+@enduml

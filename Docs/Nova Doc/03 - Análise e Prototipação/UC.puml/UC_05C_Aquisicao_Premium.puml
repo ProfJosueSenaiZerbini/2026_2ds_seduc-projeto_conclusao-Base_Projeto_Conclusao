@@ -1,0 +1,47 @@
+
+@startuml UC_05C_Aquisicao_Premium
+
+title CYPHER — Aquisição Premium e Licenciamento
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Comprador\nautenticado" as COMP
+
+rectangle "CYPHER — Aquisição Premium" {
+
+  usecase "Selecionar oferta\nPremium não exclusiva" as U01
+
+  usecase "Concluir aquisição" as U02
+
+  usecase "Consultar\nMinhas Compras" as U03
+
+  usecase "Consultar licença" as U04
+
+  usecase "Baixar arquivos\nautorizados" as U05
+}
+
+actor "Mercado Pago\n(ambiente de testes)" as MP
+
+COMP -- U01
+COMP -- U02
+COMP -- U03
+COMP -- U04
+COMP -- U05
+
+U02 -- MP
+
+@enduml

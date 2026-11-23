@@ -1,0 +1,46 @@
+
+@startuml UC_08C_Avaliacoes_Reputacao
+
+title CYPHER - Avaliação e Reputação Profissional
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional\navaliador" as AVAL
+
+rectangle "CYPHER - Avaliação e Reputação" {
+
+  usecase "Avaliar colaboração\nconcluída" as U01
+
+  usecase "Consultar reputação\nprofissional" as U02
+
+  usecase "Consultar avaliações\nliberadas e autorizadas" as U03
+
+  usecase "Revisar avaliação\ndenunciada" as U04
+
+}
+
+actor "Usuário\nautenticado" as USER
+actor "Moderador" as MOD
+
+AVAL -- U01
+
+U02 -- USER
+U03 -- USER
+
+U04 -- MOD
+
+@enduml

@@ -1,0 +1,47 @@
+
+@startuml UC_09C_Notificacoes
+
+title CYPHER - Notificações e Lembretes
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Notificações" {
+
+  usecase "Consultar caixa\nde notificações" as U01
+
+  usecase "Marcar notificação\ncomo lida ou não lida" as U02
+
+  usecase "Remover notificações\nou limpar a caixa" as U03
+
+  usecase "Configurar preferências\nde recebimento" as U04
+
+  usecase "Consultar lembretes\nde eventos acompanhados" as U05
+
+  usecase "Abrir conteúdo\nassociado ao aviso" as U06
+
+}
+
+USER -- U01
+USER -- U02
+USER -- U03
+USER -- U04
+USER -- U05
+USER -- U06
+
+@enduml

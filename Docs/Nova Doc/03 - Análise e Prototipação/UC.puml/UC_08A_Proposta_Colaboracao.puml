@@ -1,0 +1,47 @@
+
+@startuml UC_08A_Proposta_Colaboracao
+
+title CYPHER - Proposta e Aceite de Colaboração
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional\nproponente" as PROP
+
+rectangle "CYPHER - Convites de Colaboração" {
+
+  usecase "Propor colaboração\nformal" as U01
+
+  usecase "Acompanhar proposta\nenviada" as U02
+
+  usecase "Consultar convite\nrecebido" as U03
+
+  usecase "Aceitar proposta" as U04
+
+  usecase "Recusar proposta" as U05
+
+}
+
+actor "Profissional\nconvidado" as CONV
+
+PROP -- U01
+PROP -- U02
+
+U03 -- CONV
+U04 -- CONV
+U05 -- CONV
+
+@enduml

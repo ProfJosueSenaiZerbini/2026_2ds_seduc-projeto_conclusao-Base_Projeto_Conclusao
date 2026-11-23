@@ -1,0 +1,49 @@
+
+@startuml UC_03A_Profissoes
+
+title CYPHER — Gestão das Profissões
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 25
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional" as PRO
+
+rectangle "CYPHER — Gestão Profissional" {
+
+  usecase "Selecionar\nprofissões" as U01
+  usecase "Informar tempo\nde atuação" as U02
+  usecase "Alterar\nprofissões" as U03
+  usecase "Solicitar alteração\nantecipada" as U04
+  usecase "Consultar permissões\nde publicação" as U05
+
+  usecase "Declarar vertentes\nde Rapper" as U06
+  usecase "Declarar modalidades\nde Freestyleiro" as U07
+
+}
+
+actor "Rapper" as RAP
+actor "Freestyleiro" as FRE
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+
+U06 -- RAP
+U07 -- FRE
+
+@enduml

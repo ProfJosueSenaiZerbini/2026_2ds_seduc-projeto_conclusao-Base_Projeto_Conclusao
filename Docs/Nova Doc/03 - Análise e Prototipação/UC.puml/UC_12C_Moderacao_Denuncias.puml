@@ -1,0 +1,56 @@
+
+@startuml UC_12C_Moderacao_Denuncias
+
+title CYPHER - Denúncias, Moderação e Recursos
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Usuário\nautenticado" as USER
+
+rectangle "CYPHER - Moderação" {
+
+  usecase "Registrar denúncia\nde conteúdo ou conduta" as U01
+
+  usecase "Consultar situação\nda denúncia" as U02
+
+  usecase "Apresentar recurso\nou esclarecimento" as U03
+
+  usecase "Analisar denúncias\ne evidências" as U04
+
+  usecase "Priorizar ocorrências\nde risco elevado" as U05
+
+  usecase "Aplicar medidas\nde moderação autorizadas" as U06
+
+  usecase "Registrar e comunicar\ndecisão" as U07
+
+  usecase "Analisar recurso\nsob competência" as U08
+
+}
+
+actor "Moderador" as MOD
+
+USER -- U01
+USER -- U02
+USER -- U03
+
+U04 -- MOD
+U05 -- MOD
+U06 -- MOD
+U07 -- MOD
+U08 -- MOD
+
+@enduml

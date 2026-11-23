@@ -1,0 +1,47 @@
+
+@startuml UC_06A_Projetos_Galerias
+
+title CYPHER — Projetos e Galerias
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 17
+skinparam nodesep 30
+skinparam ranksep 30
+skinparam ArrowColor #566057
+skinparam actorBorderColor #253127
+skinparam usecaseBorderColor #475649
+skinparam usecaseBackgroundColor #F7F9F6
+skinparam rectangleBorderColor #27362A
+
+actor "Profissional\nresponsável" as PRO
+
+rectangle "CYPHER — Projetos e Galerias" {
+
+  usecase "Cadastrar projeto\nou experiência" as U01
+
+  usecase "Atualizar equipe,\nentregas e resultados" as U02
+
+  usecase "Criar galeria\nmultimídia" as U03
+
+  usecase "Associar trabalhos\ne mídias existentes" as U04
+
+  usecase "Definir visibilidade\ndos registros" as U05
+
+  usecase "Retirar itens\nde uma coleção" as U06
+
+}
+
+PRO -- U01
+PRO -- U02
+PRO -- U03
+PRO -- U04
+PRO -- U05
+PRO -- U06
+
+@enduml
