@@ -126,6 +126,22 @@ Com o MariaDB ligado, execute `node scripts/prints-tcc.js`. O script cria dados 
 
 ---
 
+## 🎬 Demonstração
+
+Para testar o iBico com um cenário pronto (bicos abertos, em andamento, finalizados e cancelados, contas com e sem saldo), com o MariaDB ligado:
+
+```bash
+npm run demo:preparar   # recria o banco separado db_bico_demo (o db_bico não é tocado) e cria os dados pelas rotas reais
+npm run demo            # sobe o iBico em http://localhost:3000 com o db_bico_demo
+npm run demo:offline    # igual, mas com o provedor falso de CEP (plano B sem internet: só 01310-100 e 13690-000)
+```
+
+- `demo:preparar` pergunta antes de apagar um `db_bico_demo` que já exista (use `npm run demo:preparar -- --sim` para pular a pergunta) e imprime a lista de contas. Todas usam a senha `ibico123`.
+- Para voltar ao estado inicial depois de testar, rode `npm run demo:preparar -- --sim` outra vez.
+- Contas, o que testar em cada uma (com o caso de teste CTxx) e a ordem sugerida de ~10 minutos: [Docs/Teste/roteiro-demo.md](Docs/Teste/roteiro-demo.md).
+
+---
+
 ## 🧹 Padrão de código
 
 O projeto usa **Prettier** (formatação), **ESLint** (JavaScript) e **Stylelint** (CSS), todos instalados como dependências de desenvolvimento pelo `npm install`.

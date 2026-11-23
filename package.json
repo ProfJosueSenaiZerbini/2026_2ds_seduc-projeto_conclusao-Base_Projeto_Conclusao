@@ -14,7 +14,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "lint:css": "stylelint \"public/css/**/*.css\""
+    "lint:css": "stylelint \"public/css/**/*.css\"",
+    "demo:preparar": "node scripts/preparar-demo.js",
+    "demo": "node scripts/rodar-demo.js",
+    "demo:offline": "node scripts/rodar-demo.js --cep-fake"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
