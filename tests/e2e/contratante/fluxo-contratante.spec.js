@@ -197,26 +197,28 @@ test.describe('Fluxo Completo E2E - Área do Contratante (iBico)', () => {
         test('Deve testar os botões de dados e segurança do Perfil', async ({ page }) => {
             // Botão Ocultar (CPF)
             const btnOcultar = page.getByRole('button', { name: /ocultar|mostrar/i });
-            if (await btnOcultar.isVisible()) {
-                await btnOcultar.click();
-            }
+            await expect(btnOcultar).toBeVisible();
+            await btnOcultar.click();
 
-            // Botão Alterar senha
-            const btnSenha = page
-                .getByRole('button', { name: /alterar senha|senha/i })
-                .or(page.getByRole('link', { name: /alterar senha|senha/i }));
-            if (await btnSenha.isVisible()) {
-                await btnSenha.click();
-            }
+            // Botão Alterar senha: abre o modal
+            const btnSenha = page.getByRole('button', { name: /alterar senha/i });
+            await expect(btnSenha).toBeVisible();
+            await btnSenha.click();
 
-            // Botão Voltar
-            const btnVoltar = page
-                .getByRole('link', { name: /voltar/i })
-                .or(page.getByRole('button', { name: /voltar/i }));
-            if (await btnVoltar.isVisible()) {
-                await btnVoltar.click();
-                await expect(page).toHaveURL(/\/homeContratante/);
-            }
+            const modalSenha = page.locator('#modalAlterarSenha');
+            await expect(modalSenha).toHaveClass(/aberto/);
+            await expect(modalSenha).toHaveAttribute('aria-hidden', 'false');
+
+            // Fecha pelo Cancelar de dentro do modal
+            await modalSenha.getByRole('button', { name: /cancelar/i }).click();
+            await expect(modalSenha).not.toHaveClass(/aberto/);
+            await expect(modalSenha).toHaveAttribute('aria-hidden', 'true');
+
+            // Só então o Voltar fica clicável
+            const btnVoltar = page.getByRole('link', { name: /voltar/i });
+            await expect(btnVoltar).toBeVisible();
+            await btnVoltar.click();
+            await expect(page).toHaveURL(/\/homeContratante/);
         });
 
         test('Deve abrir o Modal Editar Perfil, preencher dados e testar ações', async ({ page }) => {
