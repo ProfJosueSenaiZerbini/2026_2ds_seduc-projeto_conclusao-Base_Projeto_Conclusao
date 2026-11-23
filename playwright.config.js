@@ -9,6 +9,13 @@ export default defineConfig({
     // No GitHub Actions também gera o relatório HTML (playwright-report/), publicado como artifact se falhar.
     reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
 
+    // Diagnóstico de falhas: guarda trace e screenshot só dos testes que falham (vão para test-results/,
+    // que o workflow publica como artifact).
+    use: {
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure'
+    },
+
     // O próprio Playwright sobe o servidor com o CEP falso (CEP_FAKE=1): a publicação de bicos verifica o
     // endereço pelo CEP e, assim, os testes não dependem da ViaCEP/BrasilAPI nem de internet.
     // reuseExistingServer: false garante esse modo — se já houver um servidor na porta 3000 (ex.: npm run dev),
