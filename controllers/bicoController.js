@@ -1,5 +1,6 @@
 import db from '../config/database.js';
 import { definirAlerta } from '../middleware/sessaoMiddleware.js';
+import { comRetentativa } from '../config/transacao.js';
 import {
     sqlBicosConcluidosDoTrabalhador,
     sqlBicosConcluidosDoContratante,
@@ -472,254 +473,274 @@ const obterPrimeiraLinha = (resultado) => {
 
 // Factory para manter a operação testável com uma conexão isolada.
 
-export const criarAtualizadorStatusCandidatura = (banco) => async (req, res) => {
-    const { candidatura_id, novo_status, observacao } = req.body || {};
-    const usuario_id = req.session?.usuario?.id || req.session?.usuario?.id_usuario;
+export const criarAtualizadorStatusCandidatura =
+    (banco, opcoesRetentativa = {}) =>
+    async (req, res) => {
+        const { candidatura_id, novo_status, observacao } = req.body || {};
+        const usuario_id = req.session?.usuario?.id || req.session?.usuario?.id_usuario;
 
-    if (!usuario_id) {
-        return res.redirect('/login');
-    }
-
-    const candidaturaIdNum =
-        typeof candidatura_id === 'number'
-            ? candidatura_id
-            : typeof candidatura_id === 'string' && candidatura_id.trim() !== ''
-              ? Number(candidatura_id)
-              : NaN;
-
-    const usuarioIdNum = Number(usuario_id);
-
-    if (!Number.isInteger(candidaturaIdNum) || candidaturaIdNum <= 0) {
-        return res.status(400).send('Identificador de candidatura inválido.');
-    }
-
-    if (!Number.isInteger(usuarioIdNum) || usuarioIdNum <= 0) {
-        return res.status(400).send('Identificador de usuário inválido.');
-    }
-
-    if (observacao != null && (typeof observacao !== 'string' || [...observacao].length > 255)) {
-        return res.status(400).send('A observação deve ter no máximo 255 caracteres.');
-    }
-
-    if (!['Aceito', 'Recusado'].includes(novo_status)) {
-        return res.status(400).send('Status inválido.');
-    }
-
-    let connection;
-    let transacaoAtiva = false;
-
-    // Depois que o bico é identificado e o contratante confirmado como dono, as recusas por regra
-    // (400/409) voltam para a tela de gerenciamento com um alerta estilizado, em vez de texto puro.
-    // Nada muda no banco: a transação é desfeita antes.
-    let bicoIdDoAlerta = null;
-
-    const responderComRollback = async (status, mensagem) => {
-        await connection.rollback();
-        transacaoAtiva = false;
-
-        if (bicoIdDoAlerta && (status === 400 || status === 409)) {
-            const faltaSaldo = /^(Saldo insuficiente|Não foi possível reservar o valor)/.test(mensagem);
-            definirAlerta(req, {
-                tipo: 'erro',
-                mensagem,
-                acao: faltaSaldo ? { rotulo: 'Adicionar saldo', href: '/carteira/contratante' } : null
-            });
-            return res.redirect(`/bicos/${bicoIdDoAlerta}/gerenciar`);
+        if (!usuario_id) {
+            return res.redirect('/login');
         }
 
-        return res.status(status).send(mensagem);
-    };
+        const candidaturaIdNum =
+            typeof candidatura_id === 'number'
+                ? candidatura_id
+                : typeof candidatura_id === 'string' && candidatura_id.trim() !== ''
+                  ? Number(candidatura_id)
+                  : NaN;
 
-    try {
-        connection = await banco.getConnection();
-        await connection.beginTransaction();
-        transacaoAtiva = true;
+        const usuarioIdNum = Number(usuario_id);
 
-        // 1. Localiza o bico relacionado à candidatura.
-        const resultadoInicial = await connection.query('SELECT bico_id FROM candidaturas WHERE id = ?', [
-            candidaturaIdNum
-        ]);
-
-        const candidaturaInicial = obterPrimeiraLinha(resultadoInicial);
-
-        if (!candidaturaInicial) {
-            return await responderComRollback(404, 'Candidatura não encontrada.');
+        if (!Number.isInteger(candidaturaIdNum) || candidaturaIdNum <= 0) {
+            return res.status(400).send('Identificador de candidatura inválido.');
         }
 
-        const bicoId = candidaturaInicial.bico_id;
+        if (!Number.isInteger(usuarioIdNum) || usuarioIdNum <= 0) {
+            return res.status(400).send('Identificador de usuário inválido.');
+        }
 
-        // 2. Bloqueia o bico para evitar decisões simultâneas.
-        const resultadoBico = await connection.query(
-            `SELECT id, contratante_id, status, valor
+        if (observacao != null && (typeof observacao !== 'string' || [...observacao].length > 255)) {
+            return res.status(400).send('A observação deve ter no máximo 255 caracteres.');
+        }
+
+        if (!['Aceito', 'Recusado'].includes(novo_status)) {
+            return res.status(400).send('Status inválido.');
+        }
+
+        // Uma tentativa = a transação inteira (conexão, begin, passos, commit). Se o MariaDB escolher esta
+        // requisição como vítima de deadlock (1213) ou lock wait timeout (1205), `comRetentativa` refaz tudo
+        // do início (até 3 tentativas); o rollback e o release de cada tentativa acontecem aqui dentro.
+        const tentar = async () => {
+            let connection;
+            let transacaoAtiva = false;
+
+            // Depois que o bico é identificado e o contratante confirmado como dono, as recusas por regra
+            // (400/409) voltam para a tela de gerenciamento com um alerta estilizado, em vez de texto puro.
+            // Nada muda no banco: a transação é desfeita antes.
+            let bicoIdDoAlerta = null;
+
+            const responderComRollback = async (status, mensagem) => {
+                await connection.rollback();
+                transacaoAtiva = false;
+
+                if (bicoIdDoAlerta && (status === 400 || status === 409)) {
+                    const faltaSaldo = /^(Saldo insuficiente|Não foi possível reservar o valor)/.test(mensagem);
+                    definirAlerta(req, {
+                        tipo: 'erro',
+                        mensagem,
+                        acao: faltaSaldo ? { rotulo: 'Adicionar saldo', href: '/carteira/contratante' } : null
+                    });
+                    return res.redirect(`/bicos/${bicoIdDoAlerta}/gerenciar`);
+                }
+
+                return res.status(status).send(mensagem);
+            };
+
+            try {
+                connection = await banco.getConnection();
+                await connection.beginTransaction();
+                transacaoAtiva = true;
+
+                // 1. Localiza o bico relacionado à candidatura.
+                const resultadoInicial = await connection.query('SELECT bico_id FROM candidaturas WHERE id = ?', [
+                    candidaturaIdNum
+                ]);
+
+                const candidaturaInicial = obterPrimeiraLinha(resultadoInicial);
+
+                if (!candidaturaInicial) {
+                    return await responderComRollback(404, 'Candidatura não encontrada.');
+                }
+
+                const bicoId = candidaturaInicial.bico_id;
+
+                // 2. Bloqueia o bico para evitar decisões simultâneas.
+                const resultadoBico = await connection.query(
+                    `SELECT id, contratante_id, status, valor
              FROM bicos
              WHERE id = ?
              FOR UPDATE`,
-            [bicoId]
-        );
-
-        const bico = obterPrimeiraLinha(resultadoBico);
-
-        if (!bico) {
-            return await responderComRollback(404, 'Bico não encontrado.');
-        }
-
-        if (Number(bico.contratante_id) !== usuarioIdNum) {
-            return await responderComRollback(403, 'Você não tem autorização para alterar esta candidatura.');
-        }
-
-        bicoIdDoAlerta = bicoId;
-
-        // 3. Bloqueia a candidatura.
-        const resultadoCandidatura = await connection.query(
-            'SELECT * FROM candidaturas WHERE id = ? AND bico_id = ? FOR UPDATE',
-            [candidaturaIdNum, bicoId]
-        );
-
-        const candidatura = obterPrimeiraLinha(resultadoCandidatura);
-
-        if (!candidatura) {
-            return await responderComRollback(404, 'Candidatura não encontrada.');
-        }
-
-        if (candidatura.status !== 'Pendente') {
-            return await responderComRollback(400, 'Esta candidatura já foi processada.');
-        }
-
-        if (bico.status !== 'Aberto') {
-            return await responderComRollback(400, 'Este bico não está mais aberto.');
-        }
-
-        // 4. Se aceitar, verifica e reserva o saldo do contratante.
-        if (novo_status === 'Aceito') {
-            const resultadoUsuario = await connection.query(
-                'SELECT saldo_simulado FROM usuarios WHERE id = ? FOR UPDATE',
-                [usuarioIdNum]
-            );
-
-            const contratante = obterPrimeiraLinha(resultadoUsuario);
-
-            if (!contratante) {
-                return await responderComRollback(404, 'Contratante não encontrado.');
-            }
-
-            const valorBico = Number(bico.valor);
-            const saldoDisponivel = Number(contratante.saldo_simulado);
-
-            if (!Number.isFinite(valorBico) || valorBico <= 0 || !Number.isFinite(saldoDisponivel)) {
-                return await responderComRollback(400, 'Não foi possível validar os valores da carteira.');
-            }
-
-            if (saldoDisponivel < valorBico) {
-                return await responderComRollback(
-                    400,
-                    'Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.'
+                    [bicoId]
                 );
-            }
 
-            // Desconta o valor da carteira.
-            const resultadoDebito = await connection.query(
-                `UPDATE usuarios
+                const bico = obterPrimeiraLinha(resultadoBico);
+
+                if (!bico) {
+                    return await responderComRollback(404, 'Bico não encontrado.');
+                }
+
+                if (Number(bico.contratante_id) !== usuarioIdNum) {
+                    return await responderComRollback(403, 'Você não tem autorização para alterar esta candidatura.');
+                }
+
+                bicoIdDoAlerta = bicoId;
+
+                // 3. Bloqueia a candidatura.
+                const resultadoCandidatura = await connection.query(
+                    'SELECT * FROM candidaturas WHERE id = ? AND bico_id = ? FOR UPDATE',
+                    [candidaturaIdNum, bicoId]
+                );
+
+                const candidatura = obterPrimeiraLinha(resultadoCandidatura);
+
+                if (!candidatura) {
+                    return await responderComRollback(404, 'Candidatura não encontrada.');
+                }
+
+                if (candidatura.status !== 'Pendente') {
+                    return await responderComRollback(400, 'Esta candidatura já foi processada.');
+                }
+
+                if (bico.status !== 'Aberto') {
+                    return await responderComRollback(400, 'Este bico não está mais aberto.');
+                }
+
+                // 4. Se aceitar, verifica e reserva o saldo do contratante.
+                if (novo_status === 'Aceito') {
+                    const resultadoUsuario = await connection.query(
+                        'SELECT saldo_simulado FROM usuarios WHERE id = ? FOR UPDATE',
+                        [usuarioIdNum]
+                    );
+
+                    const contratante = obterPrimeiraLinha(resultadoUsuario);
+
+                    if (!contratante) {
+                        return await responderComRollback(404, 'Contratante não encontrado.');
+                    }
+
+                    const valorBico = Number(bico.valor);
+                    const saldoDisponivel = Number(contratante.saldo_simulado);
+
+                    if (!Number.isFinite(valorBico) || valorBico <= 0 || !Number.isFinite(saldoDisponivel)) {
+                        return await responderComRollback(400, 'Não foi possível validar os valores da carteira.');
+                    }
+
+                    if (saldoDisponivel < valorBico) {
+                        return await responderComRollback(
+                            400,
+                            'Saldo insuficiente. Adicione saldo à sua carteira para aceitar este trabalhador.'
+                        );
+                    }
+
+                    // Desconta o valor da carteira.
+                    const resultadoDebito = await connection.query(
+                        `UPDATE usuarios
                  SET saldo_simulado = saldo_simulado - ?
                  WHERE id = ? AND saldo_simulado >= ?`,
-                [valorBico, usuarioIdNum, valorBico]
-            );
+                        [valorBico, usuarioIdNum, valorBico]
+                    );
 
-            if (resultadoDebito.affectedRows !== 1) {
-                return await responderComRollback(400, 'Não foi possível reservar o valor. Verifique seu saldo.');
-            }
+                    if (resultadoDebito.affectedRows !== 1) {
+                        return await responderComRollback(
+                            400,
+                            'Não foi possível reservar o valor. Verifique seu saldo.'
+                        );
+                    }
 
-            // Registra a reserva no extrato.
-            await connection.query(
-                `INSERT INTO movimentacoes_carteira
+                    // Registra a reserva no extrato.
+                    await connection.query(
+                        `INSERT INTO movimentacoes_carteira
                     (usuario_id, bico_id, tipo_movimentacao, valor, descricao)
                  VALUES (?, ?, 'RESERVA', ?, ?)`,
-                [usuarioIdNum, bicoId, valorBico, `Reserva do bico: ${bicoId}`]
-            );
-        }
+                        [usuarioIdNum, bicoId, valorBico, `Reserva do bico: ${bicoId}`]
+                    );
+                }
 
-        // 5. Atualiza o status da candidatura.
-        const resultadoAtualizacaoCandidatura = await connection.query(
-            `UPDATE candidaturas
+                // 5. Atualiza o status da candidatura.
+                const resultadoAtualizacaoCandidatura = await connection.query(
+                    `UPDATE candidaturas
              SET status = ?
              WHERE id = ? AND status = 'Pendente'`,
-            [novo_status, candidaturaIdNum]
-        );
+                    [novo_status, candidaturaIdNum]
+                );
 
-        if (resultadoAtualizacaoCandidatura.affectedRows !== 1) {
-            return await responderComRollback(409, 'A candidatura foi alterada. Atualize a página e tente novamente.');
-        }
+                if (resultadoAtualizacaoCandidatura.affectedRows !== 1) {
+                    return await responderComRollback(
+                        409,
+                        'A candidatura foi alterada. Atualize a página e tente novamente.'
+                    );
+                }
 
-        // 6. Registra o histórico da candidatura.
-        await connection.query(
-            `INSERT INTO historico_candidaturas
+                // 6. Registra o histórico da candidatura.
+                await connection.query(
+                    `INSERT INTO historico_candidaturas
                 (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
              VALUES (?, ?, ?, ?, ?)`,
-            [candidaturaIdNum, candidatura.status, novo_status, usuarioIdNum, observacao || null]
-        );
+                    [candidaturaIdNum, candidatura.status, novo_status, usuarioIdNum, observacao || null]
+                );
 
-        // 7. Se aceitou, vincula o trabalhador ao bico.
-        if (novo_status === 'Aceito') {
-            await connection.query(
-                `UPDATE bicos
+                // 7. Se aceitou, vincula o trabalhador ao bico.
+                if (novo_status === 'Aceito') {
+                    await connection.query(
+                        `UPDATE bicos
                  SET trabalhador_id = ?, status = 'Em andamento'
                  WHERE id = ? AND status = 'Aberto'`,
-                [candidatura.trabalhador_id, bicoId]
-            );
+                        [candidatura.trabalhador_id, bicoId]
+                    );
 
-            // Recusa automaticamente as outras candidaturas pendentes.
-            const resultadoPendentes = await connection.query(
-                `SELECT id
+                    // Recusa automaticamente as outras candidaturas pendentes.
+                    const resultadoPendentes = await connection.query(
+                        `SELECT id
                  FROM candidaturas
                  WHERE bico_id = ?
                    AND id <> ?
                    AND status = 'Pendente'
                  ORDER BY id
                  FOR UPDATE`,
-                [bicoId, candidaturaIdNum]
-            );
+                        [bicoId, candidaturaIdNum]
+                    );
 
-            const candidaturasPendentes = obterLinhas(resultadoPendentes) || [];
+                    const candidaturasPendentes = obterLinhas(resultadoPendentes) || [];
 
-            const observacaoAutomatica = 'Recusada automaticamente após a aceitação de outra candidatura.';
+                    const observacaoAutomatica = 'Recusada automaticamente após a aceitação de outra candidatura.';
 
-            for (const pendente of candidaturasPendentes) {
-                await connection.query(
-                    `UPDATE candidaturas
+                    for (const pendente of candidaturasPendentes) {
+                        await connection.query(
+                            `UPDATE candidaturas
                      SET status = 'Recusado'
                      WHERE id = ? AND status = 'Pendente'`,
-                    [pendente.id]
-                );
+                            [pendente.id]
+                        );
 
-                await connection.query(
-                    `INSERT INTO historico_candidaturas
+                        await connection.query(
+                            `INSERT INTO historico_candidaturas
                         (candidatura_id, status_anterior, status_novo, alterado_por, observacao)
                      VALUES (?, 'Pendente', 'Recusado', ?, ?)`,
-                    [pendente.id, usuarioIdNum, observacaoAutomatica]
-                );
+                            [pendente.id, usuarioIdNum, observacaoAutomatica]
+                        );
+                    }
+                }
+
+                // 8. Confirma todas as operações.
+                await connection.commit();
+                transacaoAtiva = false;
+
+                return res.redirect(`/bicos/${bicoId}/gerenciar`);
+            } catch (erro) {
+                if (connection && transacaoAtiva) {
+                    try {
+                        await connection.rollback();
+                    } catch (erroRollback) {
+                        console.error('Erro ao reverter transação de candidatura:', erroRollback);
+                    }
+                }
+
+                throw erro;
+            } finally {
+                connection?.release();
             }
+        };
+
+        try {
+            return await comRetentativa(tentar, opcoesRetentativa);
+        } catch (erro) {
+            // Qualquer erro que não seja de trava (ou 3 travas seguidas) segue para o 500, como antes.
+            console.error('ERRO AO ATUALIZAR STATUS DA CANDIDATURA:', erro);
+
+            return res.status(500).send('Erro interno ao atualizar candidatura.');
         }
-
-        // 8. Confirma todas as operações.
-        await connection.commit();
-        transacaoAtiva = false;
-
-        return res.redirect(`/bicos/${bicoId}/gerenciar`);
-    } catch (erro) {
-        if (connection && transacaoAtiva) {
-            try {
-                await connection.rollback();
-            } catch (erroRollback) {
-                console.error('Erro ao reverter transação de candidatura:', erroRollback);
-            }
-        }
-
-        console.error('ERRO AO ATUALIZAR STATUS DA CANDIDATURA:', erro);
-
-        return res.status(500).send('Erro interno ao atualizar candidatura.');
-    } finally {
-        connection?.release();
-    }
-};
+    };
 
 export const atualizarStatusCandidatura = criarAtualizadorStatusCandidatura(db);
 
