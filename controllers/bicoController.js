@@ -177,8 +177,8 @@ export const criarCadastradorBico =
 
             await banco.query(query, [
                 contratante_id,
-                titulo,
-                descricao,
+                titulo.trim(),
+                descricao.trim(),
                 valorNumerico,
                 bairro,
                 endereco.cep,

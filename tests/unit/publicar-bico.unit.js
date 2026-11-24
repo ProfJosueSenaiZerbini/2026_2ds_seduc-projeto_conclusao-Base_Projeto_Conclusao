@@ -1,4 +1,4 @@
-// Testes unitários da publicação do bico: corpo ausente e data do serviço.
+// Testes unitários da publicação do bico: corpo ausente, data do serviço e textos gravados.
 // Não acessam o banco nem a internet: o controller recebe um banco e uma consulta de CEP falsos.
 // Executar com: npm run test:unit
 import { test, describe, after } from 'node:test';
@@ -84,6 +84,15 @@ describe('publicar bico', () => {
         assert.equal(res.dados.erro, 'A data do serviço não pode estar no passado.');
         assert.equal(res.dados.dataMinima, '2026-11-17');
         assert.equal(insercoes.length, 0);
+    });
+
+    test('título e descrição são gravados sem os espaços das pontas', async () => {
+        const titulo = 'x'.repeat(100);
+        const { insercoes } = await publicar(
+            corpoValido({ titulo: `${' '.repeat(50)}${titulo}  `, descricao: '  Montar dois armários.  ' })
+        );
+
+        assert.deepEqual(insercoes[0].slice(1, 3), [titulo, 'Montar dois armários.']);
     });
 
     test('data de hoje (fuso de São Paulo) é aceita', async () => {
