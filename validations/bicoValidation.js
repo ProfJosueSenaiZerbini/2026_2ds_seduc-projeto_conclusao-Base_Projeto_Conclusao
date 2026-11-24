@@ -52,5 +52,12 @@ export const validarDataServico = (data) =>
         );
     })();
 
+// "Hoje" (AAAA-MM-DD) no fuso do serviço, independente do fuso do servidor.
+export const hojeEmSaoPaulo = (agora = new Date()) =>
+    agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+
+// Recebe uma data já validada por validarDataServico; hoje é aceito.
+export const dataServicoNoPassado = (data, agora = new Date()) => data < hojeEmSaoPaulo(agora);
+
 export const validarHorarioServico = (horario) =>
     typeof horario === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(horario);

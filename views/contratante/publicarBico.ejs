@@ -140,7 +140,7 @@
             <div class="row">
               <div class="input-group">
                 <label>Data da Execução</label>
-                <input type="date" name="data_servico" value="<%= v.data_servico || '' %>" required>
+                <input type="date" name="data_servico" min="<%= typeof dataMinima !== 'undefined' ? dataMinima : '' %>" value="<%= v.data_servico || '' %>" required>
               </div>
               <div class="input-group">
                 <label>Horário de Início</label>

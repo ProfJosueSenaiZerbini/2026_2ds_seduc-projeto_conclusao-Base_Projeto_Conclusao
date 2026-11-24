@@ -21,6 +21,8 @@ import {
     validarDescricaoBico,
     validarBairroBico,
     validarDataServico,
+    dataServicoNoPassado,
+    hojeEmSaoPaulo,
     validarHorarioServico,
     validarCep,
     normalizarCep,
@@ -61,7 +63,8 @@ export const exibirFormularioPublicar = (req, res) => {
     return res.render('contratante/publicarBico', {
         usuario: req.session.usuario,
         erro: null,
-        valores: valoresDoFormularioBico()
+        valores: valoresDoFormularioBico(),
+        dataMinima: hojeEmSaoPaulo()
     });
 };
 
@@ -71,7 +74,7 @@ export const MENSAGEM_CEP_INDISPONIVEL = 'Não conseguimos verificar o CEP agora
 // a partir da consulta (buscarCep), nunca do req.body. Do formulário vêm só cep, numero e complemento —
 // exceto no CEP geral de cidade pequena (consulta sem rua/bairro), em que rua e bairro digitados são aceitos.
 export const criarCadastradorBico =
-    (banco, buscarCep = buscarEnderecoPorCep) =>
+    (banco, buscarCep = buscarEnderecoPorCep, agora = () => new Date()) =>
     async (req, res) => {
         // Sem Content-Type reconhecido o Express 5 deixa req.body indefinido.
         const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body || {};
@@ -85,7 +88,8 @@ export const criarCadastradorBico =
             res.status(status).render('contratante/publicarBico', {
                 usuario: req.session.usuario,
                 erro,
-                valores: valoresDoFormularioBico(req.body)
+                valores: valoresDoFormularioBico(req.body),
+                dataMinima: hojeEmSaoPaulo(agora())
             });
 
         if (!validarTituloBico(titulo)) {
@@ -110,6 +114,10 @@ export const criarCadastradorBico =
 
         if (!validarDataServico(data_servico)) {
             return responderErro('Informe a data do serviço.');
+        }
+
+        if (dataServicoNoPassado(data_servico, agora())) {
+            return responderErro('A data do serviço não pode estar no passado.');
         }
 
         if (!validarHorarioServico(horario)) {
