@@ -1497,6 +1497,11 @@ export const exibirGerenciamentoBico = async (req, res) => {
         return res.redirect('/login');
     }
 
+    // Id que não é número não chega ao banco (NaN geraria erro de SQL e resposta 500).
+    if (!/^\d+$/.test(String(id))) {
+        return res.status(404).send('Bico não encontrado ou você não tem permissão para acessá-lo.');
+    }
+
     try {
         // 1. Converte ambos para inteiros para evitar falhas de comparação no SQL
         const bicoIdNum = Number(id);
