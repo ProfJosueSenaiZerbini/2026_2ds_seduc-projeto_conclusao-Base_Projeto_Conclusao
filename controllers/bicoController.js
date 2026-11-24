@@ -30,7 +30,10 @@ import {
     validarNumeroEndereco,
     normalizarNumeroEndereco,
     validarComplemento,
-    validarLogradouro
+    validarLogradouro,
+    LIMITE_MENSAGEM_CANDIDATURA,
+    normalizarMensagemCandidatura,
+    validarMensagemCandidatura
 } from '../validations/bicoValidation.js';
 import { buscarEnderecoPorCep, CepIndisponivelError } from '../services/cepService.js';
 
@@ -416,6 +419,12 @@ export const candidatarAoBico = async (req, res) => {
         return res.status(400).send('A mensagem da candidatura deve ser um texto.');
     }
 
+    if (!validarMensagemCandidatura(mensagem)) {
+        return res
+            .status(400)
+            .send(`A mensagem da candidatura deve ter no máximo ${LIMITE_MENSAGEM_CANDIDATURA} caracteres.`);
+    }
+
     let connection;
     let transacaoAtiva = false;
     try {
@@ -437,7 +446,7 @@ export const candidatarAoBico = async (req, res) => {
 
         const resInsert = await connection.query(
             "INSERT INTO candidaturas (bico_id, trabalhador_id, mensagem, status) VALUES (?, ?, ?, 'Pendente')",
-            [bicoIdNum, trabalhadorIdNum, mensagem?.trim() || null]
+            [bicoIdNum, trabalhadorIdNum, normalizarMensagemCandidatura(mensagem) || null]
         );
 
         const result = obterLinhas(resInsert);
