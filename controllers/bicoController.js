@@ -73,7 +73,8 @@ export const MENSAGEM_CEP_INDISPONIVEL = 'Não conseguimos verificar o CEP agora
 export const criarCadastradorBico =
     (banco, buscarCep = buscarEnderecoPorCep) =>
     async (req, res) => {
-        const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body;
+        // Sem Content-Type reconhecido o Express 5 deixa req.body indefinido.
+        const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body || {};
         const contratante_id = req.session?.usuario?.id;
 
         if (!contratante_id) {
