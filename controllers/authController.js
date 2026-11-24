@@ -157,6 +157,11 @@ export const criarAutenticadorUsuario =
             return mostrarErro('Preencha a senha.');
         }
 
+        // Opcional, mas quando vem precisa ser texto (um corpo JSON pode trazer número, lista...).
+        if (tipoPerfil != null && typeof tipoPerfil !== 'string') {
+            return mostrarErro('Tipo de usuário inválido.');
+        }
+
         try {
             const usuarios = await banco.query(
                 'SELECT id, nome, email, cpf, senha, tipo_perfil, saldo_simulado FROM usuarios WHERE email = ?',
