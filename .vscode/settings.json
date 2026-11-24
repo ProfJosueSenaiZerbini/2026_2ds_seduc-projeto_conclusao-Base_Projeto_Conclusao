@@ -17,5 +17,11 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "never",
     "source.fixAll.stylelint": "never"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
   }
 }
