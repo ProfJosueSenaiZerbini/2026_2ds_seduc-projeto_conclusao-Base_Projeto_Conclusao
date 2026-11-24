@@ -52,7 +52,7 @@
             const v = (typeof valores !== 'undefined' && valores) || {};
           %>
           <div class="form-layout">
-          <form action="/bicos/novo" method="POST" class="main-card" id="publicar-form">
+          <form action="/bicos/novo" method="POST" class="main-card" id="publicar-form" data-envio-unico>
             <div class="input-group">
               <label>Título do Bico</label>
               <input type="text" name="titulo" placeholder="Ex: Montagem de móveis de escritório" value="<%= v.titulo || '' %>" required>
@@ -209,6 +209,7 @@
 
     <script src="/js/mascotes.js" defer></script>
     <script src="/js/publicarBico.js" defer></script>
+    <script src="/js/envioUnico.js" defer></script>
 </body>
 
 </html>

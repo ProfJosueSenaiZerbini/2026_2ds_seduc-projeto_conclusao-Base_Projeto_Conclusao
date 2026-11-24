@@ -716,3 +716,8 @@ input[readonly]:focus {
     text-align: left;
   }
 }
+
+.btn-submit:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}

@@ -281,3 +281,8 @@ body {
     width: 100%;
   }
 }
+
+.wallet__actions .btn:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
