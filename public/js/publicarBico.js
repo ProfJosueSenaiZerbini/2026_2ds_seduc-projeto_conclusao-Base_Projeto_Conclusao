@@ -50,6 +50,29 @@ if (publicarForm) {
     const resumoAgenda = document.querySelector('[data-summary="agenda"]');
     const resumoValor = document.querySelector('[data-summary="valor"]');
 
+    const caixaSaldo = document.querySelector('#balance-box');
+    const saldoReter = document.querySelector('[data-saldo-reter]');
+    const saldoStatus = document.querySelector('[data-saldo-status]');
+
+    const formatarReais = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // Publicar não depende de saldo: o valor só é reservado quando o contratante aceita um candidato.
+    const atualizarSaldo = (valor) => {
+        const saldo = Number(caixaSaldo.dataset.saldo) || 0;
+        saldoReter.textContent = formatarReais(valor > 0 ? valor : 0);
+
+        if (!(valor > 0)) {
+            saldoStatus.className = 'saldo-status';
+            saldoStatus.textContent = 'Informe o valor para conferir o saldo.';
+        } else if (valor <= saldo) {
+            saldoStatus.className = 'saldo-status saldo-status--ok';
+            saldoStatus.textContent = 'Saldo suficiente disponível';
+        } else {
+            saldoStatus.className = 'saldo-status saldo-status--insuficiente';
+            saldoStatus.textContent = 'Saldo insuficiente: adicione saldo antes de aceitar um candidato.';
+        }
+    };
+
     // "Rua X, 123 – Bairro, Cidade/UF" (cada parte só entra quando existe).
     const montarEnderecoResumo = () => {
         const rua = camposEndereco.logradouro.value.trim();
@@ -75,8 +98,8 @@ if (publicarForm) {
         resumoAgenda.textContent = [data, horario].filter(Boolean).join(' às ') || 'A definir';
 
         const valor = Number(campos.valor.value);
-        resumoValor.textContent =
-            valor > 0 ? valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'A definir';
+        resumoValor.textContent = valor > 0 ? formatarReais(valor) : 'A definir';
+        atualizarSaldo(valor);
     };
 
     // ---------- CEP ----------

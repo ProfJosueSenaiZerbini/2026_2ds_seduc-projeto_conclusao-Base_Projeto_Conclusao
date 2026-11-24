@@ -148,7 +148,7 @@
               </div>
             </div>
 
-            <div class="balance-box">
+            <div class="balance-box" id="balance-box" data-saldo="<%= Number(usuario.saldo_simulado || 0) %>">
               <div class="balance-info">
                 <div class="wallet-icon"><i class="ph-fill ph-wallet"></i></div>
                 <div>
@@ -157,8 +157,8 @@
                 </div>
               </div>
               <div class="balance-check">
-                <p>Valor a Reter: <span class="highlight">R$ 0,00</span></p>
-                <p class="status-ok"><i class="ph-fill ph-check-circle"></i> Saldo suficiente disponível</p>
+                <p>Valor a Reter: <span class="highlight" data-saldo-reter>R$ 0,00</span></p>
+                <p class="saldo-status" data-saldo-status role="status" aria-live="polite"></p>
               </div>
             </div>
 
