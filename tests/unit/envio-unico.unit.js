@@ -72,6 +72,26 @@ describe('envio único de formulário', () => {
         assert.equal(formulario.enviar(), true);
     });
 
+    test('no mesmo grupo, enviar um formulário bloqueia os outros (aceitar e recusar)', () => {
+        const aceitar = criarFormulario('candidatura');
+        const recusar = criarFormulario('candidatura');
+        const pagina = carregar(aceitar, recusar);
+
+        assert.equal(aceitar.enviar(), true);
+        assert.equal(recusar.enviar(), false);
+        pagina.passarTempo();
+        assert.equal(recusar.botao.disabled, true);
+    });
+
+    test('formulários sem grupo são independentes', () => {
+        const publicar = criarFormulario();
+        const outro = criarFormulario();
+        carregar(publicar, outro);
+
+        assert.equal(publicar.enviar(), true);
+        assert.equal(outro.enviar(), true);
+    });
+
     test('voltar pelo histórico libera o envio', () => {
         const formulario = criarFormulario();
         const pagina = carregar(formulario);
