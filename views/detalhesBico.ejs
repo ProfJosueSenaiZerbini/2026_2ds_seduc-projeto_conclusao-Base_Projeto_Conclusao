@@ -331,7 +331,7 @@
                                   Mensagem (opcional):
                                 </label>
 
-                                <textarea name="mensagem" id="mensagem" rows="3"
+                                <textarea name="mensagem" id="mensagem" rows="3" maxlength="500"
                                   placeholder="Apresente-se brevemente ou tire dúvidas..."
                                   class="candidatura-form__textarea"></textarea>
                               </div>
@@ -349,7 +349,7 @@
 
                                 <% } %>
 
-                                  <a href="/hometrabalhador" class="btn-back">
+                                  <a href="<%= ehTrabalhador ? '/hometrabalhador' : '/homeContratante' %>" class="btn-back">
                                     Voltar
                                   </a>
                 </div>

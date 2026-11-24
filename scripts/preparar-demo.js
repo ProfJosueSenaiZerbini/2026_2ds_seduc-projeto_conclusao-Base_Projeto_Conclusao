@@ -7,7 +7,7 @@
 //      Se o banco já existir, pede confirmação no terminal (use --sim para pular a pergunta).
 //   2. Sobe o próprio app numa porta temporária (CEP_FAKE=1) só enquanto cria os dados e o derruba no fim.
 //   3. Cria tudo pelas rotas reais da aplicação (cadastro, login, carteira, bicos, candidaturas, chat, avaliações...).
-//      O SQL direto só é usado para consultar ids e para envelhecer datas (finalização, avaliação, histórico).
+//      O SQL direto só é usado para consultar ids e para envelhecer datas (serviço, finalização, avaliação, histórico).
 //   4. Imprime a "cola" (conta / e-mail / senha / o que testar) e grava a mesma cola em Docs/Teste/roteiro-demo.md.
 //
 // Nenhum código da aplicação é alterado. Todos os dados (nomes, CPFs, e-mails, valores) são fictícios.
@@ -535,7 +535,8 @@ async function main() {
                     ...(b.logradouro ? { logradouro: b.logradouro, bairro: b.bairro } : {}),
                     numero: b.numero,
                     complemento: b.complemento || '',
-                    data_servico: dataRelativa(b.dias),
+                    // A rota recusa data passada: publica com data futura e grava a real por SQL (passo 5).
+                    data_servico: dataRelativa(Math.max(b.dias, 1)),
                     horario: b.horario
                 })
             );
@@ -696,6 +697,15 @@ async function main() {
                 "UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'RESERVA'",
                 [dias + 2, id]
             );
+        }
+
+        // Data real dos serviços já realizados.
+        for (const [chave, b] of Object.entries(BICOS)) {
+            if (b.dias >= 0) continue;
+            await banco.query('UPDATE bicos SET data_servico = ? WHERE id = ?', [
+                dataRelativa(b.dias),
+                ids.bicos[chave]
+            ]);
         }
 
         // ---- 6. Conferência rápida do cenário ------------------------------------------------------------

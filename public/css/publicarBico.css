@@ -259,10 +259,17 @@ textarea {
   font-weight: bold;
 }
 
-.status-ok {
-  color: var(--contratante-verde-medio);
+.saldo-status {
   margin-top: 4px;
   font-weight: 600;
+}
+
+.saldo-status--ok {
+  color: var(--contratante-verde-medio);
+}
+
+.saldo-status--insuficiente {
+  color: var(--erro);
 }
 
 .form-actions {
@@ -708,4 +715,9 @@ input[readonly]:focus {
   .balance-check {
     text-align: left;
   }
+}
+
+.btn-submit:disabled {
+  cursor: progress;
+  opacity: 0.6;
 }

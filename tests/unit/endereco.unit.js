@@ -349,11 +349,14 @@ const criarRespostaFalsa = () => {
     return resposta;
 };
 
+// Data relativa a hoje: o controller recusa serviço no passado.
+const DATA_FUTURA = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 const corpoValido = (extra = {}) => ({
     titulo: 'Montagem de móveis',
     descricao: 'Montar dois armários e uma cama.',
     valor: '150.00',
-    data_servico: '2026-12-10',
+    data_servico: DATA_FUTURA,
     horario: '09:00',
     cep: '01310-100',
     numero: '1578',

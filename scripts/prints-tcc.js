@@ -7,6 +7,7 @@
 //   2. Sobe o próprio app (app.js) na porta 3100 apontando para esse banco.
 //   3. Cria os dados fictícios pelas rotas reais da aplicação (cadastro, login, carteira, bicos, candidaturas, chat...).
 //      O SQL direto só é usado para consultar ids e para espalhar datas/horas (aparência realista).
+//      A rota recusa serviço no passado: esses bicos são publicados com data futura e a data real entra por SQL.
 //   4. Abre o Chromium (1440x900, deviceScaleFactor 2) e salva os PNGs em Docs/Prints.
 //
 // Nenhum código da aplicação é alterado. Todos os dados (nomes, CPFs, e-mails, valores) são fictícios.
@@ -335,7 +336,7 @@ async function main() {
                     descricao: b.descricao,
                     valor: b.valor,
                     bairro: b.bairro,
-                    data_servico: dataRelativa(b.dias),
+                    data_servico: dataRelativa(Math.max(b.dias, 1)),
                     horario: b.horario
                 })
             );
@@ -595,6 +596,15 @@ async function main() {
                 "UPDATE movimentacoes_carteira SET criado_em = NOW() - INTERVAL ? DAY WHERE bico_id = ? AND tipo_movimentacao = 'RESERVA'",
                 [dias + 2, ids.bicos[bico]]
             );
+        }
+
+        // Data real dos serviços já realizados (publicados acima com data futura).
+        for (const [chave, b] of Object.entries(BICOS)) {
+            if (b.dias >= 0) continue;
+            await banco.query('UPDATE bicos SET data_servico = ? WHERE id = ?', [
+                dataRelativa(b.dias),
+                ids.bicos[chave]
+            ]);
         }
 
         // ---- 6. Capturas -----------------------------------------------------------------------------------

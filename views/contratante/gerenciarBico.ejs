@@ -119,14 +119,14 @@
                       <% if (c.status_candidatura==='Pendente' && bico.status==='Aberto' ) { %>
                         <div class="candidate-card__actions">
                           <!-- Form Aceitar -->
-                          <form action="/bicos/candidaturas/status" method="POST">
+                          <form action="/bicos/candidaturas/status" method="POST" data-envio-unico="candidatura">
                             <input type="hidden" name="candidatura_id" value="<%= c.candidatura_id %>">
                             <input type="hidden" name="novo_status" value="Aceito">
                             <button class="manage-job__button manage-job__button--primary" type="submit">Aceitar</button>
                           </form>
 
                           <!-- Form Recusar -->
-                          <form action="/bicos/candidaturas/status" method="POST">
+                          <form action="/bicos/candidaturas/status" method="POST" data-envio-unico="candidatura">
                             <input type="hidden" name="candidatura_id" value="<%= c.candidatura_id %>">
                             <input type="hidden" name="novo_status" value="Recusado">
                             <button class="manage-job__button manage-job__button--danger" type="submit">Recusar</button>
@@ -212,6 +212,7 @@
       <script src="/js/mascotes.js" defer></script>
       <script src="/js/avaliacaoBico.js" defer></script>
       <script src="/js/gerenciarBico.js" defer></script>
+      <script src="/js/envioUnico.js" defer></script>
 </body>
 
 </html>

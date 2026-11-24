@@ -13,6 +13,7 @@ import perfilRoutes from './routes/perfilRoutes.js';
 import cepRoutes from './routes/cepRoutes.js';
 import { modoCepFalso } from './services/cepService.js';
 import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
+import { tratarErro } from './middleware/erroMiddleware.js';
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
@@ -94,6 +95,9 @@ app.get('/', (req, res) => {
 
     return res.render('landing');
 });
+
+// Depois de todas as rotas: erros não tratados viram uma resposta genérica.
+app.use(tratarErro);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

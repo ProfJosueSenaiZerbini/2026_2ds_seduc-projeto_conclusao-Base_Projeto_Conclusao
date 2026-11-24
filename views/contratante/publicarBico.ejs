@@ -52,7 +52,7 @@
             const v = (typeof valores !== 'undefined' && valores) || {};
           %>
           <div class="form-layout">
-          <form action="/bicos/novo" method="POST" class="main-card" id="publicar-form">
+          <form action="/bicos/novo" method="POST" class="main-card" id="publicar-form" data-envio-unico>
             <div class="input-group">
               <label>Título do Bico</label>
               <input type="text" name="titulo" placeholder="Ex: Montagem de móveis de escritório" value="<%= v.titulo || '' %>" required>
@@ -140,7 +140,7 @@
             <div class="row">
               <div class="input-group">
                 <label>Data da Execução</label>
-                <input type="date" name="data_servico" value="<%= v.data_servico || '' %>" required>
+                <input type="date" name="data_servico" min="<%= typeof dataMinima !== 'undefined' ? dataMinima : '' %>" value="<%= v.data_servico || '' %>" required>
               </div>
               <div class="input-group">
                 <label>Horário de Início</label>
@@ -148,7 +148,7 @@
               </div>
             </div>
 
-            <div class="balance-box">
+            <div class="balance-box" id="balance-box" data-saldo="<%= Number(usuario.saldo_simulado || 0) %>">
               <div class="balance-info">
                 <div class="wallet-icon"><i class="ph-fill ph-wallet"></i></div>
                 <div>
@@ -157,8 +157,8 @@
                 </div>
               </div>
               <div class="balance-check">
-                <p>Valor a Reter: <span class="highlight">R$ 0,00</span></p>
-                <p class="status-ok"><i class="ph-fill ph-check-circle"></i> Saldo suficiente disponível</p>
+                <p>Valor a Reter: <span class="highlight" data-saldo-reter>R$ 0,00</span></p>
+                <p class="saldo-status" data-saldo-status role="status" aria-live="polite"></p>
               </div>
             </div>
 
@@ -209,6 +209,7 @@
 
     <script src="/js/mascotes.js" defer></script>
     <script src="/js/publicarBico.js" defer></script>
+    <script src="/js/envioUnico.js" defer></script>
 </body>
 
 </html>

@@ -147,6 +147,15 @@
         return wrapper;
     }
 
+    // Mantém a ordem dos ids: uma mensagem do outro lado pode chegar depois de uma própria, mais nova.
+    function inserirMensagem(elemento, mensagemId) {
+        const posterior = Array.from(mensagensEl.querySelectorAll('[data-mensagem-id]')).find(function (existente) {
+            return Number(existente.dataset.mensagemId) > mensagemId;
+        });
+        mensagensEl.insertBefore(elemento, posterior || null);
+        idsMensagensExibidas.add(mensagemId);
+    }
+
     function extrairHorario(criadoEm) {
         if (typeof criadoEm !== 'string') {
             return '';
@@ -198,8 +207,7 @@
                     mensagem.remetente_nome,
                     mensagemId
                 );
-                idsMensagensExibidas.add(mensagemId);
-                mensagensEl.appendChild(elemento);
+                inserirMensagem(elemento, mensagemId);
             });
 
             if (dados.mensagens.length > 0) {
@@ -284,10 +292,9 @@
                 Number(dados.mensagem.id)
             );
             const mensagemId = Number(dados.mensagem.id);
+            // Não avança ultimaMensagemId aqui: só a consulta periódica sabe até onde já recebeu tudo.
             if (!idsMensagensExibidas.has(mensagemId)) {
-                mensagensEl.appendChild(elemento);
-                idsMensagensExibidas.add(mensagemId);
-                ultimaMensagemId = Math.max(ultimaMensagemId, mensagemId);
+                inserirMensagem(elemento, mensagemId);
                 rolarParaFinal(true);
             }
             inputMensagem.value = '';

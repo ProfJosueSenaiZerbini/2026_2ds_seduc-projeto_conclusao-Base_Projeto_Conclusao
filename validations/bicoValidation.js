@@ -4,6 +4,16 @@ export const validarTituloBico = (titulo) =>
 export const validarDescricaoBico = (descricao) =>
     typeof descricao === 'string' && descricao.trim().length >= 10 && descricao.trim().length <= 500;
 
+// Mensagem opcional da candidatura. As quebras de linha chegam do formulário como CRLF; contam (e são
+// gravadas) como um caractere só, do mesmo jeito que o maxlength do textarea conta.
+export const LIMITE_MENSAGEM_CANDIDATURA = 500;
+
+export const normalizarMensagemCandidatura = (mensagem) =>
+    typeof mensagem === 'string' ? mensagem.replace(/\r\n/g, '\n').trim() : '';
+
+export const validarMensagemCandidatura = (mensagem) =>
+    [...normalizarMensagemCandidatura(mensagem)].length <= LIMITE_MENSAGEM_CANDIDATURA;
+
 export const validarBairroBico = (bairro) =>
     typeof bairro === 'string' && bairro.trim().length >= 2 && bairro.trim().length <= 100;
 
@@ -51,6 +61,13 @@ export const validarDataServico = (data) =>
             dataValidada.getUTCDate() === dia
         );
     })();
+
+// "Hoje" (AAAA-MM-DD) no fuso do serviço, independente do fuso do servidor.
+export const hojeEmSaoPaulo = (agora = new Date()) =>
+    agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+
+// Recebe uma data já validada por validarDataServico; hoje é aceito.
+export const dataServicoNoPassado = (data, agora = new Date()) => data < hojeEmSaoPaulo(agora);
 
 export const validarHorarioServico = (horario) =>
     typeof horario === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(horario);

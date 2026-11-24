@@ -21,6 +21,8 @@ import {
     validarDescricaoBico,
     validarBairroBico,
     validarDataServico,
+    dataServicoNoPassado,
+    hojeEmSaoPaulo,
     validarHorarioServico,
     validarCep,
     normalizarCep,
@@ -28,7 +30,10 @@ import {
     validarNumeroEndereco,
     normalizarNumeroEndereco,
     validarComplemento,
-    validarLogradouro
+    validarLogradouro,
+    LIMITE_MENSAGEM_CANDIDATURA,
+    normalizarMensagemCandidatura,
+    validarMensagemCandidatura
 } from '../validations/bicoValidation.js';
 import { buscarEnderecoPorCep, CepIndisponivelError } from '../services/cepService.js';
 
@@ -61,7 +66,8 @@ export const exibirFormularioPublicar = (req, res) => {
     return res.render('contratante/publicarBico', {
         usuario: req.session.usuario,
         erro: null,
-        valores: valoresDoFormularioBico()
+        valores: valoresDoFormularioBico(),
+        dataMinima: hojeEmSaoPaulo()
     });
 };
 
@@ -71,9 +77,10 @@ export const MENSAGEM_CEP_INDISPONIVEL = 'Não conseguimos verificar o CEP agora
 // a partir da consulta (buscarCep), nunca do req.body. Do formulário vêm só cep, numero e complemento —
 // exceto no CEP geral de cidade pequena (consulta sem rua/bairro), em que rua e bairro digitados são aceitos.
 export const criarCadastradorBico =
-    (banco, buscarCep = buscarEnderecoPorCep) =>
+    (banco, buscarCep = buscarEnderecoPorCep, agora = () => new Date()) =>
     async (req, res) => {
-        const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body;
+        // Sem Content-Type reconhecido o Express 5 deixa req.body indefinido.
+        const { titulo, descricao, valor, data_servico, horario, cep, numero, complemento } = req.body || {};
         const contratante_id = req.session?.usuario?.id;
 
         if (!contratante_id) {
@@ -84,7 +91,8 @@ export const criarCadastradorBico =
             res.status(status).render('contratante/publicarBico', {
                 usuario: req.session.usuario,
                 erro,
-                valores: valoresDoFormularioBico(req.body)
+                valores: valoresDoFormularioBico(req.body),
+                dataMinima: hojeEmSaoPaulo(agora())
             });
 
         if (!validarTituloBico(titulo)) {
@@ -109,6 +117,10 @@ export const criarCadastradorBico =
 
         if (!validarDataServico(data_servico)) {
             return responderErro('Informe a data do serviço.');
+        }
+
+        if (dataServicoNoPassado(data_servico, agora())) {
+            return responderErro('A data do serviço não pode estar no passado.');
         }
 
         if (!validarHorarioServico(horario)) {
@@ -168,8 +180,8 @@ export const criarCadastradorBico =
 
             await banco.query(query, [
                 contratante_id,
-                titulo,
-                descricao,
+                titulo.trim(),
+                descricao.trim(),
                 valorNumerico,
                 bairro,
                 endereco.cep,
@@ -407,6 +419,12 @@ export const candidatarAoBico = async (req, res) => {
         return res.status(400).send('A mensagem da candidatura deve ser um texto.');
     }
 
+    if (!validarMensagemCandidatura(mensagem)) {
+        return res
+            .status(400)
+            .send(`A mensagem da candidatura deve ter no máximo ${LIMITE_MENSAGEM_CANDIDATURA} caracteres.`);
+    }
+
     let connection;
     let transacaoAtiva = false;
     try {
@@ -428,7 +446,7 @@ export const candidatarAoBico = async (req, res) => {
 
         const resInsert = await connection.query(
             "INSERT INTO candidaturas (bico_id, trabalhador_id, mensagem, status) VALUES (?, ?, ?, 'Pendente')",
-            [bicoIdNum, trabalhadorIdNum, mensagem?.trim() || null]
+            [bicoIdNum, trabalhadorIdNum, normalizarMensagemCandidatura(mensagem) || null]
         );
 
         const result = obterLinhas(resInsert);
@@ -1477,6 +1495,11 @@ export const exibirGerenciamentoBico = async (req, res) => {
 
     if (!contratante_id) {
         return res.redirect('/login');
+    }
+
+    // Id que não é número não chega ao banco (NaN geraria erro de SQL e resposta 500).
+    if (!/^\d+$/.test(String(id))) {
+        return res.status(404).send('Bico não encontrado ou você não tem permissão para acessá-lo.');
     }
 
     try {
