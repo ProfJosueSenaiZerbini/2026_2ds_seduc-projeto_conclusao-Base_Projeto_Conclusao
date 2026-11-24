@@ -108,7 +108,7 @@ const BICOS = {
         titulo: 'Ajudante para evento',
         cep: CEP_GERAL_TESTE,
         logradouro: 'Rua das Palmeiras',
-        bairro: 'Barão Geraldo',
+        bairro: 'Centro',
         numero: '245',
         valor: '200.00',
         dias: 4,
@@ -149,6 +149,9 @@ const BICOS = {
     jardinagem: {
         dono: 'marcos',
         titulo: 'Poda de cerca viva',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua das Acácias',
+        bairro: 'Jardim América',
         numero: '1600',
         valor: '180.00',
         dias: 7,
@@ -169,6 +172,9 @@ const BICOS = {
     estante: {
         dono: 'marcos',
         titulo: 'Montagem de estante de escritório',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua dos Ipês',
+        bairro: 'Vila Nova',
         numero: '1800',
         valor: '130.00',
         dias: 8,
@@ -178,6 +184,9 @@ const BICOS = {
     calcada: {
         dono: 'marcos',
         titulo: 'Lavagem de calçada e quintal',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua das Hortênsias',
+        bairro: 'Centro',
         numero: '1900',
         valor: '110.00',
         dias: 3,
@@ -188,6 +197,9 @@ const BICOS = {
     ventilador: {
         dono: 'marcos',
         titulo: 'Instalação de ventilador de teto',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua dos Jacarandás',
+        bairro: 'Santa Cruz',
         numero: '2000',
         valor: '100.00',
         dias: 9,
@@ -515,7 +527,7 @@ async function main() {
             ['rafael', 'Olá, Carla! Consigo sim. Preciso levar algum equipamento?'],
             ['carla', 'Só roupa confortável e sapato fechado. Nós fornecemos luvas e almoço.'],
             ['rafael', 'Perfeito! Qual é o endereço completo?'],
-            ['carla', 'Rua das Palmeiras, 245, em Barão Geraldo. O portão é azul, é só tocar a campainha.'],
+            ['carla', 'Rua das Palmeiras, 245, no Centro. O portão é azul, é só tocar a campainha.'],
             ['rafael', 'Combinado, estarei lá às 8h30. Até sábado!']
         ];
         for (const [quem, texto] of conversa) {
