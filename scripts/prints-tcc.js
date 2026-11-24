@@ -12,44 +12,24 @@
 // Nenhum código da aplicação é alterado. Todos os dados (nomes, CPFs, e-mails, valores) são fictícios.
 import { chromium } from '@playwright/test';
 import mariadb from 'mariadb';
-import dotenv from 'dotenv';
-import { spawn } from 'node:child_process';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-dotenv.config({ path: path.join(RAIZ, '.env'), quiet: true });
+import {
+    RAIZ,
+    pausa,
+    cpfValido,
+    dataRelativa,
+    form,
+    opcoesConexao,
+    recriarBanco,
+    subirServidor
+} from './lib/demo-comum.js';
 
 const BANCO = 'db_bico_prints';
 const PORTA = 3100;
 const BASE = `http://localhost:${PORTA}`;
 const PASTA_PRINTS = path.join(RAIZ, 'Docs', 'Prints');
 const SENHA = 'ibico123';
-
-// ---------------------------------------------------------------- utilidades
-const pausa = (ms) => new Promise((r) => setTimeout(r, ms));
-
-// CPF fictício com dígitos verificadores válidos, a partir de 9 dígitos-base.
-function cpfValido(base9) {
-    const d = base9.split('').map(Number);
-    const dv = (n) => {
-        const soma = d.slice(0, n).reduce((s, v, i) => s + v * (n + 1 - i), 0);
-        const resto = (soma * 10) % 11;
-        return resto === 10 ? 0 : resto;
-    };
-    d.push(dv(9));
-    d.push(dv(10));
-    return d.join('');
-}
-
-function dataRelativa(dias) {
-    const d = new Date();
-    d.setDate(d.getDate() + dias);
-    return d.toISOString().split('T')[0];
-}
-
-const form = (campos) => ({ form: campos, maxRedirects: 0, failOnStatusCode: false });
 
 // ---------------------------------------------------------------- dados fictícios
 const USUARIOS = {
@@ -249,64 +229,18 @@ const BICOS = {
     }
 };
 
-// ---------------------------------------------------------------- infraestrutura
-async function recriarBanco() {
-    const conexao = await mariadb.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        port: Number(process.env.DB_PORT || 3306),
-        multipleStatements: true
-    });
-    const schema = readFileSync(path.join(RAIZ, 'schema.sql'), 'utf8').replaceAll('db_bico', BANCO);
-    await conexao.query(`DROP DATABASE IF EXISTS ${BANCO}`);
-    await conexao.query(schema);
-    await conexao.end();
-}
-
-async function subirServidor() {
-    const servidor = spawn(process.execPath, ['app.js'], {
-        cwd: RAIZ,
-        env: { ...process.env, PORT: String(PORTA), DB_NAME: BANCO },
-        stdio: ['ignore', 'pipe', 'pipe']
-    });
-    let log = '';
-    servidor.stdout.on('data', (c) => {
-        log += c;
-    });
-    servidor.stderr.on('data', (c) => {
-        log += c;
-    });
-
-    for (let i = 0; i < 60; i++) {
-        try {
-            const r = await fetch(`${BASE}/login`);
-            if (r.ok) return servidor;
-        } catch {
-            /* ainda subindo */
-        }
-        if (servidor.exitCode !== null) throw new Error(`O servidor encerrou ao iniciar:\n${log}`);
-        await pausa(500);
-    }
-    servidor.kill();
-    throw new Error(`O servidor não respondeu a tempo:\n${log}`);
-}
-
 // ---------------------------------------------------------------- main
 async function main() {
     mkdirSync(PASTA_PRINTS, { recursive: true });
 
     console.log(`> Recriando o banco ${BANCO}...`);
-    await recriarBanco();
+    await recriarBanco(BANCO);
 
     console.log(`> Subindo o app em ${BASE}...`);
-    const servidor = await subirServidor();
+    const servidor = await subirServidor({ porta: PORTA, banco: BANCO });
 
     const banco = mariadb.createPool({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        port: Number(process.env.DB_PORT || 3306),
+        ...opcoesConexao(),
         database: BANCO,
         connectionLimit: 3
     });
