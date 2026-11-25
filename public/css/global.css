@@ -935,3 +935,278 @@ body:has(.contractor-sidebar.is-collapsed) {
   color: var(--cor-branco-a85);
   font-size: 12px;
 }
+
+/* =========================================================
+   NOTIFICAÇÕES DO TRABALHADOR (sino do cabeçalho)
+   ========================================================= */
+.notificacoes {
+  position: relative;
+}
+
+/* Mesmo desenho do botão "Sair": borda discreta, sem o círculo vermelho cheio no hover. */
+.notificacoes__sino {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--worker-header-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--worker-header-ink);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.notificacoes__sino:hover,
+.notificacoes__sino[aria-expanded='true'] {
+  border-color: var(--worker-header-accent);
+  background: var(--trabalhador-grafite-claro);
+}
+
+.notificacoes__sino:focus-visible {
+  outline: 2px solid var(--worker-header-ink);
+  outline-offset: 2px;
+}
+
+.notificacoes__contador {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid var(--worker-header-bg);
+  border-radius: 999px;
+  background: var(--worker-header-accent);
+  color: var(--cor-branco);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
+.notificacoes__painel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  width: min(360px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--trabalhador-borda);
+  border-radius: 12px;
+  background: var(--cor-branco);
+  color: var(--trabalhador-grafite);
+  box-shadow: 0 16px 40px var(--sombra-cor-forte);
+}
+
+.notificacoes__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--trabalhador-borda);
+  font-size: 15px;
+}
+
+.notificacoes__som {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--trabalhador-borda);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--trabalhador-texto-suave);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.notificacoes__som:hover {
+  border-color: var(--trabalhador-borda-hover);
+}
+
+.notificacoes__lista {
+  max-height: min(420px, 60vh);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.notificacao + .notificacao {
+  border-top: 1px solid var(--trabalhador-borda);
+}
+
+.notificacao__link {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.notificacao__link:hover,
+.notificacao__link:focus-visible {
+  background: var(--trabalhador-creme-claro);
+}
+
+.notificacao--nova .notificacao__link {
+  background: var(--trabalhador-rosa-suave);
+}
+
+.notificacao__icone {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--trabalhador-texto-suave);
+  font-size: 20px;
+}
+
+.notificacao--aceita .notificacao__icone {
+  color: var(--sucesso-vivo);
+}
+
+.notificacao--recusada .notificacao__icone {
+  color: var(--trabalhador-vermelho);
+}
+
+.notificacao__corpo {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notificacao__titulo {
+  font-size: 14px;
+}
+
+.notificacao__mensagem,
+.notificacao__motivo {
+  overflow-wrap: anywhere;
+}
+
+.notificacao__motivo,
+.notificacao__quando {
+  color: var(--trabalhador-texto-suave);
+  font-size: 12px;
+}
+
+.notificacoes__vazio {
+  margin: 0;
+  padding: 22px 14px;
+  color: var(--trabalhador-texto-suave);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Aviso que aparece no canto quando chega uma notificação nova. */
+.notificacoes-avisos {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  display: flex;
+  max-width: calc(100vw - 32px);
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notificacoes-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 340px;
+  max-width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--trabalhador-borda);
+  border-left: 4px solid var(--trabalhador-texto-suave);
+  border-radius: 10px;
+  background: var(--cor-branco);
+  color: var(--trabalhador-grafite);
+  font-size: 13px;
+  line-height: 1.4;
+  text-decoration: none;
+  box-shadow: 0 12px 32px var(--sombra-cor-forte);
+  animation: notificacao-entra 0.25s ease-out;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.notificacoes-aviso--aceita {
+  border-left-color: var(--sucesso-vivo);
+}
+
+.notificacoes-aviso--recusada {
+  border-left-color: var(--trabalhador-vermelho);
+}
+
+.notificacoes-aviso.saindo {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.notificacoes-aviso__icone {
+  font-size: 22px;
+}
+
+.notificacoes-aviso--aceita .notificacoes-aviso__icone {
+  color: var(--sucesso-vivo);
+}
+
+.notificacoes-aviso--recusada .notificacoes-aviso__icone {
+  color: var(--trabalhador-vermelho);
+}
+
+.notificacoes-aviso__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@keyframes notificacao-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Celular: o painel ocupa a largura do cabeçalho (margem de 16px), em vez de sair pela esquerda da tela. */
+@media (max-width: 600px) {
+  .navbar {
+    position: relative;
+  }
+
+  .notificacoes {
+    position: static;
+  }
+
+  .notificacoes__painel {
+    top: calc(100% + 6px);
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notificacoes-aviso {
+    animation: none;
+    transition: none;
+  }
+}

@@ -6,7 +6,8 @@
 //   1. Recria um banco SEPARADO (db_bico_demo) a partir do schema.sql. O banco db_bico não é tocado.
 //      Se o banco já existir, pede confirmação no terminal (use --sim para pular a pergunta).
 //   2. Sobe o próprio app numa porta temporária (CEP_FAKE=1) só enquanto cria os dados e o derruba no fim.
-//   3. Cria tudo pelas rotas reais da aplicação (cadastro, login, carteira, bicos, candidaturas, chat, avaliações...).
+//   3. Cria tudo pelas rotas reais da aplicação (cadastro, login, carteira, bicos, candidaturas, chat, avaliações,
+//      fotos de perfil e notificações lidas).
 //      O SQL direto só é usado para consultar ids e para envelhecer datas (serviço, finalização, avaliação, histórico).
 //   4. Imprime a "cola" (conta / e-mail / senha / o que testar) e grava a mesma cola em Docs/Teste/roteiro-demo.md.
 //
@@ -24,7 +25,8 @@ import {
     recriarBanco,
     abrirPool,
     portaLivre,
-    subirServidor
+    subirServidor,
+    avatarPng
 } from './lib/demo-comum.js';
 
 const BANCO = 'db_bico_demo';
@@ -262,6 +264,10 @@ const COLA = [
             {
                 texto: 'Meu Perfil > "Ver como os outros veem meu perfil": depois de o Diego avaliar, a nota dele aparece (avaliação mútua completa).',
                 ct: 'CT17, CT19'
+            },
+            {
+                texto: 'Já tem foto de perfil (avatar verde), que aparece no Meu Perfil e na barra lateral. Em Meu Perfil: Trocar foto (JPG, PNG ou WebP, até 2 MB) ou Remover foto, que volta às iniciais "CM".',
+                ct: 'CT27'
             }
         ]
     },
@@ -296,6 +302,14 @@ const COLA = [
             {
                 texto: 'Histórico: bicos finalizados com a nota que ele deu aos contratantes.',
                 ct: 'CT17'
+            },
+            {
+                texto: 'Tem foto de perfil (avatar vinho): aparece no Meu Perfil dele e no perfil público (a Carla abre pelo nome dele na lista de candidatos).',
+                ct: 'CT27'
+            },
+            {
+                texto: 'Sino sem notificações novas (os aceites antigos já foram lidos). Deixe esta conta aberta noutra janela (anônima) e clique uma vez na página: quando a Carla aceitar ou recusar em "Montagem de guarda-roupa", em até 20 s chega o aviso com som e o contador do sino.',
+                ct: 'CT28'
             }
         ]
     },
@@ -306,6 +320,10 @@ const COLA = [
             {
                 texto: 'Perfil público sem avaliações (sem indicadores fictícios). Candidata a bicos pelo feed (ex.: "Poda de cerca viva") e vê o endereço completo só depois de aceita.',
                 ct: 'CT07, CT24, CT26'
+            },
+            {
+                texto: 'Sem foto: o perfil mostra as iniciais "JL". Também está Pendente em "Montagem de guarda-roupa": se a Carla aceitar o Rafael, ela recebe "Vaga preenchida".',
+                ct: 'CT27, CT28'
             }
         ]
     },
@@ -320,6 +338,10 @@ const COLA = [
             {
                 texto: 'No detalhe de bicos em que ele não foi aceito (ex.: "Montagem de guarda-roupa"), o endereço aparece só com a região (bairro/cidade).',
                 ct: 'CT26'
+            },
+            {
+                texto: 'Sino com 5 notificações não lidas: os 4 aceites da Carla e "Bico cancelado" (Instalação de prateleiras). Abrir o painel marca como lidas; cada uma leva ao bico.',
+                ct: 'CT28'
             }
         ]
     }
@@ -333,7 +355,11 @@ const ROTEIRO = [
     },
     {
         min: 1,
-        texto: 'Mesma conta: abra "Montagem de guarda-roupa" e aceite um dos 2 candidatos (saldo e extrato, recusa automática do outro). [CT08]'
+        texto: 'Antes do aceite, abra o Rafael numa janela anônima (Trabalhar) e clique uma vez na página para liberar o som. [CT28]'
+    },
+    {
+        min: 1,
+        texto: 'Contratante principal: abra "Montagem de guarda-roupa" e aceite o Rafael (saldo e extrato, recusa automática da Juliana). Na janela do Rafael, em até 20 s, chegam o aviso "Candidatura aceita", o som e o contador do sino. [CT08, CT28]'
     },
     {
         min: 1,
@@ -354,6 +380,10 @@ const ROTEIRO = [
     {
         min: 1,
         texto: 'Mesma conta: em "Troca de resistência do chuveiro" (aba Concluídos) avalie e edite a nota; em "Conserto de torneira" veja o selo "Prazo encerrado". [CT13, CT18]'
+    },
+    {
+        min: 1,
+        texto: 'Contratante principal: Meu Perfil > Trocar foto (qualquer JPG ou PNG) e veja a foto nova também na barra lateral; depois Remover foto volta às iniciais. [CT27]'
     },
     {
         min: 1,
@@ -657,6 +687,50 @@ async function main() {
 
         // Beatriz (sem saldo): aberto com 1 candidato Pendente.
         await candidatar('juliana', 'semSaldo', 'Faço acabamento de bancadas e levo as ferramentas.');
+
+        // Fotos de perfil (rota /perfil/foto): Carla e Rafael têm foto; os outros aparecem com as iniciais.
+        // Avatares gerados pelo próprio script (silhueta sobre fundo de cor), nenhuma foto de pessoa real.
+        console.log('> Fotos de perfil (rota /perfil/foto)...');
+        for (const [chave, cores] of [
+            ['carla', { fundo: [31, 77, 58], silhueta: [214, 232, 222] }],
+            ['rafael', { fundo: [139, 23, 40], silhueta: [245, 242, 235] }]
+        ]) {
+            const r = await ctx[chave].post(`${base}/perfil/foto`, {
+                multipart: { foto: { name: `${chave}.png`, mimeType: 'image/png', buffer: avatarPng(cores) } },
+                maxRedirects: 0,
+                failOnStatusCode: false
+            });
+            esperar(r, 302, `foto de ${chave}`);
+            const [foto] = await banco.query('SELECT tipo FROM fotos_perfil WHERE usuario_id = ?', [
+                ids.usuarios[chave]
+            ]);
+            if (!foto) throw new Error(`foto de ${chave}: não foi gravada (veja o alerta em /perfil)`);
+        }
+
+        // Notificações: o Rafael já leu os aceites antigos do Marcos (rota /notificacoes/lidas), para o aviso ao
+        // vivo do aceite na "Montagem de guarda-roupa" se destacar. O Diego fica com as dele não lidas.
+        console.log('> Notificações (rotas /notificacoes e /notificacoes/lidas)...');
+        const notificacoesDe = async (chave) => {
+            const r = await ctx[chave].get(`${base}/notificacoes`, {
+                headers: { Accept: 'application/json' },
+                failOnStatusCode: false
+            });
+            esperar(r, 200, `notificações de ${chave}`);
+            return r.json();
+        };
+        const doRafael = await notificacoesDe('rafael');
+        if (doRafael.notificacoes.length > 0) {
+            const r = await ctx.rafael.post(`${base}/notificacoes/lidas`, {
+                data: { ateId: doRafael.notificacoes[0].id },
+                headers: { Accept: 'application/json' },
+                failOnStatusCode: false
+            });
+            esperar(r, 200, 'marcar notificações do Rafael como lidas');
+        }
+        for (const chave of ['rafael', 'juliana', 'diego']) {
+            const { naoLidas } = await notificacoesDe(chave);
+            console.log(`  ${USUARIOS[chave].nome}: ${naoLidas} notificação(ões) não lida(s)`);
+        }
 
         // ---- 5. Datas envelhecidas (só SQL de datas, pelas mesmas colunas que a aplicação usa) -----------
         console.log('> Envelhecendo datas de finalização e avaliação...');

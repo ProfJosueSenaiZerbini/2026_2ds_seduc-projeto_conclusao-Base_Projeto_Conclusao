@@ -171,3 +171,16 @@ CREATE TABLE IF NOT EXISTS fotos_perfil (
     CONSTRAINT fk_fotos_perfil_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- Leitura das notificações (uma linha por usuário).
+-- As notificações do trabalhador vêm de historico_candidaturas (aceite e recusas feitas por outra pessoa);
+-- aqui fica só até qual registro do histórico ele já viu.
+CREATE TABLE IF NOT EXISTS notificacoes_leitura (
+    usuario_id INT PRIMARY KEY,
+    ultimo_lido_id INT NOT NULL DEFAULT 0,
+    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_notificacoes_leitura_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
