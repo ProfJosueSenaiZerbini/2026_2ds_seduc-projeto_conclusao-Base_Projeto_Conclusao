@@ -1,4 +1,3 @@
-## Acrescentar nesta pasta
-
-- Links para abrir os diagramas que forem executados
-- Arquivos de imagems contendo print de cada diagrama
+## Descrição dos conteúdos presentes na pasta:
+Aqui se encontram os arquivos salvos que representam os diagramas específicos do projeto.
+- Programas utilizados: BrModelo e Draw.io (Site: https://www.drawio.com/)
