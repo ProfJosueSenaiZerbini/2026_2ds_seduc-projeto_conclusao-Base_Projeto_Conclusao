@@ -19,24 +19,41 @@ const recusar = (ctxContratante, candidaturaId, observacao) =>
         formulario({ candidatura_id: String(candidaturaId), novo_status: 'Recusado', observacao })
     );
 
-// Página do trabalhador com consulta rápida (300 ms) e contagem das notas tocadas pelo "plim".
+// Página do trabalhador com consulta rápida (300 ms) e um AudioContext simulado que conta as notas do "plim".
+// Simulado porque o servidor do CI (Linux, sem tela) não tem dispositivo de áudio: o AudioContext real pode
+// nunca sair de "suspended" e o som não toca. Como no navegador, ele começa suspenso e só passa a "running"
+// quando a página chama resume() (o script faz isso no primeiro clique ou tecla).
 const abrirPaginaDoTrabalhador = async (ctx) => {
     await ctx.addInitScript(() => {
         window.ibicoNotificacoesIntervaloMs = 300;
         window.__notasTocadas = 0;
-        const Original = window.AudioContext;
-        if (!Original) return;
-        window.AudioContext = class extends Original {
+        const no = () => ({ connect: (destino) => destino });
+        window.AudioContext = class {
+            constructor() {
+                this.state = 'suspended';
+                this.currentTime = 0;
+                this.destination = no();
+            }
+            resume() {
+                this.state = 'running';
+                return Promise.resolve();
+            }
             createOscillator() {
-                const oscilador = super.createOscillator();
-                const iniciar = oscilador.start.bind(oscilador);
-                oscilador.start = (...args) => {
-                    window.__notasTocadas += 1;
-                    return iniciar(...args);
+                return {
+                    ...no(),
+                    type: 'sine',
+                    frequency: { value: 0 },
+                    start: () => {
+                        window.__notasTocadas += 1;
+                    },
+                    stop: () => {}
                 };
-                return oscilador;
+            }
+            createGain() {
+                return { ...no(), gain: { setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} } };
             }
         };
+        window.webkitAudioContext = window.AudioContext;
     });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/hometrabalhador`);
