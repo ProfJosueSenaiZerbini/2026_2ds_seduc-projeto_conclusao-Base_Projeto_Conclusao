@@ -294,3 +294,225 @@ describe('aceitar candidatura repete a transação em deadlock', () => {
         assert.equal(contar(banco.estado.gravado, /^UPDATE usuarios SET saldo_simulado/), 1);
     });
 });
+
+// ------------------------------------------------- finalizar e cancelar bico com banco falso (issue #154)
+const OUTRA_PENDENTE_ID = 9;
+
+// Banco falso genérico: `leituras` é uma lista de [regex, linhas] para os SELECTs; o resto é gravação.
+// `falhas`: { <número da tentativa>: errno } lançado na primeira consulta que casar com `pontoDeFalha`.
+const criarBancoComLeituras = ({ leituras, pontoDeFalha, falhas = {} }) => {
+    const estado = { conexoes: 0, transacoes: [], gravado: [] };
+
+    return {
+        estado,
+        getConnection: async () => {
+            const numero = ++estado.conexoes;
+            const registro = [];
+            estado.transacoes.push(registro);
+            let pendente = [];
+            let falhou = false;
+
+            return {
+                beginTransaction: async () => registro.push('begin'),
+                commit: async () => {
+                    registro.push('commit');
+                    estado.gravado.push(...pendente);
+                    pendente = [];
+                },
+                rollback: async () => {
+                    registro.push('rollback');
+                    pendente = [];
+                },
+                release: () => registro.push('release'),
+                query: async (sql, params = []) => {
+                    const comando = sql.replace(/\s+/g, ' ').trim();
+
+                    if (falhas[numero] && !falhou && pontoDeFalha.test(comando)) {
+                        falhou = true;
+                        throw erroDeBanco(falhas[numero], 'falha simulada');
+                    }
+
+                    const leitura = leituras.find(([regex]) => regex.test(comando));
+                    if (leitura) return leitura[1].map((linha) => ({ ...linha }));
+                    if (/^SELECT/.test(comando)) throw new Error(`SELECT inesperado no banco falso: ${comando}`);
+
+                    pendente.push({ comando, params });
+                    return { affectedRows: 1 };
+                }
+            };
+        }
+    };
+};
+
+const criarRespostaJson = () => {
+    const res = { statusCode: 200, corpo: null, respostas: 0 };
+    res.status = (codigo) => {
+        res.statusCode = codigo;
+        return res;
+    };
+    res.json = (corpo) => {
+        res.corpo = corpo;
+        res.respostas++;
+        return res;
+    };
+    return res;
+};
+
+const reqDoBico = () => ({
+    params: { id: String(BICO_ID) },
+    session: { usuario: { id: CONTRATANTE_ID } },
+    body: {}
+});
+
+const bicoEmAndamento = {
+    id: BICO_ID,
+    contratante_id: CONTRATANTE_ID,
+    trabalhador_id: TRABALHADOR_ID,
+    valor: String(VALOR),
+    status: 'Em andamento'
+};
+const reservaDoBico = { usuario_id: CONTRATANTE_ID, valor: String(VALOR) };
+
+const LEITURAS_FINALIZAR = [
+    [/^SELECT id, contratante_id, trabalhador_id, valor, status FROM bicos/, [bicoEmAndamento]],
+    [/^SELECT usuario_id, valor FROM movimentacoes_carteira .*'RESERVA'/, [reservaDoBico]],
+    [/^SELECT id FROM movimentacoes_carteira .*'CREDITO'/, []],
+    [/^SELECT id FROM usuarios WHERE id = \? FOR UPDATE/, [{ id: TRABALHADOR_ID }]]
+];
+
+const LEITURAS_CANCELAR = [
+    [/^SELECT id, contratante_id, trabalhador_id, valor, status FROM bicos/, [bicoEmAndamento]],
+    [/^SELECT id FROM movimentacoes_carteira .*IN \('CREDITO', 'ESTORNO'\)/, []],
+    [/^SELECT usuario_id, valor FROM movimentacoes_carteira .*'RESERVA'/, [reservaDoBico]],
+    [/^SELECT id FROM usuarios WHERE id = \? FOR UPDATE/, [{ id: CONTRATANTE_ID }]],
+    [/^SELECT id FROM candidaturas .*'Pendente'/, [{ id: OUTRA_PENDENTE_ID }]],
+    [/^SELECT id FROM candidaturas .*'Aceito'/, [{ id: CANDIDATURA_ID }]]
+];
+
+// O último passo antes do commit: prova que o rollback descarta tudo o que a tentativa já tinha feito.
+const ULTIMO_PASSO = /^INSERT INTO historico_eventos_bicos/;
+// Suspeita da issue #163: o SELECT ... FOR UPDATE nas movimentações (gap locks).
+const SELECT_MOVIMENTACOES = /^SELECT .* FROM movimentacoes_carteira/;
+
+const { criarFinalizadorBico, criarCanceladorBico } = await import('../../controllers/bicoController.js');
+
+const CASOS = [
+    {
+        nome: 'finalizar bico',
+        criar: criarFinalizadorBico,
+        leituras: LEITURAS_FINALIZAR,
+        erro500: 'Erro interno ao finalizar o bico.',
+        gravacoesEsperadas: [
+            [/^UPDATE bicos SET status = 'Finalizado'/, 'finaliza o bico'],
+            [/^UPDATE usuarios SET saldo_simulado = saldo_simulado \+ \?/, 'credita o trabalhador'],
+            [/^INSERT INTO movimentacoes_carteira .*'CREDITO'/, 'registra o crédito'],
+            [ULTIMO_PASSO, 'registra o evento']
+        ]
+    },
+    {
+        nome: 'cancelar bico com estorno',
+        criar: criarCanceladorBico,
+        leituras: LEITURAS_CANCELAR,
+        erro500: 'Erro interno ao cancelar o bico.',
+        gravacoesEsperadas: [
+            [/^UPDATE bicos SET status = 'Cancelado'/, 'cancela o bico'],
+            [/^UPDATE usuarios SET saldo_simulado = saldo_simulado \+ \?/, 'estorna ao contratante'],
+            [/^INSERT INTO movimentacoes_carteira .*'ESTORNO'/, 'registra o estorno'],
+            [/^UPDATE candidaturas SET status = 'Recusado'/, 'recusa a pendente'],
+            [ULTIMO_PASSO, 'registra o evento']
+        ]
+    }
+];
+
+for (const caso of CASOS) {
+    const executar = async (falhas, pontoDeFalha = ULTIMO_PASSO) => {
+        const banco = criarBancoComLeituras({ leituras: caso.leituras, pontoDeFalha, falhas });
+        const { esperas, opcoes } = semEspera();
+        const res = criarRespostaJson();
+        await caso.criar(banco, opcoes)(reqDoBico(), res);
+        return { banco, esperas, res };
+    };
+
+    const gravouUmaVezCada = (gravado) => {
+        for (const [regex, descricao] of caso.gravacoesEsperadas) {
+            assert.equal(contar(gravado, regex), 1, `${descricao} uma vez só`);
+        }
+    };
+
+    describe(`${caso.nome} repete a transação em deadlock`, () => {
+        test('sem erro: uma tentativa só, igual ao comportamento anterior', async () => {
+            const { banco, esperas, res } = await executar({});
+
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.corpo.sucesso, true);
+            assert.deepEqual(banco.estado.transacoes, [['begin', 'commit', 'release']]);
+            assert.deepEqual(esperas, []);
+            gravouUmaVezCada(banco.estado.gravado);
+        });
+
+        test('1ª tentativa com deadlock e 2ª certa: conclui normalmente e grava uma vez só', async () => {
+            mock.method(console, 'error', () => {});
+            const { banco, esperas, res } = await executar({ 1: 1213 });
+
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.corpo.sucesso, true);
+            assert.equal(res.respostas, 1, 'responde uma vez só');
+            assert.deepEqual(banco.estado.transacoes, [
+                ['begin', 'rollback', 'release'],
+                ['begin', 'commit', 'release']
+            ]);
+            assert.equal(esperas.length, 1);
+            gravouUmaVezCada(banco.estado.gravado);
+            mock.restoreAll();
+        });
+
+        test('deadlock no SELECT ... FOR UPDATE das movimentações também é repetido (#163)', async () => {
+            mock.method(console, 'error', () => {});
+            const { banco, res } = await executar({ 1: 1213 }, SELECT_MOVIMENTACOES);
+
+            assert.equal(res.statusCode, 200);
+            assert.equal(banco.estado.conexoes, 2);
+            gravouUmaVezCada(banco.estado.gravado);
+            mock.restoreAll();
+        });
+
+        test('lock wait timeout (1205) também é repetido', async () => {
+            mock.method(console, 'error', () => {});
+            const { banco, res } = await executar({ 1: 1205 });
+
+            assert.equal(res.statusCode, 200);
+            assert.equal(banco.estado.conexoes, 2);
+            gravouUmaVezCada(banco.estado.gravado);
+            mock.restoreAll();
+        });
+
+        test('3 deadlocks seguidos: responde 500 e nada é gravado', async () => {
+            const erro = mock.method(console, 'error', () => {});
+            const { banco, esperas, res } = await executar({ 1: 1213, 2: 1213, 3: 1213 });
+
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.corpo, { sucesso: false, erro: caso.erro500 });
+            assert.equal(res.respostas, 1);
+            assert.deepEqual(banco.estado.transacoes, [
+                ['begin', 'rollback', 'release'],
+                ['begin', 'rollback', 'release'],
+                ['begin', 'rollback', 'release']
+            ]);
+            assert.equal(esperas.length, 2);
+            assert.deepEqual(banco.estado.gravado, [], 'nada foi gravado');
+            assert.ok(erro.mock.callCount() >= 1, 'o erro final é registrado');
+            mock.restoreAll();
+        });
+
+        test('outro erro de banco: 500 na hora, sem repetir', async () => {
+            mock.method(console, 'error', () => {});
+            const { banco, esperas, res } = await executar({ 1: 1062 });
+
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(banco.estado.transacoes, [['begin', 'rollback', 'release']]);
+            assert.deepEqual(esperas, []);
+            assert.deepEqual(banco.estado.gravado, []);
+            mock.restoreAll();
+        });
+    });
+}
