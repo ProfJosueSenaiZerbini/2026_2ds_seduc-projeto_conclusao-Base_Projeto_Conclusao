@@ -11,6 +11,7 @@ import bicoRoutes from './routes/bicoRoutes.js';
 import carteiraRoutes from './routes/carteiraRoutes.js';
 import perfilRoutes from './routes/perfilRoutes.js';
 import cepRoutes from './routes/cepRoutes.js';
+import notificacaoRoutes from './routes/notificacaoRoutes.js';
 import { modoCepFalso } from './services/cepService.js';
 import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
 import { tratarErro } from './middleware/erroMiddleware.js';
@@ -81,6 +82,7 @@ app.use('/bicos', bicoRoutes);
 app.use('/carteira', carteiraRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/api/cep', cepRoutes);
+app.use('/notificacoes', notificacaoRoutes);
 
 // Página inicial do iBico
 app.get('/', (req, res) => {

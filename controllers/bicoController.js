@@ -489,6 +489,10 @@ const obterPrimeiraLinha = (resultado) => {
     return Array.isArray(linhas) ? linhas[0] : linhas;
 };
 
+// Observação gravada no histórico das candidaturas recusadas automaticamente quando outra é aceita
+// (também identifica esse caso nas notificações do trabalhador).
+export const OBSERVACAO_RECUSA_AUTOMATICA = 'Recusada automaticamente após a aceitação de outra candidatura.';
+
 // Factory para manter a operação testável com uma conexão isolada.
 
 export const criarAtualizadorStatusCandidatura =
@@ -711,7 +715,7 @@ export const criarAtualizadorStatusCandidatura =
 
                     const candidaturasPendentes = obterLinhas(resultadoPendentes) || [];
 
-                    const observacaoAutomatica = 'Recusada automaticamente após a aceitação de outra candidatura.';
+                    const observacaoAutomatica = OBSERVACAO_RECUSA_AUTOMATICA;
 
                     for (const pendente of candidaturasPendentes) {
                         await connection.query(

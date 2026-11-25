@@ -15,9 +15,24 @@
         <span>Meu Perfil</span>
       </a>
 
-      <button class="icon-btn" title="Notificações">
-        <i class="ph ph-bell" aria-hidden="true"></i>
-      </button>
+      <!-- Notificações: aceite e recusas das candidaturas (public/js/notificacoes.js). -->
+      <div class="notificacoes" data-notificacoes data-usuario="<%= typeof usuario !== 'undefined' && usuario ? usuario.id : '' %>">
+        <button type="button" class="notificacoes__sino" id="notificacoesBotao" aria-expanded="false" aria-controls="notificacoesPainel" aria-label="Notificações" title="Notificações">
+          <i class="ph ph-bell" aria-hidden="true"></i>
+          <span class="notificacoes__contador" id="notificacoesContador" hidden></span>
+        </button>
+        <div class="notificacoes__painel" id="notificacoesPainel" role="region" aria-labelledby="notificacoesTitulo" hidden>
+          <div class="notificacoes__topo">
+            <strong id="notificacoesTitulo">Notificações</strong>
+            <button type="button" class="notificacoes__som" id="notificacoesSom" aria-pressed="true" title="Som do aviso">
+              <i class="ph ph-speaker-high" aria-hidden="true"></i>
+              <span>Som ligado</span>
+            </button>
+          </div>
+          <ul class="notificacoes__lista" id="notificacoesLista"></ul>
+          <p class="notificacoes__vazio" id="notificacoesVazio">Nenhuma notificação por enquanto.</p>
+        </div>
+      </div>
 
       <!-- Permite encerrar a sessao sem depender de JavaScript. -->
       <form action="/logout" method="POST" style="margin: 0;">
@@ -26,3 +41,7 @@
     </div>
   </div>
 </header>
+
+<!-- Avisos que aparecem quando chega uma notificação nova (lidos por leitores de tela). -->
+<div class="notificacoes-avisos" id="notificacoesAvisos" aria-live="polite"></div>
+<script src="/js/notificacoes.js" defer></script>
