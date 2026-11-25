@@ -1,6 +1,8 @@
 import pool from '../config/database.js';
 import bcrypt from 'bcrypt';
 import { SQL_FINALIZADO_EM, contarBicosParaAvaliar, montarSeloAvaliacao } from './avaliacaoRegras.js';
+import { renovarSessao, versaoDaSenha } from '../services/sessaoService.js';
+import { criarLimitadorTentativas } from '../services/limiteTentativas.js';
 import {
     normalizarCPF,
     validarConfirmacaoSenha,
@@ -126,8 +128,19 @@ export const criarCadastradorUsuario =
 
 export const cadastrarUsuario = criarCadastradorUsuario(pool, bcrypt);
 
+// #160: a mesma mensagem para e-mail sem conta e para senha errada, para o login não revelar quais e-mails
+// têm conta.
+export const MENSAGEM_LOGIN_INVALIDO = 'E-mail ou senha incorretos.';
+export const MENSAGEM_LOGIN_BLOQUEADO = 'Muitas tentativas de login. Aguarde alguns minutos e tente novamente.';
+
+// Hash bcrypt de uma senha que ninguém usa. Com e-mail sem conta a senha é comparada com ele, para a resposta
+// levar o mesmo tempo que uma senha errada (senão o tempo também revelaria quais e-mails têm conta).
+const HASH_FALSO = bcrypt.hashSync('senha-que-nao-existe-em-nenhuma-conta', 10);
+
+const limitadorLogin = criarLimitadorTentativas();
+
 export const criarAutenticadorUsuario =
-    (banco, hasher = bcrypt) =>
+    (banco, hasher = bcrypt, limitador = limitadorLogin) =>
     async (req, res) => {
         const body = req.body || {};
 
@@ -162,6 +175,12 @@ export const criarAutenticadorUsuario =
             return mostrarErro('Tipo de usuário inválido.');
         }
 
+        // Limite de tentativas por IP + e-mail (#160): bloqueia antes de consultar o banco.
+        const chaveTentativas = `${req.ip}|${emailLimpo}`;
+        if (limitador.bloqueado(chaveTentativas)) {
+            return mostrarErro(MENSAGEM_LOGIN_BLOQUEADO, 429);
+        }
+
         try {
             const usuarios = await banco.query(
                 'SELECT id, nome, email, cpf, senha, tipo_perfil, saldo_simulado FROM usuarios WHERE email = ?',
@@ -169,7 +188,10 @@ export const criarAutenticadorUsuario =
             );
 
             if (!usuarios || usuarios.length === 0) {
-                return mostrarErro('E-mail não cadastrado!');
+                // Compara com o hash falso só para gastar o mesmo tempo de uma senha errada.
+                await hasher.compare(senha, HASH_FALSO);
+                limitador.registrarFalha(chaveTentativas);
+                return mostrarErro(MENSAGEM_LOGIN_INVALIDO);
             }
 
             const usuario = usuarios[0];
@@ -182,8 +204,13 @@ export const criarAutenticadorUsuario =
             // Comparação da senha criptografada
             const senhaValida = await hasher.compare(senha, usuario.senha);
             if (!senhaValida) {
-                return mostrarErro('Senha incorreta!');
+                limitador.registrarFalha(chaveTentativas);
+                return mostrarErro(MENSAGEM_LOGIN_INVALIDO);
             }
+
+            // Senha certa: zera o contador de falhas. A mensagem de perfil trocado abaixo só aparece para quem
+            // já sabe a senha, então não revela nada.
+            limitador.limpar(chaveTentativas);
 
             // Validação de tipo de perfil (se selecionado na tela de login)
             if (tipoPerfil && usuario.tipo_perfil.toLowerCase() !== tipoPerfil.toLowerCase()) {
@@ -192,7 +219,11 @@ export const criarAutenticadorUsuario =
                 );
             }
 
+            // Renova o id da sessão antes de gravar o usuário (evita fixação de sessão, #161).
+            await renovarSessao(req);
+
             // Salva os dados do usuário na sessão
+            req.session.versaoSenha = versaoDaSenha(usuario.senha);
             req.session.usuario = {
                 id: usuario.id,
                 nome: usuario.nome,

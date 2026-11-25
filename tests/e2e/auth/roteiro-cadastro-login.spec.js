@@ -26,11 +26,12 @@ const preencherCadastro = async (page, dados) => {
     await page.locator('#termos').check();
 };
 
-// Prova que a conta recusada não foi criada: o login com o e-mail dela diz que não existe.
+// Prova que a conta recusada não foi criada: o login com o e-mail dela é recusado.
+// (Desde a #160 a mensagem é a mesma de senha errada, para não revelar quais e-mails têm conta.)
 const afirmarContaNaoCriada = async (request, email) => {
     const login = await request.post(`${BASE}/login`, formulario({ email, senha: SENHA, tipoPerfil: 'contratante' }));
     expect(login.status()).toBe(400);
-    expect(await login.text()).toContain('E-mail não cadastrado!');
+    expect(await login.text()).toContain('E-mail ou senha incorretos.');
 };
 
 test.describe('CT02 – Cadastro inválido', () => {
@@ -113,7 +114,7 @@ test.describe('CT03 – Login e rota interna sem login', () => {
         await page.locator('#submitBtn').click();
 
         await expect(page).toHaveURL(`${BASE}/login`);
-        await expect(page.locator('#alerta-sistema')).toContainText('Senha incorreta!');
+        await expect(page.locator('#alerta-sistema')).toContainText('E-mail ou senha incorretos.');
         // A sessão não foi aberta: a home continua redirecionando para o login.
         await page.goto(`${BASE}/homeContratante`);
         await expect(page).toHaveURL(`${BASE}/login`);
@@ -135,7 +136,7 @@ test.describe('CT03 – Login e rota interna sem login', () => {
             })
         );
         expect(inexistente.status()).toBe(400);
-        expect(await inexistente.text()).toContain('E-mail não cadastrado!');
+        expect(await inexistente.text()).toContain('E-mail ou senha incorretos.');
 
         const perfilTrocado = await anonimo.request.post(
             `${BASE}/login`,
