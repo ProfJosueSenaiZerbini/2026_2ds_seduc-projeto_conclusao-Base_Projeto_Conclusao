@@ -16,7 +16,7 @@
 
 <body>
     <%
-        const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'CT';
+        const iniciais = iniciaisDoNome(usuario.nome, 'CT');
     %>
 
     <%- include('../Partials/headerContratante') %>

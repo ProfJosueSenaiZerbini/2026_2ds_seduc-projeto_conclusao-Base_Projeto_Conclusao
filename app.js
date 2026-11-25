@@ -14,6 +14,7 @@ import cepRoutes from './routes/cepRoutes.js';
 import { modoCepFalso } from './services/cepService.js';
 import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
 import { tratarErro } from './middleware/erroMiddleware.js';
+import { iniciaisDoNome } from './services/iniciais.js';
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
@@ -39,6 +40,8 @@ app.locals.formatarMoedaBRL = (valor) => {
         currency: 'BRL'
     }).format(Number.isFinite(numero) ? numero : 0);
 };
+// Iniciais do avatar de quem não tem foto ("Rafael Souza" -> "RS").
+app.locals.iniciaisDoNome = iniciaisDoNome;
 
 // Middlewares
 app.use(morgan('dev'));

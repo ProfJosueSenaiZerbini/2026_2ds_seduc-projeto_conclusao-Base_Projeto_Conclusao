@@ -231,9 +231,7 @@
               <div class="user-info">
 
                 <div class="avatar avatar-purple">
-                  <%= bico.nome_trabalhador
-                    ? bico.nome_trabalhador.slice(0, 2).toUpperCase()
-                    : '+' %>
+                  <%= iniciaisDoNome(bico.nome_trabalhador, '+') %>
                 </div>
 
                 <div>
@@ -334,7 +332,7 @@
 
             <div class="job-footer">
               <div class="user-info">
-                <div class="avatar avatar-purple"><%= bico.nome_trabalhador ? bico.nome_trabalhador.slice(0, 2).toUpperCase() : '-' %></div>
+                <div class="avatar avatar-purple"><%= iniciaisDoNome(bico.nome_trabalhador, '-') %></div>
                 <div>
                   <span class="user-role">Profissional</span>
                   <strong class="user-name"><%= bico.nome_trabalhador || '-' %></strong>

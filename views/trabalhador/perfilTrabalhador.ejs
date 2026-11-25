@@ -21,7 +21,7 @@
         const avaliacao = reputacao.media !== null ? reputacao.media.toFixed(1).replace('.', ',') : '—';
         const totalAvaliacoes = reputacao.totalAvaliacoes;
         const bio = usuario.bio || '';
-        const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'TR';
+        const iniciais = iniciaisDoNome(usuario.nome, 'TR');
     %>
 
     <%- include('../Partials/headertrabalhador') %>
