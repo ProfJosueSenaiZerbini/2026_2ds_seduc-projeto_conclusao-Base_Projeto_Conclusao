@@ -270,7 +270,7 @@ body {
 /* Jobs Grid */
 .jobs-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
 }
 
@@ -327,11 +327,13 @@ body {
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  overflow-wrap: anywhere;
 }
 
 .job-meta {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   font-size: 0.8rem;
   color: var(--active-muted);
   margin-bottom: 1.5rem;
@@ -339,8 +341,10 @@ body {
 
 .job-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--cor-fundo-sutil);
   margin-bottom: 1rem;
@@ -350,9 +354,15 @@ body {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  min-width: 0;
+}
+
+.user-info > div:last-child {
+  min-width: 0;
 }
 
 .avatar {
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -387,9 +397,11 @@ body {
 .user-name {
   display: block;
   font-size: 0.85rem;
+  overflow-wrap: anywhere;
 }
 
 .price-info {
+  margin-left: auto;
   text-align: right;
 }
 
@@ -579,6 +591,12 @@ body {
 
   .search-box input {
     min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .jobs-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
