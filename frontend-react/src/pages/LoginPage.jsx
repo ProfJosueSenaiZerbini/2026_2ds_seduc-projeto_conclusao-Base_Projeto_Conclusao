@@ -33,12 +33,14 @@ const LoginPage = () => {
       const response = await login({ email, senha });
       
       // Salva no localStorage
-      if (response.token) {
+      if (response && response.token) {
         localStorage.setItem('plural_token', response.token);
         localStorage.setItem('plural_user', JSON.stringify(response.usuario));
         
         // Redireciona para a Home da área logada
         navigate('/home');
+      } else {
+        setError('Resposta inválida do servidor. Verifique a conexão com a API.');
       }
     } catch (err) {
       setError(

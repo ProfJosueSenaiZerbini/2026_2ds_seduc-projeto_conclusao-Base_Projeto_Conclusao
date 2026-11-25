@@ -33,13 +33,24 @@ app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/comentarios", comentariosRoutes);
 
+// Rotas de compatibilidade (sem prefixo /api)
+app.use("/auth", authRoutes);
+app.use("/posts", postRoutes);
+app.use("/admin/posts", adminRoutes);
+app.use("/users", userRoutes);
+app.use("/chat", chatRoutes);
+app.use("/comentarios", comentariosRoutes);
+
 // ✦ UNIFICAÇÃO: Serve os arquivos estáticos compilados do Frontend (React)
 const frontendDistPath = path.resolve(__dirname, "../../frontend-react/dist");
 app.use(express.static(frontendDistPath));
 
-// Qualquer outra rota de navegação (ex: /login, /home, /perfil, /chat) é entregue ao React Router
+// Qualquer rota GET de navegação (ex: /login, /home, /perfil, /chat) é entregue ao React Router
 app.use((req, res) => {
-    res.sendFile(path.join(frontendDistPath, "index.html"));
+    if (req.method === "GET") {
+        return res.sendFile(path.join(frontendDistPath, "index.html"));
+    }
+    res.status(404).json({ mensagem: "Rota não encontrada na API" });
 });
 
 const PORT = process.env.PORT || 3000;

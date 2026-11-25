@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api', // Se unificado no backend usa /api, ou variável se definida
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // Se unificado no backend usa /api, ou variável se definida
   timeout: 10000,
 });
 
@@ -110,4 +110,11 @@ export const chatWithAI = (data) => {
   return api.post('/chat/ia', data);
 };
 
+// Alias em português para compatibilidade com updateUserProfile
+export const atualizarPerfil = (userId, data) => {
+  if (typeof userId === 'object' && userId !== null && !data) {
+    return updateUserProfile(userId.id, userId);
+  }
+  return updateUserProfile(userId, data);
+};
 export default api;

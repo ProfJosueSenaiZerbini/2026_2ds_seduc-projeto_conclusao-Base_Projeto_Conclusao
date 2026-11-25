@@ -39,14 +39,14 @@ const RegisterPage = () => {
       const response = await register(formData);
       
       // Assumindo que a API retorna o token direto no registro também
-      if (response.token) {
+      if (response && response.token) {
         const user = response.user || response.usuario;
         localStorage.setItem('plural_token', response.token);
         localStorage.setItem('plural_user', JSON.stringify(user));
         navigate('/home');
         return;
       }
-      navigate('/home');
+      setError('Não foi possível obter o token após o cadastro. Tente fazer login.');
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.mensagem || 'Erro ao realizar cadastro.');
     } finally {
