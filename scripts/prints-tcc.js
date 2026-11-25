@@ -4,7 +4,7 @@
 //
 // O que o script faz:
 //   1. Recria um banco SEPARADO (db_bico_prints) a partir do schema.sql. O banco db_bico não é tocado.
-//   2. Sobe o próprio app (app.js) na porta 3100 apontando para esse banco.
+//   2. Sobe o próprio app (app.js) na porta 3100 apontando para esse banco, com CEP_FAKE=1 (provedor falso de CEP).
 //   3. Cria os dados fictícios pelas rotas reais da aplicação (cadastro, login, carteira, bicos, candidaturas, chat...).
 //      O SQL direto só é usado para consultar ids e para espalhar datas/horas (aparência realista).
 //      A rota recusa serviço no passado: esses bicos são publicados com data futura e a data real entra por SQL.
@@ -31,6 +31,8 @@ const PORTA = 3100;
 const BASE = `http://localhost:${PORTA}`;
 const PASTA_PRINTS = path.join(RAIZ, 'Docs', 'Prints');
 const SENHA = 'ibico123';
+const CEP_TESTE = '01310-100'; // Avenida Paulista, Bela Vista, São Paulo/SP (provedor falso)
+const CEP_GERAL_TESTE = '13690000'; // CEP geral de Descalvado/SP: sem rua e bairro (o contratante informa os dois)
 
 // ---------------------------------------------------------------- dados fictícios
 const USUARIOS = {
@@ -79,11 +81,12 @@ const USUARIOS = {
 };
 
 // dono: quem publica. dias: deslocamento da data do serviço (negativo = já realizado).
+// Todos os bicos têm endereço por CEP (cep + numero); o `cep` padrão é o da Avenida Paulista.
 const BICOS = {
     torneira: {
         dono: 'carla',
         titulo: 'Conserto de torneira',
-        bairro: 'Taquaral',
+        numero: '1100',
         valor: '80.00',
         dias: -4,
         horario: '09:00',
@@ -93,7 +96,7 @@ const BICOS = {
     limpeza: {
         dono: 'carla',
         titulo: 'Limpeza pós-obra',
-        bairro: 'Guanabara',
+        numero: '1200',
         valor: '220.00',
         dias: 3,
         horario: '08:00',
@@ -103,7 +106,10 @@ const BICOS = {
     evento: {
         dono: 'carla',
         titulo: 'Ajudante para evento',
-        bairro: 'Barão Geraldo',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua das Palmeiras',
+        bairro: 'Centro',
+        numero: '245',
         valor: '200.00',
         dias: 4,
         horario: '10:00',
@@ -113,7 +119,7 @@ const BICOS = {
     guardaRoupa: {
         dono: 'carla',
         titulo: 'Montagem de guarda-roupa',
-        bairro: 'Cambuí',
+        numero: '1300',
         valor: '150.00',
         dias: 5,
         horario: '14:00',
@@ -123,7 +129,7 @@ const BICOS = {
     chuveiro: {
         dono: 'carla',
         titulo: 'Troca de resistência do chuveiro',
-        bairro: 'Nova Campinas',
+        numero: '1400',
         valor: '90.00',
         dias: -2,
         horario: '16:00',
@@ -133,7 +139,7 @@ const BICOS = {
     portao: {
         dono: 'marcos',
         titulo: 'Pintura de portão',
-        bairro: 'Castelo',
+        numero: '1500',
         valor: '250.00',
         dias: -7,
         horario: '08:30',
@@ -143,7 +149,10 @@ const BICOS = {
     jardinagem: {
         dono: 'marcos',
         titulo: 'Poda de cerca viva',
-        bairro: 'Sousas',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua das Acácias',
+        bairro: 'Jardim América',
+        numero: '1600',
         valor: '180.00',
         dias: 7,
         horario: '07:30',
@@ -153,7 +162,7 @@ const BICOS = {
     prateleiras: {
         dono: 'marcos',
         titulo: 'Instalação de prateleiras',
-        bairro: 'Mansões Santo Antônio',
+        numero: '1700',
         valor: '120.00',
         dias: 2,
         horario: '15:00',
@@ -163,7 +172,10 @@ const BICOS = {
     estante: {
         dono: 'marcos',
         titulo: 'Montagem de estante de escritório',
-        bairro: 'Jardim Chapadão',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua dos Ipês',
+        bairro: 'Vila Nova',
+        numero: '1800',
         valor: '130.00',
         dias: 8,
         horario: '10:30',
@@ -172,7 +184,10 @@ const BICOS = {
     calcada: {
         dono: 'marcos',
         titulo: 'Lavagem de calçada e quintal',
-        bairro: 'Bosque',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua das Hortênsias',
+        bairro: 'Centro',
+        numero: '1900',
         valor: '110.00',
         dias: 3,
         horario: '09:30',
@@ -182,7 +197,10 @@ const BICOS = {
     ventilador: {
         dono: 'marcos',
         titulo: 'Instalação de ventilador de teto',
-        bairro: 'Taquaral',
+        cep: CEP_GERAL_TESTE,
+        logradouro: 'Rua dos Jacarandás',
+        bairro: 'Santa Cruz',
+        numero: '2000',
         valor: '100.00',
         dias: 9,
         horario: '13:30',
@@ -193,7 +211,7 @@ const BICOS = {
     reboco: {
         dono: 'marcos',
         titulo: 'Reparo de reboco na parede da sala',
-        bairro: 'Castelo',
+        numero: '2100',
         valor: '140.00',
         dias: -3,
         horario: '08:00',
@@ -203,7 +221,7 @@ const BICOS = {
     telhado: {
         dono: 'marcos',
         titulo: 'Troca de telhas do quintal',
-        bairro: 'Sousas',
+        numero: '2200',
         valor: '160.00',
         dias: -10,
         horario: '07:30',
@@ -213,7 +231,7 @@ const BICOS = {
     persiana: {
         dono: 'marcos',
         titulo: 'Instalação de persianas',
-        bairro: 'Mansões Santo Antônio',
+        numero: '2300',
         valor: '120.00',
         dias: 6,
         horario: '09:00',
@@ -222,13 +240,20 @@ const BICOS = {
     azulejo: {
         dono: 'marcos',
         titulo: 'Troca de azulejos da cozinha',
-        bairro: 'Jardim Chapadão',
+        numero: '2400',
         valor: '130.00',
         dias: 5,
         horario: '13:00',
         descricao: 'Retirar o revestimento antigo da parede da pia e assentar azulejos novos, com rejunte e acabamento.'
     }
 };
+
+// Campos de endereço do formulário. Rua e bairro só são enviados no CEP geral; nos demais vêm da consulta.
+const endereco = (b) => ({
+    cep: b.cep || CEP_TESTE,
+    ...(b.logradouro ? { logradouro: b.logradouro, bairro: b.bairro } : {}),
+    numero: b.numero
+});
 
 // ---------------------------------------------------------------- main
 async function main() {
@@ -238,7 +263,11 @@ async function main() {
     await recriarBanco(BANCO);
 
     console.log(`> Subindo o app em ${BASE}...`);
-    const servidor = await subirServidor({ porta: PORTA, banco: BANCO });
+    const servidor = await subirServidor({
+        porta: PORTA,
+        banco: BANCO,
+        env: { CEP_FAKE: '1', NODE_ENV: 'development' }
+    });
 
     const banco = mariadb.createPool({
         ...opcoesConexao(),
@@ -335,7 +364,7 @@ async function main() {
                     titulo: b.titulo,
                     descricao: b.descricao,
                     valor: b.valor,
-                    bairro: b.bairro,
+                    ...endereco(b),
                     data_servico: dataRelativa(Math.max(b.dias, 1)),
                     horario: b.horario
                 })
@@ -498,7 +527,7 @@ async function main() {
             ['rafael', 'Olá, Carla! Consigo sim. Preciso levar algum equipamento?'],
             ['carla', 'Só roupa confortável e sapato fechado. Nós fornecemos luvas e almoço.'],
             ['rafael', 'Perfeito! Qual é o endereço completo?'],
-            ['carla', 'Rua das Palmeiras, 245, em Barão Geraldo. O portão é azul, é só tocar a campainha.'],
+            ['carla', 'Rua das Palmeiras, 245, no Centro. O portão é azul, é só tocar a campainha.'],
             ['rafael', 'Combinado, estarei lá às 8h30. Até sábado!']
         ];
         for (const [quem, texto] of conversa) {
@@ -746,10 +775,16 @@ async function main() {
                     'Instalar um ventilador de teto na sala, com fixação no forro e ligação ao interruptor. Ventilador já comprado.'
                 );
                 await p.fill('input[name="valor"]', '120');
-                await p.fill('input[name="bairro"]', 'Cambuí');
+                await p.fill('input[name="cep"]', CEP_TESTE);
+                await p.waitForSelector('.cep-status--ok');
+                await p.fill('input[name="numero"]', '1578');
                 await p.fill('input[name="data_servico"]', dataRelativa(6));
                 await p.fill('input[name="horario"]', '14:00');
-                await p.evaluate(() => document.activeElement && document.activeElement.blur());
+                await p.evaluate(() => {
+                    if (document.activeElement) document.activeElement.blur();
+                    // Preencher o formulário rola a página; sem voltar ao topo o menu lateral sai no meio da imagem.
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                });
             }
         });
         await capturar({
@@ -814,7 +849,7 @@ async function main() {
                 descricao:
                     'Montagem de palco de madeira de 4 x 3 metros e instalação da iluminação básica para uma festa junina de bairro.',
                 valor: '200.00',
-                bairro: 'Cambuí',
+                ...endereco({ numero: '2600' }),
                 data_servico: dataRelativa(10),
                 horario: '15:00'
             })
