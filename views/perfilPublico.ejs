@@ -39,7 +39,7 @@
 
         <section class="worker-card" aria-labelledby="worker-name">
             <div class="worker-avatar" aria-hidden="true">
-                <%= perfil.nome.slice(0, 2).toUpperCase() %>
+                <%- include('Partials/avatar', { nome: perfil.nome, fotoUrl, classe: 'perfil-avatar-miolo' }) %>
             </div>
             <div class="worker-summary">
                 <p class="eyebrow" id="perfil-tipo">Perfil público · <%= perfil.rotuloTipo %></p>

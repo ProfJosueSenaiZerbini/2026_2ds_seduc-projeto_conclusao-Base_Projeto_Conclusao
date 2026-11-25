@@ -10,18 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/paleta.css">
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/mascotes.css">
     <link rel="stylesheet" href="/css/perfilContratante.css">
     <%- include('../Partials/phosphorIcons') %>
 </head>
 
 <body>
-    <%
-        const iniciais = usuario.nome ? usuario.nome.slice(0, 2).toUpperCase() : 'CT';
-    %>
-
     <%- include('../Partials/headerContratante') %>
 
     <main class="perfil-page">
+        <%- include('../Partials/alerta', { area: 'contratante' }) %>
         <header class="perfil-topo">
             <div>
                 <h1>Meu Perfil</h1>
@@ -36,7 +34,7 @@
         <section class="perfil-card">
             <div class="perfil-banner">
                 <div class="avatar">
-                    <span><%= iniciais %></span>
+                    <%- include('../Partials/avatar', { nome: usuario.nome, fotoUrl, classe: 'perfil-avatar-miolo' }) %>
                 </div>
                 <div class="banner-info">
                     <div class="banner-linha">
@@ -45,6 +43,7 @@
                         <span class="pill pill-conta">Conta Ibico</span>
                     </div>
                     <p class="banner-bio">Encontre profissionais e acompanhe seus bicos publicados.</p>
+                    <%- include('../Partials/fotoPerfilForm', { temFoto: Boolean(fotoUrl) }) %>
                 </div>
             </div>
 
@@ -193,6 +192,7 @@
     </div>
 
     <script src="/js/perfilContratante.js"></script>
+    <script src="/js/fotoPerfil.js" defer></script>
 </body>
 
 </html>

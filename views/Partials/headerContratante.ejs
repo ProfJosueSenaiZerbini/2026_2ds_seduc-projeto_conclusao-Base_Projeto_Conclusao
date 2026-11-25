@@ -81,11 +81,7 @@
       title="Perfil"
       <%- rotaAtual === '/perfil' ? 'aria-current="page"' : '' %>
     >
-      <img
-        src="<%= usuario && usuario.foto ? usuario.foto : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop' %>"
-        alt=""
-        class="sidebar-account__avatar"
-      >
+      <%- include('avatar', { nome: usuario && usuario.nome, fotoUrl: locals.fotoPerfilUrl || null, classe: 'sidebar-account__avatar' }) %>
       <span class="sidebar-account__name"><%= usuario && usuario.nome ? usuario.nome : 'Contratante' %></span>
     </a>
     <form action="/logout" method="POST" class="sidebar-logout-form">

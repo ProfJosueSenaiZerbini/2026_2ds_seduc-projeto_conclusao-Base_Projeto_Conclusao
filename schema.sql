@@ -157,3 +157,17 @@ CREATE TABLE IF NOT EXISTS movimentacoes_carteira (
     CONSTRAINT chk_movimentacao_valor
         CHECK (valor > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- Tabela de Fotos de Perfil (uma por usuário; quem não tem foto aparece com as iniciais)
+-- Fica separada de usuarios para a imagem nunca vir junto nas consultas da conta.
+-- tipo é o Content-Type detectado pelos bytes do arquivo (image/jpeg, image/png ou image/webp).
+CREATE TABLE IF NOT EXISTS fotos_perfil (
+    usuario_id INT PRIMARY KEY,
+    tipo VARCHAR(20) NOT NULL,
+    dados MEDIUMBLOB NOT NULL,
+    atualizado_em TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+
+    CONSTRAINT fk_fotos_perfil_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

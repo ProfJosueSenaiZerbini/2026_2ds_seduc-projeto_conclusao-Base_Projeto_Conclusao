@@ -28,13 +28,14 @@ A pasta [`migrations/`](../../migrations) tem scripts para bancos que já foram 
 - `001_estorno.sql`: adiciona `ESTORNO` ao ENUM `movimentacoes_carteira.tipo_movimentacao` (cancelamento de bico com estorno simulado). Execute uma única vez no `db_bico` (phpMyAdmin → SQL, ou MySQL Workbench). Não altera linhas existentes.
 - `002_avaliacao_bidirecional.sql`: troca a restrição única de `avaliacoes` de `(bico_id)` para `(bico_id, avaliador_id)`, adiciona a coluna `criado_em` e o `CHECK (avaliador_id <> avaliado_id)` (contratante e trabalhador avaliam um ao outro). Execute uma única vez no `db_bico` (phpMyAdmin → SQL, ou MySQL Workbench). As avaliações existentes continuam válidas e recebem `criado_em` igual a `data_atualizacao`.
 - `003_endereco_bico.sql`: adiciona a `bicos` as colunas `cep`, `logradouro`, `numero`, `complemento`, `cidade` e `uf` (endereço do bico verificado pelo CEP). Execute uma única vez no `db_bico` (phpMyAdmin → SQL, ou MySQL Workbench). As colunas novas aceitam NULL: os bicos já publicados continuam válidos e exibem apenas o bairro.
+- `004_foto_perfil.sql`: cria a tabela `fotos_perfil` (foto de perfil de contratante e trabalhador). Execute uma única vez no `db_bico` (phpMyAdmin → SQL, ou MySQL Workbench). A tabela `usuarios` não muda; quem não tem foto aparece com as iniciais do nome.
 
 ## Tabelas
 
 Ordem de criação (cada tabela só referencia tabelas anteriores):
-`usuarios` → `bicos` → `avaliacoes` → `historico_eventos_bicos` → `candidaturas` → `mensagens_chat` → `historico_candidaturas` → `movimentacoes_carteira`.
+`usuarios` → `bicos` → `avaliacoes` → `historico_eventos_bicos` → `candidaturas` → `mensagens_chat` → `historico_candidaturas` → `movimentacoes_carteira` → `fotos_perfil`.
 
-Todas as tabelas têm `id INT AUTO_INCREMENT` como chave primária. Colunas de data com padrão usam `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`.
+Todas as tabelas têm `id INT AUTO_INCREMENT` como chave primária, exceto `fotos_perfil`, cuja chave é o próprio `usuario_id`. Colunas de data com padrão usam `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`.
 
 ### usuarios
 
@@ -98,6 +99,10 @@ Histórico de mudanças de status das candidaturas. `candidatura_id` (FK, `ON DE
 
 Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adição de saldo), `tipo_movimentacao` ENUM `ADICAO`, `RESERVA`, `CREDITO`, `ESTORNO`; `valor` DECIMAL(10,2) com CHECK `> 0`; `descricao` VARCHAR(255) opcional; `criado_em`. Restrição única `(bico_id, tipo_movimentacao)`: cada bico gera no máximo uma reserva, um crédito e um estorno (o estorno devolve ao contratante a reserva de um bico cancelado; várias adições de saldo são permitidas, pois `bico_id` é nulo nelas).
 
+### fotos_perfil
+
+Foto de perfil, no máximo uma por usuário. `usuario_id` (PK e FK → usuarios, `ON DELETE CASCADE`), `tipo` VARCHAR(20) (`image/jpeg`, `image/png` ou `image/webp`, detectado pelos bytes do arquivo), `dados` MEDIUMBLOB (até 2 MB, limite da aplicação), `atualizado_em` TIMESTAMP(3), que muda a cada troca e entra na URL da foto (`/perfil/:id/foto?v=...`) para o navegador não mostrar a antiga do cache. Fica separada de `usuarios` para a imagem nunca vir junto nas consultas da conta.
+
 ## Relacionamentos
 
 - `usuarios` 1—N `bicos` (como contratante e, opcionalmente, como trabalhador contratado).
@@ -105,6 +110,7 @@ Extrato da carteira simulada. `usuario_id` (FK), `bico_id` (FK, nulo para adiç�
 - `candidaturas` 1—N `historico_candidaturas` e 1—N `mensagens_chat`.
 - `bicos` 1—0..2 `avaliacoes`; `bicos` 1—N `historico_eventos_bicos` e `movimentacoes_carteira`.
 - `usuarios` também é referenciado por `avaliacoes` (avaliador e avaliado), `historico_eventos_bicos` (autor), `mensagens_chat` (remetente), `historico_candidaturas` (quem alterou) e `movimentacoes_carteira` (dono da carteira).
+- `usuarios` 1—0..1 `fotos_perfil`.
 
 ## Regras garantidas pelo banco
 
@@ -129,6 +135,7 @@ A aplicação não exclui registros; o comportamento abaixo é o definido no ban
 | mensagens_chat.remetente_id | usuarios | `RESTRICT` (padrão) |
 | historico_candidaturas.alterado_por | usuarios | `RESTRICT` (padrão) |
 | movimentacoes_carteira.usuario_id | usuarios | `RESTRICT` (padrão) |
+| fotos_perfil.usuario_id | usuarios | `CASCADE`: apaga a foto do usuário |
 
 Efeito prático:
 
@@ -140,4 +147,4 @@ Efeito prático:
 
 - O `sql_mode` padrão do XAMPP não é estrito: um texto longo demais seria cortado e um valor de ENUM inválido seria gravado como texto vazio, ambos apenas com aviso. A aplicação valida os dados antes de gravar. Os CHECKs são aplicados mesmo sem modo estrito.
 - O contratante pode cancelar um bico `Aberto` ou `Em andamento` (`POST /bicos/:id/cancelar`). No segundo caso, a reserva volta ao saldo dele e é registrada como `ESTORNO` em `movimentacoes_carteira`. Bico finalizado não pode ser cancelado. Todos os valores permanecem simulados.
-- Para quem já tem um banco antigo: este script não migra dados existentes. As diferenças para o schema antigo são os CHECKs de `usuarios` e `bicos`, a coluna `bicos.criado_em`, o charset/motor explícitos e as mudanças das migrações `001` (`ESTORNO`), `002` (avaliação bidirecional) e `003` (colunas de endereço em `bicos`), descritas na seção [Migrações](#migrações).
+- Para quem já tem um banco antigo: este script não migra dados existentes. As diferenças para o schema antigo são os CHECKs de `usuarios` e `bicos`, a coluna `bicos.criado_em`, o charset/motor explícitos e as mudanças das migrações `001` (`ESTORNO`), `002` (avaliação bidirecional), `003` (colunas de endereço em `bicos`) e `004` (tabela `fotos_perfil`), descritas na seção [Migrações](#migrações).

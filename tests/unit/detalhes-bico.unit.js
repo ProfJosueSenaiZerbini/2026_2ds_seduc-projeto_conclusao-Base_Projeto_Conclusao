@@ -4,6 +4,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import ejs from 'ejs';
 import { fileURLToPath } from 'node:url';
+import { iniciaisDoNome } from '../../services/iniciais.js';
 
 const VIEW = fileURLToPath(new URL('../../views/detalhesBico.ejs', import.meta.url));
 
@@ -15,7 +16,8 @@ const linkVoltar = async (tipoPerfil) => {
         avaliacao: null,
         rotaAtual: '/7',
         alerta: null,
-        formatarMoedaBRL: String
+        formatarMoedaBRL: String,
+        iniciaisDoNome
     });
     return html.match(/<a href="([^"]+)" class="btn-back">/)?.[1];
 };

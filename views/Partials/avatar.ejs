@@ -1,0 +1,10 @@
+<%#
+  Avatar: a foto de perfil quando houver, senão as iniciais do nome.
+  Passe sempre { nome, fotoUrl, classe } de forma explícita (fotoUrl: null quando não houver): os includes
+  do EJS herdam as variáveis da página, e a foto de outra pessoa (perfil público) poderia vazar.
+%>
+<% if (fotoUrl) { %>
+<img src="<%= fotoUrl %>" alt="" class="<%= classe %> avatar-foto" data-avatar="foto">
+<% } else { %>
+<span class="<%= classe %> avatar-iniciais" data-avatar="iniciais" aria-hidden="true"><%= iniciaisDoNome(nome) %></span>
+<% } %>
