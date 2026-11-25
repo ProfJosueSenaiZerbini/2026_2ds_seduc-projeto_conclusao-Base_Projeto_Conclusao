@@ -1,6 +1,7 @@
 import pool from '../config/database.js';
 import bcrypt from 'bcrypt';
 import { SQL_FINALIZADO_EM, contarBicosParaAvaliar, montarSeloAvaliacao } from './avaliacaoRegras.js';
+import { renovarSessao, versaoDaSenha } from '../services/sessaoService.js';
 import {
     normalizarCPF,
     validarConfirmacaoSenha,
@@ -192,7 +193,11 @@ export const criarAutenticadorUsuario =
                 );
             }
 
+            // Renova o id da sessão antes de gravar o usuário (evita fixação de sessão, #161).
+            await renovarSessao(req);
+
             // Salva os dados do usuário na sessão
+            req.session.versaoSenha = versaoDaSenha(usuario.senha);
             req.session.usuario = {
                 id: usuario.id,
                 nome: usuario.nome,
