@@ -32,7 +32,6 @@ O **Lumina** foi concebido como um espaço de lazer, partilha e conexão cultura
 * **Frontend**: React 18, Tailwind CSS, Lucide React, React Router 6, Vite.
 * **Backend**: Node.js, Express 5, JWT, BcryptJS, @supabase/supabase-js, MySQL2.
 * **Banco de Dados**: Supabase (Online) / MySQL (XAMPP local).
-* **Testes**: Playwright E2E.
 
 ---
 
