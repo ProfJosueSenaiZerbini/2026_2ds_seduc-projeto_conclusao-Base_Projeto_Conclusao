@@ -53,8 +53,16 @@ if (publicarForm) {
     const caixaSaldo = document.querySelector('#balance-box');
     const saldoReter = document.querySelector('[data-saldo-reter]');
     const saldoStatus = document.querySelector('[data-saldo-status]');
+    const saldoIcone = document.querySelector('[data-saldo-icone]');
+    const saldoTexto = document.querySelector('[data-saldo-texto]');
 
     const formatarReais = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    const mostrarSaldo = (modificador, icone, mensagem) => {
+        saldoStatus.className = modificador ? `saldo-status saldo-status--${modificador}` : 'saldo-status';
+        saldoIcone.className = icone ? `ph-fill ${icone}` : '';
+        saldoTexto.textContent = mensagem;
+    };
 
     // Publicar não depende de saldo: o valor só é reservado quando o contratante aceita um candidato.
     const atualizarSaldo = (valor) => {
@@ -62,14 +70,15 @@ if (publicarForm) {
         saldoReter.textContent = formatarReais(valor > 0 ? valor : 0);
 
         if (!(valor > 0)) {
-            saldoStatus.className = 'saldo-status';
-            saldoStatus.textContent = 'Informe o valor para conferir o saldo.';
+            mostrarSaldo('', '', 'Informe o valor para conferir o saldo.');
         } else if (valor <= saldo) {
-            saldoStatus.className = 'saldo-status saldo-status--ok';
-            saldoStatus.textContent = 'Saldo suficiente disponível';
+            mostrarSaldo('ok', 'ph-check-circle', 'Saldo suficiente disponível');
         } else {
-            saldoStatus.className = 'saldo-status saldo-status--insuficiente';
-            saldoStatus.textContent = 'Saldo insuficiente: adicione saldo antes de aceitar um candidato.';
+            mostrarSaldo(
+                'insuficiente',
+                'ph-warning-circle',
+                'Saldo insuficiente: adicione saldo antes de aceitar um candidato.'
+            );
         }
     };
 

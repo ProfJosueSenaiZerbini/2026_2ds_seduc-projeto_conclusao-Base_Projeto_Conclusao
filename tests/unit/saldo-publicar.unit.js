@@ -50,7 +50,11 @@ const abrirTela = (saldo) => {
             formulario.elements.valor.ouvintes.input();
         },
         reter: () => porSeletor('[data-saldo-reter]').textContent.replace(/\s/g, ' '),
-        status: () => porSeletor('[data-saldo-status]')
+        status: () => ({
+            className: porSeletor('[data-saldo-status]').className,
+            textContent: porSeletor('[data-saldo-texto]').textContent,
+            icone: porSeletor('[data-saldo-icone]').className
+        })
     };
 };
 
@@ -60,6 +64,7 @@ describe('publicar bico: conferência de saldo', () => {
 
         assert.equal(tela.reter(), 'R$ 0,00');
         assert.equal(tela.status().textContent, 'Informe o valor para conferir o saldo.');
+        assert.equal(tela.status().icone, '');
     });
 
     test('valor maior que o saldo: avisa que é insuficiente', () => {
@@ -69,6 +74,7 @@ describe('publicar bico: conferência de saldo', () => {
         assert.equal(tela.reter(), 'R$ 500,00');
         assert.match(tela.status().textContent, /^Saldo insuficiente/);
         assert.match(tela.status().className, /saldo-status--insuficiente/);
+        assert.equal(tela.status().icone, 'ph-fill ph-warning-circle');
     });
 
     test('valor igual ao saldo é suficiente', () => {
@@ -77,5 +83,6 @@ describe('publicar bico: conferência de saldo', () => {
 
         assert.equal(tela.status().textContent, 'Saldo suficiente disponível');
         assert.match(tela.status().className, /saldo-status--ok/);
+        assert.equal(tela.status().icone, 'ph-fill ph-check-circle');
     });
 });
