@@ -430,7 +430,7 @@ test.describe('Textos fictícios removidos', () => {
         const c = await criarConta(browser, 'contratante', 'txt_c');
         const publicar = await (await c.ctx.request.get(`${BASE}/bicos/novo`)).text();
         expect(publicar).not.toMatch(
-            /Pagamento garantido|Segurança Ibico|Verificado|Alcance Local|propostas por hora|propostas\/hora/
+            /Pagamento garantido|Segurança iBico|Verificado|Alcance Local|propostas por hora|propostas\/hora/
         );
         expect(publicar).toContain('O valor fica reservado na sua carteira simulada quando você aceita um candidato.');
         await c.ctx.close();
@@ -450,7 +450,7 @@ test.describe('Textos fictícios removidos', () => {
         expect(hc).not.toMatch(
             /avatar-status|Conta ativa|Conta e segurança|Dados pessoais cadastrados|Perfil de contratante/
         );
-        expect(hc).toContain('Conta Ibico');
+        expect(hc).toContain('Conta iBico');
         expect(hc).toContain('Cadastrado');
         expect(hc).toContain('Alterar senha');
 
