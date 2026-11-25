@@ -11,7 +11,6 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 
 **Legenda de status**
 - **Aprovado:** coberto por teste automatizado que passou, conferindo o resultado esperado.
-- **Unitários aprovados; E2E a executar:** os testes unitários passaram; o E2E já está escrito, mas ainda não foi executado com o banco.
 
 | Caso | Cobertura (arquivo › teste) | Status |
 |---|---|---|
@@ -41,8 +40,8 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 | CT24 – Sem indicadores fictícios | `roteiro/perfil-reputacao.spec.js` › "Sem indicadores fictícios" (2 testes) e "Textos fictícios removidos" (2 testes); `tests/unit/perfil.unit.js` (Membro recente calculado) | Aprovado |
 | CT25 – Endereço do bico pelo CEP | `roteiro/endereco-bico.spec.js` › "CT25 – Endereço do bico verificado pelo CEP" (6 testes) e "CT25 – Rota /api/cep"; `tests/unit/endereco.unit.js` (validações, serviço de CEP com fetch simulado, publicação e rota) | Aprovado |
 | CT26 – Privacidade do endereço | `roteiro/endereco-bico.spec.js` › "CT26 – Privacidade do endereço do bico"; `tests/unit/endereco.unit.js` › "privacidade do endereço nos detalhes do bico" | Aprovado |
-| CT27 – Foto de perfil | `roteiro/foto-perfil.spec.js` › "CT27 – Foto de perfil" (3 testes); `tests/unit/foto-perfil.unit.js`, `avatar.unit.js` e `iniciais.unit.js` | Unitários aprovados; E2E a executar |
-| CT28 – Notificações do trabalhador | `roteiro/notificacoes.spec.js` › "CT28 – Notificações do trabalhador" (2 testes); `tests/unit/notificacoes.unit.js` | Unitários aprovados; E2E a executar |
+| CT27 – Foto de perfil | `roteiro/foto-perfil.spec.js` › "CT27 – Foto de perfil" (3 testes); `tests/unit/foto-perfil.unit.js`, `avatar.unit.js` e `iniciais.unit.js` | Aprovado |
+| CT28 – Notificações do trabalhador | `roteiro/notificacoes.spec.js` › "CT28 – Notificações do trabalhador" (2 testes); `tests/unit/notificacoes.unit.js` | Aprovado |
 
 ---
 
@@ -179,17 +178,17 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 ## CT27 – Foto de perfil
 **Procedimento:** (a) como contratante, em `/perfil`, adicionar uma foto PNG; (b) conferir a barra lateral; (c) tentar enviar um arquivo de texto renomeado para `.png` e uma imagem acima de 2 MB; (d) remover a foto; (e) como trabalhador, adicionar uma foto e abrir o perfil público dele como contratante; (f) sem foto, conferir o avatar da barra lateral.
 **Resultado esperado:** (a) a foto aparece no banner do perfil e o botão passa a "Trocar foto", com "Remover foto" ao lado; (b) a barra lateral mostra a mesma foto; (c) nada é gravado, a página volta ao perfil com o alerta "A foto precisa ser uma imagem JPG, PNG ou WebP." ou "A foto pode ter no máximo 2 MB."; (d) voltam as iniciais do nome (primeira letra do nome e do sobrenome, ex.: "CM" para Carla Mendes); (e) o perfil público mostra a foto do trabalhador, e a barra lateral do contratante continua com o avatar dele; (f) aparecem as iniciais, e nenhuma imagem é carregada de servidor externo.
-**Status:** Unitários aprovados em 25/11/2026 (`tests/unit/foto-perfil.unit.js`, `avatar.unit.js`, `iniciais.unit.js`). E2E em `roteiro/foto-perfil.spec.js` a executar com o banco ligado (exige a tabela `fotos_perfil`: schema atual ou `migrations/004_foto_perfil.sql`).
+**Status:** Unitários aprovados em 25/11/2026 (`tests/unit/foto-perfil.unit.js`, `avatar.unit.js`, `iniciais.unit.js`). E2E em `roteiro/foto-perfil.spec.js` aprovado em 25/11/2026 na verificação do GitHub Actions (exige a tabela `fotos_perfil`: schema atual ou `migrations/004_foto_perfil.sql`).
 
 ## CT28 – Notificações do trabalhador
 **Procedimento:** dois trabalhadores se candidatam ao mesmo bico e ficam com a página aberta; (a) o contratante aceita um deles; (b) o outro é recusado automaticamente; (c) o escolhido abre o painel do sino e recarrega a página; (d) em outro bico, o contratante recusa um candidato com a observação "Já contratei outra pessoa."; (e) o contratante tenta acessar `GET /notificacoes`; (f) o trabalhador desliga o som no painel.
 **Resultado esperado:** (a) em até 20 segundos, sem recarregar, aparece no canto da tela o aviso "Candidatura aceita – Você foi escolhido para "…"", o sino mostra o contador 1 e toca um aviso sonoro curto (o navegador só libera o som depois de algum clique ou tecla na página); (b) o outro recebe "Vaga preenchida – Outro profissional foi escolhido para "…""; (c) o painel lista a notificação com link para o bico, o contador some e, ao recarregar, o aviso não se repete; (d) a notificação "Candidatura recusada" mostra "Motivo: Já contratei outra pessoa."; (e) 403; (f) os avisos seguintes aparecem sem som. Candidatar-se ou cancelar a própria candidatura não gera notificação.
-**Status:** Unitários aprovados em 25/11/2026 (`tests/unit/notificacoes.unit.js`). O sino (contador, aviso, som, painel, som desligado e celular) foi conferido no navegador com respostas simuladas. E2E em `roteiro/notificacoes.spec.js` a executar com o banco ligado (exige a tabela `notificacoes_leitura`: schema atual ou `migrations/005_notificacoes.sql`).
+**Status:** Unitários aprovados em 25/11/2026 (`tests/unit/notificacoes.unit.js`). O sino (contador, aviso, som, painel, som desligado e celular) foi conferido no navegador com respostas simuladas. E2E em `roteiro/notificacoes.spec.js` aprovado em 25/11/2026 na verificação do GitHub Actions (exige a tabela `notificacoes_leitura`: schema atual ou `migrations/005_notificacoes.sql`).
 
 ---
 
 ## Observações
-- Os casos CT01 a CT26 têm teste automatizado aprovado; os CT27 e CT28 têm os unitários aprovados e o E2E a executar. Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT26) conferem o resultado de cada operação.
+- Os casos CT01 a CT28 têm teste automatizado aprovado (em 25/11/2026: 101 E2E e 240 unitários, na verificação do GitHub Actions). Os E2E antigos são, em sua maioria, de navegação e de interface; os do roteiro (CT02–CT26) conferem o resultado de cada operação.
 - Os CT17 a CT19 exigem a tabela `avaliacoes` nova (schema atual ou `migrations/002_avaliacao_bidirecional.sql`).
 - Desde o CT25, o `npm test` sobe o próprio servidor (`webServer` no `playwright.config.js`, com `NODE_ENV=development` e `CEP_FAKE=1`). A porta 3000 precisa estar livre (pare o `npm start`/`npm run dev` antes) e o banco precisa estar ligado. O cadastro dos testes usa CPFs fictícios de 1 a 9, liberados só em `development`.
 - Os CT05, CT25 e CT26 exigem as colunas de endereço na tabela `bicos` (schema atual ou `migrations/003_endereco_bico.sql`).
