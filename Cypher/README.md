@@ -2,8 +2,7 @@
 
 Plataforma para profissionalização, conexão e valorização da cena underground do rap e da cultura hip-hop.
 
-A stack final mantém Node.js, TypeScript, Express, EJS e JavaScript sem framework no navegador, com MySQL como banco relacional até o fim do projeto. Esta versão ainda executa com SQLite. O [plano de arquitetura](../planoEvolucao/04-implementacao/ajustes-tecnicos-gerais.md#arquitetura-final-da-cypher) detalha a transição para MySQL, a proteção das mídias, o envio de e-mails e as tarefas agendadas.
-
+A stack final mantém Node.js, TypeScript, Express, EJS e JavaScript sem framework no navegador, com SQLite como banco relacional.
 ## Executar
 
 Ambiente verificado: Node.js 24.22.1 e npm 12.2.1 no Windows x64.
