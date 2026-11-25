@@ -336,6 +336,19 @@ body:has(.contractor-sidebar.is-collapsed) {
   box-shadow: 0 0 0 1px var(--contractor-sidebar-accent);
 }
 
+/* Sem foto de perfil: as iniciais do nome no mesmo círculo. */
+.sidebar-account__avatar.avatar-iniciais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--contractor-sidebar-secondary);
+  color: var(--contractor-sidebar-white);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
 .sidebar-account__name {
   overflow: hidden;
   text-overflow: ellipsis;
