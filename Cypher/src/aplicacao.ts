@@ -1,5 +1,10 @@
+import { prepararCentralInicial } from "./app/models/central.js";
+import { webhook as webhookMercadoPago } from "./app/controllers/controladorLicenciamentoBeats.js";
+import { migrarParticipacoesEventos, processarLembretesEventos } from "./app/models/eventos.js";
+import { conexaoInternaCypher } from "./app/models/bancoDados.js";
+import { processarPrazos, resumoReputacao, reputacaoPublica } from "./app/models/colaboracoes.js";
 import { rotuloProfissional } from "./app/models/tratamentoProfissional.js";
-import { pendenciasPerfil } from "./app/models/identidadeUsuario.js";
+import { completudePerfil } from "./app/models/identidadeUsuario.js";
 import { discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo } from "./app/models/catalogoDemonstrativo.js";
 import { protegerEscrita } from "./app/middlewares/seguranca.js";
 import { prepararSuperAdminLocal } from "./app/models/administracao.js";
@@ -59,7 +64,16 @@ import {
 } from "lucide-static";
 
 inicializarAplicacaoCypher();
+migrarParticipacoesEventos();
 await prepararSuperAdminLocal();
+const responsavelCentral=conexaoInternaCypher().prepare("SELECT usuario_id FROM administradores WHERE papel='super_admin' AND ativo=1 ORDER BY criado_em LIMIT 1").get() as {usuario_id:string}|undefined;
+if(responsavelCentral)prepararCentralInicial(responsavelCentral.usuario_id);
+processarPrazos();
+const cicloColaboracoes = setInterval(() => { try { processarPrazos(); } catch (erro) { console.error("Falha ao processar prazos de colaboração."); } }, 60000);
+cicloColaboracoes.unref();
+processarLembretesEventos();
+const cicloEventos = setInterval(() => { try { processarLembretesEventos(); } catch { console.error("Falha ao processar lembretes de eventos."); } }, 60000);
+cicloEventos.unref();
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
@@ -120,8 +134,12 @@ const icones = {
 app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), "views"));
 app.locals.icones = icones;
+app.locals.resumoReputacao = resumoReputacao;
+app.locals.reputacaoParaPerfil = (id: string, visitante: string) => {try {return reputacaoPublica(id,visitante);} catch{return null;}};
 app.locals.rotuloProfissional = rotuloProfissional;
-Object.assign(app.locals, { pendenciasPerfil, discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo });
+Object.assign(app.locals, { completudePerfil, discoDemo, idFaixaDemo, imagemPerfilDemo, imagemPublicacaoDemo });
+app.post("/payments/mercadopago/webhook", express.json({ limit: "8kb" }), webhookMercadoPago);
+app.use(["/portfolio/edit", "/portfolio/preview"], express.urlencoded({ extended: true, limit: "512kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(protegerEscrita);

@@ -1,0 +1,16 @@
+<section id="profile-editor-selo" class="pf-seal-editor" aria-labelledby="meu-selo">
+  <h4 id="meu-selo">Meu selo profissional</h4>
+  <p>Crie uma assinatura visual para seu perfil.</p>
+  <form class="profile-edit-form" action="/profile/selo" method="post" data-seal-editor>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="pf-seal-editor-grid">
+      <span class="pf-seal" data-seal-preview data-forma="<%= selo?.forma || 'disco' %>" data-cor="<%= selo?.cor || 'oliva' %>" aria-label="Prévia do selo"><%= selo?.letras || usuario.initials.slice(0,3) %></span>
+      <label>Monograma<input name="letras" value="<%= selo?.letras || usuario.initials.slice(0,3) %>" maxlength="3" required aria-describedby="selo-instrucao"><small id="selo-instrucao">Até três letras ou números.</small></label>
+      <label>Forma<select name="forma"><% for (const [id, nome] of Object.entries(formasSelo)) { %><option value="<%= id %>" <%= selo?.forma === id ? 'selected' : '' %>><%= nome %></option><% } %></select></label>
+      <label>Cor<select name="cor"><% for (const [id, nome] of Object.entries(coresSelo)) { %><option value="<%= id %>" <%= selo?.cor === id ? 'selected' : '' %>><%= nome %></option><% } %></select></label>
+    </div>
+    <div class="profile-edit-actions"><button class="button button-lime" type="submit">Salvar selo</button>
+      <% if (selo) { %><button class="button button-outline" name="acao" value="retirar" formnovalidate>Retirar selo</button><% } %>
+    </div>
+  </form>
+</section>

@@ -46,10 +46,16 @@
       <link rel="stylesheet" href="/css/tema-cypher-claro.css">
       <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
       <% if (stylesheet) { %>
+        <% if (stylesheet === 'cena-perfil' && typeof editando !== 'undefined' && editando) { %><link rel="stylesheet" href="/css/perfil.css"><% } %>
         <link rel="stylesheet" href="/css/<%= stylesheet %>.css">
       <% } %>
       <link rel="stylesheet" href="/css/tema.css">
       <link rel="stylesheet" href="/css/responsivo.css">
       <link rel="stylesheet" href="/css/formularios.css">
+      <link rel="stylesheet" href="/css/busca-global.css">
+      <% if(typeof midiasUsuario==='function'){ %><link rel="stylesheet" href="/css/midias-publicacoes.css"><% } %>
+      <% if (typeof interacao === 'function' || stylesheet === 'catalogo-obras' || stylesheet === 'cena-perfil') { %><link rel="stylesheet" href="/css/interacoes-conteudo.css"><% } %>
+      <% if (typeof usuario !== "undefined" && usuario && usuario.tipoConta === "administrativo") { %><link rel="stylesheet" href="/css/admin.css"><% } %>
+      <link rel="stylesheet" href="/css/botao-salvar.css">
     </head>
-    <body>
+    <body<% if (typeof usuario !== "undefined" && usuario && usuario.tipoConta === "administrativo") { %> class="admin-context"<% } %>>

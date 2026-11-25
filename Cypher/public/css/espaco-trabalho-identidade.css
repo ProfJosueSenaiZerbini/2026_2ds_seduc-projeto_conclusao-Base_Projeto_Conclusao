@@ -61,7 +61,9 @@
   gap: 8px;
   white-space: nowrap;
 }
-.et-search-controls .dc-filter:has(option:checked:not([value=""], [value="todas"])) summary {
+.et-search-controls
+  .dc-filter:has(option:checked:not([value=""], [value="todas"]))
+  summary {
   border-color: var(--dc-olive);
   background: var(--dc-hover);
 }
@@ -189,280 +191,103 @@
   color: var(--dc-ink);
   background: var(--dc-surface);
 }
-/* Placa de criação com as mesmas superfícies e cores da Descoberta.
-   O giro e a saída radial usam camadas distintas, com a mesma curva de movimento. */
+/* Giro e saída radial compartilham duração e curva, como uma engrenagem. */
 .et-workspace .et-create {
-  --et-create-radius: 104px;
-  --et-create-duration: 650ms;
-  --et-create-stagger: 65ms;
-  --et-create-easing: cubic-bezier(0.22, 0.72, 0.18, 1);
-  --et-create-origin-turn: 60deg;
-  --et-plate-shape: polygon(
-    21% 0,
-    79% 0,
-    100% 21%,
-    100% 79%,
-    79% 100%,
-    21% 100%,
-    0 79%,
-    0 21%
-  );
   position: fixed;
   z-index: 30;
   left: calc(var(--rail) + var(--et-inset) + 16px);
   bottom: 48px;
+  box-sizing: border-box;
   width: 60px;
-  height: 60px;
-  isolation: isolate;
+  padding-bottom: 58px;
+  overflow: hidden;
+  border: 1px solid var(--dc-olive);
+  border-radius: 3px 9px 3px 6px;
+  background: var(--dc-panel);
+  color: var(--dc-ink);
+  box-shadow: 3px 4px 0 #080f0b40, 0 8px 20px #050b0726;
+  transition: width 200ms ease;
+}
+.et-workspace .et-create[open] {
+  width: min(260px, calc(100vw - 40px));
 }
 .et-workspace .et-create summary {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  color: var(--dc-ink);
-  background: var(--dc-olive);
-  clip-path: var(--et-plate-shape);
-  isolation: isolate;
-  filter: drop-shadow(2px 3px 1px #050b0745);
-  list-style: none;
+  position: absolute;
+  inset: auto 0 0;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  list-style: none;
+  background: var(--dc-surface);
+  box-shadow: inset 3px 0 var(--et-gold);
 }
 .et-workspace .et-create summary::-webkit-details-marker {
   display: none;
 }
-.et-workspace .et-create summary::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  z-index: -2;
-  background: var(--dc-surface);
-  clip-path: var(--et-plate-shape);
-  pointer-events: none;
-}
-.et-workspace .et-create summary::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  z-index: -1;
-  background:
-    url("marcas-botao.svg") top left / 96px 48px no-repeat,
-    var(--dc-panel);
-  clip-path: var(--et-plate-shape);
-  pointer-events: none;
-}
 .et-workspace .et-create-symbol {
-  position: relative;
-  z-index: 1;
+  color: var(--et-gold);
+  flex: 0 0 58px;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  transition: transform var(--et-create-duration) var(--et-create-easing);
+  transition: transform 200ms ease;
 }
 .et-workspace .et-create-symbol svg {
-  width: 32px;
-  height: 32px;
-  stroke-width: 3.5px;
-  stroke-linecap: square;
-}
-.et-workspace .et-create-symbol::after {
-  content: "";
-  position: absolute;
-  bottom: 2px;
-  left: 17px;
-  width: 2px;
-  height: 5px;
-  background: currentColor;
-  transform: rotate(5deg);
-  pointer-events: none;
-}
-.et-workspace .et-create-mark {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  color: var(--et-gold);
-  transform: rotate(16deg);
-  pointer-events: none;
-}
-.et-workspace .et-create-mark svg {
-  width: 13px;
-  height: 13px;
+  width: 24px;
+  height: 24px;
 }
 .et-workspace .et-create[open] .et-create-symbol {
-  transform: rotate(315deg);
+  transform: rotate(45deg);
 }
-.dark .et-workspace .et-create summary {
-  filter: drop-shadow(2px 3px 1px #050b0799);
+.et-workspace .et-create-title {
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 13px;
 }
-.et-workspace .et-create:has(summary:focus-visible) {
-  outline: 2px solid var(--et-gold);
-  outline-offset: 6px;
+.et-workspace .et-create:not([open]) .et-create-title {
+  display: none;
 }
 .et-workspace .et-create nav {
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-}
-.et-workspace .et-create-orbit {
-  --et-orbit-turn: calc(-1 * var(--angle));
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  transform: rotate(var(--et-orbit-turn));
-  transform-origin: 0 0;
-}
-.et-workspace .et-create-carrier {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  transform: translateX(var(--et-create-radius))
-    rotate(calc(-1 * var(--et-orbit-turn))) scale(1);
-  transform-origin: 0 0;
+  display: grid;
+  padding: 6px;
+  border-bottom: 1px solid var(--dc-line);
+  max-height: max(48px, calc(100dvh - 175px - env(safe-area-inset-bottom)));
+  overflow-y: auto;
 }
 .et-workspace .et-create-action {
-  --et-action-edge: var(--dc-olive);
-  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 5px 8px;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 6px;
+}
+.et-workspace .et-create-action > span:first-child {
   display: grid;
   place-items: center;
-  width: 50px;
-  height: 50px;
-  border: 2px solid var(--et-action-edge);
-  border-radius: 48% 52% 47% 53% / 53% 47% 52% 48%;
-  color: var(--dc-ink);
-  background:
-    url("marcas-botao.svg") top left / 96px 48px no-repeat,
-    var(--dc-panel),
-    var(--dc-surface);
-  box-shadow:
-    2px 3px 0 #050b0745,
-    inset 0 0 0 1px var(--dc-line);
-  transform: translate(-50%, -50%);
-  isolation: isolate;
-  transition: border-color 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.et-workspace .et-create-action[data-create-kind="beats"] {
-  --et-action-edge: var(--dc-paper);
-}
-.et-workspace .et-create-action[data-create-kind="events"] {
-  --et-action-edge: var(--dc-accent);
-}
-.et-workspace .et-create-action::before {
-  content: "";
-  position: absolute;
-  inset: -4px -3px -3px -4px;
-  z-index: -1;
-  border: 1px solid var(--et-action-edge);
-  border-radius: 53% 47% 51% 49% / 47% 54% 46% 53%;
-  opacity: 0.7;
-  transform: rotate(-8deg);
-  pointer-events: none;
-  transition:
-    inset 0.2s ease,
-    opacity 0.2s ease;
-}
-.et-workspace .et-create-icon {
-  display: grid;
-  place-items: center;
-}
-.et-workspace .et-create-icon svg {
-  width: 25px;
-  height: 25px;
-}
-.et-workspace .et-create-label {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  width: max-content;
-  max-width: 104px;
-  padding: 4px 6px;
+  flex: 0 0 32px;
+  height: 32px;
   border: 1px solid var(--dc-line);
-  border-left: 2px solid var(--et-action-edge);
-  border-radius: 1px 3px 1px 2px;
-  color: var(--dc-ink);
-  background:
-    url("marcas-botao.svg") top left / 108px 44px no-repeat,
-    var(--dc-panel),
-    var(--dc-surface);
-  font:
-    700 11px/1.2 "Space Grotesk",
-    "DM Sans",
-    sans-serif;
-  text-align: center;
-  box-shadow: 2px 2px 0 #050b0766;
-  transform: translateX(-50%);
+  border-radius: 2px 5px 2px 3px;
+  background: var(--dc-surface);
 }
-/* O último rótulo fica acima para não encostar no anterior na órbita compacta. */
-.et-workspace .et-create-orbit:last-child:not(:first-child) .et-create-label {
-  top: auto;
-  bottom: calc(100% + 6px);
-}
-/* Sem JavaScript, details continua utilizável, apenas sem a transição de saída. */
-.et-workspace .et-create[data-create-enhanced] .et-create-orbit {
-  transform: rotate(var(--et-create-origin-turn));
-  pointer-events: none;
-  transition: transform var(--et-create-duration) var(--et-create-easing);
-  transition-delay: calc(
-    (var(--et-action-count) - 1 - var(--i)) * var(--et-create-stagger)
-  );
-}
-.et-workspace .et-create[data-create-enhanced] .et-create-carrier {
-  transform: translateX(0px) rotate(calc(-1 * var(--et-create-origin-turn)))
-    scale(0.22);
-  transition: transform var(--et-create-duration) var(--et-create-easing);
-  transition-delay: inherit;
-}
-.et-workspace .et-create[data-create-enhanced] .et-create-label {
-  opacity: 0;
-  transition: opacity 0.14s ease;
-}
-.et-workspace .et-create[data-create-expanded] .et-create-orbit {
-  transform: rotate(var(--et-orbit-turn));
-  pointer-events: auto;
-  transition-delay: calc(var(--i) * var(--et-create-stagger));
-}
-.et-workspace .et-create[data-create-expanded] .et-create-carrier {
-  transform: translateX(var(--et-create-radius))
-    rotate(calc(-1 * var(--et-orbit-turn))) scale(1);
-}
-.et-workspace .et-create[data-create-expanded] .et-create-label {
-  opacity: 1;
-  transition-delay: calc(
-    var(--et-create-duration) * 0.7 + var(--i) * var(--et-create-stagger)
-  );
-}
-.et-workspace
-  .et-create[data-create-enhanced]:not([data-create-expanded])
-  .et-create-symbol {
-  transform: rotate(0deg);
-}
-.et-workspace .et-create-action:focus-visible .et-create-label {
-  opacity: 1;
-  transition-delay: 0s;
+.et-workspace .et-create-action svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: var(--dc-accent);
 }
 .et-workspace .et-create-action:is(:hover, :focus-visible) {
-  border-color: var(--dc-ink);
+  background: var(--dc-hover);
 }
-.et-workspace .et-create-action:is(:hover, :focus-visible)::before {
-  inset: -6px -5px -5px -6px;
-  opacity: 1;
+.et-workspace .et-create :is(summary, a):focus-visible {
+  outline: 2px solid var(--dc-accent);
+  outline-offset: -3px;
 }
 @media (min-width: 901px) {
   .et-workspace .dc-header {
@@ -488,15 +313,14 @@
     padding-top: 20px;
     padding-bottom: calc(148px + env(safe-area-inset-bottom));
   }
+  .et-workspace .et-create summary {
+    flex-direction: row-reverse;
+  }
   .et-workspace .et-create {
     left: auto;
     right: max(20px, env(safe-area-inset-right));
     bottom: calc(86px + env(safe-area-inset-bottom));
-    --et-create-radius: min(104px, 30vw);
-    --et-create-origin-turn: 120deg;
-  }
-  .et-workspace .et-create-orbit {
-    --et-orbit-turn: calc(180deg + var(--angle));
+
   }
 }
 @media (max-width: 680px) {
@@ -530,30 +354,17 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .et-workspace .et-create[data-create-enhanced] .et-create-orbit,
-  .et-workspace .et-create[data-create-enhanced] .et-create-carrier,
-  .et-workspace .et-create[data-create-enhanced] .et-create-label,
-  .et-workspace .et-create .et-create-symbol,
-  .et-workspace .et-create-action,
-  .et-workspace .et-create-action::before {
+  .et-workspace .et-create,
+  .et-workspace .et-create summary,
+  .et-workspace .et-create-symbol,
+  .et-workspace .et-create-action {
     transition: none;
   }
 }
 @media (forced-colors: active) {
   .et-workspace .et-create summary,
+  .et-workspace .et-create nav,
   .et-workspace .et-create-action {
-    border-color: ButtonText;
-  }
-  .et-workspace .et-create summary {
-    border: 2px solid ButtonText;
-    color: ButtonText;
-    background: ButtonFace;
-    clip-path: none;
-    filter: none;
-  }
-  .et-workspace .et-create summary::before,
-  .et-workspace .et-create summary::after,
-  .et-workspace .et-create-mark {
-    display: none;
+    border: 1px solid ButtonText;
   }
 }

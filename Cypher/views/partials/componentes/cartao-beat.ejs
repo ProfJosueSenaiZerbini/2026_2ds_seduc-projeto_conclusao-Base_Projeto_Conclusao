@@ -1,26 +1,27 @@
 <%
-  const capaBeat = beat.demonstracao && imagemPublicacaoDemo(beat.id);
+  const capaEnviada=typeof capaUsuario==='function'?capaUsuario('beat',beat.id):'';
+  const capaBeat = imagemPublicacaoDemo(beat.id);
   const precosBeat = (beat.ofertas || []).filter(oferta => oferta.ativa !== false).map(oferta => oferta.precoCentavos).filter(preco => typeof preco === 'number' && Number.isFinite(preco) && preco >= 0);
   const menorPrecoBeat = precosBeat.length ? Math.min(...precosBeat) : null;
-  const livreBeat = menorPrecoBeat === 0 || (menorPrecoBeat === null && /^(free use|uso livre|gratuita?)$/i.test(beat.license || ''));
   const vendidoBeat = beat.vendido === true || beat.disponibilidade === 'vendido';
+  const livreBeat = !vendidoBeat && menorPrecoBeat === 0;
+  const pausado = beat.disponibilidade === 'pausado';
   const numeroBeat = typeof indice !== 'undefined' ? String(indice + 1).padStart(2, '0') : '01';
 %>
-<article class="beats-card<%= vendidoBeat ? ' is-sold' : '' %>" id="beat-<%= beat.id %>" data-beat-card data-beat-id="<%= beat.id %>" data-title="<%= beat.title %>" data-bpm="<%= Number(beat.bpm) || 0 %>" data-price="<%= livreBeat ? 0 : menorPrecoBeat ?? '' %>" aria-labelledby="beat-titulo-<%= beat.id %>">
+<article class="beats-card" id="beat-<%= beat.id %>" data-beat-card data-beat-id="<%= beat.id %>" data-title="<%= beat.title %>" data-bpm="<%= Number(beat.bpm) || 0 %>" data-price="<%= menorPrecoBeat ?? '' %>" aria-labelledby="beat-titulo-<%= beat.id %>">
   <div class="beats-sleeve">
     <div class="beats-vinyl" aria-hidden="true"><span>CYPHER<br>BEAT SIDE</span></div>
     <div class="beats-cover">
-      <% if (capaBeat) { %>
+      <% if(capaEnviada){ %><img src="<%= capaEnviada %>" alt="Capa de <%= beat.title %>" loading="lazy"><% }else if (capaBeat) { %>
         <img src="/img/<%= capaBeat %>" alt="Capa de <%= beat.title %>" loading="lazy" decoding="async">
       <% } else { %>
         <div class="beats-cover-art" aria-hidden="true"><span>CYPHER<br>ORIGINAL BEAT</span><%- icones.disc %><strong><%= beat.title %></strong></div>
       <% } %>
       <span class="beats-cover-shade" aria-hidden="true"></span>
       <span class="beats-genre"><%= beat.genre || 'Gênero não informado' %></span>
-      <button class="beats-favorite" type="button" data-beat-favorite aria-pressed="false" aria-label="Favoritar <%= beat.title %>" hidden><%- include('icone-beat', { tipo: 'heart' }) %></button>
       <div class="beats-cover-bottom">
-        <span class="beats-availability<%= vendidoBeat ? ' beats-availability-sold' : '' %>"><i aria-hidden="true"></i><%= vendidoBeat ? 'Vendido' : 'Disponível' %></span>
-        <% if (beat.vendaExclusiva) { %><span class="beats-edition">Exclusivo</span><% } %>
+        <span class="beats-availability<%= pausado || vendidoBeat ? ' beats-availability-sold' : '' %>"><i aria-hidden="true"></i><%= vendidoBeat ? 'Vendido exclusivo' : disponibilidades[beat.disponibilidade] %></span>
+        <% if (beat.ofertas.some(o => o.modalidade === 'exclusiva')) { %><span class="beats-edition"><%= vendidoBeat ? (beat.compradorExclusivo||'Exclusividade reservada') : 'Sob negociação exclusiva' %></span><% } %>
       </div>
     </div>
     <span class="beats-catalog-number" aria-hidden="true">CX / <%= numeroBeat %> <span>SIDE A</span></span>
@@ -38,19 +39,21 @@
     <%- include('player-previa-beat', { beat }) %>
     <div class="beats-card-footer">
       <div class="beats-price<%= livreBeat ? ' beats-price-free' : '' %>">
-        <span><%= vendidoBeat ? 'Indisponível para compra' : livreBeat ? 'Crie no seu ritmo' : menorPrecoBeat !== null ? 'A partir de' : 'Fale com o beatmaker' %></span>
-        <strong><%= livreBeat ? 'Free Use' : menorPrecoBeat !== null ? (menorPrecoBeat / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta' %></strong>
+        <span><%= pausado ? 'Novas aquisições pausadas' : livreBeat ? 'Conforme os termos da oferta' : menorPrecoBeat !== null ? 'A partir de' : 'Fale com o beatmaker' %></span>
+        <strong><%= vendidoBeat ? 'Licença exclusiva' : livreBeat ? 'Free Use' : menorPrecoBeat !== null ? (menorPrecoBeat / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta' %></strong>
       </div>
       <%- include('abrir-ficha-beat', { beat, classe: 'beats-details-button', icone: 'arrowUpRight', rotulo: 'Ver beat' }) %>
     </div>
+    <%- include('acoes-conteudo', { tipo:'beat', id:beat.id }) %>
     <% if (beat.owned) { %>
       <div class="beats-owner-actions">
         <a class="beats-link" href="/beats/<%= encodeURIComponent(beat.id) %>/edit">Editar</a>
-        <form method="post" action="/beats/<%= encodeURIComponent(beat.id) %>/delete" data-confirm="Excluir este beat do seu catálogo?">
+        <form method="post" action="/beats/<%= encodeURIComponent(beat.id) %>/delete" data-confirm="Retirar este beat do catálogo e preservar autorizações anteriores?">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <button class="beats-link beats-delete" type="submit">Excluir</button>
+          <button class="beats-link beats-delete" type="submit">Retirar do catálogo</button>
         </form>
       </div>
     <% } %>
   </div>
+<% if(!beat.demonstracao){ %><a class="cy-report-link" href="/suporte/new?objeto_tipo=beat&amp;objeto_id=<%= encodeURIComponent(beat.id) %>">Denunciar beat</a><% } %>
 </article>

@@ -1,0 +1,31 @@
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<% if (administrativo) { %>
+<div class="app-shell dc-shell admin-shell">
+ <%- include('../partials/navegacao-administrativa',{path,usuario}) %>
+ <main class="main-shell">
+ <%- include('../partials/barra-superior',{breadcrumb:'Pedidos de serviço'}) %>
+ <div class="page-content admin-page admin-op">
+<% } else { %>
+<div class="dc-shell op-shell">
+ <a class="dc-skip" href="#op-conteudo">Pular para o conteúdo</a>
+ <%- include('../partials/barra-lateral',{path}) %>
+ <div class="dc-page">
+ <%- include('../partials/componentes/cabecalho-descoberta',{titulo:'Oportunidades',tituloId:'op-titulo',descricao:'Encontros profissionais que fazem a cena acontecer.'}) %>
+<% } %>
+ <div class="<%= administrativo ? 'op-content' : 'dc-content op-content' %>" id="op-conteudo" tabindex="-1">
+ <nav class="op-tabs" aria-label="Navegação de oportunidades">
+ <% if(!administrativo){ %>
+ <a href="/opportunities" <%- tela==='lista'&&contexto==='explorar'?'aria-current="page"':'' %>>Explorar</a>
+ <% if(profissional){ %><a href="/my-applications" <%- tela==='lista'&&contexto==='candidaturas'?'aria-current="page"':'' %>>Minhas candidaturas</a><a href="/my-opportunities" <%- tela==='lista'&&contexto==='minhas'?'aria-current="page"':'' %>>Minhas oportunidades</a><% }else{ %><a href="/service-requests">Minhas solicitações</a><% } %>
+ <a href="/messages">Mensagens</a><% } %>
+ </nav>
+ <% if(sucesso){ %><p class="op-feedback" role="status"><%- icones.check %> Atualização registrada.</p><% } %>
+ <% if(erro){ %><p class="op-feedback op-error" role="alert"><%= erro %></p><% } %>
+ <%- include('../partials/chamadas/'+tela) %>
+ </div>
+ <% if (!administrativo) { %><%- include('../partials/navegacao-mobile',{rotaAtual:'/opportunities'}) %><% } %>
+ </div>
+<% if (administrativo) { %></main><% } %>
+</div>
+<script src="/js/chamadas.js" defer></script>
+<%- include('../partials/fim-pagina') %>

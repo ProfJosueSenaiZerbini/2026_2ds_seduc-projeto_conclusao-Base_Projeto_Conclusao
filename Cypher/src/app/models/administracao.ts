@@ -18,7 +18,7 @@ export const papeisAdministrativos: readonly PapelAdministrativo[] = [
 
 export function exigirAdministrador(
   autorId: string,
-  acao: "equipe" | "taxonomia" | "excecoes" | "editorial" | "auditoria"
+  acao: "equipe" | "taxonomia" | "excecoes" | "editorial" | "auditoria" | "reputacao" | "moderacao"
 ) {
   const db = conexaoInternaCypher();
   const autor = db
@@ -31,7 +31,7 @@ export function exigirAdministrador(
     !autor ||
     !(
       autor.papel === "super_admin" ||
-      (autor.papel === "moderador" && acao === "excecoes") ||
+      (autor.papel === "moderador" && ["excecoes", "reputacao", "moderacao"].includes(acao)) ||
       (autor.papel === "editor" && acao === "editorial")
     )
   )
@@ -69,8 +69,8 @@ export async function criarAdministrador(
     }
     const id = randomUUID();
     db.prepare(
-      `INSERT INTO usuarios (id,email,senha_hash,tipo_conta,codigo_publico) VALUES (?,?,?,'administrativo',?)`
-    ).run(id, email, hash, `ADM-${randomUUID()}`);
+      `INSERT INTO usuarios (id,email,senha_hash,tipo_conta) VALUES (?,?,?,'administrativo')`
+    ).run(id, email, hash);
     db.prepare(
       "INSERT INTO administradores (usuario_id,nome,papel) VALUES (?,?,?)"
     ).run(id, dados.nome.trim(), dados.papel);

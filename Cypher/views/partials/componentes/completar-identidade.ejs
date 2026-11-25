@@ -1,7 +1,10 @@
-<% { const faltam = pendenciasPerfil(usuario).length; if (faltam && (typeof apenasIdentidade === 'undefined' || !usuario.identidadeRevisada)) { %>
-  <a class="profile-completion" href="/profile/completar">
-    <span class="profile-completion-icon" aria-hidden="true"><%- icones.listChecks %></span>
-    <span><strong>Complete seu perfil</strong><small><%= faltam === 1 ? 'Falta 1 informação' : 'Faltam ' + faltam + ' informações' %></small></span>
-    <span class="profile-completion-arrow" aria-hidden="true"><%- icones.arrowRight %></span>
+<% if (!usuario.demonstracao && ['consumidor', 'profissional'].includes(usuario.tipoConta)) {
+     const progresso = completudePerfil(usuario);
+     const noPerfil = typeof sempre !== 'undefined' && sempre;
+     if (noPerfil || progresso.pendencias.length) { %>
+  <a class="profile-progress-summary" href="/profile/completar">
+    <span>Progresso do perfil</span>
+    <strong><%= progresso.percentual %>% completo</strong>
+    <span class="profile-progress-arrow" aria-hidden="true"><%- icones.arrowRight %></span>
   </a>
 <% } } %>

@@ -1,0 +1,10 @@
+<% if (plataforma) { %>
+  <a class="obra-ouvir<%= plataforma.spotify ? ' obra-ouvir-spotify' : '' %>" href="<%= plataforma.url %>" target="_blank" rel="noopener noreferrer" aria-label="Ouvir <%= titulo %><%= plataforma.nome ? ' no ' + plataforma.nome : '' %> (abre em nova aba)">
+    <% if (plataforma.spotify) { %>
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.25c-2.83-1.73-6.4-2.12-10.6-1.16a.75.75 0 1 1-.33-1.46c4.6-1.05 8.55-.6 11.71 1.33.35.21.47.68.25 1.04Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.24-1.99-8.18-2.57-12-1.41a.94.94 0 0 1-.55-1.8c4.37-1.32 9.81-.68 13.53 1.6.44.28.58.85.31 1.3Zm.13-3.41C15.21 8.3 8.8 8.09 5.09 9.21a1.12 1.12 0 1 1-.65-2.15c4.25-1.29 11.33-1.04 15.81 1.62a1.12 1.12 0 1 1-1.15 1.94Z"/></svg>
+      <span class="obra-ouvir-rotulo" aria-hidden="true">Spotify</span>
+    <% } else { %>
+      <%- icones.headphones %><span><%= plataforma.nome || 'Ouvir' %></span>
+    <% } %>
+  </a>
+<% } %>

@@ -11,8 +11,11 @@ import {
   criarSessaoCypher,
   obterUsuarioDaSessaoCypher,
   revogarSessaoCypher,
+  conexaoInternaCypher,
   type UsuarioDaSessao,
 } from "./bancoDados.js";
+import { contaEncerrada } from "./protecoesConta.js";
+import { registrarConsentimento } from "./consentimentoConta.js";
 
 const parametrosScrypt = { N: 16_384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
 const tamanhoChave = 64;
@@ -106,26 +109,29 @@ export async function autenticarUsuario(
   senha: string
 ): Promise<string | undefined> {
   const credenciais = buscarCredenciaisCypher(email);
-  if (!credenciais) return undefined;
+  if (!credenciais || contaEncerrada(conexaoInternaCypher(), credenciais.id))
+    return undefined;
 
   const senhaValida = await verificarSenha(senha, credenciais.senhaHash);
-  return senhaValida && (credenciais.tipoConta === "administrativo" || credenciais.emailConfirmado) ? credenciais.id : undefined;
+  return senhaValida &&
+    (credenciais.tipoConta === "administrativo" || credenciais.emailConfirmado)
+    ? credenciais.id
+    : undefined;
 }
 
 export async function cadastrarUsuario(dados: {
   nome: string;
-  identificador?: string;
+  identificador: string;
   vulgo?: string;
-  generoPersonalizado?: string;
-  nascimento?: string;
-  tratamento?: string;
+  nomePublico?: boolean;
+  nascimento: string;
   vertentes?: string[];
   email: string;
   senha: string;
-  tipoConta?: "profissional" | "consumidor";
+  tipoConta: "profissional" | "consumidor";
   categorias: string[];
-  outraCategoria: string;
   atuacoes?: import("./bancoDados.js").AtuacaoProfissionalPersistida[];
+  consentimento?: boolean;
 }): Promise<void> {
   if (buscarCredenciaisCypher(dados.email)) {
     throw new Error("EMAIL_DUPLICADO");
@@ -133,41 +139,28 @@ export async function cadastrarUsuario(dados: {
 
   const id = randomUUID();
   const senhaHash = await gerarHashSenha(dados.senha);
-  const identificadorNome = dados.nome
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 24);
-  const identificador = `@${identificadorNome || "artista"}-${id.slice(0, 6)}`;
-  const iniciaisBase = dados.nome
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map(parte => parte[0]?.toLocaleUpperCase("pt-BR") ?? "")
-    .join("");
-  const iniciais = iniciaisBase
-    ? (iniciaisBase + (iniciaisBase[1] ?? iniciaisBase[0])).slice(0, 2)
-    : "AA";
   const funcao = dados.categorias.join(" · ");
 
   try {
-    criarContaCypher({
-      id,
-      email: dados.email,
-      senhaHash,
-      tipoConta: dados.tipoConta ?? "profissional",
-      nome: dados.nome.trim(),
-      nomeInformado:dados.nome,vulgo:dados.vulgo,usarVulgo:false,generoPersonalizado:dados.generoPersonalizado,nascimento:dados.nascimento,tratamento:dados.tratamento,vertentes:dados.vertentes,
-      funcao,
-      identificador: dados.identificador ?? identificador,
-      iniciais,
-      cTag: `CYP-${id.replace(/-/g, "").slice(0, 12).toUpperCase()}`,
-      categorias: dados.categorias,
-      outraCategoria: dados.outraCategoria,
-      atuacoes: dados.atuacoes,
-    });
+    conexaoInternaCypher().transaction(() => {
+      criarContaCypher({
+        id,
+        email: dados.email,
+        senhaHash,
+        tipoConta: dados.tipoConta,
+        nome: dados.nome.trim(),
+        nomeInformado: dados.nome,
+        vulgo: dados.vulgo,
+        nomePublico: dados.nomePublico,
+        nascimento: dados.nascimento,
+        vertentes: dados.vertentes,
+        funcao,
+        identificador: dados.identificador,
+        categorias: dados.categorias,
+        atuacoes: dados.atuacoes,
+      });
+      if (dados.consentimento) registrarConsentimento(id);
+    })();
   } catch (erro) {
     if (
       erro instanceof Error &&

@@ -1,128 +1,75 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
-<%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: 'Buscar pessoas' }) %>
-<div class="page-content">
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      EXPLORAR A CENA
-    </div>
-    <h1>
-      Buscar pessoas
-    </h1>
-    <p>
-      Encontre profissionais por função, localização e estilo — sem ruído.
-    </p>
+<%
+  const contexto = { q, tipo, ...filtros };
+  const limpar = urlBusca({ q, tipo });
+  const exibidas = categorias.filter(c => c.id !== 'tudo' && (tipo === 'tudo' || c.id === tipo));
+%>
+<div class="dc-shell cy-search">
+  <a class="dc-skip" href="#conteudo-busca">Pular para os resultados</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: 'Busca global', tituloId: 'titulo-busca', descricao: 'Pessoas, sons e encontros. A cena se conecta aqui.' }) %>
+    <main class="dc-content" id="conteudo-busca" aria-labelledby="titulo-busca" tabindex="-1">
+      <header class="search-intro">
+        <div><span class="dc-stamp">Conexões que movem a cultura</span>
+          <h2><%= q ? 'Resultados para' : 'Encontre sua' %> <em><%= q ? '“' + q + '”' : 'próxima conexão.' %></em></h2>
+          <p><%= q ? 'Explore os resultados ou refine a busca por categoria.' : 'Descubra artistas, profissionais e trabalhos com a identidade da rua.' %></p>
+        </div>
+        <span class="search-index" aria-hidden="true">CYPHER<br>MAPA DA CENA <span>↗</span></span>
+      </header>
+      <nav class="dc-tabs search-tabs" aria-label="Categorias da pesquisa">
+        <% categorias.forEach(cat => { %>
+          <a href="<%= urlBusca({ q, tipo: cat.id }) %>" data-search-navigation<% if (tipo === cat.id) { %> aria-current="page"<% } %>><span aria-hidden="true"><%- icones[cat.icone] %></span><%= cat.nome %><small><%= contagens[cat.id] %></small></a>
+        <% }) %>
+      </nav>
+      <% if (tipo !== 'tudo') { %>
+        <form class="search-filters" action="/search" method="get" aria-label="Filtrar <%= categorias.find(c => c.id === tipo).nome %>">
+          <input type="hidden" name="q" value="<%= q %>"><input type="hidden" name="tipo" value="<%= tipo %>">
+          <% const campos = [
+            { nome: 'categoria', rotulo: tipo === 'pessoas' ? 'Profissão' : tipo === 'eventos' ? 'Tipo de evento' : 'Formato', todas: tipo === 'pessoas' ? 'Todas as profissões' : 'Todos os formatos', opcoes: opcoes.categorias },
+            ...(['pessoas', 'obras', 'beats'].includes(tipo) ? [{ nome: 'genero', rotulo: 'Gênero musical', todas: 'Todos os gêneros', opcoes: opcoes.generos }] : []),
+            ...(['pessoas', 'eventos'].includes(tipo) ? [{ nome: 'localizacao', rotulo: 'Localização', todas: 'Todas as localidades', opcoes: opcoes.localizacoes }] : []),
+            ...(tipo === 'pessoas' ? [{ nome: 'ordem', rotulo: 'Ordenar por', todas: 'Nome A–Z', opcoes: ['populares'] }] : []),
+            ...(tipo === 'eventos' ? [{ nome: 'periodo', rotulo: 'Período', todas: 'Todas as datas', opcoes: ['proximos', 'passados'] }] : [])
+          ].filter(c => c.opcoes.length || filtros[c.nome]); %>
+          <% campos.forEach(campo => { %>
+            <label for="search-<%= campo.nome %>"><%= campo.rotulo %><select id="search-<%= campo.nome %>" name="<%= campo.nome %>">
+              <option value=""><%= campo.todas %></option>
+              <% const valores = [...new Set([...campo.opcoes, filtros[campo.nome]].filter(Boolean))]; valores.forEach(valor => { %><option value="<%= valor %>"<%= filtros[campo.nome] === valor ? ' selected' : '' %>><%= ({ populares: 'Populares', proximos: 'Próximos eventos', passados: 'Eventos passados' })[valor] || valor %></option><% }) %>
+            </select></label>
+          <% }) %>
+          <% if (campos.length) { %><button class="dc-primary" type="submit"><span aria-hidden="true"><%- icones.sliders %></span> Aplicar filtros</button><% } %>
+        </form>
+      <% } %>
+      <% if (filtrosAtivos) { %><div class="search-active-filters"><span><%= Object.values(filtros).filter(Boolean).map(v => ({ populares: 'Populares', proximos: 'Próximos eventos', passados: 'Eventos passados' })[v] || v).join(' / ') %></span><a href="<%= limpar %>" data-search-navigation>Limpar filtros <span aria-hidden="true">×</span></a></div><% } %>
+      <div class="search-results">
+        <div class="search-meta"><span><strong><%= total %></strong> <%= total === 1 ? 'resultado' : 'resultados' %><%= q ? ' para “' + q + '”' : ' na cena' %></span><span><%= tipo === 'pessoas' ? filtros.ordem === 'populares' ? 'Popularidade' : 'Nome A–Z' : 'Conteúdo público' %></span></div>
+        <% exibidas.forEach(cat => {
+          const todos = grupos[cat.id];
+          const itens = tipo === 'tudo' ? todos.slice(0, 6) : todos.slice((pagina - 1) * 24, pagina * 24);
+          if (!itens.length) return;
+        %>
+          <section class="search-section" aria-labelledby="search-<%= cat.id %>-title">
+            <div class="dc-heading"><h3 id="search-<%= cat.id %>-title"><span aria-hidden="true"><%- icones[cat.icone] %></span><%= cat.nome %> <small><%= todos.length %></small></h3><% if (tipo === 'tudo') { %><a href="<%= urlBusca({ q, tipo: cat.id }) %>" data-search-navigation>Ver <%= cat.nome.toLocaleLowerCase('pt-BR') %> <%- icones.arrowRight %></a><% } %></div>
+            <div class="search-grid search-grid-<%= cat.id %>">
+              <% itens.forEach(item => { %>
+                <% if (cat.id === 'pessoas') { %><%- include('../partials/componentes/pessoa-resultado', { pessoa: item, rotulos: rotulosPessoa(item) }) %>
+                <% } else { %><%- include('../partials/componentes/item-descoberta', { item }) %><% } %>
+              <% }) %>
+            </div>
+          </section>
+        <% }) %>
+        <% if (!total) { %>
+          <div class="dc-empty search-empty"><span aria-hidden="true"><%- icones.search %></span><div><h3><%= q || filtrosAtivos ? 'Essa conexão ainda não apareceu.' : 'A cena começa com quem chega.' %></h3><p><%= q || filtrosAtivos ? 'Tente outro nome, termo ou combinação de filtros. Você também pode explorar outras categorias.' : 'Os perfis e trabalhos públicos da comunidade aparecerão aqui.' %></p><% if (filtrosAtivos) { %><a class="dc-primary" href="<%= limpar %>" data-search-navigation>Limpar filtros</a><% } else if (q) { %><a class="dc-primary" href="/search" data-search-navigation>Explorar a cena</a><% } %></div></div>
+        <% } %>
+        <% if (tipo !== 'tudo' && paginas > 1) { %>
+          <nav class="search-pagination" aria-label="Paginação dos resultados"><% if (pagina > 1) { %><a href="<%= urlBusca({ ...contexto, pagina: pagina - 1 }) %>" data-search-navigation>← Anterior</a><% } %><span>Página <%= pagina %> de <%= paginas %></span><% if (pagina < paginas) { %><a href="<%= urlBusca({ ...contexto, pagina: pagina + 1 }) %>" data-search-navigation>Próxima →</a><% } %></nav>
+        <% } %>
+      </div>
+      <footer class="search-note"><span aria-hidden="true"><%- icones.users %></span> Uma pessoa, muitas atuações. Encontre quem soma à sua ideia.</footer>
+      <p class="sr-only" role="status" aria-live="polite" data-search-status></p>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: '/search' }) %>
   </div>
-</div>
-<form class="people-search-form" method="get" action="/search">
-  <label class="search-field" for="busca-profissionais">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.search %>
-    </span>
-    <input id="busca-profissionais" name="q" type="search" value="<%= filtros.q %>" maxlength="100" placeholder="Busque por nome, função, cidade ou estilo" aria-label="Buscar profissionais" >
-  </label>
-  <label class="people-search-filter" for="filtro-categoria">
-    <span>
-      Categoria profissional
-    </span>
-    <select id="filtro-categoria" name="categoria">
-      <option value="">
-        Todas as categorias
-      </option>
-      <% opcoesFiltros.categorias.forEach(categoria => { %>
-        <option value="<%= categoria %>"<%= filtros.categoria === categoria ? 'selected' : '' %>>
-          <%= categoria %>
-        </option>
-      <% }) %>
-    </select>
-  </label>
-  <label class="people-search-filter" for="filtro-genero">
-    <span>
-      Gênero musical
-    </span>
-    <select id="filtro-genero" name="genero">
-      <option value="">
-        Todos os gêneros
-      </option>
-      <% opcoesFiltros.generos.forEach(genero => { %>
-        <option value="<%= genero %>"<%= filtros.genero === genero ? 'selected' : '' %>>
-          <%= genero %>
-        </option>
-      <% }) %>
-    </select>
-  </label>
-  <label class="people-search-filter" for="filtro-localizacao">
-    <span>
-      Localização
-    </span>
-    <select id="filtro-localizacao" name="localizacao">
-      <option value="">
-        Todas as localidades
-      </option>
-      <% opcoesFiltros.localizacoes.forEach(localizacao => { %>
-        <option value="<%= localizacao %>"<%= filtros.localizacao === localizacao ? 'selected' : '' %>>
-          <%= localizacao %>
-        </option>
-      <% }) %>
-    </select>
-  </label>
-  <label class="people-search-filter" for="filtro-ordem">
-    <span>Ordenar por</span>
-    <select id="filtro-ordem" name="ordem">
-      <option value="">Ordem alfabética</option>
-      <option value="populares"<%= filtros.ordem === 'populares' ? ' selected' : '' %>>Populares</option>
-    </select>
-  </label>
-  <div class="people-search-actions">
-    <button class="button button-dark" type="submit">
-      Buscar
-    </button>
-    <% if (filtrosAtivos) { %>
-      <a class="button button-outline" href="/search">
-        Limpar
-      </a>
-    <% } %>
-  </div>
-</form>
-<div class="results-meta">
-  <span>
-    <strong>
-      <%= pessoas.length %>
-    </strong>
-    <%= pessoas.length === 1 ? 'perfil público encontrado' : 'perfis públicos encontrados' %>
-  </span>
-  <span>
-    <%= filtros.ordem === 'populares' ? 'Popularidade' : 'Ordem alfabética' %>
-  </span>
-</div>
-<% if (pessoas.length) { %>
-  <div class="people-grid">
-    <% pessoas.forEach(pessoa => { %>
-      <%- include('../partials/componentes/cartao-profissional', {
-        perfil: {
-          nome: pessoa.name, handle: pessoa.handle, funcao: pessoa.role, iniciais: pessoa.initials,
-          local: pessoa.city, detalhes: pessoa.genres, status: pessoa.availabilityLabel,
-          url: '/p/' + encodeURIComponent(pessoa.publicSlug)
-        }
-      }) %>
-    <% }) %>
-  </div>
-<% } else { %>
-<%- include('../partials/componentes/estado-vazio', {
-    classe: 'people-empty-state',
-    variacao: 'normal',
-    icone: icones.users,
-    titulo: 'Nenhum perfil público encontrado',
-    descricao: filtrosAtivos
-      ? 'Ajuste os filtros ou limpe a busca para ver outros profissionais.'
-      : 'Os profissionais aparecem aqui quando publicam seus perfis.',
-    acaoPrincipal: { href: '/settings', label: 'Ver configurações de visibilidade' }
-  }) %>
-<% } %>
-</div>
-</main>
 </div>
 <%- include('../partials/fim-pagina') %>

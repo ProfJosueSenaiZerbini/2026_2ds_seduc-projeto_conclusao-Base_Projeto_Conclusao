@@ -1,0 +1,9 @@
+<article class="pf-work-detail" id="obra-<%= obra.id %>" aria-labelledby="obra-titulo">
+  <header><div><small><%= [obra.type,obra.typeDetail].filter(Boolean).join(' · ') %></small><h3 id="obra-titulo"><%= obra.title %></h3></div><a class="pf-link" href="<%= apresentacao.url('catalogo') %>">Fechar ficha</a></header>
+  <p><%= [obra.genre,obra.genreDetail,obra.releaseDate?.split('-').reverse().join('/'),obra.role,obra.roleDetail].filter(Boolean).join(' · ') %></p>
+  <%- include('midias-publicacao',{tipo:'obra',id:obra.id}) %>
+  <% if (obra.creditos.length) { %><details><summary>Créditos confirmados</summary><ul><% for (const c of obra.creditos) { %><li><%= c.nome %> · <%= c.funcao %></li><% } %></ul></details><% } %>
+  <% if (obra.faixas.length) { %><details><summary>Ver <%= obra.faixas.length %> faixas</summary><ol><% for (const faixa of obra.faixas) { %><li><a href="<%= faixa.url %>"><%= faixa.titulo %></a></li><% } %></ol></details><% } %>
+  <% if (obra.lyrics) { %><details><summary>Letra</summary><p class="pf-biography"><%= obra.lyrics %></p></details><% } %>
+  <%- include('acoes-obra',{id:obra.id,titulo:obra.title,plataforma:obra.plataforma}) %>
+</article>

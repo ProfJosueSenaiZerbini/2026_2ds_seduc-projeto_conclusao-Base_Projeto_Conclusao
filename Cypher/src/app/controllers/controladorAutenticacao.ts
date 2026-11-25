@@ -2,7 +2,5 @@
 export {
   paginaAutenticacao,
   login,
-  validarDadosCadastro,
-  register,
   logout,
 } from "./controladorCompatibilidade.js";

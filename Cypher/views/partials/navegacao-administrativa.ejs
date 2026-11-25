@@ -1,11 +1,36 @@
 <aside class="sidebar" id="navegacao-principal">
-  <div class="sidebar-top"><a class="logo" href="/admin">CYPHER / EQUIPE</a><button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">×</button></div>
-  <nav class="side-nav" aria-label="Administração">
-    <a class="side-link<%= path === '/admin' ? ' active' : '' %>" href="/admin">Painel interno</a>
-    <% if (usuario.papelAdministrativo === 'super_admin') { %><a class="side-link" href="/admin/revisao">Análises de taxonomia</a><% } %>
-    <% if (['super_admin','moderador'].includes(usuario.papelAdministrativo)) { %><a class="side-link" href="/admin/revisao/excecoes">Exceções profissionais</a><% } %>
-  </nav>
-  <div class="sidebar-bottom"><p><strong><%= usuario.name %></strong></p><p><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[usuario.papelAdministrativo] %></p>
-    <form method="post" action="/admin/logout"><button class="button button-outline" type="submit">Sair da equipe</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+  <div class="sidebar-scroll">
+    <div class="sidebar-top">
+      <div class="sidebar-brand-row">
+        <a class="logo logo-compact" href="/admin" aria-label="Cypher — painel administrativo">
+          <span class="discovery-rail-mark" hidden aria-hidden="true"><%- icones.crown %></span><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="logo-word">CYPHER</span>
+        </a>
+        <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu"><span class="lucide-icon" aria-hidden="true"><%- icones.x %></span></button>
+      </div>
+    </div>
+    <nav class="side-nav" aria-label="Navegação administrativa">
+      <div class="nav-label">EQUIPE</div>
+      <% const linksAdmin = [
+        { href: '/admin', label: 'Painel administrativo', icon: icones.house },
+        ...(['super_admin','editor'].includes(usuario.papelAdministrativo)?[{href:'/admin/central',label:'Conteúdos da Central',icon:icones.lightbulb},{href:'/admin/central/quality',label:'Qualidade da Central',icon:icones.sliders}]:[]),
+        ...(usuario.papelAdministrativo === 'super_admin' ? [{ href: '/admin/revisao', label: 'Análises de taxonomia', icon: icones.sliders }] : []),
+        ...(['super_admin', 'moderador'].includes(usuario.papelAdministrativo) ? [
+          { href: '/admin/revisao/excecoes', label: 'Exceções profissionais', icon: icones.shieldCheck },
+          { href: '/admin/oportunidades', label: 'Pedidos de serviço', icon: icones.briefcase },
+          {href:'/admin/moderacao',label:'Suporte e moderação',icon:icones.shieldCheck},
+          {href:'/admin/reputacao',label:'Colaborações e reputação',icon:icones.users}
+        ] : [])
+      ]; %>
+      <% linksAdmin.forEach(link => { const ativo = path === link.href || (link.href === '/admin/oportunidades' && path.startsWith('/admin/oportunidades/')) || (link.href === '/admin/reputacao' && path.startsWith('/admin/reputacao/')); %>
+        <a class="side-link<%= ativo ? ' active' : '' %>" href="<%= link.href %>" aria-label="<%= link.label %>" <%- ativo ? 'aria-current="page"' : '' %>>
+          <span class="side-icon lucide-icon" aria-hidden="true"><%- link.icon %></span><span class="side-link-label"><%= link.label %></span>
+        </a>
+      <% }) %>
+    </nav>
+    <div class="sidebar-bottom admin-account">
+      <div class="user-mini"><div class="avatar avatar-yellow"><%= usuario.initials || 'AD' %></div><div><strong><%= usuario.name %></strong><span><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[usuario.papelAdministrativo] %></span></div></div>
+      <form method="post" action="/admin/logout"><button class="side-link admin-logout" type="submit"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.arrowLeft %></span><span class="side-link-label">Sair da equipe</span></button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+    </div>
   </div>
 </aside>

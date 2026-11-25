@@ -1,8 +1,13 @@
 <form class="profile-edit-form" method="post" action="/settings/identidade" data-identity-editor>
-  <div class="form-grid"><label>Nome Completo<input name="nomeInformado" value="<%= usuario.nomeInformado || usuario.name %>" minlength="2" maxlength="80" autocomplete="name" required><small>Fica privado quando o vulgo é escolhido como nome público.</small></label>
+  <div class="form-grid"><label>Nome Completo<input name="nomeInformado" value="<%= usuario.nomeInformado || usuario.name %>" minlength="2" maxlength="80" autocomplete="name" required></label>
   <label>Vulgo / nome artístico<input name="vulgo" value="<%= usuario.vulgo || '' %>" maxlength="80" autocomplete="nickname"></label></div>
-  <label class="privacy-option"><span>Mostrar meu vulgo como nome público</span><input type="checkbox" name="usarVulgo" value="1" <%= usuario.usarVulgo ? 'checked' : '' %>></label>
   <div class="form-grid"><label>Data de nascimento<input type="date" name="nascimento" value="<%= usuario.nascimento || '' %>" <%= usuario.nascimento ? 'readonly' : 'required' %>><small>Privada. Correções da data registrada precisam ser solicitadas à equipe.</small></label>
   <%- include('genero',{identidade:usuario}) %></div>
+  <% if (typeof retornoPerfil !== 'undefined' && retornoPerfil) { %><input type="hidden" name="retorno" value="perfil"><% } %>
+  <input type="hidden" name="nomePublicoPresente" value="1">
+  <label class="privacy-option">
+    <span><strong>Mostrar nome completo publicamente</strong><small>Com o nome privado, sua identidade pública usa o vulgo ou o @.</small></span>
+    <input type="checkbox" name="nomePublico" value="1"<%= usuario.namePublic ? ' checked' : '' %><%= usuario.protecaoMenor ? ' disabled' : '' %>>
+  </label>
   <button class="button button-lime" type="submit">Salvar identidade</button><input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>

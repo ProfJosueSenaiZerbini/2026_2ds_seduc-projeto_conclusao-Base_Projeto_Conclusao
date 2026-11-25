@@ -26,6 +26,9 @@ export function criarClienteHttp(base, {caixaEmail}={}) {
       dados.passwordConfirmation ??= dados.password;
       dados.identificador ??= `teste_${createHash('sha256').update(String(dados.email)).digest('hex').slice(0,16)}`;
       dados.nascimento ??= '1990-01-01';
+      dados.aceiteTermos ??= 'sim';
+      dados.versaoTermos ??= '2026-11-24';
+      dados.versaoPrivacidade ??= '2026-11-24';
       options={...options,body:json?JSON.stringify(dados):new URLSearchParams(dados)};
     }
     let cookie = headers.get("cookie") ?? "";

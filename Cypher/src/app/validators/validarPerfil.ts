@@ -1,3 +1,5 @@
+import { opcoesDisponibilidadeProfissional } from "../models/modeloPerfil.js";
+
 export function listaDeLinhas(
   valor: unknown,
   limite: number,
@@ -27,16 +29,28 @@ export type DadosPerfilValidacao = {
   generos: { valida: boolean };
   equipamentos: { valida: boolean };
   categoriasDisponiveis: string[];
-  statusPermitidos: Array<{ value: string }>;
+  competencias: { valida: boolean };
+  disponibilidadeAnterior: string;
 };
+
+export function validarApresentacaoPerfil(
+  cidade: string,
+  biografia: string
+): string | null {
+  if (cidade.length > 100) return "A cidade deve ter no máximo 100 caracteres.";
+  if (biografia.length > 500)
+    return "A biografia deve ter no máximo 500 caracteres.";
+  return null;
+}
 
 export function validarPerfil(dados: DadosPerfilValidacao): string | null {
   if (dados.nome.length < 2 || dados.nome.length > 80)
-    return "Informe um nome artístico entre 2 e 80 caracteres.";
-  if (dados.cidade.length > 100)
-    return "A cidade deve ter no máximo 100 caracteres.";
-  if (dados.biografia.length > 500)
-    return "A biografia deve ter no máximo 500 caracteres.";
+    return "Informe um nome completo entre 2 e 80 caracteres.";
+  const erroApresentacao = validarApresentacaoPerfil(
+    dados.cidade,
+    dados.biografia
+  );
+  if (erroApresentacao) return erroApresentacao;
   if (dados.contato.length > 200)
     return "O contato deve ter no máximo 200 caracteres.";
   if (
@@ -50,10 +64,15 @@ export function validarPerfil(dados: DadosPerfilValidacao): string | null {
     return "Informe até 8 gêneros, com no máximo 40 caracteres cada.";
   if (!dados.equipamentos.valida)
     return "Informe até 12 equipamentos, com no máximo 80 caracteres cada.";
+  if (!dados.competencias.valida)
+    return "Informe até 12 competências, com no máximo 80 caracteres cada.";
   if (
     dados.disponibilidade &&
-    !dados.statusPermitidos.some(opcao => opcao.value === dados.disponibilidade)
+    dados.disponibilidade !== dados.disponibilidadeAnterior &&
+    !opcoesDisponibilidadeProfissional.some(
+      opcao => opcao.value === dados.disponibilidade
+    )
   )
-    return "Escolha um status compatível com suas categorias profissionais.";
+    return "Escolha uma opção de disponibilidade profissional válida.";
   return null;
 }

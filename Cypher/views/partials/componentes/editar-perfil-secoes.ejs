@@ -23,21 +23,15 @@
       <div class="profile-edit-section-heading">
         <div class="eyebrow">IDENTIDADE E APRESENTAÇÃO</div>
         <h3>Informações pessoais</h3>
-        <p>Edite o nome artístico e a apresentação que compõem seu perfil profissional.</p>
+        <p>Atualize a biografia e a localização do seu perfil.</p>
       </div>
-      <p class="profile-field-note">Nome Completo e vulgo são separados. Configure a apresentação pública na seção Identidade pública. Fotos e capas serão integradas com o módulo de mídia.</p>
+      <a class="text-link" href="/publicacoes/perfil/<%= encodeURIComponent(usuario.id) %>/midias">Gerenciar foto e capa</a>
       <form method="post" action="/profile/secoes/pessoal" class="profile-edit-form" data-profile-section-form data-profile-section="pessoal">
-        <div class="form-grid">
-          <label>
-            Nome Completo
-            <input name="nome" value="<%= valores.nome %>" minlength="2" maxlength="80" autocomplete="nickname" required>
-          </label>
           <label>
             Cidade e estado
             <input name="cidade" value="<%= valores.cidade %>" maxlength="100" placeholder="Ex.: São Paulo, SP" autocomplete="address-level2">
-            <small>A exposição pública é controlada em Privacidade e contato.</small>
+            <small>Use o formato Cidade, UF. A visibilidade é controlada em Privacidade e contato.</small>
           </label>
-        </div>
         <label>
           Biografia
           <textarea name="biografia" maxlength="500" rows="5" placeholder="Conte um pouco sobre sua trajetória e seu trabalho"><%= valores.biografia %></textarea>
@@ -50,8 +44,9 @@
     </section>
 
     <section class="profile-edit-section" id="edit-panel-identidade" role="tabpanel" aria-labelledby="edit-tab-identidade" data-profile-edit-panel="identidade"<%= secaoEdicao === 'identidade' ? '' : ' hidden' %>>
-      <h3>Identidade pública</h3><p>Seu nome informado fica privado quando você usa o vulgo como nome público.</p>
-      <%- include('formulario-identidade',{usuario}) %>
+      <h3>Identidade pública</h3><p>Gerencie seu nome completo, vulgo e identificador @.</p>
+      <%- include('formulario-identidade',{usuario, retornoPerfil:true}) %>
+      <%- include('perfil-editor-selo') %>
       <p><a href="/settings#identidade">Gerenciar identificador @ e histórico</a></p>
     </section>
     <section class="profile-edit-section" id="edit-panel-profissional" role="tabpanel" aria-labelledby="edit-tab-profissional" data-profile-edit-panel="profissional"<%= secaoEdicao === 'profissional' ? '' : ' hidden' %>>
@@ -61,13 +56,12 @@
         <p>As respostas ficam agrupadas por categoria e cada detalhe mantém sua configuração de visibilidade.</p>
       </div>
       <% if (categoriasBloqueadas) { %>
-        <p class="profile-policy-notice" role="status">Categorias profissionais ficam bloqueadas até <strong><%= proximaAlteracaoCategorias %></strong>. Você pode atualizar suas respostas, gêneros, status e equipamentos sem alterar as categorias. Se precisar mudar antes do prazo, solicite uma exceção abaixo.</p>
+        <p class="profile-policy-notice" role="status">Categorias profissionais ficam bloqueadas até <strong><%= proximaAlteracaoCategorias %></strong>. Você pode atualizar suas respostas, gêneros, disponibilidade e equipamentos sem alterar as categorias. Se precisar mudar antes do prazo, solicite uma exceção abaixo.</p>
       <% } else if (excecaoCategoriaDisponivel) { %>
-        <p class="profile-policy-notice" role="status">A equipe autorizou uma alteração excepcional de categorias. A autorização será consumida somente quando a mudança for salva; ao concluir, inicia-se um novo prazo de 60 dias.</p>
+        <p class="profile-policy-notice" role="status">A equipe autorizou uma alteração excepcional de categorias. A autorização será consumida somente quando a mudança for salva; ao concluir, inicia-se um novo prazo de 30 dias.</p>
       <% } %>
       <form method="post" action="/profile/secoes/profissional" class="profile-edit-form" data-atuacao-form data-profile-section-form data-profile-section="profissional">
-          <%- include('vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
-          <fieldset class="profile-category-fieldset category-fieldset"<%= categoriasBloqueadas ? ' disabled' : '' %>>
+          <fieldset id="profile-profissoes" class="profile-category-fieldset category-fieldset"<%= categoriasBloqueadas ? ' disabled' : '' %>>
             <legend>Categorias profissionais atuais</legend>
           <p class="category-selection-summary" data-category-summary>Nenhuma profissão selecionada</p>
           <div class="professional-area-picker" data-category-area-picker aria-label="Áreas profissionais">
@@ -87,7 +81,7 @@
                 <div class="professional-catalog-group__options">
                   <% grupo.profissoes.forEach(profissao => { %>
                     <label class="profile-category-option category-option">
-                      <input type="checkbox" name="categorias" value="<%= profissao.rotulo %>"<%= (categoriasBloqueadas ? usuario.categories : valores.categorias).includes(profissao.rotulo) ? ' checked' : '' %>>
+                      <input type="checkbox" name="categorias" value="<%= profissao.rotulo %>"<%= profissoesComEstilosMusicais.has(profissao.rotulo) ? " data-estilos-musicais" : "" %><%= (categoriasBloqueadas ? usuario.categories : valores.categorias).includes(profissao.rotulo) ? ' checked' : '' %>>
                       <span><%= rotuloProfissional(profissao.rotulo,usuario.tratamento) %></span>
                     </label>
                   <% }) %>
@@ -112,7 +106,7 @@
               <%- include('questionario-atuacao', {
                 categoriaAtuacao: questionario.categoria,
                 perguntasAtuacao: questionario.perguntas,
-                idQuestionario: `perfil-atuacao-${indice}`,
+                idQuestionario: questionario.perguntas.length ? "atuacao-" + questionario.perguntas[0].profissaoId : "perfil-atuacao-" + indice,
                 legada: questionario.legada,
                 atuacoesExistentes,
                 formatarRespostaAtuacao
@@ -123,42 +117,55 @@
         <input type="hidden" name="respostasAtuacoesJson" data-respostas-atuacoes-json value="{}">
         <input type="hidden" name="visibilidadesAtuacoesJson" data-visibilidades-atuacoes-json value="{}">
 
-        <label>
-          Status profissional
-          <select name="disponibilidade" data-profile-status>
-            <option value="">Não informar um status agora</option>
-            <% statusOptions.forEach(opcao => { %>
-              <option value="<%= opcao.value %>" data-categorias="<%= opcao.categorias.join('|') %>"<%= valores.disponibilidade === opcao.value ? ' selected' : '' %>><%= opcao.label %></option>
-            <% }) %>
-          </select>
-          <small>As opções consideram as categorias selecionadas.</small>
+        <label id="profile-competencias">
+          Competências e especializações <span class="profile-field-optional">(uma por linha, até 12)</span>
+          <textarea name="competencias" maxlength="1000" rows="4" placeholder="Ex.: composição, mixagem vocal ou fotografia de shows"><%= valores.competencias %></textarea>
+          <small>Controle a exibição pública em Privacidade e contato.</small>
         </label>
 
-        <fieldset class="profile-category-fieldset profile-genre-fieldset">
-          <legend>Gêneros e estilos musicais · selecione até 8</legend>
-          <div class="profile-category-grid">
-            <% generosDisponiveis.forEach(genero => { %>
-              <label class="profile-category-option profile-genre-option">
-                <input type="checkbox" name="generos" value="<%= genero %>"<%= valores.generos.includes(genero) ? ' checked' : '' %>>
-                <span><%= genero %></span>
-              </label>
+        <label>
+          Disponibilidade para trabalhos e colaborações
+          <select name="disponibilidade">
+            <option value="">Prefiro não informar</option>
+            <% if (disponibilidadeAnterior && !opcoesDisponibilidade.some(opcao => opcao.value === disponibilidadeAnterior)) { %>
+              <option value="<%= disponibilidadeAnterior %>"<%= valores.disponibilidade === disponibilidadeAnterior ? ' selected' : '' %>><%= rotuloStatusProfissional(disponibilidadeAnterior) %></option>
+            <% } %>
+            <% opcoesDisponibilidade.forEach(opcao => { %>
+              <option value="<%= opcao.value %>"<%= valores.disponibilidade === opcao.value ? ' selected' : '' %>><%= opcao.label %></option>
             <% }) %>
-            <label class="profile-category-option profile-genre-option">
-              <input type="checkbox" name="generos" value="Outro" data-genre-other<%= valores.outroGenero ? ' checked' : '' %>>
-              <span>Outro</span>
+          </select>
+        </label>
+
+        <% const temGeneros = usuario.genres.length || valores.generos.length || valores.outroGenero; %>
+        <div id="profile-estilos" data-estilos-profissionais data-tem-generos="<%= Boolean(temGeneros) %>"<%= temGeneros || valores.categorias.some(categoria => profissoesComEstilosMusicais.has(categoria)) ? '' : ' hidden' %>>
+          <fieldset class="profile-category-fieldset profile-genre-fieldset">
+            <legend>Gêneros e estilos musicais · selecione até 8</legend>
+            <div class="profile-category-grid">
+              <% generosDisponiveis.forEach(genero => { %>
+                <label class="profile-category-option profile-genre-option">
+                  <input type="checkbox" name="generos" value="<%= genero %>"<%= valores.generos.includes(genero) ? ' checked' : '' %>>
+                  <span><%= genero %></span>
+                </label>
+              <% }) %>
+              <label class="profile-category-option profile-genre-option">
+                <input type="checkbox" name="generos" value="Outro" data-genre-other<%= valores.outroGenero ? ' checked' : '' %>>
+                <span>Outro</span>
+              </label>
+            </div>
+          </fieldset>
+          <div class="profile-other-category" data-other-genre-field<%= valores.outroGenero ? '' : ' hidden' %>>
+            <label>
+              Sugira outro gênero
+              <input id="genero-personalizado" name="outroGenero" value="<%= valores.outroGenero %>" maxlength="40" minlength="2" placeholder="Ex.: Drill brasileiro">
+              <small>Essa sugestão será analisada pela equipe e não aparecerá publicamente antes da aprovação.</small>
             </label>
           </div>
-        </fieldset>
-        <div class="profile-other-category" data-other-genre-field<%= valores.outroGenero ? '' : ' hidden' %>>
-          <label>
-            Sugira outro gênero
-            <input id="genero-personalizado" name="outroGenero" value="<%= valores.outroGenero %>" maxlength="40" minlength="2" placeholder="Ex.: Drill brasileiro">
-            <small>Essa sugestão será analisada pela equipe e não aparecerá publicamente antes da aprovação.</small>
-          </label>
+          <% if (usuario.genres.some(genero => !generosDisponiveis.includes(genero))) { %>
+            <p class="profile-field-note">Gêneros personalizados já aprovados são mantidos no seu perfil. Para sugerir outro, use “Outro”.</p>
+          <% } %>
         </div>
-        <% if (usuario.genres.some(genero => !generosDisponiveis.includes(genero))) { %>
-          <p class="profile-field-note">Gêneros personalizados já aprovados são mantidos no seu perfil. Para sugerir outro, use “Outro”.</p>
-        <% } %>
+
+          <%- include('vertentes-rapper',{vertentesDisponiveis,vertentesSelecionadas}) %>
         <label id="profile-equipment-input">
           Equipamentos e ferramentas profissionais <span class="profile-field-optional">(um por linha, até 12)</span>
           <textarea name="equipamentos" maxlength="1000" rows="4" placeholder="Microfone, interface, DAW ou outra ferramenta"><%= valores.equipamentos %></textarea>
@@ -286,17 +293,16 @@
       <div class="profile-edit-section-heading">
         <div class="eyebrow">OBRAS E PARTICIPAÇÕES</div>
         <h3>Portfólio e experiência</h3>
-        <p>O perfil mostra obras vinculadas e sua trajetória declarada; os cadastros de conteúdo continuam em suas áreas próprias.</p>
+        <p>Escolha os trabalhos e participações que compõem sua apresentação.</p>
       </div>
       <div class="profile-portfolio-summary">
-        <div><span>Obras no seu catálogo</span><strong><%= obras.length %></strong></div>
-        <a class="button button-lime" href="/works">Gerenciar obras e créditos <span aria-hidden="true">↗</span></a>
+        <a class="button button-lime" href="/portfolio/edit">Organizar portfólio</a>
+        <a class="button button-outline" href="/espaco-de-trabalho">Gerenciar trabalhos e créditos</a>
       </div>
       <div class="profile-portfolio-links">
         <a class="settings-link-row" href="/beats"><span><strong>Banco de beats</strong><small>Explore o catálogo de beats disponível na Cypher.</small></span><span aria-hidden="true">↗</span></a>
         <a class="settings-link-row" href="/events"><span><strong>Eventos e oportunidades</strong><small>Consulte eventos e oportunidades na plataforma.</small></span><span aria-hidden="true">↗</span></a>
       </div>
-      <p class="profile-field-note">A Cypher não possui um formulário de marcos de experiência verificados. As respostas profissionais são declarações do perfil e ficam em Atuação profissional.</p>
     </section>
 
     <section class="profile-edit-section" id="edit-panel-privacidade" role="tabpanel" aria-labelledby="edit-tab-privacidade" data-profile-edit-panel="privacidade"<%= secaoEdicao === 'privacidade' ? '' : ' hidden' %>>
@@ -306,7 +312,7 @@
         <p>O contato profissional é diferente do e-mail usado para entrar. As opções abaixo controlam o que aparece no perfil público.</p>
       </div>
       <form method="post" action="/profile/secoes/contato" class="profile-edit-form" data-profile-section-form data-profile-section="privacidade">
-        <label>
+        <label id="profile-contato">
           Contato profissional
           <input name="contato" value="<%= valores.contato %>" maxlength="200" placeholder="E-mail profissional, Instagram ou outro canal">
           <small>Seu e-mail de acesso não é publicado por este campo.</small>
@@ -326,18 +332,16 @@
       <div class="profile-edit-section-heading">
         <div class="eyebrow">ACESSO · SEGURANÇA</div>
         <h3>Conta e segurança</h3>
-        <p>Dados de acesso e operações de conta permanecem em Configurações; não há aqui controles que não tenham suporte no servidor.</p>
+        <p>Gerencie seus dados de acesso em Configurações.</p>
       </div>
       <dl class="profile-account-summary">
         <div><dt>E-mail de acesso</dt><dd><%= usuario.email || 'Não informado' %></dd></div>
-        <div><dt>Identificador Cypher</dt><dd><%= usuario.publicCode %> <span>Imutável</span></dd></div>
         <div><dt>Tipo de conta</dt><dd><%= usuario.tipoConta === 'organizador' ? 'Organizador' : 'Profissional' %></dd></div>
       </dl>
       <div class="profile-portfolio-links">
         <a class="settings-link-row" href="/settings#conta"><span><strong>Configurações da conta</strong><small>Consulte seu e-mail e as opções de conta existentes.</small></span><span aria-hidden="true">↗</span></a>
         <a class="settings-link-row" href="/settings#conta-seguranca"><span><strong>Encerramento de conta</strong><small>Exclusão exige senha atual e confirmação explícita.</small></span><span aria-hidden="true">↗</span></a>
       </div>
-      <p class="profile-field-note">Alteração de e-mail, troca de senha e gerenciamento de sessões não estão disponíveis na interface atual; por isso não são apresentados como ações.</p>
     </section>
   </div>
 </section>

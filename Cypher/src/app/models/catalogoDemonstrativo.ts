@@ -1,4 +1,8 @@
+import { imagemCena } from "./imagensCena.js";
+import { pessoasCena, encontrosCena, projetosCena } from "./cenaConteudo.js";
 export const perfisDemonstrativos = [
+  { slug: "nog.demo", nome: "NOG", funcao: "Rapper", iniciais: "NG", imagem: "Rappers/NOG.jpg", genero: "Rap", cidade: "", bio: "Perfil de exemplo de NOG, artista de HORIZONTAL!." },
+  { slug: "eureka.demo", nome: "Eureka Beats", funcao: "Beatmaker", iniciais: "EB", imagem: "Beatmaker/EUREKA BEATS-PROFILE.jpg", genero: "R&B", cidade: "", bio: "Perfil de exemplo de Eureka Beats. Instrumentais como Vice City." },
   {
     slug: "jotape.demo",
     nome: "Jotapê",
@@ -52,6 +56,7 @@ export const perfisDemonstrativos = [
 ];
 
 export const beatsDemonstrativos = [
+  { id: "demo-beat-vice-city", slug: "eureka.demo", titulo: "Vice City", imagem: "Beats/Vice-City-EUREKA BEATS.jpg", genero: "R&B", bpm: "" },
   {
     id: "demo-beat-visao-de-rua",
     slug: "hxtel.demo",
@@ -96,6 +101,28 @@ export const beatsDemonstrativos = [
 
 export const discosDemonstrativos = [
   {
+    id: "demo-album-profetiza",
+    slug: "lezin.demo",
+    titulo: "Profetiza",
+    tipo: "Álbum",
+    imagem: "Albuns/Profetiza-LEZIN.png",
+    genero: "Trap",
+    data: "2026-08-24",
+    link: "https://open.spotify.com/intl-pt/album/2IKZ3qQg3vuKblNCHXgQdp",
+    producao: "",
+    // Repertório e participações conforme a referência enviada pelo usuário (2026).
+    faixas: ["Intro", "Ovelha Negra", "Profetiza", "Latifundiário", "Gana",
+      "Sem dor, Sem ganho", "Mustang", "Tipo Amar", "Não Perco a Minha Paz",
+      "7AM", "Predestinadão", "Sou quem sou", "Gigante", "Burro"],
+    duracoes: ["1:20", "3:04", "2:55", "2:32", "2:16", "2:24", "2:34",
+      "2:18", "2:26", "3:04", "3:00", "2:15", "2:27", "2:19"],
+    participacoes: { 1: "Matteuzin, Papatunes", 2: "yvri, Papatunes",
+      3: "Papatunes", 4: "yvri, Papatunes", 5: "Papatunes", 6: "Papatunes",
+      7: "Papatunes", 8: "Papatunes", 9: "yvri, Papatunes", 10: "meLLo, Papatunes",
+      11: "Papatinho, Papatunes", 12: "Matteuzin, Papatunes",
+      13: "yvri, Papatunes", 14: "Papatunes" } as Record<number, string>,
+  },
+  {
     id: "demo-obra-ate-a-ultima-rima",
     slug: "jotape.demo",
     titulo: "Até A Última Rima",
@@ -103,7 +130,7 @@ export const discosDemonstrativos = [
     imagem: "Albuns/ate-a-ultima-rima-JOTAPE.jpg",
     genero: "Rap",
     data: "2025-07-03",
-    link: "https://music.apple.com/us/album/at%C3%A9-a-%C3%BAltima-rima/1821536742",
+    link: "https://open.spotify.com/album/0q7BnzgfpF9TiaYAN01K3E",
     producao: "Papatinho",
     faixas: [
       "MacGyver",
@@ -137,7 +164,7 @@ export const discosDemonstrativos = [
     imagem: "Albuns/LEZIN-LMC-vol1.jpg",
     genero: "Trap",
     data: "2026-08-05",
-    link: "https://music.amazon.it/albums/B0HCCJ1RYS",
+    link: "https://open.spotify.com/album/2nXcz3AyIkcI3NTV2u138e",
     producao: "LeodoKick",
     faixas: ["Sold Out", "Go Girl", "Longe"],
     participacoes: { 2: "H4lfmeasures", 3: "Prod Zuca" } as Record<
@@ -166,16 +193,18 @@ export const faixasDemonstrativas = [
     imagem: "Obras/LEVINSK-NOG-HORIZONTAL.jpg",
     genero: "Rap",
     data: "2026-09-18",
-    link: "https://audiomack.com/nog-21/song/horizontal",
+    link: "https://open.spotify.com/track/2K6FdNNrVeTIgMQnmCrz4w",
     producao: "Teo Guedx",
     participacao: "NOG",
   },
 ];
 
 const imagensPerfil = new Map(
-  perfisDemonstrativos.map(p => ["@" + p.slug, p.imagem])
+  [...perfisDemonstrativos.map(p => ["@" + p.slug, p.imagem] as const),...pessoasCena.flatMap(p=>[["@"+p.slug,p.imagem||'cena/perfis/'+p.slug+'.svg'] as const,["@"+p.slug+'.cena',p.imagem||'cena/perfis/'+p.slug+'.svg'] as const])]
 );
 const imagensPublicacao = new Map([
+  ...encontrosCena.map(e=>[e.id,'cena/obras/'+e.id+'.svg'] as const),
+  ...projetosCena.map(e=>[e.id,'cena/obras/'+e.id+'.svg'] as const),
   ...beatsDemonstrativos.map(b => [b.id, b.imagem] as const),
   ...faixasDemonstrativas.map(f => [f.id, f.imagem] as const),
   ...discosDemonstrativos.flatMap(d => [
@@ -188,7 +217,7 @@ export function idFaixaDemo(discoId: string, indice: number) {
   return `${discoId}-faixa-${indice + 1}`;
 }
 
-export const imagemPerfilDemo = (handle: string) => imagensPerfil.get(handle);
-export const imagemPublicacaoDemo = (id: string) => imagensPublicacao.get(id);
+export const imagemPerfilDemo = (handle: string) => imagemCena(handle.replace(/^@/, "").replace(/\.cena$/, "").replace(/\.demo$/, "")) || imagensPerfil.get(handle);
+export const imagemPublicacaoDemo = (id: string) => imagemCena(id) || imagensPublicacao.get(id);
 export const discoDemo = (id: string) =>
   discosDemonstrativos.find(disco => disco.id === id);

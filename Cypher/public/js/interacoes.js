@@ -29,44 +29,6 @@
     }
   }
 
-  const navegacaoPerfil = document.querySelector("[data-profile-section-nav]");
-  if (navegacaoPerfil) {
-    const linksPerfil = Array.from(
-      navegacaoPerfil.querySelectorAll('a[href^="#"]')
-    );
-    const secoesPerfil = linksPerfil
-      .map(link =>
-        document.getElementById(decodeURIComponent(link.hash.slice(1)))
-      )
-      .filter(Boolean);
-    const ativarLinkPerfil = id => {
-      linksPerfil.forEach(link => {
-        const ativo = decodeURIComponent(link.hash.slice(1)) === id;
-        link.classList.toggle("is-current", ativo);
-        if (ativo) link.setAttribute("aria-current", "location");
-        else link.removeAttribute("aria-current");
-      });
-    };
-    if (secoesPerfil.length) {
-      const inicial = decodeURIComponent(location.hash.slice(1));
-      ativarLinkPerfil(
-        secoesPerfil.some(secao => secao.id === inicial)
-          ? inicial
-          : secoesPerfil[0].id
-      );
-    }
-    linksPerfil.forEach(link =>
-      link.addEventListener("click", () =>
-        ativarLinkPerfil(decodeURIComponent(link.hash.slice(1)))
-      )
-    );
-    window.addEventListener("hashchange", () => {
-      const atual = decodeURIComponent(location.hash.slice(1));
-      if (secoesPerfil.some(secao => secao.id === atual))
-        ativarLinkPerfil(atual);
-    });
-  }
-
   const criarAviso = mensagem => {
     const aviso = document.createElement("div");
     aviso.className = "mvc-toast";
@@ -321,14 +283,6 @@
     );
   }
 
-  document.querySelectorAll("[data-faq]").forEach(botao => {
-    botao.addEventListener("click", () => {
-      const item = botao.closest(".faq-item");
-      const aberto = item.classList.toggle("open");
-      botao.setAttribute("aria-expanded", String(aberto));
-    });
-  });
-
   document.querySelectorAll("[data-menu-toggle]").forEach(botao => {
     botao.addEventListener("click", () => {
       const menu = document.getElementById(botao.dataset.menuToggle);
@@ -338,6 +292,50 @@
       menu.hidden = !aberto;
     });
   });
+
+  const opcoesSidebar = document.getElementById("sidebar-options-checkbox");
+  const menuOpcoesSidebar = document.getElementById("recursos-menu");
+  if (opcoesSidebar && menuOpcoesSidebar) {
+    const fecharOpcoes = () => {
+      opcoesSidebar.checked = false;
+      opcoesSidebar.setAttribute("aria-expanded", "false");
+      menuOpcoesSidebar.hidePopover();
+      menuOpcoesSidebar.hidden = true;
+    };
+    const posicionarOpcoes = () => {
+      if (!opcoesSidebar.checked) return;
+      const sidebar = opcoesSidebar.closest(".sidebar");
+      const limites = sidebar.getBoundingClientRect();
+      const botao = opcoesSidebar.nextElementSibling.getBoundingClientRect();
+      const largura = menuOpcoesSidebar.getBoundingClientRect().width;
+      menuOpcoesSidebar.style.left = `${Math.max(12, Math.min(limites.right + 8, window.innerWidth - largura - 12))}px`;
+      menuOpcoesSidebar.style.bottom = `${Math.max(12, window.innerHeight - botao.bottom)}px`;
+    };
+    opcoesSidebar.addEventListener("change", () => {
+      if (!opcoesSidebar.checked) {
+        fecharOpcoes();
+        return;
+      }
+      opcoesSidebar.setAttribute("aria-expanded", "true");
+      menuOpcoesSidebar.hidden = false;
+      menuOpcoesSidebar.showPopover();
+      posicionarOpcoes();
+    });
+    new ResizeObserver(posicionarOpcoes).observe(opcoesSidebar.closest(".sidebar"));
+    window.addEventListener("resize", posicionarOpcoes);
+    document.querySelectorAll("[data-sidebar-close]").forEach(botao => {
+      botao.addEventListener("click", fecharOpcoes);
+    });
+    document.addEventListener("click", evento => {
+      if (!evento.target.closest(".sidebar-bottom")) fecharOpcoes();
+    });
+    document.addEventListener("keydown", evento => {
+      if (evento.key === "Escape" && opcoesSidebar.checked) {
+        fecharOpcoes();
+        opcoesSidebar.focus();
+      }
+    });
+  }
 
   const barraLateral = document.querySelector(".sidebar");
   // Continuidade do rail: estado de uma navegação, não uma preferência fixa.
@@ -614,10 +612,7 @@
           opcao.selected = interesse.status === valor;
           seletor.appendChild(opcao);
         });
-        const salvar = document.createElement("button");
-        salvar.className = "text-link";
-        salvar.type = "submit";
-        salvar.textContent = "Salvar";
+        const salvar = dialogo.querySelector("[data-event-status-submit]").content.cloneNode(true);
         formulario.append(seletor, salvar);
         const csrf = exclusao.elements.namedItem("_csrf");
         if (csrf) formulario.appendChild(csrf.cloneNode(true));
@@ -1324,33 +1319,6 @@
     });
   atualizarOutroGenero();
 
-  const seletorStatusPerfil = document.querySelector("[data-profile-status]");
-  const atualizarStatusPerfil = () => {
-    if (!seletorStatusPerfil) return;
-    const categoriasSelecionadas = new Set(
-      [
-        ...document.querySelectorAll(".profile-category-option input:checked"),
-      ].map(campo => campo.value)
-    );
-    const opcaoAtual = seletorStatusPerfil.selectedOptions[0];
-    seletorStatusPerfil
-      .querySelectorAll("option[data-categorias]")
-      .forEach(opcao => {
-        const compativel = opcao.dataset.categorias
-          .split("|")
-          .some(categoria => categoriasSelecionadas.has(categoria));
-        opcao.hidden = !compativel;
-        opcao.disabled = !compativel;
-      });
-    if (opcaoAtual?.disabled) seletorStatusPerfil.value = "";
-  };
-  document
-    .querySelectorAll(".profile-category-option input[type=checkbox]")
-    .forEach(campo => {
-      campo.addEventListener("change", atualizarStatusPerfil);
-    });
-  atualizarStatusPerfil();
-
   const listaPerfisCredito = document.querySelector(
     "[data-profile-credit-list]"
   );
@@ -1458,19 +1426,6 @@
     if (remover)
       remover.closest("[data-credit-entry], [data-ghost-entry]")?.remove();
   });
-
-  document
-    .querySelector("[data-central-search]")
-    ?.addEventListener("submit", evento => {
-      evento.preventDefault();
-      const campo = evento.currentTarget.querySelector("input");
-      const consulta = campo.value.trim().toLocaleLowerCase("pt-BR");
-      document.querySelectorAll("[data-faq-item]").forEach(item => {
-        item.hidden = !item.textContent
-          .toLocaleLowerCase("pt-BR")
-          .includes(consulta);
-      });
-    });
 
   const centroNotificacoes = document.querySelector(
     "[data-notification-center]"

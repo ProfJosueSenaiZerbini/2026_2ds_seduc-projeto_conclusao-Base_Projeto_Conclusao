@@ -1,5 +1,10 @@
 <% if (usuario.tipoConta === 'administrativo') { %>
-<header class="topbar"><button class="icon-button mobile-menu" type="button" data-sidebar-open aria-label="Abrir menu">☰</button><div class="breadcrumbs"><span>Equipe</span><strong><%= breadcrumb %></strong></div><a href="/admin">Painel interno</a></header>
+<header class="dc-header admin-header">
+  <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir navegação administrativa" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
+  <a class="dc-brand" href="/admin" aria-label="Cypher — administração">CYPHER</a>
+  <div class="dc-title"><span class="admin-header-label">ÁREA DA EQUIPE</span><h1><%= breadcrumb %></h1></div>
+  <div class="admin-header-account"><span class="lucide-icon" aria-hidden="true"><%- icones.shieldCheck %></span><span><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[usuario.papelAdministrativo] %></span></div>
+</header>
 <% } else { %>
 <header class="topbar">
   <button class="icon-button mobile-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação">
@@ -19,14 +24,7 @@
     </strong>
   </div>
   <div class="topbar-actions">
-    <% if (typeof showSearch !== 'undefined' && showSearch) { %>
-      <a class="topbar-search" href="/search">
-        <span class="lucide-icon" aria-hidden="true">
-          <%- icones.search %>
-        </span>
-        Buscar pessoas
-      </a>
-    <% } %>
+    <%- include('componentes/busca-global') %>
     <%- include('componentes/acoes-conta') %>
   </div>
 </header>

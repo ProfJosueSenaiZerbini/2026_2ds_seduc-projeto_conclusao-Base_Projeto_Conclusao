@@ -31,7 +31,6 @@ const codigo = `
     funcao: "Rapper",
     identificador: "@teste-relacoes",
     iniciais: "TR",
-    cTag: "#TR0001",
     categorias: ["Rapper"],
     outraCategoria: "",
   });

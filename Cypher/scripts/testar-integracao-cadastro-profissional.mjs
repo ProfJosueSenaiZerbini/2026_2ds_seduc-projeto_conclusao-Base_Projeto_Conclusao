@@ -29,7 +29,6 @@ const codigo = `
     funcao: "Rapper · Produtor(a)",
     identificador: "conta-integracao-" + id.slice(0, 8),
     iniciais: "CI",
-    cTag: "CYP-TESTE-" + id.slice(0, 8),
     categorias: ["Rapper", "Produtor(a)"],
     outraCategoria: "Artista independente",
     atuacoes: [],

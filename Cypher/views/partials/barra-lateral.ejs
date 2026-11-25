@@ -19,6 +19,9 @@
             CYPHER
           </span>
         </a>
+        <div class="sidebar-theme">
+          <%- include('componentes/tema-entrada') %>
+        </div>
         <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">
           <span class="lucide-icon" aria-hidden="true">
             <%- icones.x %>
@@ -34,12 +37,14 @@
         { href: '/dashboard', label: 'Descoberta', icon: icones.house },
         ...(usuario.tipoConta === 'profissional' && !usuario.demonstracao ? [{ href: '/espaco-de-trabalho', label: 'Espaço de Trabalho', icon: icones.briefcase }] : []),
         { href: '/works', label: 'Obras', icon: icones.music },
+        { href: '/work-projects', label: 'Trabalhos e galerias', icon: icones.brush },
         { href: '/beats', label: 'Banco de Beats', icon: icones.headphones },
         { href: '/events', label: 'Eventos', icon: icones.calendarDays },
-        { href: '/search', label: 'Buscar pessoas', icon: icones.users },
+        { href: '/opportunities', label: 'Oportunidades', icon: icones.briefcase },
+        ...(usuario.tipoConta === 'profissional' && !usuario.demonstracao ? [{href:'/colaboracoes',label:'Colaborações',icon:icones.users}] : []),
       ]; %>
       <% links.forEach(link => { %>
-        <% const ativo = path === link.href || (link.href === '/dashboard' && path === '/') || (link.href === '/works' && path.startsWith('/works/')); %>
+        <% const ativo = path === link.href || (link.href === '/dashboard' && path === '/') || (link.href === '/works' && path.startsWith('/works/')) || (link.href === '/work-projects' && path.startsWith('/work-projects/')) || (link.href === '/colaboracoes' && path.startsWith('/colaboracoes/')); %>
         <a class="side-link<%= ativo ? ' active' : '' %>" aria-label="<%= link.label %>" href="<%= link.href %>" <%- ativo ? 'aria-current="page"' : '' %>>
           <span class="side-icon lucide-icon" aria-hidden="true">
             <%- link.icon %>
@@ -54,22 +59,9 @@
           <% } %>
         </a>
       <% }) %>
-      <% const recursosAtivos = ['/central', '/profile', '/settings', '/notificacoes'].includes(path) || path.startsWith('/admin/revisao'); %>
-      <div class="nav-label nav-label-spaced">
-        RECURSOS
-      </div>
-      <button class="side-link resources-toggle" aria-label="Mais recursos" type="button" data-menu-toggle="recursos-menu" aria-controls="recursos-menu" aria-expanded="<%= recursosAtivos ? 'true' : 'false' %>">
-        <span class="side-icon lucide-icon" aria-hidden="true">
-          <%- icones.circleHelp %>
-        </span>
-        <span class="side-link-label">
-          Recursos
-        </span>
-        <span class="resources-chevron lucide-icon" aria-hidden="true">
-          <%- icones.chevronDown %>
-        </span>
-      </button>
-      <div class="resource-links" id="recursos-menu"<%= recursosAtivos ? '' : 'hidden' %>>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="resource-links" id="recursos-menu" popover="manual" aria-label="Opções da conta" hidden>
         <a class="side-link<%= path === '/profile' ? ' active' : '' %>" href="/profile">
           <span class="side-icon lucide-icon" aria-hidden="true">
             <%- icones.user %>
@@ -86,6 +78,8 @@
             Configurações
           </span>
         </a>
+<a class="side-link" href="/suporte"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.circleHelp %></span><span class="side-link-label">Falar com a Cypher</span></a>
+        <a class="side-link<%= path === '/purchases' ? ' active' : '' %>" href="/purchases"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.headphones %></span><span class="side-link-label">Minhas Compras</span></a>
         <a class="side-link<%= path === '/central' ? ' active' : '' %>" href="/central">
           <span class="side-icon lucide-icon" aria-hidden="true">
             <%- icones.lightbulb %>
@@ -94,6 +88,12 @@
             Cypher Central
           </span>
         </a>
+        <% if (typeof interacao === 'function') { %>
+          <a class="side-link<%= path === '/colecoes' ? ' active' : '' %>" href="/colecoes">
+            <span class="side-icon lucide-icon" aria-hidden="true"><%- icones.listChecks %></span>
+            <span class="side-link-label">Minha coleção</span>
+          </a>
+        <% } %>
         <a class="side-link<%= path === '/notificacoes' ? ' active' : '' %>" href="/notificacoes">
           <span class="side-icon lucide-icon" aria-hidden="true">
             <%- icones.bell %>
@@ -113,34 +113,15 @@
           </a>
         <% } %>
       </div>
-    </nav>
-    <div class="sidebar-bottom">
-      <% if (usuario.tipoConta === 'profissional') { %><a class="reputation-mini reputation-link" href="/profile" aria-label="Ver reputação profissional de<%= usuario.name %>">
-        <div class="mini-heading">
-          <span>
-            REPUTAÇÃO
-          </span>
-          <span class="lucide-icon" aria-hidden="true">
-            <%- icones.badgeCheck %>
-          </span>
-        </div>
-        <div class="rep-number">
-          <%= usuario.reputation %>
-          <span>
-            profissional
-          </span>
-        </div>
-        <div class="rep-bar" role="progressbar" aria-label="Reputação profissional" aria-valuenow="<%= usuario.reputation %>" aria-valuemin="0" aria-valuemax="100">
-          <i style="width:<%= usuario.reputation %>%">
-          </i>
-        </div>
-        <p>
-          Você está construindo presença.
-        </p>
+
+      <% if (usuario.tipoConta === 'profissional') { const rep = typeof resumoReputacao==='function'?resumoReputacao(usuario.id):{media:null,estado:'Ainda sem avaliações'}; %><a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
+        <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true"><%- icones.badgeCheck %></span></div>
+        <div class="rep-number"><%= rep.media===null?'—':rep.media.toFixed(1).replace('.',',') %><% if(rep.media!==null){ %><span>/ 5</span><% } %></div><p><%= rep.estado %></p>
       </a>
-      <% } %><a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
+      <% } %><div class="sidebar-account-row">
+      <a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
         <div class="avatar avatar-yellow">
-          <%= usuario.initials %>
+          <%- include('componentes/avatar-usuario') %>
         </div>
         <div>
           <strong>
@@ -150,10 +131,16 @@
             <%= usuario.role %>
           </span>
         </div>
-        <span class="lucide-icon user-mini-arrow" aria-hidden="true">
-          <%- icones.chevronRight %>
-        </span>
       </a>
+      <div class="sidebar-options">
+        <input type="checkbox" id="sidebar-options-checkbox" class="sidebar-options-checkbox" aria-label="Opções da conta" aria-controls="recursos-menu" aria-expanded="false">
+        <label for="sidebar-options-checkbox" class="sidebar-options-toggle" title="Opções da conta">
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+        </label>
+      </div>
+      </div>
     </div>
   </div>
 </aside>

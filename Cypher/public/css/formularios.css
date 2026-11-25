@@ -68,14 +68,7 @@ form .button, .tag-panel .button {
   box-shadow: none;
 }
 
-.profile-completion {
-  margin: 1rem 0;
-  padding: 1rem 1.25rem;
-  border-inline-start: 3px solid #92b333;
-  background: var(--bg-surface, Canvas);
-}
-.profile-completion p { margin: .35rem 0; }
-.profile-completion a { color: inherit; text-decoration: underline; }
+
 .app-shell, .auth-page { min-height: 100svh; }
 @media (prefers-reduced-motion: reduce) {
   .floating-field * { transition: none !important; }
@@ -188,85 +181,4 @@ form .button, .tag-panel .button {
   :root body input[type="checkbox"]:not([role="switch"]):checked::after {
     content: none;
   }
-}
-
-a.profile-completion {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  margin: 0 0 16px;
-  border: 1px solid #758643;
-  border-radius: 12px;
-  background: linear-gradient(120deg, #e7f7ad, #f3f6df 66%, #fcf3cd);
-  color: #24300f;
-  text-decoration: none;
-}
-
-.profile-completion strong,
-.profile-completion small {
-  display: block;
-}
-
-.profile-completion small {
-  margin-top: 3px;
-}
-
-.profile-completion-icon,
-.profile-completion-arrow {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: #d3ee79;
-}
-
-.profile-completion-arrow {
-  margin-left: auto;
-  background: #24300f;
-  color: #e7f7ad;
-}
-
-a.profile-completion:hover .profile-completion-arrow,
-a.profile-completion:focus-visible .profile-completion-arrow {
-  background: #45551d;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .profile-completion-arrow { transition: transform .18s ease; }
-  a.profile-completion:hover .profile-completion-arrow { transform: translateX(3px); }
-}
-
-.profile-completion-form {
-  max-width: 660px;
-}
-
-.profile-completion-choice {
-  display: grid;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--line, #bdc6b1);
-  border-radius: 8px;
-}
-
-.profile-completion-form .profile-completion-choice label:has(input[type="radio"]) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.profile-completion-choice input[type="radio"] {
-  width: auto;
-  min-height: auto;
-}
-
-.profile-completion-form .profile-completion-vulgo[hidden] {
-  display: none;
-}
-
-.profile-completion-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }

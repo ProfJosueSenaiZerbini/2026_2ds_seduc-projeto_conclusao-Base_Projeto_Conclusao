@@ -1,3 +1,5 @@
+import { perfilUrl, enderecoObra } from "../models/enderecosPerfil.js";
+import { artigosPublicados } from "../models/central.js";
 import { randomInt } from "node:crypto";
 import type { Request, Response } from "express";
 import type { UsuarioDaSessao } from "../models/bancoDados.js";
@@ -19,7 +21,10 @@ import { resolverTemaEvento } from "../models/temasEvento.js";
 
 const albumAteAUltimaRima = "demo-obra-ate-a-ultima-rima";
 const faixaAlice = idFaixaDemo(albumAteAUltimaRima, 7);
-const slugsPerfisDestacados = new Set(["@lezin.demo", "@levinsk.demo"]);
+const perfisDestacados = new Set([
+  "demo-catalogo-lezin.demo",
+  "demo-catalogo-levinsk.demo",
+]);
 const acoesPublicacoesDestacadas = new Map([
   ["demo-workshop-dj-producao", "Ver evento"],
   ["demo-destaque-roda-da-madrugada", "Ver evento"],
@@ -66,8 +71,6 @@ const texto = (valor: unknown) =>
   typeof valor === "string" ? valor.trim().slice(0, 100) : "";
 const normalizar = (valor: string) =>
   valor.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
-const perfilUrl = (handle: string) =>
-  "/p/" + encodeURIComponent(handle.replace(/^@/, ""));
 const dataCurta = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
@@ -76,9 +79,11 @@ const dataCurta = new Intl.DateTimeFormat("pt-BR", {
 
 function ficha(item: PublicacaoDescoberta) {
   const id = encodeURIComponent(item.id);
-  if (item.grupo === "obras") return perfilUrl(item.handle) + "#obra-" + id;
+  if (item.grupo === "obras") return enderecoObra(item.handle, item.id);
   if (item.grupo === "beats") return "/beats#beat-" + id;
-  return "/events?localizacao=#evento-" + id;
+  return item.demonstracao
+    ? "/events?localizacao=#evento-" + id
+    : "/events/" + id;
 }
 
 export function descoberta(req: Request, res: Response) {
@@ -112,20 +117,23 @@ export function descoberta(req: Request, res: Response) {
     if (usuario.categories.some(c => producao.includes(c)))
       criadoresMusicais.forEach(c => complementares.add(c));
   }
-  const cartaoPerfil = (p: ReturnType<typeof CypherModel.buscarPessoasPublicas>["pessoas"][number]) => ({
-      grupo: "profissionais",
-      titulo: p.name,
-      autor: p.handle,
-      tipo: p.role,
-      genero: "",
-      local: p.city,
-      url: perfilUrl(p.handle),
-      iniciais: p.initials,
-      categorias: p.categories,
-      estilos: p.genres,
-      afinidade: afinidade(p.city, p.genres),
-      complementar: p.categories.some(c => complementares.has(c)),
-    });
+  const cartaoPerfil = (
+    p: ReturnType<typeof CypherModel.buscarPessoasPublicas>["pessoas"][number]
+  ) => ({
+    userId: p.userId,
+    grupo: "profissionais",
+    titulo: p.name,
+    autor: p.handle,
+    tipo: p.role,
+    genero: "",
+    local: p.city,
+    url: perfilUrl(p.handle),
+    iniciais: p.initials,
+    categorias: p.categories,
+    estilos: p.genres,
+    afinidade: afinidade(p.city, p.genres),
+    complementar: p.categories.some(c => complementares.has(c)),
+  });
   const filtrosPessoas = { q, categoria: "", genero: "", localizacao: "" };
   const pessoas = CypherModel.buscarPessoasPublicas(filtrosPessoas, usuario.id)
     .pessoas.map(cartaoPerfil)
@@ -135,7 +143,12 @@ export function descoberta(req: Request, res: Response) {
         b.afinidade - a.afinidade
     );
   const filtrado = Boolean(q || detalhe || categoria !== "tudo");
-  const publicacoesComDestaques = publicacoesDescoberta("", filtrado ? "" : faixaAlice)
+  const publicacoesComDestaques = publicacoesDescoberta(
+    "",
+    filtrado ? "" : faixaAlice,
+    false,
+    usuario.id
+  )
     .filter(item => {
       const campos = normalizar(
         [
@@ -164,7 +177,7 @@ export function descoberta(req: Request, res: Response) {
         temaCartao: resolverTemaEvento(item.temaCartao),
         url: ficha(item),
         fotoDestaque:
-          item.grupo === "eventos" && item.demonstracao
+          item.grupo === "eventos"
             ? fotoEventoDemonstrativo(item.id)
             : undefined,
         dataCurta: partes.map(parte => parte.value).join(""),
@@ -176,50 +189,72 @@ export function descoberta(req: Request, res: Response) {
       };
     })
     .sort((a, b) => b.afinidade - a.afinidade);
-  const destaques = filtrado ? [] : [
-    ...publicacoesComDestaques.flatMap(item => {
-      const acao = acoesPublicacoesDestacadas.get(item.id);
-      if (!item.demonstracao || !acao) return [];
-      const disco = discoDemo(item.id);
-      const detalhes = item.grupo === "eventos"
-        ? [item.dataCurta, item.hora, item.local]
-        : [item.autor, item.grupo === "beats" ? item.genero : item.tipo,
-           disco && disco.faixas.length + " faixas"];
-      return [{
-        titulo: item.titulo,
-        texto: detalhes.filter(Boolean).join(" · "),
-        foto: item.fotoDestaque
-          ? "descoberta/" + item.fotoDestaque
-          : imagemPublicacaoDemo(item.id),
-        url: item.url,
-        acao,
-      }];
-    }),
-    ...pessoas.filter(item => slugsPerfisDestacados.has(item.autor)).map(item => ({
-      titulo: item.titulo,
-      texto: [item.tipo, item.local].filter(Boolean).join(" · "),
-      foto: imagemPerfilDemo(item.autor),
-      url: item.url,
-      acao: "Ver perfil",
-    })),
-  ];
+  const destaques = filtrado
+    ? []
+    : [
+        ...publicacoesComDestaques.flatMap(item => {
+          const acao = acoesPublicacoesDestacadas.get(item.id);
+          if (!acao) return [];
+          const disco = discoDemo(item.id);
+          const detalhes =
+            item.grupo === "eventos"
+              ? [item.dataCurta, item.hora, item.local]
+              : [
+                  item.autor,
+                  item.grupo === "beats" ? item.genero : item.tipo,
+                  disco && disco.faixas.length + " faixas",
+                ];
+          return [
+            {
+              titulo: item.titulo,
+              texto: detalhes.filter(Boolean).join(" · "),
+              foto: item.fotoDestaque
+                ? item.fotoDestaque.includes("/")
+                  ? item.fotoDestaque
+                  : "descoberta/" + item.fotoDestaque
+                : imagemPublicacaoDemo(item.id),
+              url: item.url,
+              acao,
+            },
+          ];
+        }),
+        ...pessoas
+          .filter(item => perfisDestacados.has(item.userId))
+          .map(item => ({
+            titulo: item.titulo,
+            texto: [item.tipo, item.local].filter(Boolean).join(" · "),
+            foto: imagemPerfilDemo(item.autor),
+            url: item.url,
+            acao: "Ver perfil",
+          })),
+      ];
   for (let i = destaques.length - 1; i > 0; i--) {
     const j = randomInt(i + 1);
     [destaques[i], destaques[j]] = [destaques[j], destaques[i]];
   }
-  const publicacoes = publicacoesComDestaques.filter(item => item.id !== faixaAlice);
+  const publicacoes = publicacoesComDestaques.filter(
+    item => item.id !== faixaAlice
+  );
   const musica = publicacoes.filter(item => item.grupo !== "eventos");
   const hoje = dataAtualCadastro();
   const agenda = publicacoes
     .filter(
-      item =>
-        item.grupo === "eventos" && item.dataCurta && item.data >= hoje
+      item => item.grupo === "eventos" && item.dataCurta && item.data >= hoje
     )
-    .sort((a, b) => a.data.localeCompare(b.data) || a.hora.localeCompare(b.hora) || a.id.localeCompare(b.id));
-  const populares = filtrado ? [] : CypherModel.buscarPessoasPublicas(
-    { ...filtrosPessoas, ordem: "populares" },
-    usuario.id
-  ).pessoas.slice(0, 3).map(cartaoPerfil);
+    .sort(
+      (a, b) =>
+        a.data.localeCompare(b.data) ||
+        a.hora.localeCompare(b.hora) ||
+        a.id.localeCompare(b.id)
+    );
+  const populares = filtrado
+    ? []
+    : CypherModel.buscarPessoasPublicas(
+        { ...filtrosPessoas, ordem: "populares" },
+        usuario.id
+      )
+        .pessoas.slice(0, 3)
+        .map(cartaoPerfil);
   const candidatos = [...publicacoes, ...pessoas].filter(
     item =>
       categoria === "tudo" ||
@@ -278,6 +313,8 @@ export function descoberta(req: Request, res: Response) {
     eventosDestacados: publicacoes
       .filter(item => item.fotoDestaque)
       .sort((a, b) => a.data.localeCompare(b.data)),
-    guias: CypherModel.faqs().slice(0, 3),
+    guias: artigosPublicados()
+      .slice(0, 3)
+      .map(a => ({ q: a.titulo, a: a.resumo, href: "/central/" + a.slug })),
   });
 }

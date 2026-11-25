@@ -13,9 +13,6 @@
     };
     form.querySelectorAll('[name="tipoConta"]').forEach(input=>input.addEventListener('change',()=>sincronizarModalidade(true)));
     sincronizarModalidade();
-    const apelido=form.querySelector('[data-has-nickname]');
-    const sincronizarVulgo=()=>{const area=form.querySelector('[data-nickname-fields]');if(!area)return;area.hidden=!apelido.checked;area.querySelectorAll('input').forEach(input=>{input.disabled=!apelido.checked;});};
-    apelido?.addEventListener('change',sincronizarVulgo);sincronizarVulgo();
     const senha=form.querySelector('[name="password"]');const confirmacao=form.querySelector('[name="passwordConfirmation"]');
     const conferirSenha=()=>confirmacao.setCustomValidity(confirmacao.value && confirmacao.value!==senha.value?'As senhas não conferem.':'');
     senha?.addEventListener('input',conferirSenha);confirmacao?.addEventListener('input',conferirSenha);

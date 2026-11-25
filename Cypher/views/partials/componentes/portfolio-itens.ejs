@@ -1,0 +1,18 @@
+<div class="pf-items pf-items-<%= molde %>">
+  <% itens.forEach(item => { const icone = ({ obra: 'music', beat: 'headphones', evento: 'calendarDays', projeto: 'briefcase' })[item.tipo] || 'briefcase'; %>
+    <article class="pf-work<%= item.destaque ? ' pf-work-featured' : '' %>">
+      <a class="pf-work-art" href="<%= item.url %>" tabindex="-1" aria-hidden="true">
+        <% if (item.capa) { %><img src="<%= item.capa %>" alt="" loading="lazy"><% } else { %><span class="lucide-icon" aria-hidden="true"><%- icones[icone] %></span><span class="pf-work-art-label"><%= item.nomeTipo %></span><% } %>
+        <% if (item.destaque) { %><span class="pf-feature-label">Em destaque</span><% } %>
+      </a>
+      <div class="pf-work-copy">
+        <div class="pf-work-meta"><span><%= item.nomeTipo %></span><span class="pf-relation<%= item.proprio ? '' : ' pf-relation-participation' %>"><%= item.proprio ? 'Trabalho próprio' : 'Participação confirmada' %></span></div>
+        <h4><a href="<%= item.url %>"><%= item.titulo %></a></h4>
+        <p class="pf-work-author"><%= item.autor %></p>
+        <% if (item.papel) { %><p class="pf-work-role"><strong><%= item.proprio ? 'Atuação' : 'Contribuição' %></strong><span><%= item.papel %></span></p><% } %>
+        <% if (item.descricao) { %><p class="pf-work-description"><%= item.descricao %></p><% } %>
+        <a class="pf-work-link" href="<%= item.url %>">Conhecer trabalho <span class="lucide-icon" aria-hidden="true"><%- icones.arrowUpRight %></span></a>
+      </div>
+    </article>
+  <% }) %>
+</div>

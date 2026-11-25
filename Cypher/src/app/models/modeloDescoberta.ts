@@ -1,3 +1,5 @@
+import { imagemCena } from "./imagensCena.js";
+import { objetoDisponivel } from "./politicasModeracao.js";
 import { conexaoInternaCypher } from "./bancoDados.js";
 
 const fotosEventosDestacados = new Map([
@@ -11,7 +13,7 @@ const fotosEventosDestacados = new Map([
 ]);
 
 export function fotoEventoDemonstrativo(id: string) {
-  return fotosEventosDestacados.get(id);
+  return imagemCena(id) || fotosEventosDestacados.get(id);
 }
 
 export type PublicacaoDescoberta = {
@@ -36,9 +38,11 @@ export type PublicacaoDescoberta = {
 // Projeção pública da vitrine. Letras, contatos e inscrições ficam nas fichas.
 export function publicacoesDescoberta(
   grupo: PublicacaoDescoberta["grupo"] | "" = "",
-  faixaDemonstrativa = ""
+  faixaDemonstrativa = "",
+  incluirFaixas = false,
+  visitante = ""
 ): PublicacaoDescoberta[] {
-  return conexaoInternaCypher()
+  const linhas = conexaoInternaCypher()
     .prepare(
       `
     WITH autores AS (
@@ -56,7 +60,7 @@ export function publicacoesDescoberta(
            '' AS categoria, o.demonstracao, '' AS temaCartao, '' AS cor
     FROM obras o JOIN autores a ON a.usuario_id = o.proprietario_id
     WHERE o.publicada = 1 AND o.situacao IN ('', 'Lançado') AND o.demonstracao = a.demonstracao
-      AND (o.demonstracao = 0 OR o.id NOT LIKE '%-faixa-%' OR o.id = @faixaDemonstrativa)
+      AND (@incluirFaixas = 1 OR o.id NOT LIKE '%-faixa-%' OR o.id = @faixaDemonstrativa)
     UNION ALL
     SELECT 'beats', b.id, b.titulo, a.nome, a.identificador, 'Beat', b.genero, a.cidade,
            '', '', '', b.criado_em, '', b.demonstracao, '', ''
@@ -75,5 +79,6 @@ export function publicacoesDescoberta(
     ORDER BY criado DESC, id DESC
   `
     )
-    .all({ grupo, faixaDemonstrativa }) as PublicacaoDescoberta[];
+    .all({ grupo, faixaDemonstrativa, incluirFaixas: incluirFaixas ? 1 : 0 }) as PublicacaoDescoberta[];
+  return linhas.filter(i=>objetoDisponivel(conexaoInternaCypher(),({obras:"obra",beats:"beat",eventos:"evento"})[i.grupo],i.id,visitante));
 }

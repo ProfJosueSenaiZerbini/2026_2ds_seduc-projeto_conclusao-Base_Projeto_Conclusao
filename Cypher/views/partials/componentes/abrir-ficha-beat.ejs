@@ -1,3 +1,4 @@
+<% if(!beat.demonstracao){ %><a class="<%= classe %>" href="/beats/<%= encodeURIComponent(beat.id) %>" aria-label="Ver ficha de <%= beat.title %>"><%= typeof rotulo !== 'undefined' ? rotulo : 'Ver ficha' %> <span aria-hidden="true"><%- icones[icone] %></span></a><% }else{ %>
 <button class="<%= classe %>" type="button" aria-haspopup="dialog" aria-controls="detalhe-beat" aria-label="Ver ficha de <%= beat.title %>"
   data-beat-detail data-beat-title="<%= beat.title %>" data-beat-producer="<%= beat.producer %>"
   data-beat-bpm="<%= beat.bpm ? `${beat.bpm} BPM` : 'Não informado' %>" data-beat-key="<%= beat.key || 'Não informado' %>"
@@ -7,3 +8,4 @@
   data-beat-exclusive="<%= Boolean(beat.vendaExclusiva) %>">
   <%= typeof rotulo !== 'undefined' ? rotulo : 'Ver ficha' %> <span aria-hidden="true"><%- icones[icone] %></span>
 </button>
+<% } %>

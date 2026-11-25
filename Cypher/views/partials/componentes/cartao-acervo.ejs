@@ -1,0 +1,71 @@
+<% const audioEnviado=typeof midiasUsuario==='function'?midiasUsuario('obra',o.id).find(m=>m.finalidade==='audio'):null; const previaObra=audioEnviado?'/publication-media/'+audioEnviado.id:o.previa; %>
+<article class="ob-card<%= o.colecao ? ' ob-card-record' : '' %><%= o.tipo === 'Single' ? ' ob-card-single' : '' %>" data-ob-card data-ob-id="<%= o.id %>" data-ob-liked="<%= o.curtida %>" data-ob-likes="<%= o.curtidas %>" data-ob-title="<%= o.titulo %>" aria-labelledby="acervo-titulo-<%= o.id %>">
+  <div class="ob-artwork">
+    <a class="ob-cover" href="<%= o.url %>" aria-label="Abrir <%= o.titulo %>">
+      <% const capaEnviada=typeof capaUsuario==='function'?capaUsuario('obra',o.id):''; %><% if(capaEnviada){ %><img src="<%= capaEnviada %>" alt="Capa de <%= o.titulo %>"><% }else if (o.capa) { %><img src="/img/<%= o.capa %>" alt="Capa de <%= o.titulo %>" loading="lazy" decoding="async"><% } else { %><span class="ob-cover-fallback" aria-hidden="true"><small>CYPHER / ORIGINAL</small><%- icones.music2 %><strong><%= o.titulo %></strong></span><% } %>
+      <span class="ob-cover-gloss" aria-hidden="true"></span>
+    </a>
+    <span class="ob-format"><%= o.tipo %></span>
+    <button class="ob-favorite" type="button" data-ob-favorite aria-pressed="false" aria-label="Curtir <%= o.titulo %>" hidden><span class="ob-crown-face"><%- include('icone-beat', { tipo: 'crown' }) %><span data-ob-like-total><%= o.curtidas %></span></span></button>
+    <% if (o.colecao) { %><span class="ob-track-count"><%- icones.listChecks %><%= o.faixas !== null ? o.faixas + (o.faixas === 1 ? ' faixa' : ' faixas') : 'Faixas não informadas' %></span><% } %>
+  </div>
+  <div class="ob-card-info">
+    <div class="ob-card-meta"><span><%= o.genero || 'Gênero não informado' %></span><span><%= o.ano || 'Ano não informado' %></span></div>
+    <h4 id="acervo-titulo-<%= o.id %>"><a href="<%= o.url %>"><%= o.titulo %></a></h4>
+    <p class="ob-artists"><a href="<%= o.artistaUrl %>"><%= o.autor %></a><% o.artistas.filter(a => a !== o.autor).forEach(a => { %><span> &amp; <%= a %></span><% }) %></p>
+    <% if (o.colecao && o.listaFaixas.length) { %>
+      <div class="ob-track-preview">
+        <ol aria-label="Lista de faixas de <%= o.titulo %>" tabindex="0"><% o.listaFaixas.forEach((faixa, i) => { %>
+          <li><a href="<%= o.url %>" data-ob-track-open="<%= i %>"><span><%= String(i + 1).padStart(2, '0') %></span><strong><%= faixa %></strong><span class="ob-track-time"><%= o.faixasDetalhadas[i]?.duracao || '' %></span><span aria-hidden="true">▷</span></a></li>
+        <% }) %></ol>
+      </div>
+    <% } else if (o.colecao) { %><p class="ob-record-caption">As faixas deste projeto ainda não foram informadas.</p><% } %>
+    <% if (!o.colecao || previaObra) { %>
+      <div class="ob-preview" data-ob-preview<% if (previaObra) { %> data-ob-src="<%= previaObra %>"<% } %>>
+        <button class="ob-play" type="button" data-ob-play aria-pressed="false" aria-label="<%= previaObra ? 'Ouvir prévia de ' + o.titulo : 'Prévia de ' + o.titulo + ' ainda não disponível' %>"<%= previaObra ? '' : ' disabled' %>><span class="ob-play-icon"><%- include('icone-beat', { tipo: 'play' }) %></span><span class="ob-pause-icon"><%- include('icone-beat', { tipo: 'pause' }) %></span></button>
+        <div class="ob-preview-copy"><span data-ob-preview-label><%= previaObra ? 'Ouvir prévia' : 'Prévia indisponível' %></span><span class="ob-preview-line" aria-hidden="true"><i data-ob-progress></i></span></div>
+        <% if (!o.colecao && o.duracao) { %><span class="ob-duration" aria-label="Duração: <%= o.duracao %>"><%- icones.clock %><%= o.duracao %></span><% } %>
+      </div>
+    <% } %>
+    <% if (typeof usuario !== 'undefined' && o.handle === usuario?.handle) { %><a class="ob-media-manage" href="/publicacoes/obra/<%= o.id %>/midias">Gerenciar mídias</a><% } %>
+    <%- include('acoes-obra', { id: o.id, titulo: o.titulo, plataforma: o.plataforma, ocultarCurtida: true }) %>
+  </div>
+  <% if (o.colecao && o.listaFaixas.length) { %>
+    <dialog class="ob-album-dialog" aria-labelledby="album-titulo-<%= o.id %>" data-ob-album>
+      <div class="ob-album-top"><span class="ob-track-label">CYPHER / ACERVO MUSICAL</span><button type="button" class="ob-album-close" data-ob-album-close aria-label="Fechar detalhes do álbum">×</button></div>
+      <header class="ob-album-heading">
+        <% if (capaEnviada || o.capa) { %><img src="<%= capaEnviada || '/img/'+o.capa %>" alt="Capa de <%= o.titulo %>"><% } %>
+        <div><span class="ob-track-label"><%= o.tipo %> · <%= o.ano || 'Ano não informado' %></span><h2 id="album-titulo-<%= o.id %>"><%= o.titulo %></h2><p><%= o.artistas.join(' & ') %></p><p class="ob-album-meta"><%= o.genero %> · <%= o.listaFaixas.length %> faixas</p></div>
+      </header>
+      <div class="ob-album-track-heading"><h3 class="ob-track-label">Faixa a faixa</h3><span><%= o.listaFaixas.length %> músicas</span></div>
+      <ol class="ob-album-tracks"><% o.listaFaixas.forEach((faixa, i) => { const detalhe = o.faixasDetalhadas[i]; %><li>
+        <button type="button" data-ob-album-track="<%= i %>" data-audio-src="<%= detalhe?.audio || '' %>">
+          <span class="ob-album-track-number"><%= String(i + 1).padStart(2, '0') %></span>
+          <span class="ob-album-track-copy"><strong><%= faixa %></strong><small><%= detalhe?.artistas || o.autor %></small></span>
+          <span class="ob-album-track-duration"><%= detalhe?.duracao || '' %></span>
+          <span class="ob-album-track-action" aria-hidden="true">▷</span>
+        </button>
+      </li><% }) %></ol>
+      <div class="ob-album-player">
+        <audio preload="none" data-ob-album-audio></audio>
+        <div class="ob-album-player-actions">
+          <div class="ob-album-now"><span class="ob-track-label">Player local</span><strong data-ob-now-title>Escolha uma faixa</strong></div>
+          <div class="ob-album-transport">
+            <button type="button" data-ob-audio-prev aria-label="Faixa anterior" title="Faixa anterior"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zm12 0v14l-9-7z"/></svg></button>
+            <button type="button" class="ob-album-toggle" data-ob-album-listen aria-label="Reproduzir" title="Reproduzir"><span class="ob-play-icon"><%- include('icone-beat', { tipo: 'play' }) %></span><span class="ob-pause-icon"><%- include('icone-beat', { tipo: 'pause' }) %></span></button>
+            <button type="button" data-ob-audio-next aria-label="Próxima faixa" title="Próxima faixa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM6 5l9 7-9 7z"/></svg></button>
+          </div>
+        </div>
+        <div class="ob-album-timeline">
+          <span data-ob-elapsed></span><input type="range" min="0" max="1" step="any" value="0" data-ob-seek aria-label="Posição da reprodução" disabled><span data-ob-total-time></span>
+        </div>
+        <p class="ob-album-status" data-ob-audio-status role="status"></p>
+        <label class="ob-album-files">Adicionar áudios locais<input type="file" accept="audio/*,.flac,.m4a" multiple data-ob-audio-files aria-label="Adicionar áudios locais"></label>
+      </div>
+      <footer class="ob-album-footer">
+        <a href="<%= o.url %>">Ver no perfil do artista</a>
+        <%- include('ouvir-obra', { titulo: o.titulo, plataforma: o.plataforma }) %>
+      </footer>
+    </dialog>
+  <% } %>
+</article>

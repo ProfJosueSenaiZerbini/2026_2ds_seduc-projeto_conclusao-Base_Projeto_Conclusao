@@ -1,0 +1,10 @@
+{
+  "oficial": "C:\\Users\\Emicê\\Senai\\Cypher-CX\\Cypher\\data\\cypher.sqlite",
+  "backup": "C:\\Users\\Emicê\\Senai\\Cypher-CX\\Cypher\\artifacts\\backup-oportunidades-1795485855647\\original.sqlite",
+  "copia": "C:\\Users\\Emicê\\Senai\\Cypher-CX\\Cypher\\artifacts\\backup-oportunidades-1795485855647\\validacao.sqlite",
+  "versaoAnterior": 29,
+  "versaoFinal": 29,
+  "tabelasPreservadas": 48,
+  "integridade": "ok",
+  "dadosPreservados": true
+}

@@ -9,7 +9,9 @@
     "start": "node dist/src/aplicacao.js",
     "check": "tsc --noEmit",
     "seed:catalog": "node --import tsx scripts/inserir-catalogo-demonstrativo.mjs",
+    "test:scene": "npm run build && node scripts/testar-cena.mjs",
     "test:db": "node scripts/testar-banco.mjs && node scripts/testar-politicas-perfil.mjs",
+    "test:search": "npm run build && node scripts/testar-busca-global.mjs",
     "test:admin-ui": "node scripts/testar-admin-ui.mjs",
     "test:catalog": "npm run build && node scripts/testar-catalogo-profissional.mjs",
     "test:questionnaires": "npm run build && node scripts/testar-questionarios-profissionais.mjs",
@@ -22,7 +24,16 @@
     "format:views": "node scripts/formatar-ejs.mjs",
     "test:identity-http": "npm run build && node scripts/testar-identidade-http.mjs",
     "test:email": "npm run build && node scripts/testar-entrega-email.mjs",
-    "email:verify": "npm run build && node scripts/verificar-smtp.mjs"
+    "email:verify": "npm run build && node scripts/verificar-smtp.mjs",
+    "test:opportunities": "npm run build && node scripts/testar-oportunidades.mjs",
+    "test:projects": "npm run build && node scripts/testar-projetos.mjs",
+    "test:portfolio": "npm run build && node scripts/testar-portfolio.mjs",
+    "test:collaborations": "npm run build && node scripts/testar-colaboracoes.mjs",
+    "test:central": "npm run build && node scripts/testar-central.mjs",
+    "test:support": "npm run build && node scripts/testar-suporte.mjs",
+    "test:accounts": "npm run build && node scripts/testar-contas.mjs",
+    "test:events": "npm run build && node scripts/testar-eventos.mjs",
+    "test:beats": "npm run build && node scripts/testar-beats.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",

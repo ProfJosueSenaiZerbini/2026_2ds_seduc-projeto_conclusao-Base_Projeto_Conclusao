@@ -1,0 +1,326 @@
+.account-policy {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 140px 32px 64px;
+  color: var(--ink);
+}
+.account-policy header {
+  max-width: 740px;
+  margin-bottom: 40px;
+}
+.account-policy h1 {
+  font:
+    700 clamp(34px, 6vw, 64px)/1.02 "Space Grotesk",
+    sans-serif;
+  letter-spacing: -0.06em;
+  margin: 14px 0;
+}
+.account-policy header p,
+.account-policy section p {
+  color: var(--muted-foreground, #59664f);
+  line-height: 1.7;
+}
+.account-policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.account-policy section {
+  padding: 28px;
+  border: 1px solid var(--border-soft, #c6d0b9);
+  border-radius: 14px;
+  background: var(--surface-raised, #fff);
+}
+.account-step {
+  font:
+    700 13px "Space Grotesk",
+    sans-serif;
+  color: #487112;
+}
+.account-policy h2 {
+  font:
+    700 22px "Space Grotesk",
+    sans-serif;
+  letter-spacing: -0.03em;
+}
+.account-policy footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+}
+.dark .account-policy section {
+  background: #151d13;
+  border-color: #354330;
+}
+.dark .account-policy header p,
+.dark .account-policy section p {
+  color: #c3cdb9;
+}
+.dark .account-step {
+  color: #c8f22b;
+}
+@media (max-width: 640px) {
+  .account-policy {
+    padding: 116px 18px 36px;
+  }
+  .account-policy-grid {
+    grid-template-columns: 1fr;
+  }
+  .account-policy section {
+    padding: 23px;
+  }
+  .account-policy footer .button {
+    width: 100%;
+  }
+}
+.registration-page .account-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.6;
+}
+.registration-page .account-consent input {
+  flex: 0 0 18px;
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  margin-top: 3px;
+}
+.account-consent a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.account-protection {
+  padding: 16px;
+  border: 1px solid #76943a;
+  background: #edf5d9;
+  color: #30471c;
+  border-radius: 10px;
+  line-height: 1.65;
+}
+.dark .account-protection {
+  background: #1b2b16;
+  border-color: #58713b;
+  color: #d7e7c1;
+}
+.settings-page .settings-layout {
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
+}
+.settings-page .settings-index-link {
+  font-size: 13px;
+  min-height: 44px;
+  color: #495b3b;
+}
+.settings-page .settings-index-link.active {
+  color: #17200e;
+}
+.settings-page .settings-section {
+  background: var(--surface-raised, #fff);
+  border-color: var(--border-soft, #d6dfc9);
+  border-radius: 14px;
+  padding: 28px;
+}
+.settings-page .settings-section > h2 {
+  font:
+    700 28px/1.15 "Space Grotesk",
+    sans-serif;
+  letter-spacing: -0.04em;
+  margin: 10px 0 18px;
+}
+.settings-page .settings-intro p,
+.settings-page .settings-section p {
+  color: #526249;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.settings-page .profile-edit-form {
+  border-top: 1px solid var(--border-soft, #d6dfc9);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+.settings-page label {
+  font-size: 13px;
+}
+.settings-page .settings-data span {
+  font-size: 11px;
+  color: #526249;
+}
+.settings-page .settings-data strong {
+  font-size: 14px;
+}
+.settings-page .settings-data-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.settings-password-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.settings-page .account-delete-panel {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid #bd8e75;
+  border-radius: 12px;
+}
+.settings-page .account-delete-panel summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+.settings-page .settings-data {
+  border-color: var(--border-soft, #d6dfc9);
+}
+.dark .settings-page .settings-section {
+  background: #151e13;
+  border-color: #354330;
+}
+.dark .settings-page .settings-intro p,
+.dark .settings-page .settings-section p,
+.dark .settings-page .settings-data span,
+.dark .settings-page .settings-index-link {
+  color: #c3cdb9;
+}
+.dark .settings-page .settings-index-link.active {
+  color: #17200e;
+}
+.dark .settings-page .settings-index-link:not(.active):hover {
+  background: #24331d;
+  color: #eaf1e2;
+}
+.dark .settings-page .profile-edit-form {
+  border-color: #354330;
+}
+.dark .settings-page .settings-data {
+  border-color: #354330;
+}
+.dark .settings-page .settings-note {
+  background: #202d1a;
+  color: #d2dfc3;
+  border-color: #466038;
+}
+.dark .settings-page .account-delete-panel {
+  border-color: #8b634a;
+}
+@media (max-width: 800px) {
+  .settings-page .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-page .settings-index {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+  }
+  .settings-page .settings-index-link {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .settings-page .settings-section {
+    padding: 22px;
+  }
+}
+@media (max-width: 540px) {
+  .settings-password-grid,
+  .settings-page .settings-data-grid {
+    grid-template-columns: 1fr;
+  }
+  .settings-page .settings-section {
+    padding: 20px 16px;
+  }
+  .settings-page .profile-edit-form > .button {
+    width: 100%;
+  }
+}
+.account-settings-shell .settings-page {
+  max-width: 1260px;
+  width: 100%;
+  padding: 32px clamp(18px, 3vw, 46px) 80px;
+  margin: 0 auto;
+}
+.account-settings-shell .settings-section,
+.account-settings-shell .settings-index {
+  background: var(--dc-panel);
+  border-color: var(--dc-line);
+  box-shadow: var(--dc-shadow);
+}
+.account-settings-shell .settings-section :is(h2, h3, label, summary),
+.account-settings-shell .settings-data strong {
+  color: var(--dc-ink);
+}
+.account-settings-shell .settings-section p,
+.account-settings-shell .settings-index-link,
+.account-settings-shell .settings-data span {
+  color: var(--dc-muted);
+}
+.account-settings-shell .settings-index-link.active {
+  background: var(--dc-button);
+  color: var(--dc-button-ink);
+}
+.account-settings-shell .settings-data,
+.account-settings-shell .profile-edit-form {
+  border-color: var(--dc-line);
+}
+.account-settings-shell .settings-section .eyebrow {
+  color: var(--dc-olive);
+  font-size: 11px;
+  letter-spacing: 0.13em;
+}
+.account-settings-shell .settings-section h3 {
+  font-size: 20px;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+.account-settings-shell .profile-edit-form p {
+  margin: 0 0 16px;
+}
+.account-settings-shell .profile-edit-form label {
+  display: grid;
+  gap: 7px;
+}
+.account-settings-shell .profile-edit-form input,
+.account-settings-shell .profile-edit-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid var(--dc-line);
+  background: var(--dc-field);
+  color: var(--dc-ink);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.account-settings-shell .button-lime {
+  background: var(--dc-button);
+  color: var(--dc-button-ink);
+  border: 1px solid var(--dc-olive);
+}
+.account-settings-shell .button-outline {
+  background: var(--dc-field);
+  color: var(--dc-ink);
+  border-color: var(--dc-line);
+}
+.account-settings-shell .button-outline:hover {
+  background: var(--dc-hover);
+}
+.account-settings-shell .settings-note {
+  margin-top: 20px;
+}
+.account-settings-shell .profile-edit-form .category-option input {
+  width: 16px;
+  min-height: 16px;
+}
+.account-settings-shell .profile-edit-form .category-option {
+  display: flex;
+}
+.account-settings-shell .settings-data-grid {
+  margin: 16px 0;
+}
+.account-settings-shell .account-delete-panel p {
+  margin-top: 14px;
+}
+.account-settings-shell .account-delete-panel[open] summary {
+  color: var(--dc-yellow);
+}
+.account-settings-shell .account-closure-page{max-width:860px}.account-closure-page .settings-quick-links{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:22px}.account-closure-page .settings-quick-links form{margin:0}

@@ -8,80 +8,49 @@
   };
   const catalogo = pagina.querySelector(".beats-catalog");
   const cards = [...pagina.querySelectorAll("[data-beat-card]")];
-  const filtro = pagina.querySelector("[data-favorites-filter]");
-  const contador = pagina.querySelector("[data-beats-count]");
-  const vazio = pagina.querySelector("[data-favorites-empty]");
+  const importar = pagina.querySelector("[data-importar-favoritos]");
   const chave = pagina.dataset.favoritesKey;
-  let favoritos = new Set();
-  let somenteFavoritos = false;
-
+  let favoritosLocais = [];
   try {
-    const salvos = JSON.parse(localStorage.getItem(chave) || "[]");
-    if (Array.isArray(salvos))
-      favoritos = new Set(salvos.filter(id => typeof id === "string"));
+    const dados = JSON.parse(localStorage.getItem(chave) || "[]");
+    if (Array.isArray(dados))
+      favoritosLocais = [
+        ...new Set(
+          dados.filter(id => typeof id === "string" && id.length <= 120)
+        ),
+      ];
   } catch {
-    /* A seleção continua funcionando quando o armazenamento está indisponível. */
+    /* Armazenamento local indisponível. */
   }
 
-  function atualizarFavoritos() {
-    let visiveis = 0;
-    for (const card of cards) {
-      const favorito = favoritos.has(card.dataset.beatId);
-      const botao = card.querySelector("[data-beat-favorite]");
-      botao.hidden = false;
-      botao.setAttribute("aria-pressed", String(favorito));
-      botao.setAttribute(
-        "aria-label",
-        `${favorito ? "Desfavoritar" : "Favoritar"} ${card.dataset.title}`
-      );
-      card.hidden = somenteFavoritos && !favorito;
-      if (!card.hidden) visiveis++;
-    }
-    if (contador)
-      contador.textContent = `${visiveis} ${visiveis === 1 ? "beat" : "beats"}`;
-    const quantidade = pagina.querySelector("[data-favorites-count]");
-    if (quantidade)
-      quantidade.textContent = cards.filter(card =>
-        favoritos.has(card.dataset.beatId)
-      ).length;
-    if (vazio) vazio.hidden = !somenteFavoritos || visiveis > 0;
-    filtro?.setAttribute("aria-pressed", String(somenteFavoritos));
-  }
-
-  for (const card of cards) {
-    card.querySelector("[data-beat-favorite]").addEventListener("click", () => {
-      const id = card.dataset.beatId;
-      if (favoritos.has(id)) favoritos.delete(id);
-      else favoritos.add(id);
-      let persistido = true;
+  if (importar && favoritosLocais.length) {
+    importar.hidden = false;
+    importar.addEventListener("click", async () => {
+      importar.disabled = true;
+      const csrf = document.querySelector('meta[name="csrf-token"]').content;
       try {
-        localStorage.setItem(chave, JSON.stringify([...favoritos]));
+        while (favoritosLocais.length) {
+          const resposta = await fetch("/colecoes/importar-beats", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": csrf,
+            },
+            body: JSON.stringify({ ids: favoritosLocais.slice(0, 100) }),
+          });
+          if (!resposta.ok) throw new Error();
+          favoritosLocais = favoritosLocais.slice(100);
+          localStorage.setItem(chave, JSON.stringify(favoritosLocais));
+        }
+        localStorage.removeItem(chave);
+        location.assign("/colecoes");
       } catch {
-        persistido = false;
+        importar.disabled = false;
+        anunciar("Não foi possível terminar a importação. Tente novamente.");
       }
-      atualizarFavoritos();
-      anunciar(
-        `${card.dataset.title} ${favoritos.has(id) ? "adicionado aos" : "removido dos"} favoritos.${persistido ? "" : " A seleção está salva apenas nesta página."}`
-      );
-      if (card.hidden) filtro?.focus();
     });
   }
-  filtro?.addEventListener("click", () => {
-    somenteFavoritos = !somenteFavoritos;
-    atualizarFavoritos();
-    anunciar(
-      somenteFavoritos
-        ? "Exibindo seus favoritos nesta seleção."
-        : "Exibindo todos os beats da seleção."
-    );
-  });
-  pagina
-    .querySelector("[data-show-all-beats]")
-    ?.addEventListener("click", () => {
-      somenteFavoritos = false;
-      atualizarFavoritos();
-      filtro?.focus();
-    });
+
   pagina
     .querySelector("[data-beats-sort]")
     ?.addEventListener("change", evento => {
@@ -105,7 +74,6 @@
     });
   const barra = pagina.querySelector("[data-beats-toolbar]");
   if (barra) barra.hidden = false;
-  atualizarFavoritos();
 
   // Uma única fonte de áudio mantém as prévias do destaque e do catálogo sincronizadas.
   const previas = [...pagina.querySelectorAll("[data-beat-preview]")];
@@ -204,17 +172,5 @@
   window.addEventListener("pagehide", () => {
     requisicao++;
     audio.pause();
-  });
-  window.addEventListener("storage", evento => {
-    if (evento.key !== chave && evento.key !== null) return;
-    try {
-      const salvos = JSON.parse(evento.newValue || "[]");
-      favoritos = new Set(
-        Array.isArray(salvos) ? salvos.filter(id => typeof id === "string") : []
-      );
-      atualizarFavoritos();
-    } catch {
-      /* Ignora dados inválidos de outra aba. */
-    }
   });
 })();

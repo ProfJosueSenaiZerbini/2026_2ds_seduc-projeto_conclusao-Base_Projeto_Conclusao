@@ -4,7 +4,7 @@
           <%- icones.bell %>
         </span>
         <% if ((quantidadeNaoLidas ?? 0) > 0) { %>
-          <span class="notification-count" aria-label="<%= quantidadeNaoLidas %>não lida(s)">
+          <span class="notification-count" aria-label="<%= quantidadeNaoLidas %> não lida(s)">
             <%= quantidadeNaoLidas %>
           </span>
         <% } %>
@@ -49,5 +49,5 @@
       </section>
     </div>
     <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de <%= usuario.name %>" title="Perfil de <%= usuario.name %>">
-      <%= usuario.initials %>
+      <%- include('avatar-usuario') %>
     </a>

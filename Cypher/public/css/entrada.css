@@ -354,7 +354,7 @@
 .tag-page .password-toggle { display: grid; place-items: center; width: 44px; }
 .password-toggle svg { display: block; width: 20px; height: 20px; }
 .tag-panel [data-handle-state]:empty { display: none; }
-.tag-page .tag-panel label.nickname-switch {
+.tag-page .tag-panel label.register-name-privacy {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -757,23 +757,13 @@
 .registration-page .tag-panel .trajectory-option.is-past::before { background:#b0c978; }
 .registration-page .tag-panel .trajectory-option.is-past .trajectory-option-mark { background:#a2bb72; border-color:#a2bb72; }
 .registration-page .tag-panel .trajectory-option:has(input:checked) .trajectory-option-mark { border:5px solid #b0c978; box-shadow:0 0 0 4px #b0c97822; }
-.registration-page .tag-panel .trajectory-privacy { padding:18px 0 0; margin:0; border:0; border-top:1px solid #82916b40; }
-.registration-page .tag-panel .trajectory-privacy legend { width:auto; padding:0 8px 0 0; font-size:14px; color:#ccd6bf; font-weight:500; }
-.registration-page .tag-panel .trajectory-privacy-options { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-.registration-page .tag-panel .trajectory-privacy-options label { position:relative; margin:0; cursor:pointer; }
-.registration-page .tag-panel .trajectory-privacy-options input { position:absolute; opacity:0; width:1px; height:1px; min-height:0; padding:0; }
-.registration-page .tag-panel .trajectory-privacy-options span { display:block; padding:9px 13px; border:1px solid #82916b70; border-radius:2px 5px 1px 3px; color:#c6cfbb; background:#14201560; font-size:13px; }
-.registration-page .tag-panel .trajectory-privacy-options input:checked + span { color:#edffd0; border-color:#b0c978; background:#35472ac9; }
-.registration-page .tag-panel .trajectory-privacy-options input:focus-visible + span { outline:2px solid #b0c978; outline-offset:3px; }
 :root:not(.dark) .registration-page .tag-panel .trajectory-profession { background:#d6dbc54d; color:#626c55; }
 :root:not(.dark) .registration-page .tag-panel .trajectory-profession[aria-current],
-:root:not(.dark) .registration-page .tag-panel .trajectory-privacy-options input:checked + span { color:#2e461d; border-color:#657e41; background:#cbd8b3cc; }
 :root:not(.dark) .registration-page .tag-panel .trajectory-option,
 :root:not(.dark) .registration-page .tag-panel .trajectory-option:has(input:checked),
 :root:not(.dark) .registration-page .tag-panel .trajectory-option:hover { background:transparent; border:0; box-shadow:none; color:#35482a; }
 :root:not(.dark) .registration-page .tag-panel .trajectory-option-mark { background:#dce0cb; }
 :root:not(.dark) .registration-page .tag-panel .trajectory-option.is-past .trajectory-option-mark { background:#718a4e; border-color:#718a4e; }
-:root:not(.dark) .registration-page .tag-panel .trajectory-privacy-options span { color:#4b593e; background:#e2e5d080; border-color:#879772; }
 @media(max-width:600px) {
  .registration-page .tag-panel .trajectory-options { grid-template-columns:1fr; }
  .registration-page .tag-panel .trajectory-option { flex-direction:row-reverse; justify-content:flex-end; align-items:center; text-align:left; min-height:52px; padding:8px 0; gap:16px; font-size:14px; }

@@ -656,26 +656,6 @@
   font-size: 10px;
   line-height: 1.5;
 }
-.ctag-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  margin: 17px 0;
-  padding: 12px;
-  border: 1px solid #e2e8d4;
-  border-radius: 8px;
-  color: #68735f;
-  background: #f4f7eb;
-  font-size: 10px;
-  line-height: 1.5;
-}
-.ctag-note > .lucide-icon {
-  margin-top: 1px;
-  color: #7c9a20;
-}
-.ctag-note strong {
-  color: #455535;
-}
 .dark .category-label,
 .dark .category-label span {
   color: #a9b7a3;
@@ -727,14 +707,6 @@
   color: #f4faef;
   border-color: #8eaf48;
   background: #263525;
-}
-.dark .ctag-note {
-  color: #c6d4bf;
-  border-color: #3c4c38;
-  background: #1c281b;
-}
-.dark .ctag-note strong {
-  color: #e4eedf;
 }
 
 .dark .auth-panel .category-label {
@@ -834,7 +806,6 @@
 .register-stage[hidden],
 .professional-questionnaire[hidden],
 .professional-questionnaire__field[hidden],
-[data-register-ctag][hidden],
 [data-other-category-field][hidden],
 [data-register-submit][hidden],
 [data-question-next][hidden],
@@ -1133,9 +1104,6 @@
   color: #ffd1c7;
   background: #35221f;
 }
-.auth-panel--register .ctag-note {
-  margin: 12px 0 0;
-}
 .auth-panel--register .auth-switch {
   margin-top: 17px;
 }
@@ -1418,9 +1386,9 @@
 .registration-modes legend { margin-bottom: 12px; font-weight: 700; }
 .registration-modes label { display: flex; flex-direction: row; align-items: flex-start; gap: 12px; border: 1px solid var(--line, #d4ddcc); border-radius: 14px; padding: 16px; cursor: pointer; }
 .registration-modes label:has(input:checked) { border-color: #70942a; background: rgba(167, 206, 75, .14); box-shadow: inset 0 0 0 1px #70942a; }
-.registration-modes input, .auth-panel .nickname-switch input { width: 18px; height: 18px; min-width: 18px; margin: 2px 0 0; accent-color: #648a27; }
+.registration-modes input, .auth-panel .register-name-privacy input { width: 18px; height: 18px; min-width: 18px; margin: 2px 0 0; accent-color: #648a27; }
 .registration-modes small { display: block; margin-top: 5px; font-weight: 400; line-height: 1.4; }
-.auth-panel .nickname-switch { display: flex; flex-direction: row; align-items: center; gap: 10px; margin: 14px 0; }
+.auth-panel .register-name-privacy { display: flex; flex-direction: row; align-items: center; gap: 10px; margin: 14px 0; }
 .registration-page .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .registration-page .form-grid label, .registration-page .form-grid input { min-width: 0; }
 .registration-page [data-nickname-fields] { padding: 12px 16px; border-left: 3px solid #a7ce4b; margin-bottom: 20px; }

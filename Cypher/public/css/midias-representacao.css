@@ -1,0 +1,73 @@
+@import "./descoberta.css";
+.mr-page {
+  max-width: 1100px;
+  margin: auto;
+  padding-bottom: 100px;
+}
+.mr-panel {
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid var(--dc-line);
+  border-radius: 4px 20px 4px 4px;
+  background: var(--dc-panel);
+  overflow-wrap: anywhere;
+}
+.mr-panel h2 {
+  margin-bottom: 12px;
+}
+.mr-panel p {
+  margin-block: 12px;
+}
+.mr-form {
+  display: grid;
+  gap: 14px;
+  margin-block: 20px;
+}
+.mr-form label {
+  display: grid;
+  gap: 8px;
+}
+.mr-form :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--dc-line);
+  background: var(--dc-field);
+  color: var(--dc-ink);
+  font: inherit;
+}
+.mr-form button {
+  justify-self: start;
+  min-height: 44px;
+}
+.mr-form .mr-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-weight: 400;
+}
+.mr-form .mr-consent input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  padding: 0;
+  margin-top: 2px;
+  accent-color: var(--dc-olive);
+}
+.mr-state {
+  display: inline-block;
+  border: 1px solid var(--dc-line);
+  padding: 5px 10px;
+  font-weight: 600;
+}
+.mr-file {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+.mr-text {
+  white-space: pre-wrap;
+}

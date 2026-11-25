@@ -1,0 +1,62 @@
+<% const a = apresentacao;
+   const nomeCompleto = a.proprio ? (pessoa.nomeInformado || pessoa.name) : pessoa.name;
+   const nome = pessoa.vulgo || nomeCompleto;
+   const segundoNome = pessoa.vulgo && pessoa.vulgo.trim().toLocaleLowerCase('pt-BR') !== nomeCompleto.trim().toLocaleLowerCase('pt-BR') ? nomeCompleto : '';
+   const retrato = a.foto;
+   const capa = a.capa || a.destaque?.imagem;
+   const slug = encodeURIComponent(pessoa.handle.replace(/^@/, ''));
+   const publica = '/p/' + slug;
+   const temPublico = !a.proprio || pessoa.profilePublic;
+%>
+<article class="pf-identity" aria-labelledby="artista-nome">
+  <div class="pf-cover <%= capa ? 'has-art' : '' %>">
+    <% if (capa) { %><img class="pf-cover-art" src="<%= capa %>" alt="" fetchpriority="high"><% } %>
+    <div class="pf-signature">
+      <div class="pf-portrait" aria-hidden="true"><% if (retrato) { %><img src="<%= retrato %>" alt="" fetchpriority="high"><% } else { %><span><%= pessoa.initials %></span><% } %></div>
+      <div class="pf-names"><% if (pessoa.handle !== nome) { %><p class="pf-handle"><%= pessoa.handle %></p><% } %>
+        <h2 id="artista-nome"><%= nome %></h2>
+        <% if (segundoNome) { %><p class="pf-fullname"><%= segundoNome %></p><% } %>
+        <% if (a.proprio && pessoa.namePublic === false) { %><span class="pf-handle">Nome completo privado</span><% } %>
+        <% if (pessoa.categories.length) { %><p class="pf-roles"><%= pessoa.categories.map(c => pessoa.rotulosCategorias[c] || c).join(' · ') %></p><% } %>
+      </div>
+      <% if (a.selo) { %><span class="pf-seal" data-forma="<%= a.selo.forma %>" data-cor="<%= a.selo.cor %>" role="img" aria-label="Selo profissional de <%= nome %>" title="Selo profissional de <%= nome %>"><%= a.selo.letras %></span><% } %>
+    </div>
+    <% if (a.destaque) { %><a class="pf-cover-credit" href="<%= a.destaque.url %>"><%- icones.disc %><span><small>Do acervo</small><strong><%= a.destaque.titulo %></strong></span></a><% } %>
+  </div>
+  <div class="pf-identity-foot">
+    <div class="pf-intro">
+      <% if (pessoa.biography && (a.aba !== 'sobre' || pessoa.biography.length <= 165)) { %>
+        <p><%= pessoa.biography.length > 165 ? pessoa.biography.slice(0,162).replace(/\s+\S*$/, '') + '…' : pessoa.biography %>
+        <% if (pessoa.biography.length > 165) { %><a class="pf-inline" href="<%= a.url('sobre') %>">Ler biografia</a><% } %></p>
+      <% } %>
+      <div class="pf-meta">
+        <% if (pessoa.city) { %><span><%- icones.mapPin %><%= pessoa.city %><%= a.proprio && !pessoa.locationPublic ? ' · Só você' : '' %></span><% } %>
+        <% if (pessoa.availability) { %><span><%- icones.briefcase %><%= pessoa.availabilityLabel %></span><% } %>
+        <% if (a.rep) { %><a href="<%= a.url('avaliacoes') %>"><span aria-hidden="true">☆</span><%= a.rep.media === null ? a.rep.estado : a.rep.media.toFixed(1).replace('.',',') + ' / 5 · ' + a.rep.avaliacoes + ' avaliações' %></a><% } %>
+      </div>
+    </div>
+    <div class="pf-actions">
+      <% if (a.editavel) { %><a class="pf-button primary" href="/profile?editar=1#editar-perfil"><%- icones.pen %>Editar perfil</a><% } %>
+      <% if (a.outraPessoa) { %><%- include('acoes-conteudo',{tipo:'perfil',id:pessoa.id}) %><% } %>
+      <% if (a.conversa) { %><a class="pf-button" href="/messages/<%= encodeURIComponent(a.conversa) %>">Mensagem</a>
+      <% } else if (a.outraPessoa && pessoa.contact) { %><a class="pf-button" href="<%= a.url('sobre').split('#')[0] %>#contato">Contato</a><% } %>
+      <% if (a.editavel || a.outraPessoa || temPublico) { %>
+        <details class="pf-menu"><summary class="pf-button" aria-label="Mais ações do perfil"><%- icones.more %></summary>
+          <div class="pf-menu-list">
+            <% if (a.editavel) { %><a href="/publicacoes/perfil/<%= encodeURIComponent(pessoa.id) %>/midias">Alterar foto e capa</a><a href="/portfolio/edit">Organizar portfólio</a><a href="/representacoes">Representação profissional</a>
+              <% if (temPublico) { %><a href="<%= publica %>">Ver perfil público</a><% } %>
+            <% } %>
+            <% if (!a.proprio && !a.outraPessoa && typeof usuario !== 'undefined' && usuario.id === pessoa.id) { %><a href="/profile">Voltar ao meu perfil</a><% } %>
+            <% if (a.propor) { %><a href="/colaboracoes/new?destinatario=<%= encodeURIComponent(pessoa.handle) %>">Propor colaboração</a><% } %>
+            <% if (a.representar) { %><a href="/representacoes?destinatario=<%= encodeURIComponent(pessoa.handle) %>">Propor representação</a><% } %>
+            <% if (temPublico) { %><a href="<%= publica %>" data-share-profile>Compartilhar perfil</a><% } %>
+            <% if (a.outraPessoa) { %><a href="/suporte/new?objeto_tipo=perfil&amp;objeto_id=<%= encodeURIComponent(pessoa.id) %>">Denunciar perfil</a>
+              <% if (a.selo) { %><a href="/suporte/new?objeto_tipo=selo&amp;objeto_id=<%= encodeURIComponent(a.selo.id) %>">Denunciar selo</a><% } %>
+            <% } %>
+          </div>
+        </details>
+      <% } %>
+      <span class="pf-share-status" role="status"></span>
+    </div>
+  </div>
+</article>

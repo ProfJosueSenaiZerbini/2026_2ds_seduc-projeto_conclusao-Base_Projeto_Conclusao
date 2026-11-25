@@ -1,0 +1,202 @@
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<div class="dc-shell">
+<%- include('../partials/barra-lateral',{path}) %>
+<div class="dc-page">
+<%- include('../partials/componentes/cabecalho-descoberta',{titulo:tela==='representacoes'?'Representação profissional':'Minhas mídias',tituloId:'mr-titulo',descricao:''}) %>
+<main class="dc-content mr-page" aria-labelledby="mr-titulo">
+<% if(erro){ %>
+  <p role="alert">
+    <%= erro %>
+  </p>
+  <a href="/profile">
+    Voltar ao perfil
+  </a>
+<% } %>
+<% if(tela==='midias'){ %>
+  <% const voltarMidia=tipo==='perfil'?'/profile':tipo==='beat'?'/beats/'+encodeURIComponent(id)+'/manage':tipo==='evento'?'/events/'+encodeURIComponent(id):tipo==='projeto'?'/work-projects/'+encodeURIComponent(id):'/espaco-de-trabalho/obra/'+encodeURIComponent(id); %>
+  <a class="button button-outline" href="<%= voltarMidia %>">
+    <%= 'Voltar ao '+(tipo==='perfil'?'perfil':tipo==='beat'?'beat':tipo==='evento'?'evento':'trabalho') %>
+  </a>
+  <section class="mr-panel">
+    <p class="eyebrow">
+    <%= ({perfil:'Identidade',beat:'Banco de Beats',evento:'Agenda',obra:'Obras',projeto:'Espaço de Trabalho'})[tipo] %>
+  </p>
+  <h2>
+    Enviar mídia
+  </h2>
+  <p>
+    <%= ['obra','projeto'].includes(tipo)?'Imagens de até 8 MB. Áudio e vídeo de até 25 MB. Textos em TXT UTF-8 de até 256 KB.':'Envie uma imagem PNG ou JPEG de até 8 MB.' %>
+  </p>
+  <form data-publication-upload="/publicacoes/<%= tipo %>/<%= encodeURIComponent(id) %>/midias" class="mr-form">
+    <label>
+      Finalidade
+      <select name="finalidade">
+        <option value="imagem">
+          <%= tipo==='perfil'?'Foto de perfil':tipo==='evento'?'Cartaz':'Capa' %>
+        </option>
+        <% if(tipo==='perfil'){ %><option value="capa">Capa do perfil</option><% } %>
+        <% if(['obra','projeto'].includes(tipo)){ %>
+          <option value="audio">
+            Áudio
+          </option>
+          <option value="video">
+            Vídeo
+          </option>
+          <option value="texto">
+            Texto
+          </option>
+        <% } %>
+      </select>
+    </label>
+    <label>
+      Arquivo
+      <input type="file" name="arquivo" required accept=".png,.jpg,.jpeg,.mp3,.wav,.ogg,.mp4,.webm,.txt">
+    </label>
+    <label class="mr-consent">
+      <input type="checkbox" name="autorizacao" required>
+      Tenho direitos ou autorização para compartilhar este arquivo nesta publicação.
+    </label>
+    <button class="dc-primary">
+      Enviar arquivo
+    </button>
+    <p role="status" data-upload-status>
+    </p>
+    <noscript>
+      Ative o JavaScript para enviar arquivos.
+    </noscript>
+  </form>
+  <p>
+    Ao enviar outra mídia da mesma finalidade, a nova versão substitui a apresentação anterior.
+  </p>
+</section>
+<p>
+  Os arquivos acompanham a visibilidade desta publicação. Envie materiais que você tem autorização para compartilhar.
+</p>
+<%- include('../partials/componentes/midias-publicacao',{tipo,id}) %>
+<section class="mr-panel">
+<h2>
+  Arquivos vinculados
+</h2>
+<% if(!arquivos.length){ %>
+  <p>
+    Você ainda não enviou uma mídia para este registro.
+  </p>
+<% } %>
+<% for(const a of arquivos){ %>
+  <div class="mr-file">
+    <a href="/publication-media/<%= a.id %>">
+      <%= a.nome %>
+    </a>
+    <form method="post" action="/publication-media/<%= a.id %>/retirar">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="ci-button">
+        Retirar
+      </button>
+    </form>
+  </div>
+<% } %>
+</section>
+<% } %>
+<% if(tela==='representacoes'){ %>
+<section class="mr-panel">
+<h2>
+  Propor um vínculo
+</h2>
+<p>
+  O vínculo passa a valer depois do aceite da outra pessoa. Cada profissional continua gerenciando sua própria conta e seus arquivos.
+</p>
+<form class="mr-form" method="post" action="/representacoes">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <label>
+    Profissional (@username)
+    <input name="destinatario" required maxlength="25" value="<%= destinatario %>">
+  </label>
+  <label>
+    Seu papel
+    <select name="papel">
+      <option value="representar">
+        Quero representar esta pessoa
+      </option>
+      <option value="ser_representado">
+        Quero ser representado por esta pessoa
+      </option>
+    </select>
+  </label>
+  <label>
+    Escopo da representação
+    <textarea name="escopo" required minlength="10" maxlength="2000" rows="4">
+    </textarea>
+  </label>
+  <button class="dc-primary">
+    Enviar convite
+  </button>
+</form>
+</section>
+<h2>
+Seus vínculos
+</h2>
+<% if(!itens.length){ %>
+<p>
+  Os convites enviados e recebidos aparecerão aqui.
+</p>
+<% } %>
+<% for(const v of itens){ %>
+<article class="mr-panel">
+  <h3>
+    <%= v.representado %>
+  </h3>
+  <p>
+    Representante:
+    <strong>
+      <%= v.representante %>
+    </strong>
+  </p>
+  <p class="mr-state">
+  <%= ({pendente:'Aguardando aceite',ativa:'Vínculo ativo',recusada:'Convite recusado',cancelada:'Convite cancelado',encerrada:'Vínculo encerrado'})[v.estado] %>
+</p>
+<p class="mr-text">
+  <%= v.escopo %>
+</p>
+<% const acoes=v.estado==='pendente'?(v.proponente_id===usuario.id?['cancelar']:['aceitar','recusar']):v.estado==='ativa'?['encerrar']:[]; for(const acao of acoes){ %>
+  <form method="post" action="/representacoes/<%= v.id %>" class="mr-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="versao" value="<%= v.versao %>">
+    <input type="hidden" name="acao" value="<%= acao %>">
+    <% if(acao==='encerrar'){ %>
+      <label>
+        Motivo do encerramento
+        <textarea name="motivo" required minlength="10" maxlength="2000">
+        </textarea>
+      </label>
+    <% } %>
+    <button class="ci-button">
+    <%= ({aceitar:'Aceitar proposta',recusar:'Recusar proposta',cancelar:'Cancelar convite',encerrar:'Encerrar vínculo'})[acao] %>
+  </button>
+</form>
+<% } %>
+<details>
+<summary>
+  Histórico do vínculo
+</summary>
+<% for(const h of v.historico){ %>
+  <p>
+  <%= new Date(h.criado_em).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}) %>
+  <%= ' · '+h.acao %>
+</p>
+<% if(h.motivo){ %>
+  <p>
+    <%= h.motivo %>
+  </p>
+<% } %>
+<% } %>
+</details>
+</article>
+<% } %>
+<% } %>
+</main>
+<%- include('../partials/navegacao-mobile',{rotaAtual:path}) %>
+</div>
+</div>
+<script src="/js/midias-publicacoes.js" defer>
+</script>
+<%- include('../partials/fim-pagina') %>

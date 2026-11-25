@@ -2,72 +2,13 @@
   const menu = document.querySelector(".et-create");
   if (menu) {
     const controle = menu.querySelector("summary");
-    const painel = menu.querySelector("nav");
-    const movimentoReduzido = matchMedia("(prefers-reduced-motion: reduce)");
-    let expandido = menu.open;
-    let fechamento, entrada;
-
-    function atualizarAcessibilidade() {
-      painel.inert = !expandido;
-      controle.setAttribute("aria-expanded", String(expandido));
-      controle.setAttribute(
-        "aria-label",
-        expandido ? "Fechar menu de criação" : "Abrir menu de criação"
-      );
-    }
-
-    function abrir() {
-      clearTimeout(fechamento);
-      cancelAnimationFrame(entrada);
-      const estavaAberto = menu.open;
-      expandido = true;
-      menu.open = true;
-      atualizarAcessibilidade();
-      if (estavaAberto || movimentoReduzido.matches) {
-        menu.setAttribute("data-create-expanded", "");
-      } else {
-        // Um quadro para materializar o conteúdo de details antes da transição.
-        entrada = requestAnimationFrame(() => {
-          entrada = requestAnimationFrame(() => {
-            if (expandido) menu.setAttribute("data-create-expanded", "");
-          });
-        });
-      }
-    }
-
     function fechar(devolverFoco) {
-      if (expandido) {
-        expandido = false;
-        cancelAnimationFrame(entrada);
-        menu.removeAttribute("data-create-expanded");
-        atualizarAcessibilidade();
-        const estilo = getComputedStyle(menu);
-        const duracao =
-          parseFloat(estilo.getPropertyValue("--et-create-duration")) || 650;
-        const intervalo =
-          parseFloat(estilo.getPropertyValue("--et-create-stagger")) || 65;
-        const quantidade = painel.querySelectorAll("a").length;
-        const espera = movimentoReduzido.matches
-          ? 0
-          : duracao + Math.max(0, quantidade - 1) * intervalo + 30;
-        if (espera) {
-          fechamento = setTimeout(() => {
-            if (!expandido) menu.open = false;
-          }, espera);
-        } else {
-          menu.open = false;
-        }
-      }
+      menu.open = false;
       if (devolverFoco) controle.focus();
     }
 
-    menu.setAttribute("data-create-enhanced", "");
-    if (expandido) menu.setAttribute("data-create-expanded", "");
-    atualizarAcessibilidade();
-    controle.addEventListener("click", evento => {
-      evento.preventDefault();
-      if (expandido) fechar(false);
-      else abrir();
+    menu.addEventListener("toggle", () => {
+      controle.setAttribute("aria-label", menu.open ? "Fechar menu de criação" : "Abrir menu de criação");
     });
     document.addEventListener("click", evento => {
       if (!menu.contains(evento.target)) fechar(false);
@@ -139,7 +80,7 @@
     filtrar();
   });
   filtro.addEventListener("change", evento => {
-    if (evento.target.name === "profissao") filtrar();
+    if (["profissao", "modalidade"].includes(evento.target.name)) filtrar();
   });
   busca.addEventListener("input", () => {
     ++versao;

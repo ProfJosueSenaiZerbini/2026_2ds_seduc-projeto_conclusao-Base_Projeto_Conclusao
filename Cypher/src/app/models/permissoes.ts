@@ -1,7 +1,7 @@
 export type TipoConta = "consumidor" | "profissional" | "administrativo";
 export type PapelAdministrativo = "super_admin" | "moderador" | "editor";
 export type AcaoAdministrativa =
-  "taxonomia" | "excecoes" | "equipe" | "editorial" | "auditoria";
+  "taxonomia" | "excecoes" | "equipe" | "editorial" | "auditoria" | "reputacao" | "moderacao";
 export type ContextoConta = {
   tipoConta: TipoConta;
   categories: readonly string[];
@@ -63,7 +63,7 @@ export const matrizProfissional: Readonly<
   },
   "Produtor(a)": {
     obras: [...lancamentos, "Instrumental"],
-    beat: false,
+    beat: true,
     evento: false,
     contexto:
       "Produções musicais; produção não implica licença de beat de terceiro",
@@ -186,12 +186,7 @@ export const matrizProfissional: Readonly<
     contexto:
       "Matérias e coberturas; não recebe papel editorial administrativo",
   },
-  Podcaster: {
-    obras: [],
-    beat: false,
-    evento: false,
-    contexto: "Episódios de podcast em modalidade própria futura",
-  },
+
 };
 
 export function tiposObraPermitidos(categorias: readonly string[]): string[] {
@@ -229,7 +224,7 @@ export function podeAdministrar(
   if (conta.tipoConta !== "administrativo") return false;
   if (conta.papelAdministrativo === "super_admin") return true;
   return (
-    (conta.papelAdministrativo === "moderador" && acao === "excecoes") ||
+    (conta.papelAdministrativo === "moderador" && ["excecoes", "reputacao", "moderacao"].includes(acao)) ||
     (conta.papelAdministrativo === "editor" && acao === "editorial")
   );
 }

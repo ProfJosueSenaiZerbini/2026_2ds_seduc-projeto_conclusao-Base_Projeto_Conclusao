@@ -1,0 +1,42 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<div class="dc-shell cn-shell">
+  <a class="dc-skip" href="#central-conteudo">Pular para a Cypher Central</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: 'Cypher Central', tituloId: 'central-titulo', descricao: 'Aprender, aplicar e seguir criando.' }) %>
+    <main class="cn-page" id="central-conteudo" aria-labelledby="central-titulo" tabindex="-1">
+      <% const nomeCategoria = id => categorias.find(c => c.id === id)?.nome || id; const intencoes = [{id:'comecar',nome:'Quero começar',texto:'Entenda seu espaço na Cypher.',icone:'lightbulb'},{id:'publicar',nome:'Quero publicar',texto:'Apresente seus trabalhos e sua trajetória.',icone:'plus'},{id:'conectar',nome:'Quero me conectar',texto:'Encontre pessoas e colabore com clareza.',icone:'users'},{id:'resolver',nome:'Preciso resolver',texto:'Cuide da conta, dos dados e das decisões.',icone:'shieldCheck'}]; %>
+      <% if(!q&&!categoria&&!profissao&&!intencao){ %>
+      <header class="cn-hero">
+        <div><span class="dc-stamp">Conhecimento que vira prática</span><h2>Sua próxima ideia<br><em>começa por aqui.</em></h2><p>Guias curtos para entender a plataforma, apresentar seu trabalho e criar conexões na cena. Escolha o que você quer fazer; avance no seu ritmo.</p></div>
+        <aside class="cn-hero-mark"><span class="cn-hero-board-label">CYPHER / CADERNO DA CENA</span><span class="lucide-icon" aria-hidden="true"><%- icones.lightbulb %></span><div><strong>Entenda.<br>Experimente.<br>Crie.</strong><p>Uma dúvida de cada vez. O essencial primeiro, os detalhes quando você precisar.</p></div></aside>
+      </header>
+      <nav class="cn-intents" aria-label="O que você quer fazer?">
+        <% intencoes.forEach(i => { %><a class="cn-intent" href="/central?intencao=<%= i.id %>#central-guias" <%- intencao===i.id?'aria-current="page"':'' %>><span class="lucide-icon" aria-hidden="true"><%- icones[i.icone] %></span><span><strong><%= i.nome %></strong><small><%= i.texto %></small></span></a><% }) %>
+      </nav>
+      <% } %>
+      <section class="cn-section" id="central-guias" aria-labelledby="central-guias-titulo">
+        <header class="cn-section-heading"><div><span class="cn-eyebrow">ENCONTRE SEU CAMINHO</span><h3 id="central-guias-titulo"><%= q ? 'Vamos encontrar sua resposta.' : intencao ? intencoes.find(i=>i.id===intencao)?.nome || 'Guias para você' : 'O que você quer entender?' %></h3><p>Busque uma dúvida ou refine pelos assuntos e pela sua atuação.</p></div><% if(q||categoria||profissao||intencao){ %><a href="/central#central-guias">Limpar filtros</a><% } %></header>
+        <form class="dc-controls cn-search-controls" method="get" action="/central" role="search" aria-label="Pesquisar conteúdo educativo">
+          <% if(intencao){ %><input type="hidden" name="intencao" value="<%= intencao %>"><% } %>
+          <%- include('../partials/componentes/campo-busca',{campo:{id:'cn-busca',nome:'q',valor:q,limite:100,rotulo:'O que você quer entender?',rotuloBotao:'Buscar na Central',autocomplete:'off'}}) %>
+          <details class="dc-filter"><summary><span class="lucide-icon" aria-hidden="true"><%- icones.sliders %></span> Refinar<%= categoria||profissao?' •':'' %></summary><div class="dc-filter-panel">
+            <label>Assunto<select name="categoria"><option value="">Todos os assuntos</option><% categorias.forEach(c=>{ %><option value="<%= c.id %>" <%= categoria===c.id?'selected':'' %>><%= c.nome %></option><% }) %></select></label>
+            <label>Sua atuação<select name="profissao"><option value="">Todas as atuações</option><% profissoes.forEach(p=>{ %><option value="<%= p.id %>" <%= profissao===p.id?'selected':'' %>><%= p.rotulo %></option><% }) %></select></label>
+            <button type="submit">Aplicar filtros</button>
+          </div></details>
+        </form>
+        <p class="cn-note"><%= quantidade %> <%= quantidade===1?'guia disponível':'guias disponíveis' %><%= q?' para esta pesquisa':'' %>.</p>
+        <% if(artigos.length){ %><div class="cn-grid" id="cn-guias-lista" data-cn-guides data-limit="<%= !q&&!categoria&&!profissao&&!intencao?6:0 %>">
+          <% artigos.forEach(a=>{ %><a class="cn-card" href="/central/<%= encodeURIComponent(a.slug) %>"><div class="cn-card-top"><span><%= nomeCategoria(a.categoria) %></span><span class="lucide-icon" aria-hidden="true"><%- icones[categorias.find(c=>c.id===a.categoria)?.icone||'lightbulb'] %></span></div><h4><%= a.titulo %></h4><p><%= a.resumo %></p><div class="cn-card-footer"><span><%= a.minutos %> min de leitura</span><span class="lucide-icon" aria-hidden="true"><%- icones.arrowUpRight %></span></div></a><% }) %>
+        </div><% if(!q&&!categoria&&!profissao&&!intencao&&artigos.length>6){ %><div class="cn-more-guides"><button class="cn-button" type="button" data-cn-more aria-controls="cn-guias-lista" aria-expanded="false" hidden>Explorar todos os guias</button><span class="cn-note" data-cn-guides-status aria-live="polite"></span></div><% } %><% }else{ %><div class="cn-empty"><span class="lucide-icon" aria-hidden="true"><%- icones.search %></span><h3>Essa resposta ainda não apareceu.</h3><p>Tente uma expressão mais curta ou explore outro assunto. Se precisar de ajuda com um caso da sua conta, fale com a equipe.</p><div class="cn-form-actions"><a class="cn-button" href="/central">Explorar os guias</a><a class="cn-button" href="/suporte/new">Falar com a Cypher</a></div></div><% } %>
+      </section>
+      <% if(!q&&!categoria&&!profissao&&!intencao){ %><section class="cn-section" aria-labelledby="central-assuntos-titulo"><header class="cn-section-heading"><div><span class="cn-eyebrow">EXPLORE POR ASSUNTO</span><h3 id="central-assuntos-titulo">Cada momento tem seu guia.</h3><p>Da primeira publicação à colaboração profissional.</p></div></header><div class="cn-chips"><% categorias.forEach(c=>{ %><a class="cn-button" href="/central?categoria=<%= encodeURIComponent(c.id) %>#central-guias"><span class="lucide-icon" aria-hidden="true"><%- icones[c.icone||'lightbulb'] %></span><%= c.nome %></a><% }) %></div></section><% } %>
+      <section class="cn-section" aria-labelledby="central-recentes-titulo"><header class="cn-section-heading"><div><span class="cn-eyebrow">CONTEÚDO EM MOVIMENTO</span><h3 id="central-recentes-titulo">Artigos recentes</h3><p>As últimas orientações publicadas pela equipe.</p></div></header><% if(recentes.length){ %><div class="cn-recent-list"><% recentes.forEach(a=>{ %><a href="/central/<%= encodeURIComponent(a.slug) %>"><span><small><%= nomeCategoria(a.categoria) %> · <%= a.minutos %> min</small><strong><%= a.titulo %></strong></span><span class="lucide-icon" aria-hidden="true"><%- icones.arrowUpRight %></span></a><% }) %></div><% }else{ %><p class="cn-note">Nenhum artigo publicado por enquanto. Os novos guias aparecerão aqui.</p><% } %></section>
+      <details class="cn-telemetry"><summary>Ajude a identificar dúvidas ainda sem resposta</summary><p>Você pode permitir o registro agregado dos termos de pesquisas sem resultado para orientar novos guias. Essa escolha não muda o acesso à Central.</p><form method="post" action="/central/privacy"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><label class="cn-check"><input type="checkbox" name="registrar" value="sim" <%= registrarPesquisas?'checked':'' %>> Permitir o registro das minhas buscas sem resultado para análise de lacunas</label><button class="cn-button" type="submit">Salvar preferência</button></form></details>
+    </main>
+    <%- include('../partials/navegacao-mobile',{rotaAtual:path}) %>
+  </div>
+</div>
+<script src="/js/central-nova.js" defer></script>
+<%- include('../partials/fim-pagina') %>

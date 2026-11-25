@@ -5,15 +5,7 @@
   <a class="dc-skip" href="#conteudo-trabalho">Pular para o conteúdo</a>
   <%- include('../partials/barra-lateral', { path }) %>
   <div class="dc-page">
-    <header class="dc-header">
-      <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
-      <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
-      <div class="dc-title"><h1 id="et-titulo">Espaço de Trabalho</h1><p>Suas criações, projetos e participações na cena.</p></div>
-      <div class="dc-account">
-        <%- include('../partials/componentes/tema-entrada') %>
-        <%- include('../partials/componentes/acoes-conta') %>
-      </div>
-    </header>
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: 'Espaço de Trabalho', tituloId: 'et-titulo', descricao: 'Suas criações, projetos e participações na cena.', q: '' }) %>
     <main class="et-page" id="conteudo-trabalho" aria-labelledby="et-titulo" tabindex="-1">
       <form class="dc-controls et-search-controls et-filter" method="get" action="<%= path %>" role="search" aria-label="Buscar no Espaço de Trabalho">
         <% if (secao) { %><input type="hidden" name="secao" value="<%= secao %>"><% } %>
@@ -29,6 +21,7 @@
                 <% }) %>
               </select>
             </label>
+            <label>Modalidade<select name="modalidade"><option value="">Todas as modalidades</option><% [['obra','Obras'],['beat','Beats'],['evento','Eventos'],['projeto','Projetos e galerias']].forEach(([id,nome])=>{ %><option value="<%= id %>" <%= modalidade===id?'selected':'' %>><%= nome %></option><% }) %></select></label>
             <button type="submit">Aplicar filtros</button>
           </div>
         </details>
@@ -36,6 +29,7 @@
       <% if (mensagem) { %><p class="et-feedback" role="status"><%- icones.circleCheck %><%= mensagem %></p><% } %>
       <% if (secao) { %><a class="et-back" href="<%= url() %>"><%- icones.arrowLeft %> Voltar à visão geral</a><% } %>
       <span id="et-aviso" class="et-sr" aria-live="polite"></span>
+      <nav class="et-workspace-links" aria-label="Acervo e oportunidades"><a class="et-more" href="/colaboracoes">Minhas colaborações</a><a class="et-more" href="/portfolio/edit">Organizar meu portfólio</a><a class="et-more" href="/work-projects?meus=sim">Meus projetos e galerias</a><a class="et-more" href="/work-projects/new">Criar trabalho / galeria</a><a class="et-more" href="/my-opportunities">Minhas oportunidades</a></nav>
       <div id="et-resultados">
       <% grupos.forEach(g => { %>
         <section class="et-section" aria-labelledby="titulo-<%= g.id %>">
@@ -58,21 +52,17 @@
       <% }) %>
       </div>
       <% if (acoes.length) { %>
-        <details class="et-create" style="--et-action-count:<%= acoes.length %>">
+        <details class="et-create">
           <summary aria-label="Abrir menu de criação" aria-controls="et-acoes">
             <span class="et-create-symbol" aria-hidden="true"><%- icones.plus %></span>
-            <span class="et-create-mark" aria-hidden="true"><%- icones.crown %></span>
+            <span class="et-create-title">Criar</span>
           </summary>
           <nav id="et-acoes" aria-label="Ações de criação">
-            <% acoes.forEach((a,i) => { const angulo = acoes.length === 1 ? 48 : 12+i*72/(acoes.length-1); %>
-              <span class="et-create-orbit" style="--i:<%= i %>;--angle:<%= angulo %>deg">
-                <span class="et-create-carrier">
-                  <a class="et-create-action" data-create-kind="<%= a.base.slice(1) %>" href="<%= a.base %>/new?origem=espaco">
-                    <span class="et-create-icon" aria-hidden="true"><%- icones[a.icone] %></span>
-                    <span class="et-create-label"><%= a.nome %></span>
-                  </a>
-                </span>
-              </span>
+            <% acoes.forEach(a => { %>
+              <a class="et-create-action" data-create-kind="<%= a.base.slice(1) %>" href="<%= a.base %>/new?origem=espaco">
+                <span aria-hidden="true"><%- icones[a.icone] %></span>
+                <span><%= a.nome %></span>
+              </a>
             <% }) %>
           </nav>
         </details>

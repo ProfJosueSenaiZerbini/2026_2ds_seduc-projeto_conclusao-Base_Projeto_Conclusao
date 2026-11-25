@@ -1,5 +1,7 @@
 <%
-  const rotulo = rotuloProfissional(categoriaAtuacao, typeof dados !== "undefined" ? dados.tratamento : typeof usuario !== "undefined" ? usuario?.tratamento : "");
+  const inicial = typeof cadastro !== "undefined" && cadastro;
+  const editarVisibilidade = !inicial && !(typeof ativacao !== "undefined" && ativacao);
+  const rotulo = rotuloProfissional(categoriaAtuacao, !inicial && typeof usuario !== "undefined" ? usuario?.tratamento : "");
   const atual = atuacoesExistentes?.find(item => item.categoria === categoriaAtuacao);
   const respostasAtuais = atual?.respostas ?? {};
   const visibilidadesAtuais = atual?.visibilidades ?? {};
@@ -12,11 +14,11 @@
       <h3><%= rotulo %></h3>
       <% if (legada) { %>
         <p>Categoria mantida de um cadastro anterior. Ela não será convertida automaticamente em Rapper nem em MC.</p>
-      <% } else { %>
+      <% } else if (editarVisibilidade) { %>
         <p>Respostas desta função ficam separadas das demais categorias. As informações de trajetória não comprovam experiência.</p>
       <% } %>
     </div>
-    <% if (!legada && !(typeof cadastro !== 'undefined' && cadastro)) { %>
+    <% if (!legada && editarVisibilidade) { %>
       <label class="professional-questionnaire__category-visibility">
         <span>Quem pode ver esta categoria?</span>
         <select data-visibilidade-categoria="__categoria__" aria-label="Visibilidade da categoria <%= rotulo %>">
@@ -37,7 +39,7 @@
           <legend><%= pergunta.pergunta %><% if (pergunta.obrigatoria) { %> <span>(obrigatória)</span><% } else if (dependente) { %> <span>(obrigatória se selecionar “Outro”)</span><% } else { %> <span>(opcional)</span><% } %></legend>
           <% if (pergunta.tipo === 'texto') { %>
             <textarea data-resposta-atuacao="<%= pergunta.campo %>" maxlength="<%= pergunta.maximoCaracteres ?? 500 %>" rows="3"><%= typeof valor === 'string' ? valor : '' %></textarea>
-          <% } else if (pergunta.tipo === 'enum' && typeof cadastro !== 'undefined' && cadastro && pergunta.campo === 'tempoAtuacao') { %>
+          <% } else if (pergunta.tipo === 'enum' && inicial && pergunta.campo === 'tempoAtuacao') { %>
             <p class="trajectory-hint">Toda trajetória tem um começo. Escolha o tempo que melhor representa o seu momento.</p>
             <div class="trajectory-options">
               <% (pergunta.opcoes ?? []).forEach(opcao => { %>
@@ -70,16 +72,7 @@
               <label class="professional-questionnaire__choice"><input type="radio" name="<%= idQuestionario %>-<%= pergunta.campo %>" value="false" data-resposta-atuacao="<%= pergunta.campo %>" data-tipo-resposta-atuacao="booleano" <%= valor === false ? 'checked' : '' %>><span>Não</span></label>
             </div>
           <% } %>
-          <% if(typeof cadastro !== 'undefined' && cadastro){ %>
-          <fieldset class="trajectory-privacy">
-            <legend>Quem pode ver seu tempo de atuação?</legend>
-            <div class="trajectory-privacy-options">
-            <% for(const [valorPrivacidade,rotuloPrivacidade] of [['publico','Público'],['colaboradores','Colaboradores'],['privado','Só eu']]){ %>
-              <label><input type="radio" name="privacidade-<%= idQuestionario %>-<%= pergunta.campo %>" data-visibilidade-atuacao="<%= pergunta.campo %>" value="<%= valorPrivacidade %>" <%= valorVisibilidade(pergunta) === valorPrivacidade ? 'checked' : '' %>><span><%= rotuloPrivacidade %></span></label>
-            <% } %>
-            </div>
-          </fieldset>
-          <% } else { %>
+          <% if (editarVisibilidade) { %>
           <label class="professional-questionnaire__answer-visibility">
             <span>Visibilidade desta resposta</span>
             <select data-visibilidade-atuacao="<%= pergunta.campo %>">

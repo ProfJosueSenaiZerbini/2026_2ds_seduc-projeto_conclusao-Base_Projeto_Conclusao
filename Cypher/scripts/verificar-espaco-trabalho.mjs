@@ -34,10 +34,9 @@ export async function verificarEspacoTrabalho({
   assert.match(vazio, /Você ainda não publicou trabalhos/);
   assert.match(vazio, /Nenhuma participação confirmada/);
   assert.doesNotMatch(vazio, /\/beats\/new\?origem/);
-  assert.doesNotMatch(
-    await get(pagina, letrista),
-    /<details class="et-create"/
-  );
+  const espacoLetrista = await get(pagina, letrista);
+  assert.match(espacoLetrista, /href="\/opportunities\/new\?origem=espaco"/);
+  assert.doesNotMatch(espacoLetrista, /href="\/(works|beats|events)\/new/);
   banco.salvarProfissoesUsuarioCypher("rapper", [
     { profissaoId: "rapper", valorOriginal: "Rapper", origem: "catalogo" },
     {
@@ -129,7 +128,7 @@ export async function verificarEspacoTrabalho({
   });
   const catalogo = await get("/works?q=revisao", consumidor);
   assert.ok(
-    catalogo.includes("<h3>Faixa em revisão</h3>"),
+    /Faixa em revisão/.test(catalogo.replace(/<[^>]+>/g," ")),
     catalogo
       .slice(catalogo.indexOf('<section class="et-section"'))
       .replace(/<[^>]+>/g, " ")
@@ -146,9 +145,9 @@ export async function verificarEspacoTrabalho({
     license: "Uso gratuito",
     origem: "espaco",
   });
-  assert.equal(
+  assert.match(
     beat.headers.get("location"),
-    "/espaco-de-trabalho?resultado=beatCriado"
+    /^\/beats\/[^/]+\/manage$/
   );
   const beatId = db
     .prepare("SELECT id FROM beats WHERE produtor_id=?")
@@ -169,7 +168,7 @@ export async function verificarEspacoTrabalho({
     title: "Encontro da suíte",
     category: "Outro",
     categoryDetail: "Encontro",
-    date: "2026-12-01",
+    date: "2030-06-15",
     time: "18:00",
     location: "Estúdio",
     org: "Organização",
@@ -183,17 +182,22 @@ export async function verificarEspacoTrabalho({
     participationType: "aprovacao",
   };
   const evento = banco.criarEventoCypher("rapper", eventoDados);
+  const eventos = await import("../dist/src/app/models/eventos.js");
+  eventos.salvarConfiguracaoEvento("rapper",evento,{data:eventoDados.date,horario:"18:00",fimData:eventoDados.date,fimHorario:"20:00",fuso:"America/Sao_Paulo",criterios:"Participação mediante inscrição e conferência na entrada."});
   banco.demonstrarInteresseEventoCypher(evento, "letrista");
   assert.doesNotMatch(await get(pagina, letrista), /Encontro da suíte/);
+  eventos.inscreverEvento("letrista",evento,{aceite:"sim"});
   banco.atualizarStatusInteresseEventoCypher(
     evento,
     "rapper",
     "letrista",
     "confirmado"
   );
+  assert.doesNotMatch(await get(pagina,letrista),/Encontro da suíte/,"Inscrição confirmada não presume comparecimento no acervo");
+  eventos.registrarPresencaEvento("rapper",evento,"letrista",{evidencia:"Nome conferido presencialmente na lista de entrada."},Date.parse("2030-06-15T21:01:00Z"));
   assert.match(
     await get(pagina + "/evento/" + evento, letrista),
-    /Participação confirmada/
+    /Comparecimento registrado/
   );
   assert.doesNotMatch(
     await get(pagina + "?profissao=letrista", letrista),
@@ -211,10 +215,7 @@ export async function verificarEspacoTrabalho({
     const excluida = await post(base + "/" + id + "/delete", rapper, {
       origem: "espaco",
     });
-    assert.match(
-      excluida.headers.get("location"),
-      /^\/espaco-de-trabalho\?resultado=/
-    );
+    assert.match(excluida.headers.get("location"),base==="/events" ? /^\/events\/[^/]+#gestao$/ : /^\/espaco-de-trabalho\?resultado=/);
   }
   assert.equal(
     db.prepare("SELECT count(*) AS total FROM atuacoes_obra").get().total,

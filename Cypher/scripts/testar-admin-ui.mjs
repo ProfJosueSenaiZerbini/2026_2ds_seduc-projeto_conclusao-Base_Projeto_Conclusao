@@ -138,7 +138,7 @@ try {
   assert.match(cadastroInicialHtml, /data-category-back-to-areas/);
   assert.doesNotMatch(cadastroInicialHtml, /data-category-other/);
   assert.doesNotMatch(cadastroInicialHtml, /Compartilhe sua atuação profissional/);
-  assert.match(cadastroInicialHtml, />Próximo /);
+  assert.match(cadastroInicialHtml, /data-question-next/);
   const validacaoConta = await fetch(`${base}/register/validate`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -188,25 +188,22 @@ try {
   assert.equal((await emailDuplicado.json()).field, "email");
   const banco = new Database(arquivoBanco);
   const inserirUsuario = banco.prepare(
-    `INSERT INTO usuarios (id, email, senha_hash, tipo_conta, demonstracao, codigo_publico, numero_sequencial)
-     VALUES (?, ?, 'teste', 'profissional', 0, ?, ?)`
+    `INSERT INTO usuarios (id, email, senha_hash, tipo_conta, demonstracao)
+     VALUES (?, ?, 'teste', 'profissional', 0)`
   );
   const inserirPerfil = banco.prepare(
-    `INSERT INTO perfis (usuario_id, c_tag, nome, funcao, identificador, iniciais, categorias_json, ultima_alteracao_categorias_em, demonstracao)
-     VALUES (?, ?, ?, 'Rapper · MC', ?, 'TT', '["Rapper","MC"]', datetime('now', '-10 days'), 0)`
+    `INSERT INTO perfis (usuario_id, nome, funcao, identificador, iniciais, categorias_json, ultima_alteracao_categorias_em, demonstracao)
+     VALUES (?, ?, 'Rapper · MC', ?, 'TT', '["Rapper","MC"]', datetime('now', '-10 days'), 0)`
   );
   const adicionarContas = banco.transaction(() => {
     for (let indice = 1; indice <= 9; indice += 1) {
       const id = `admin-ui-fixture-${indice}`;
       inserirUsuario.run(
         id,
-        `pessoa${indice}@example.test`,
-        `CYP-UI${String(indice).padStart(5, "0")}`,
-        100000 + indice
+        `pessoa${indice}@example.test`
       );
       inserirPerfil.run(
         id,
-        `CYP-UI-TAG-${indice}`,
         `Pessoa Teste ${indice}`,
         `@pessoa_teste_${indice}`
       );
@@ -914,33 +911,25 @@ try {
   );
   assert.doesNotMatch(perfilPendenteHtml, /profile-exception-request-form/);
 
-  const perfilProprio = await fetch(`${base}/profile?atuacao=Rapper`, {
+  const perfilProprio = await fetch(`${base}/profile?aba=atuacao&atuacao=Rapper`, {
     headers: { cookie: `cypher_session=${tokenComum}` },
   });
   assert.equal(perfilProprio.status, 200);
   const perfilProprioHtml = await perfilProprio.text();
-  assert.match(perfilProprioHtml, /professional-category-groups/);
-  assert.match(perfilProprioHtml, /id="profile-group-musica"/);
-  assert.match(perfilProprioHtml, />Rapper</);
-  assert.match(perfilProprioHtml, /href="\/profile\?atuacao=/);
+  assert.match(perfilProprioHtml, /class="pf-experience"/);
+  assert.match(perfilProprioHtml, /<details open><summary>Rapper/);
+  assert.match(perfilProprioHtml, /Editar atuação profissional/);
 
   const perfilPublico = await fetch(
-    `${base}/p/${identificadorPublico.replace(/^@/, "")}`
+    `${base}/p/${identificadorPublico.replace(/^@/, "")}`,
+    { headers: { cookie: `cypher_session=${tokenSegundoUsuario}` } }
   );
   assert.equal(perfilPublico.status, 200);
   const perfilPublicoHtml = await perfilPublico.text();
-  assert.match(
-    perfilPublicoHtml,
-    /class="profile-layout public-profile-layout"/
-  );
-  assert.match(perfilPublicoHtml, /data-profile-section-nav/);
-  assert.match(perfilPublicoHtml, /id="catalogo-publico"/);
-  assert.match(perfilPublicoHtml, /id="equipamentos-publicos"/);
-  assert.match(perfilPublicoHtml, /id="atuacao-publica"/);
-  assert.match(perfilPublicoHtml, /professional-category-groups/);
-  assert.match(perfilPublicoHtml, /id="public-group-musica"/);
-  assert.match(perfilPublicoHtml, /Profissão compartilhada/);
-  assert.doesNotMatch(perfilPublicoHtml, /<h3[^>]*>Questionário<\/h3>/);
+  assert.match(perfilPublicoHtml, /aria-labelledby="artista-nome"/);
+  assert.match(perfilPublicoHtml, /aria-label="Seções do perfil"/);
+  assert.match(perfilPublicoHtml, /aba=atuacao/);
+  assert.doesNotMatch(perfilPublicoHtml, /Editar atuação profissional|Organizar portfólio/);
 
   const bancoPedidos = new Database(arquivoBanco);
   const pedido1 = bancoPedidos

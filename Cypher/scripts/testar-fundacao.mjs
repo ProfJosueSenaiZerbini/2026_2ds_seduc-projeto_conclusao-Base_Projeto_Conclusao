@@ -14,14 +14,14 @@ const catalogo = await import("../dist/src/app/models/modeloPerfil.js");
 try {
   banco.inicializarBancoCypher();
   const db = banco.conexaoInternaCypher();
-  assert.equal(catalogo.categoriasGerais.length, 26);
+  assert.equal(catalogo.categoriasGerais.length, 25);
   assert.deepEqual(
     Object.keys(regras.matrizProfissional).sort(),
     [...catalogo.categoriasGerais].sort()
   );
   assert.deepEqual(
     catalogo.listarGruposProfissionais().map(g => g.profissoes.length),
-    [8, 3, 3, 3, 3, 3, 3]
+    [8, 3, 3, 3, 3, 3, 2]
   );
   for (const profissao of catalogo.listarProfissoesCatalogo()) {
     const id = `conta-${profissao.id}`;
@@ -34,7 +34,6 @@ try {
       funcao: profissao.rotulo,
       identificador: `@${id}`,
       iniciais: "TE",
-      cTag: `TAG-${id}`,
       categorias: [profissao.rotulo],
       outraCategoria: "",
     });
@@ -66,7 +65,7 @@ try {
           /PUBLICACAO_NAO_PERMITIDA/
         );
     }
-    if (profissao.id !== "beatmaker")
+    if (!["beatmaker", "produtor"].includes(profissao.id))
       assert.throws(
         () => banco.criarBeatCypher(id, {}),
         /PUBLICACAO_NAO_PERMITIDA/
@@ -129,7 +128,6 @@ try {
     funcao: "",
     identificador: "@publico",
     iniciais: "PU",
-    cTag: "TAG-PUBLICO",
     categorias: [],
     outraCategoria: "",
   });
@@ -252,7 +250,7 @@ try {
   );
   assert.deepEqual(db.pragma("foreign_key_check"), []);
   console.log(
-    "OK: 26 profissões, permissões contextuais, bloqueios nos models, consumidor, administradores sem perfil, RBAC, revogação e auditoria."
+    "OK: 25 profissões, permissões contextuais, bloqueios nos models, consumidor, administradores sem perfil, RBAC, revogação e auditoria."
   );
 } finally {
   banco.fecharBancoCypher();

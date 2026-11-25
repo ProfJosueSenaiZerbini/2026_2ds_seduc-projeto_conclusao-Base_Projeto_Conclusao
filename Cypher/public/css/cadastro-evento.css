@@ -1,0 +1,83 @@
+@import "./evento.css";
+@import "./temas-evento-form.css";
+.ev-editor-form {
+  gap: 24px;
+}
+.ev-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.ev-full {
+  grid-column: 1/-1;
+}
+.ev-editor-grid .ev-details {
+  display: grid;
+  gap: 14px;
+}
+.ev-editor-grid .ev-details:not([open]) > *:not(summary) {
+  display: none;
+}
+.ev-workshop-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ev-editor .event-theme-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.ev-editor .event-theme-option {
+  min-width: 0;
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 10px 2px 8px;
+  background: var(--dc-surface);
+}
+.ev-editor .event-theme-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  color: var(--dc-ink);
+}
+.ev-editor .event-theme-choice input {
+  width: 18px !important;
+  min-height: 18px !important;
+  flex: none;
+  margin-top: 3px;
+  accent-color: var(--dc-olive);
+}
+.ev-editor .event-theme-choice span {
+  display: grid;
+  gap: 4px;
+}
+.ev-editor .event-theme-choice small {
+  color: var(--dc-muted);
+}
+.ev-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ev-editor .event-theme-fieldset {
+  background: transparent;
+}
+.ev-editor .event-theme-preview {
+  background: var(--dc-panel);
+}
+@media (max-width: 720px) {
+  .ev-editor-grid,
+  .ev-workshop-options,
+  .ev-editor .event-theme-options {
+    grid-template-columns: 1fr;
+  }
+  .ev-editor-actions > * {
+    flex: 1;
+    justify-content: center;
+  }
+  .ev-editor .event-theme-fieldset {
+    padding: 12px;
+  }
+}

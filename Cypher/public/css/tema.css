@@ -184,7 +184,6 @@
 .dark .page-header h1,
 .dark .section-heading h2,
 .dark .works-toolbar h2,
-.dark .central-section-title,
 .dark .card-heading h3,
 .dark .profile-card-body h3,
 .dark .event-main h3,
@@ -337,13 +336,11 @@
   background: rgba(83, 109, 44, 0.24);
 }
 
-.dark .search-input-wrap input,
-.dark .central-search input {
+.dark .search-input-wrap input {
   color: var(--ink);
 }
 
-.dark .search-input-wrap input::placeholder,
-.dark .central-search input::placeholder {
+.dark .search-input-wrap input::placeholder {
   color: #738273;
 }
 
@@ -641,64 +638,12 @@
 }
 
 
-.dark .sidebar .status-trigger small {
-  color: #9aaa95;
-}
-
-.dark .sidebar .status-trigger strong {
-  color: #e2ecdc;
-}
-
-.dark .sidebar .status-trigger > svg {
-  color: #b2c2ac;
-}
-
-.dark .status-menu {
-  color: #e6f0e2;
-  background: #142116;
-  border-color: #52664d;
-}
-
-.dark .status-menu-heading,
-.dark .status-menu-heading button {
-  color: #c1d0ba;
-}
-
-.dark .status-menu-copy {
-  color: #aebea8;
-}
-
-.dark .status-option {
-  color: #c7d5c1;
-}
-
-.dark .status-option:hover {
-  color: #f3f8ef;
-  background: #27412a;
-}
-
-.dark .status-custom input {
-  color: #eef5eb;
-  background: #0d180f;
-  border-color: #53684d;
-}
-
-.dark .status-custom input::placeholder {
-  color: #9eb09a;
-}
-
-.dark .status-remove {
-  color: #e0a49a;
-}
-
-.dark .status-view-heading > span,
 .dark .capability-view-heading span,
 .dark .settings-field > span,
 .dark .settings-subhead > span {
   color: #a8b9a2;
 }
 
-.dark .status-empty,
 .dark .capabilities-editor-heading small,
 .dark .capability-view-heading a {
   color: #aebda8;
@@ -1077,21 +1022,6 @@ body,
 }
 .dark .work-card-role b {
   color: #e0e9dc;
-}
-.dark .profile-id-strip {
-  color: var(--ink);
-  border-color: #334232;
-  background: #1a2118;
-}
-.dark .profile-id-strip small {
-  color: #a5b49f;
-}
-.dark .immutable-label {
-  color: #c4d2bd;
-  background: #263125;
-}
-.dark .settings-data.ctag-setting {
-  background: #202b1f;
 }
 .dark .history-card h2 {
   color: #eef2e7;
@@ -1530,6 +1460,27 @@ body,
 }
 
 /* Switch de tema compartilhado — Claro/Escuro, sem modificar as paletas. */
+.sidebar-theme {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 8px;
+}
+.sidebar-theme .entry-theme {
+  flex-shrink: 0;
+  margin: 0;
+}
+.sidebar-theme .entry-theme .theme-switch {
+  width: 46px;
+  height: 36px;
+  font-size: 13px;
+}
+@media (min-width: 901px) {
+  .dc-shell .sidebar:not(:hover):not(:has(:focus-visible)) .sidebar-theme {
+    display: none;
+  }
+}
 .entry-theme {
   display: flex;
   justify-self: center;

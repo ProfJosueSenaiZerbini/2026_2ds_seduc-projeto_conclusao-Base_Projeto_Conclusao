@@ -1,0 +1,20 @@
+<% const arquivosMidia=typeof midiasUsuario==='function'?midiasUsuario(tipo,id):[]; %>
+<% if(arquivosMidia.length){ %>
+  <section class="mr-media" aria-label="Mídias da publicação">
+    <% for(const a of arquivosMidia){ %>
+      <% if(a.finalidade==='imagem'){ %>
+        <img src="/publication-media/<%= a.id %>" alt="<%= tipo==='perfil'?(a.posicao==='capa'?'Capa do perfil':'Foto de perfil'):tipo==='evento'?'Cartaz do evento':'Imagem da publicação' %>" loading="lazy">
+      <% }else if(a.finalidade==='audio'){ %>
+        <audio controls preload="none" src="/publication-media/<%= a.id %>" aria-label="<%= a.nome %>">
+        </audio>
+      <% }else if(a.finalidade==='video'){ %>
+        <video controls preload="metadata" src="/publication-media/<%= a.id %>" aria-label="<%= a.nome %>">
+        </video>
+      <% }else{ %>
+        <a class="ci-button" href="/publication-media/<%= a.id %>">
+          <%= 'Baixar '+a.nome %>
+        </a>
+      <% } %>
+    <% } %>
+  </section>
+<% } %>

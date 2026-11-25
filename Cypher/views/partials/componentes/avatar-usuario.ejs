@@ -1,0 +1,6 @@
+<% const fotoAvatar = typeof capaUsuario==='function' ? capaUsuario('perfil',usuario.id) : ''; %>
+<% if(fotoAvatar){ %>
+  <img class="avatar-photo" src="<%= fotoAvatar %>" alt="">
+<% }else{ %>
+  <%= usuario.initials %>
+<% } %>

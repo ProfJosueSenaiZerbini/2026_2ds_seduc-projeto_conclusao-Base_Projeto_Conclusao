@@ -1,0 +1,104 @@
+CYPHER — Oportunidades e Chamadas
+Entrega local e auditoria de implementação
+
+ROTAS PRINCIPAIS
+/opportunities: exploração com busca, filtros combinados e paginação de 12 registros.
+/opportunities/new: criação com funções independentes, revisão, rascunho e publicação.
+/opportunities/:id: ficha compartilhável autenticada e ações contextuais.
+/my-opportunities e /my-applications: registros do titular.
+/opportunities/applications/:id: candidatura, negociação, propostas e acordo.
+/messages: caixa, preferências e bloqueios; /messages/:id: conversa persistente.
+/service-mediation: profissionais que autorizaram contato de consumidores.
+/service-requests: pedidos excepcionais e acompanhamento do solicitante.
+/admin/oportunidades: triagem competente e gestão das publicações autorizadas.
+/work-projects: registro mínimo de projetos próprios para vínculos reais.
+
+DOCUMENTAÇÃO CONSULTADA
+Documentação/02 - Requisitos e Regras de Negócios/RN-Cypher.md
+Documentação/02 - Requisitos e Regras de Negócios/RF-Cypher.md
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-03_PerfilUsuario.drawio
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-04_EspacoTrabalho.drawio
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-06_EventosParticipacao.drawio
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-07_Oportunidades.drawio
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-08_InteracoesComunicacao.drawio
+Documentação/03 - Análise e Prototipação/FN.drawio/FN-09_AdministracaoModeracao.drawio
+Documentação/03 - Análise e Prototipação/UC.puml/UC_07D_Oportunidades.puml
+Briefing integral anexado pelo usuário.
+
+AUDITORIA DE REQUISITOS
+RN-044: módulo independente de Eventos. Todas as 25 profissões oficiais têm teste de publicação. A matriz legada de outros módulos não foi alterada.
+RN-045: Consumidor não publica chamadas comuns; contato depende da preferência do mediador e pedido público depende de análise.
+RN-046: propostas imutáveis e versionadas; envio não é aceite; confirmação exige as duas partes na mesma versão.
+RN-136: tipos serviço/projeto/colaboração/vaga, sem data ou local de evento obrigatório.
+RN-137: profissão ativa validada no servidor; vínculos opcionais exigem titularidade do evento/projeto.
+RN-138: estados separados para candidatura, análise, seleção, recusa, retirada e acordo; seleção abre conversa, sem ocupar vaga.
+RN-139: triagem por Super Admin ou Moderador; justificativa, esclarecimento, decisão e notificação. Aprovação mantém Consumidor e atribui a gestão ao administrador que aprovou.
+RN-140: aceites por identidade derivada da sessão, com versão corrente e revalidação de elegibilidade/vaga em transação IMMEDIATE.
+RN-141: transições preservam candidaturas, mensagens, propostas e acordos. Expiração persistida nas consultas. Desistência bilateral libera vaga sem apagar o acordo.
+RF-088: criar, editar, rascunhar e publicar oportunidades, com erros nos campos e dados preservados.
+RF-089: pesquisa textual, profissão/área, modalidade, finalidade, localização, remuneração, valores comparáveis por unidade, vagas, publicação, prazo e estados próprios; remoção individual e paginação.
+RF-090: candidatura com profissão compatível, apresentação, confirmação dos requisitos, prevenção de duplicação e acompanhamento próprio.
+RF-091: análise, seleção, recusa, gestão dos estados e notificações; condições aceitas continuam preservadas na proposta.
+RF-092: mediação privada autorizada ou pedido excepcional com acompanhamento e esclarecimento.
+RF-093: acordo individual, única candidatura/proposta, ocupação por função e trigger SQLite contra confirmação inválida/superlotação.
+FN-07: fluxos de exploração, criação profissional, pedido excepcional, gestão, seleção, propostas, contrapropostas, aceites e ocupação implementados.
+FN-03/04/06: perfis e portfólio por links sujeitos às permissões existentes; criação integrada ao Espaço de Trabalho; eventos mantêm suas rotas e dados.
+FN-08: suporte mínimo real de conversas/mensagens, preferência de consumidores, bloqueio e notificações existentes. Mensagens não substituem propostas.
+FN-09: acesso administrativo separado, competência de exceções e auditoria. Administrador não recebe acesso geral às conversas de terceiros.
+
+ARQUIVOS NOVOS
+src/app/models/esquemaOportunidades.ts
+src/app/models/oportunidades.ts
+src/app/models/contatosOportunidades.ts
+src/app/validators/validarOportunidade.ts
+src/app/controllers/controladorOportunidades.ts
+src/app/routes/rotasOportunidades.ts
+views/pages/chamadas.ejs
+views/partials/chamadas/{lista,formulario,ficha,negociacao,conversa,pedidos,pedido,mensagens,mediacao,projetos,erro}.ejs
+public/css/chamadas.css
+public/js/chamadas.js
+scripts/testar-oportunidades.mjs
+scripts/testar-regressoes-oportunidades.mjs
+
+ARQUIVOS MODIFICADOS
+src/app/models/bancoDados.ts: schema 29 e migração aditiva dentro da transação existente.
+src/app/models/espacoTrabalho.ts: ação Criar oportunidade para profissão oficial ativa.
+src/app/controllers/controladorCompatibilidade.ts: autenticação das novas famílias de rotas.
+src/app/routes/rotasCypher.ts: montagem do router após autorização.
+views/partials/barra-lateral.ejs: item Oportunidades, preservando estrutura e estilo.
+views/partials/navegacao-administrativa.ejs: entrada Pedidos de serviço para cargos competentes.
+views/pages/espaco-trabalho.ejs: acesso a oportunidades e projetos próprios.
+package.json: comando test:opportunities.
+scripts/testar-banco.mjs: expectativas de schema/tabelas e fechamento da conexão antes da limpeza no Windows.
+scripts/testar-questionarios-profissionais.mjs: expectativa do schema atualizado.
+scripts/verificar-espaco-trabalho.mjs: Letrista pode criar oportunidade, sem ganhar publicação de obra/beat/evento.
+
+BANCO
+Migração aditiva 28 -> 29, sem recriar a base e sem adicionar dados demonstrativos reais.
+Novas tabelas: operacoes_oportunidade, restricoes_contas, bloqueios_usuarios, preferencias_contato, projetos_trabalho, pedidos_oportunidade, oportunidades_profissionais, funcoes_oportunidade, candidaturas_oportunidade, propostas_oportunidade, aceites_oportunidade, acordos_oportunidade, desistencias_acordo, historico_oportunidades, conversas, mensagens.
+Reutiliza usuarios, perfis, profissoes_usuario, eventos, notificacoes, administradores e auditoria_administrativa.
+Foreign keys, checks, unicidade parcial de candidatura ativa, versões únicas, aceites únicos, idempotência de envio, termos imutáveis e trigger de acordo.
+A migração é aplicada ao banco oficial na próxima inicialização da aplicação. Os testes utilizaram somente bases temporárias isoladas.
+
+VALIDAÇÃO
+npm run build: passou.
+npm run check: passou.
+node --check public/js/chamadas.js: passou.
+node scripts/testar-oportunidades.mjs: 108 verificações passaram.
+Inclui publicação pelas 25 profissões, negação a consumidor/legado, rascunho privado, edição/titularidade/revisão, expiração, candidaturas, versões, aceites, idempotência, lotação, desistência bilateral, mensagens, bloqueios, preferência, mediação, triagem e acordo excepcional, vínculos, filtros, suspensão, e-mail, persistência, integridade, 18 páginas HTTP/EJS, sessão e CSRF.
+HTML corrigido: parser confirmou seis textareas independentes e botão de publicação; nenhuma marcação restante dentro dos campos.
+Revisão visual: listagem observada no navegador em desktop e largura 390px. Formulário apresentou erro de aspas no aria-invalid, corrigido e revalidado por HTTP/parser. A nova inspeção visual do formulário não pôde ser concluída porque o navegador integrado ficou indisponível após retomada.
+Regressões: 12 de 15 suítes passaram na execução registrada em regressoes-oportunidades.txt. Banco, perfis, catálogo, questionários, persistência, relações, cadastro profissional, fundação/permissões, busca, curtidas, entrega de e-mail e oportunidades passaram.
+Falhas remanescentes: testar-admin-ui espera texto antigo “Próximo”; testar-identidade-http espera “Complete seu perfil”; testar-seguranca-http passou pela nova permissão do Letrista após ajuste, mas falha mais adiante na expectativa literal “<h3>Faixa em revisão</h3>” do catálogo de Obras. Não foram modificadas as telas antigas para satisfazer essas expectativas. Não foi declarada regressão integral aprovada.
+
+LIMITES VERIFICADOS
+O catálogo global legado ainda tem 26 profissões. O módulo usa as 25 oficiais, excluindo Podcaster, sem apagar profissões históricas. A harmonização global fica fora desta entrega.
+Requisitos textuais de experiência/entrega são declarados pelo candidato e avaliados pelo responsável; profissão, conta, prazo, vagas, bloqueios e duplicação são validados pelo servidor.
+Projetos possuem cadastro/consulta mínimos para vínculo real. Não se declara concluído o módulo completo de projetos/galerias do FN-04.
+Mensagens implementam o suporte necessário a mediação e negociação; denúncia, edição/ocultação e auditoria excepcional de mensagens do FN-08 completo não fazem parte deste suporte mínimo.
+Restrições de conta são verificadas no backend do módulo; não foi criado um painel geral de aplicação de sanções.
+As notificações usam o armazenamento existente. O painel administrativo tem fila e acompanhamento próprios; não foi refeito o centro global de notificações administrativas.
+Não houve publicação em hospedagem externa.
+
+PONTO DE RETOMADA SOLICITADO
+Após esta tela, lembrar o usuário de retomar o pedido anterior: desfazer a colocação do seletor de tema no cabeçalho/sidebar e disponibilizar a troca de tema no perfil. Essa alteração permaneceu pausada durante Oportunidades.

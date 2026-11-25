@@ -1,80 +1,94 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
-<%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: 'Notificações' }) %>
-<div class="page-content notifications-page">
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      CENTRAL DE ATIVIDADES
-    </div>
-    <h1>
-      Notificações
-    </h1>
-    <p>
-      Acompanhe as atualizações reais relacionadas ao seu trabalho na Cypher.
-    </p>
-  </div>
-  <% if (quantidadeNaoLidas > 0) { %>
-    <form method="post" action="/notificacoes/marcar-todas-lidas">
-      <button class="button button-outline" type="submit">
-        Marcar todas como lidas
-      </button>
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-  <% } %>
-</div>
-<% if (notificacoes.length) { %>
-  <section class="notifications-history card-surface" aria-label="Histórico de notificações">
-    <% notificacoes.forEach(notificacao => { %>
-      <article class="notification-history-item<%= notificacao.lida ? '' : ' notification-history-item-unread' %>">
-        <div class="notification-history-mark" aria-hidden="true">
-          <%- icones.bell %>
-        </div>
-        <div class="notification-history-copy">
-          <strong>
-            <%= notificacao.titulo %>
-          </strong>
-          <p>
-            <%= notificacao.mensagem %>
-          </p>
-          <small>
-            <%= notificacao.criadaEm %>
-          </small>
-        </div>
-        <div class="notification-history-actions">
-          <% if (notificacao.url) { %>
-            <a class="text-link" href="<%= notificacao.url %>">
-              Abrir
-            </a>
+<div class="dc-shell">
+  <a href="#caixa-notificacoes" class="dc-skip">Pular para as notificações</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', {
+      titulo: 'Notificações', tituloId: 'titulo-notificacoes-pagina',
+      descricao: 'Acompanhe os avisos da sua conta.'
+    }) %>
+    <main class="dc-content nc-page" id="caixa-notificacoes" tabindex="-1" aria-labelledby="titulo-notificacoes-pagina">
+      <div class="nc-layout">
+        <section class="nc-panel" aria-labelledby="nc-inbox">
+          <div class="nc-heading">
+            <h2 id="nc-inbox">Caixa de entrada</h2>
+            <span><%= quantidadeNaoLidas %> <%= quantidadeNaoLidas === 1 ? 'não lida' : 'não lidas' %></span>
+          </div>
+          <div class="nc-toolbar">
+            <nav aria-label="Filtrar notificações">
+              <a href="/notificacoes" <%- !naoLidas ? 'aria-current="page"' : '' %>>Todas</a>
+              <a href="/notificacoes?filtro=nao-lidas" <%- naoLidas ? 'aria-current="page"' : '' %>>Não lidas</a>
+            </nav>
+            <% if (quantidadeNaoLidas > 0) { %>
+              <form method="post" action="/notificacoes/marcar-todas-lidas">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="nc-button" type="submit">Marcar todas como lidas</button>
+              </form>
+            <% } %>
+          </div>
+          <% if (notificacoes.length) { %>
+            <ul class="nc-list">
+              <% for (const aviso of notificacoes) { %>
+                <li class="<%= !aviso.lida ? 'nc-unread' : '' %>">
+                  <div class="nc-item">
+                    <h3><%= aviso.titulo %></h3>
+                    <% if (aviso.mensagem) { %><p><%= aviso.mensagem %></p><% } %>
+                    <small><%= apresentarData(aviso.criadaEm) %><%= aviso.lida ? '' : ' · Não lida' %></small>
+                  </div>
+                  <div class="nc-actions">
+                    <% if (aviso.url) { %><a class="nc-button" href="<%= aviso.url %>" aria-label="Abrir: <%= aviso.titulo %>">Abrir</a><% } %>
+                    <% for (const [acao, rotulo] of [[aviso.lida ? 'nao-lida' : 'lida', aviso.lida ? 'Marcar como não lida' : 'Marcar como lida'], ['excluir', 'Excluir']]) { %>
+                      <form method="post" action="/notificacoes/<%= encodeURIComponent(aviso.id) %>/<%= acao %>">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="pagina" value="<%= pagina %>">
+                        <input type="hidden" name="filtro" value="<%= naoLidas ? 'nao-lidas' : '' %>">
+                        <button class="nc-button" type="submit" aria-label="<%= rotulo %>: <%= aviso.titulo %>"><%= rotulo %></button>
+                      </form>
+                    <% } %>
+                  </div>
+                </li>
+              <% } %>
+            </ul>
+          <% } else { %>
+            <p class="nc-empty"><%= naoLidas ? 'Você está em dia. Nenhuma notificação não lida.' : 'Sua caixa de notificações está vazia.' %></p>
           <% } %>
-          <% if (!notificacao.lida) { %>
-            <form method="post" action="/notificacoes/<%= encodeURIComponent(notificacao.id) %>/lida">
-              <button class="button button-outline" type="submit">
-                Marcar como lida
-              </button>
+          <% if (pagina > 1 || temProxima) { %>
+            <nav class="nc-paging" aria-label="Páginas da caixa de entrada">
+              <% if (pagina > 1) { %><a class="nc-button" href="<%= urlCaixa(pagina - 1, naoLidas) %>">Anterior</a><% } %>
+              <span>Página <%= pagina %></span>
+              <% if (temProxima) { %><a class="nc-button" href="<%= urlCaixa(pagina + 1, naoLidas) %>">Próxima</a><% } %>
+            </nav>
+          <% } %>
+          <% if (notificacoes.length || naoLidas) { %>
+            <details class="nc-clear">
+              <summary>Limpar caixa</summary>
+              <p>Isso exclui todos os avisos, lidos e não lidos.</p>
+              <form method="post" action="/notificacoes/limpar">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="nc-button" type="submit" name="confirmar" value="sim">Excluir todas as notificações</button>
+              </form>
+            </details>
+          <% } %>
+        </section>
+
+        <section class="nc-panel nc-preferences" id="preferencias" aria-labelledby="nc-preferences">
+          <h2 id="nc-preferences">Preferências de avisos</h2>
+          <p>Escolha quais avisos opcionais quer receber daqui em diante. Recados essenciais de segurança e decisões administrativas continuam ativos.</p>
+          <% if (preferenciasSalvas) { %><p role="status" class="nc-status">Preferências salvas.</p><% } %>
+          <form method="post" action="/notificacoes/preferencias">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-          <% } %>
-        </div>
-      </article>
-    <% }) %>
-  </section>
-<% } else { %>
-  <section class="notifications-empty card-surface">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.bell %>
-    </span>
-    <h2>
-      Nenhuma notificação por enquanto
-    </h2>
-    <p>
-      As atividades reais da sua conta aparecerão aqui quando acontecerem.
-    </p>
-  </section>
-<% } %>
-</div>
-</main>
+            <% for (const categoria of categorias) { %>
+              <label class="nc-choice">
+                <input type="checkbox" name="ativadas" value="<%= categoria.id %>" aria-describedby="nc-<%= categoria.id %>" <%= desativadas.has(categoria.id) ? '' : 'checked' %>>
+                <span><strong><%= categoria.titulo %></strong><small id="nc-<%= categoria.id %>"><%= categoria.descricao %></small></span>
+              </label>
+            <% } %>
+            <button class="dc-primary" type="submit" name="salvar" value="sim">Salvar preferências</button>
+          </form>
+        </section>
+      </div>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: path }) %>
+  </div>
 </div>
 <%- include('../partials/fim-pagina') %>

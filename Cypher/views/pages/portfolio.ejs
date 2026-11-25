@@ -1,0 +1,33 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<div class="dc-shell pf-shell">
+  <a class="dc-skip" href="#portfolio-conteudo">Pular para o portfólio</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: 'Portfólio', tituloId: 'portfolio-titulo', descricao: 'Trabalhos, trajetórias e contribuições na cena.' }) %>
+    <main class="pf-page pf-layout-<%= config.molde %>" id="portfolio-conteudo" aria-labelledby="portfolio-titulo" tabindex="-1">
+      <% if (preview) { %><aside class="pf-notice pf-preview" role="status"><span class="lucide-icon" aria-hidden="true"><%- icones.eye %></span><div><strong>Prévia do portfólio</strong><p>Esta apresentação usa suas escolhas atuais. Elas só serão persistidas ao salvar no editor.</p></div><a class="pf-button" href="/portfolio/edit">Voltar ao editor</a></aside><% } %>
+      <header class="pf-intro">
+        <div class="pf-intro-copy">
+          <span class="pf-eyebrow">CYPHER / PORTFÓLIO PROFISSIONAL</span>
+          <h2><%= titular.nome %></h2>
+          <p class="pf-handle"><%= titular.handle %></p>
+          <% if (titular.biografia) { %><p class="pf-biography"><%= titular.biografia %></p><% } %>
+        </div>
+        <% if (dono) { %><div class="pf-intro-actions"><span class="pf-status"><%= config.visivel ? 'Visível na Cypher' : 'Portfólio reservado' %></span><a class="pf-button pf-primary" href="/portfolio/edit">Editar portfólio <span class="lucide-icon" aria-hidden="true"><%- icones.pen %></span></a></div><% } %>
+      </header>
+      <% if (dono && !config.visivel) { %><p class="pf-notice">Seu portfólio está reservado. A apresentação abaixo permite conferir os trabalhos elegíveis antes de torná-lo visível.</p><% } %>
+      <% if (itens.length) { %>
+        <% grupos.forEach((grupo, index) => { if (grupo.itens.length) { %>
+          <section class="pf-section" aria-labelledby="pf-secao-<%= index %>">
+            <header class="pf-section-heading"><h3 id="pf-secao-<%= index %>"><%= grupo.nome || 'Trabalhos selecionados' %></h3><span class="pf-section-count"><%= grupo.itens.length %> <%= grupo.itens.length === 1 ? 'trabalho' : 'trabalhos' %></span></header>
+            <%- include('../partials/componentes/portfolio-itens', { itens: grupo.itens, molde: config.molde }) %>
+          </section>
+        <% } }) %>
+      <% } else { %>
+        <section class="pf-empty"><span class="lucide-icon" aria-hidden="true"><%- icones.briefcase %></span><h3>Nenhum trabalho disponível nesta vitrine.</h3><p><%= dono ? 'Escolha trabalhos elegíveis no editor ou acompanhe as novas publicações no modo Inteligente.' : 'O profissional ainda não apresenta trabalhos acessíveis neste portfólio.' %></p><% if (dono) { %><a class="pf-button" href="/portfolio/edit">Organizar portfólio</a><% } %></section>
+      <% } %>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: path }) %>
+  </div>
+</div>
+<%- include('../partials/fim-pagina') %>

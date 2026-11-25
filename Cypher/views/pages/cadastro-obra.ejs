@@ -1,8 +1,9 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
+<link rel="stylesheet" href="/css/descoberta.css"><div class="dc-shell">
 <%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: editando ? 'Obras / Editar' : 'Obras / Cadastrar' }) %>
+<div class="dc-page">
+<%- include('../partials/componentes/cabecalho-descoberta',{titulo:editando?'Editar obra':'Nova obra',tituloId:'titulo-obra-editor',descricao:''}) %>
+<main class="dc-content">
 <div class="page-content work-form-page">
 <a href="/espaco-de-trabalho" class="back-link">
   <span class="lucide-icon" aria-hidden="true">
@@ -10,6 +11,7 @@
   </span>
   Voltar ao Espaço de Trabalho
 </a>
+<% if(editando){ %><a class="button button-outline" href="/publicacoes/obra/<%= obraId %>/midias">Enviar capa, áudio, vídeo ou texto</a><% } %>
 <div class="page-header">
   <div>
     <div class="eyebrow">
@@ -374,15 +376,13 @@
     Cancelar
   </a>
   <button class="button button-lime" type="submit">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.fileMusic %>
-    </span>
+    <span class="lucide-icon" aria-hidden="true"><%- icones.fileMusic %></span>
     <%= editando ? 'Salvar alterações' : 'Cadastrar obra' %>
   </button>
 </div>
 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 </div>
-</main>
+</main></div>
 </div>
 <%- include('../partials/fim-pagina') %>

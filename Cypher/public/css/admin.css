@@ -1,0 +1,127 @@
+@import "./descoberta.css";
+
+/* A administração compartilha o shell da Cypher; apenas a paleta é contextual. */
+body.admin-context { background:#0d100c; color:#f5f3e7; }
+.admin-context .admin-shell {
+  --dc-bg:#0d100c; --dc-ink:#f5f3e7; --dc-muted:#b8beac;
+  --dc-line:#b6aa654d; --dc-accent:#efd367; --dc-olive:#c4b35e;
+  --dc-surface:#191e16; --dc-panel:#161b13; --dc-card:#171d15;
+  --dc-field:#10150e; --dc-hover:#33341e; --dc-selected:#39371c;
+  --dc-button:linear-gradient(112deg,#f0d76f,#dfc150 66%,#c9ae42);
+  --dc-button-ink:#191b10; --dc-yellow:#bbd783; --dc-paper:#efd367;
+  --dc-paper-ink:#191b10;
+  background:var(--dc-bg); color:var(--dc-ink);
+}
+.admin-shell .main-shell { background:transparent; min-height:100svh; }
+.admin-shell .sidebar .logo-word { color:var(--dc-accent); }
+.admin-shell .sidebar .logo-mark span { background:var(--dc-accent); }
+.admin-shell .sidebar .logo-mark span:nth-child(2) { background:#bbd783; }
+.admin-shell .sidebar .admin-logout { width:100%; border:1px solid transparent; background:transparent; cursor:pointer; text-align:left; font:inherit; }
+.admin-shell .sidebar .admin-logout:hover { background:var(--dc-hover); }
+.admin-shell .sidebar .user-mini { cursor:default; }
+.admin-shell .sidebar .user-mini:hover { transform:none; }
+.admin-shell .admin-header { width:100%; }
+.admin-header-label { display:block; color:var(--dc-muted); font-size:9px; font-weight:700; letter-spacing:.15em; }
+.admin-shell .admin-header .dc-title h1 { font-size:20px; }
+.admin-header-account { display:flex; align-items:center; gap:9px; color:var(--dc-muted); font-size:12px; }
+.admin-header-account .lucide-icon { color:#bbd783; }
+.admin-shell .admin-page {
+  --admin-border:var(--dc-line); --admin-surface:var(--dc-card); --admin-muted:var(--dc-muted);
+  width:100%; max-width:1400px; margin:0 auto; padding:32px clamp(20px,4vw,64px) 64px;
+  color:var(--dc-ink);
+}
+.admin-shell .admin-page :is(h1,h2,h3,strong) { color:var(--dc-ink); }
+.admin-shell :is(.admin-dashboard-hero,.admin-hero,.op-section-heading,.op-detail-heading) {
+  position:relative; padding:28px 0 32px; margin-bottom:28px; border:0; border-bottom:1px solid var(--dc-line);
+  border-radius:0; background:transparent; box-shadow:none;
+}
+.admin-shell .admin-hero::after { display:none; }
+.admin-dashboard-hero { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+.admin-shell .admin-dashboard-hero h1 { font:700 clamp(30px,4vw,48px)/1.1 'Space Grotesk',sans-serif; letter-spacing:-.05em; margin:12px 0 16px; }
+.admin-shell .admin-dashboard-hero p { max-width:660px; color:var(--dc-muted); line-height:1.6; }
+.admin-shell :is(.eyebrow,.op-eyebrow,.admin-group-heading>span) { color:var(--dc-accent); font-size:11px; letter-spacing:.13em; font-weight:700; }
+.admin-role { padding:8px 12px; border:1px solid var(--dc-line); border-radius:2px 5px 1px 4px; color:#bbd783; font-size:12px; }
+.admin-group-heading { margin:32px 0 16px; }
+.admin-group-heading h2 { font:700 23px/1.2 'Space Grotesk',sans-serif; margin:8px 0; }
+.admin-group-heading p { color:var(--dc-muted); font-size:14px; }
+.admin-quick-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.admin-quick-grid a { display:flex; flex-direction:column; gap:14px; padding:24px; min-height:140px; border:1px solid var(--dc-line); border-top:3px solid var(--dc-accent); border-radius:2px 5px 1px 4px; background:var(--dc-card); transition:background .18s,border-color .18s; }
+.admin-quick-grid a:hover { background:var(--dc-hover); border-color:var(--dc-accent); }
+.admin-quick-grid strong { display:flex; justify-content:space-between; gap:12px; font-family:'Space Grotesk',sans-serif; }
+.admin-quick-grid strong span { color:#bbd783; }
+.admin-quick-grid small { color:var(--dc-muted); font-size:13px; line-height:1.6; }
+.admin-shell .admin-page :is(.card-surface,.admin-panel,.admin-summary,.admin-exception-requests,.admin-review-card,.op-panel) { background:var(--dc-card); border:1px solid var(--dc-line); border-radius:2px 5px 1px 4px; box-shadow:none; color:var(--dc-ink); }
+.admin-disclosure { margin:14px 0; padding:0 !important; overflow:hidden; }
+.admin-disclosure summary { cursor:pointer; padding:20px 24px; font-weight:700; color:var(--dc-accent); }
+.admin-disclosure summary span { display:block; margin:6px 0 0 19px; color:var(--dc-muted); font-size:12px; font-weight:400; }
+.admin-disclosure > :not(summary) { margin:20px 24px; }
+.admin-shell .admin-page :is(input,textarea,select) { background:var(--dc-field); color:var(--dc-ink); border-color:var(--dc-line); border-radius:3px; }
+.admin-shell .admin-page :is(.button-lime,.op-primary) { background:var(--dc-button); border-color:var(--dc-olive); color:var(--dc-button-ink); border-radius:3px; }
+.admin-shell .admin-page .button-outline { background:transparent; border-color:#8eaa5d; color:#c7df94; border-radius:3px; }
+.admin-shell .admin-tabs { background:var(--dc-card); border-color:var(--dc-line); border-radius:3px; }
+.admin-shell .admin-tabs a { color:var(--dc-muted); }
+.admin-shell .admin-tabs a.active { background:var(--dc-button); color:var(--dc-button-ink); }
+.admin-shell .admin-op .op-content { max-width:none; padding:0; }
+.admin-shell .admin-op .op-tabs { display:none; }
+.admin-shell :focus-visible { outline:2px solid #d9d976; outline-offset:4px; }
+@media(min-width:901px) {
+ .admin-shell .main-shell { margin-left:var(--rail); width:calc(100% - var(--rail)); }
+ .admin-shell .sidebar .admin-account .user-mini { min-width:50px; }
+}
+@media(max-width:900px) {
+ .admin-shell .main-shell { margin-left:0; width:100%; }
+ .admin-header-account { display:none; }
+ .admin-shell .admin-header .dc-title { display:block; }
+}
+@media(max-width:600px) {
+ .admin-dashboard-hero { flex-direction:column; gap:16px; }
+ .admin-quick-grid { grid-template-columns:1fr; }
+ .admin-disclosure summary { padding:18px; }
+ .admin-disclosure > :not(summary) { margin:18px; }
+}
+
+/* Contraste local: componentes antigos também usam os tokens gerais do tema. */
+.admin-context .admin-shell {
+  color-scheme:dark;
+  --ink:#f5f3e7; --foreground:#f5f3e7; --muted:#bcc5b2;
+  --muted-foreground:#bcc5b2; --paper:#171d15; --white:#171d15;
+  --background:#0d100c; --card:#171d15; --border:#697453;
+  --line:#697453; --dc-line:#697453; --ring:#efd367;
+}
+.admin-context .admin-shell .admin-page {
+  --admin-muted:#bcc5b2; --admin-border:#697453;
+  --admin-surface:#171d15; --field-focus:#efd367;
+}
+.admin-context .admin-page :is(label,dt,.settings-empty,.admin-category-list) { color:#d7ddcc; }
+.admin-context .admin-page :is(input,textarea,select)::placeholder { color:#aeb8a3; opacity:1; }
+.admin-context .admin-page :is(input,textarea,select):focus { border-color:#efd367; box-shadow:0 0 0 3px #efd36730; }
+.admin-context .admin-page :is(input,textarea,select):disabled { color:#b3baa9; background:#252b20; opacity:1; }
+.admin-context .admin-page :is(.admin-review-subject a,.admin-search-row label,.admin-account-identity strong) { color:#f5f3e7; }
+.admin-context .admin-page .admin-account-identity small { color:#bcc5b2; }
+.admin-context .admin-page :is(.button-lime,.op-primary):is(:hover,:focus-visible) { background:#f5df89; color:#191b10; border-color:#f5df89; }
+.admin-context .admin-page .button-outline:is(:hover,:focus-visible) { background:#293923; color:#e0f1bb; border-color:#bbd783; }
+.admin-context .admin-page button:disabled { opacity:1; background:#30372a; color:#b9c1ae; border-color:#697453; cursor:not-allowed; }
+.admin-context .admin-page :is(.admin-count-pill,.admin-tab-count) { background:#262e20; color:#e5ecd9; border-color:#697453; }
+.admin-context .admin-page .admin-tabs a.active,
+.admin-context .admin-page .admin-tabs a.active :is(strong,small,span:not(.admin-tab-count)) { color:#191b10; }
+.admin-context .admin-page .admin-tabs a.active { background:#efd367; }
+.admin-context .admin-page .admin-tabs a.active .admin-tab-count { color:#191b10; background:#fff0b3; border-color:#77662e; }
+.admin-context .admin-page .admin-policy-note { color:#f2dda0; background:#302a18; border-color:#c6a34f; }
+.admin-context .admin-page :is(.admin-request-status,.admin-pending-label) { color:#f3d983; background:#302a19; border-color:#a68e48; }
+.admin-context .admin-page .admin-request-status.is-waiting-user { color:#c4dfff; background:#1d2a38; border-color:#7798bd; }
+.admin-context .admin-page .admin-decision-status { color:#dcedb5; background:#26321b; border-color:#839657; }
+.admin-context .admin-page .admin-decision-status.is-rejected { color:#ffd0c6; background:#38231f; border-color:#b77e70; }
+.admin-context .admin-page .admin-decision-toolbar { background:#171d15; }
+.admin-context .admin-page .admin-decision-filters button { background:#252e20; color:#d7dfcc; border-color:#697453; }
+.admin-context .admin-page .admin-decision-filters button.is-active { background:#efd367; color:#191b10; border-color:#efd367; }
+.admin-context .admin-page .admin-decision-filters button span { background:#10150e; color:#f5f3e7; }
+.admin-context .admin-page .admin-panel-icon { color:#efd367; background:#34301b; border-color:#9b894b; }
+.admin-context .admin-page .admin-panel-icon-lime { color:#d5eaaa; background:#28341f; }
+.admin-context .admin-page .admin-account-avatar { color:#e0efba; background:#2a361f; border-color:#839657; }
+.admin-context .admin-page .admin-show-more { color:#d5eaaa; background:#252e20; border-color:#839657; }
+.admin-context .admin-page .admin-show-more:hover { color:#f1f8e2; background:#33442a; }
+.admin-context .admin-shell .sidebar.sidebar { --dc-nav-label-ink:#cdd3c1; }
+.admin-context .admin-shell .sidebar.sidebar .side-link.active { color:#191b10; background:#efd367; border-color:#efd367; }
+.admin-context .admin-shell .sidebar.sidebar .side-link.active .side-icon { color:#191b10; }
+.admin-context .admin-shell .sidebar.sidebar .admin-logout:hover { color:#f5f3e7; background:#33341e; }
+.admin-context .admin-shell .admin-header .dc-title h1 { color:#f5f3e7; }

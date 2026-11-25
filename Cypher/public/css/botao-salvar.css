@@ -1,0 +1,76 @@
+.botao-salvar {
+  --salvar-acento: #c4df8b;
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border: 1px solid #77935a;
+  border-radius: 50%;
+  background: #10150f;
+  color: var(--salvar-acento);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.botao-salvar svg {
+  display: block;
+  inline-size: 17px;
+  block-size: 22px;
+}
+
+.botao-salvar__marcador {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 46;
+  stroke-linejoin: round;
+}
+
+.botao-salvar[aria-pressed="true"] {
+  border-color: var(--salvar-acento);
+  background: #304126;
+}
+
+.botao-salvar[aria-pressed="true"] .botao-salvar__marcador {
+  fill: currentColor;
+}
+
+.botao-salvar:focus-visible {
+  outline: 2px solid var(--dc-accent, var(--foreground));
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .botao-salvar:not(:disabled):hover {
+    border-color: var(--salvar-acento);
+    background: #25331e;
+  }
+
+  .botao-salvar[aria-pressed="true"]:not(:disabled):hover {
+    background: #3b4e30;
+  }
+}
+
+.botao-salvar:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.botao-salvar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.botao-salvar[aria-busy="true"] {
+  cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao-salvar {
+    transition: none;
+  }
+
+  .botao-salvar:not(:disabled):active {
+    transform: none;
+  }
+}

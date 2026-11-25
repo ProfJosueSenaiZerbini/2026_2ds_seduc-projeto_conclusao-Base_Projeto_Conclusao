@@ -28,7 +28,7 @@ const roteiro = `
     criarContaCypher,
     obterPerfilPublicoCypher,
   } from "./src/app/models/bancoDados.ts";
-  import { podeCriarBeat, podeCriarObra, podeCriarEvento, opcoesStatusPorCategoria } from "./src/app/models/modeloPerfil.ts";
+  import { podeCriarBeat, podeCriarObra, podeCriarEvento } from "./src/app/models/modeloPerfil.ts";
   import { validarRespostasAtuacao } from "./src/app/models/questionarioAtuacao.ts";
 
   const respostaIncompleta = validarRespostasAtuacao("Rapper", {
@@ -54,14 +54,14 @@ const roteiro = `
 
   inicializarAplicacaoCypher();
   const db = new Database(process.env.CYPHER_DB_PATH);
-  const usuario = { id: "usuario-teste-politica", email: "teste-politica@example.test", codigo: "CYP-TST0000001", numero: 900001, nome: "Teste Política", tag: "CYP-TST-POL" };
-  const admin = { id: "admin-teste-politica", email: "admin-politica@example.test", codigo: "CYP-ADM0000001", numero: 900002, nome: "Equipe Cypher", tag: "CYP-ADM-POL" };
-  const inserirUsuario = db.prepare("INSERT INTO usuarios (id, email, senha_hash, tipo_conta, demonstracao, codigo_publico, numero_sequencial) VALUES (?, ?, NULL, 'profissional', 0, ?, ?)");
-  const inserirPerfil = db.prepare("INSERT INTO perfis (usuario_id, c_tag, nome, funcao, identificador, iniciais, categorias_json, ultima_alteracao_categorias_em, demonstracao) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 0)");
-  const solicitante = { id: "usuario-solicitante-excecao", email: "solicitante-excecao@example.test", codigo: "CYP-REQ0000001", numero: 900003, nome: "Solicitante Exceção", tag: "CYP-REQ-EXC" };
+  const usuario = { id: "usuario-teste-politica", email: "teste-politica@example.test", nome: "Teste Política" };
+  const admin = { id: "admin-teste-politica", email: "admin-politica@example.test", nome: "Equipe Cypher" };
+  const inserirUsuario = db.prepare("INSERT INTO usuarios (id, email, senha_hash, tipo_conta, demonstracao) VALUES (?, ?, NULL, 'profissional', 0)");
+  const inserirPerfil = db.prepare("INSERT INTO perfis (usuario_id, nome, funcao, identificador, iniciais, categorias_json, ultima_alteracao_categorias_em, demonstracao) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 0)");
+  const solicitante = { id: "usuario-solicitante-excecao", email: "solicitante-excecao@example.test", nome: "Solicitante Exceção" };
   for (const conta of [usuario, admin, solicitante]) {
-    inserirUsuario.run(conta.id, conta.email, conta.codigo, conta.numero);
-    inserirPerfil.run(conta.id, conta.tag, conta.nome, "Rapper", "@" + conta.id, "TP", JSON.stringify(["Rapper"]));
+    inserirUsuario.run(conta.id, conta.email);
+    inserirPerfil.run(conta.id, conta.nome, "Rapper", "@" + conta.id, "TP", JSON.stringify(["Rapper"]));
   }
   db.exec("UPDATE usuarios SET email_confirmado_em = CURRENT_TIMESTAMP");
   db.prepare("DELETE FROM perfis WHERE usuario_id = ?").run(admin.id);
@@ -175,12 +175,11 @@ const roteiro = `
     funcao: "Outros",
     identificador: "@conta-categoria-pendente",
     iniciais: "CC",
-    cTag: "CYP-CAT-PENDENTE",
     categorias: ["Outros"],
     outraCategoria: "Engenheiro de palco",
   };
   assert.throws(() => criarContaCypher(contaComSugestao), /CATEGORIA_PROFISSIONAL_INVALIDA/);
-  assert.equal(listarCategoriasProfissionaisCypher().length, 26);
+  assert.equal(listarCategoriasProfissionaisCypher().length, 25);
   assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "Engenheiro de palco"), "criada");
   const propostaCategoria = listarPropostasCategoriasPendentesCypher().find(item => item.categoria === "Engenheiro de palco");
   assert.ok(propostaCategoria);
@@ -195,7 +194,7 @@ const roteiro = `
   assert.equal(revisarPropostaCategoriaCypher(propostaRejeitada.id, admin.id, admin.email, false, "Não representa uma categoria distinta."), true);
   assert.equal(listarCategoriasProfissionaisCypher().includes("Diretor de palco"), false);
 
-  db.prepare("UPDATE perfis SET ultima_alteracao_categorias_em = datetime('now', '-60 days') WHERE usuario_id = ?").run(usuario.id);
+  db.prepare("UPDATE perfis SET ultima_alteracao_categorias_em = datetime('now', '-30 days') WHERE usuario_id = ?").run(usuario.id);
   assert.equal(estadoAlteracaoCategoriasCypher(usuario.id).bloqueada, false);
   assert.equal(atualizarPerfilCypher(dados(["Beatmaker"])), true);
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM auditoria_categorias WHERE usuario_id = ?").get(usuario.id).n, 3);

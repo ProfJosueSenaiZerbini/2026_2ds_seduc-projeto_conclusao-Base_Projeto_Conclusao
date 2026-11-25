@@ -35,7 +35,6 @@ try {
   b.inicializarBancoCypher();
   b.criarContaCypher({
     id: "teste",
-    cTag: "TESTE",
     funcao: "Consumidor",
     nome: "Teste",
     email: "destino@example.org",

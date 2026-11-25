@@ -1,0 +1,9 @@
+<% const foto = imagemPerfilDemo(pessoa.handle); %>
+<a class="search-person" href="<%= '/p/' + encodeURIComponent(pessoa.handle.replace(/^@/, '')) %>">
+  <span class="search-person-portrait" aria-hidden="true"><% if (foto) { %><img src="/img/<%= foto %>" alt="" loading="lazy" decoding="async"><% } else { %><%= pessoa.initials %><% } %></span>
+  <span class="search-person-identity"><strong><%= pessoa.name %></strong><span class="search-person-handle"><%= pessoa.handle %></span></span>
+  <span class="search-person-roles"><% if (rotulos.length) { rotulos.forEach(rotulo => { %><span><%= rotulo %></span><% }) } else { %><span>Atuação profissional</span><% } %></span>
+  <% if (pessoa.city) { %><span class="search-person-location"><span aria-hidden="true"><%- icones.mapPin %></span><%= pessoa.city %></span><% } %>
+  <% if (pessoa.genres.length) { %><span class="search-person-genres"><%= pessoa.genres.slice(0, 3).join(' · ') %></span><% } %>
+  <span class="search-person-action">Conhecer profissional <span aria-hidden="true"><%- icones.arrowUpRight %></span></span>
+</a>

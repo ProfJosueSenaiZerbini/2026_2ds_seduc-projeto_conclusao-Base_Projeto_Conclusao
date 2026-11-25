@@ -1,0 +1,105 @@
+/* A especificidade mantém esta barra independente das abas de outras telas. */
+.ob-acervo .ob-controls {
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px;
+  border: 1px solid var(--dc-line);
+  border-left: 4px solid var(--dc-accent);
+  border-radius: var(--ob-radius);
+  background: var(--dc-surface);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--dc-ink) 12%, transparent);
+}
+.ob-controls .ob-format-tabs { gap: 5px; padding: 3px; border: 0; background: transparent; }
+.ob-controls .ob-format-tabs a {
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 160ms ease, color 160ms ease;
+}
+.ob-controls .ob-format-tabs a::before { display: none; }
+.ob-controls .ob-format-tabs a[aria-current] {
+  color: #192011;
+  background: var(--dc-yellow);
+  border-color: #192011;
+  box-shadow: 2px 2px 0 #192011;
+}
+.ob-controls .ob-format-tabs a:hover:not([aria-current]) { background: var(--dc-card); }
+.ob-acervo .ob-controls .ob-format-tabs a[aria-current],
+.ob-acervo .ob-controls .ob-format-tabs a[aria-current] svg {
+  color: #192011;
+}
+.ob-acervo .ob-controls .ob-format-tabs a[aria-current] {
+  background: #f0d34f;
+  text-shadow: none;
+}
+.ob-controls .ob-collection-button { flex-shrink: 0; border-color: var(--dc-line); background: var(--dc-card); color: var(--dc-ink); }
+.ob-controls .ob-collection-button[aria-pressed="true"] { background: var(--dc-yellow); color: #192011; border-color: #192011; box-shadow: 2px 2px 0 #192011; }
+.ob-controls .ob-collection-button > span { color: inherit; }
+.ob-controls .ob-filter { flex-shrink: 0; }
+.ob-controls .ob-filter summary { min-height: 44px; border-radius: 3px; }
+.ob-controls .ob-filter form { left: auto; right: 0; max-width: calc(100vw - 48px); }
+.ob-controls :is(a, button, summary):focus-visible { outline: 2px solid var(--dc-accent); outline-offset: 4px; }
+.ob-acervo .ob-toolbar { border-top: 0; margin-top: 10px; }
+/* Face opaca acima do número: ele some por encobrimento, sem animar opacidade. */
+.ob-acervo .ob-favorite {
+  isolation: isolate;
+  z-index: 3;
+  width: auto;
+  min-width: 62px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  backdrop-filter: none;
+  overflow: visible;
+}
+.ob-acervo .ob-favorite:hover { transform: none; }
+.ob-acervo .ob-favorite[aria-pressed="true"] { background: transparent; }
+.ob-crown-face {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1px solid #e2e8c780;
+  border-radius: 5px;
+  color: #f8f6e7;
+  background: #10160d;
+  box-shadow: 2px 3px 0 #0005;
+  font: 700 12px "Space Grotesk", sans-serif;
+  transition: background 160ms ease, color 160ms ease;
+}
+.ob-crown-face svg { width: 22px; height: 22px; }
+.ob-favorite[aria-pressed="true"] .ob-crown-face { color: #192011; background: var(--dc-yellow); border-color: var(--dc-yellow); }
+.ob-favorite:focus-visible { outline: 2px solid var(--dc-yellow); outline-offset: 4px; }
+.ob-favorite:disabled { cursor: wait; }
+.ob-like-jump {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: var(--dc-yellow);
+  text-shadow: -1px -1px 0 #10160d, 1px -1px 0 #10160d, -1px 1px 0 #10160d, 1px 1px 0 #10160d;
+  font: 800 26px/1 "Space Grotesk", sans-serif;
+  animation: ob-crown-jump 850ms both;
+}
+@keyframes ob-crown-jump {
+  0% { transform: translate(-8px, 0) rotate(-12deg) scale(.7); animation-timing-function: cubic-bezier(.18,.65,.35,1); }
+  48% { transform: translate(0, -58px) rotate(5deg) scale(1.1); animation-timing-function: cubic-bezier(.55,0,.85,.4); }
+  100% { transform: translate(7px, 0) rotate(0) scale(.7); }
+}
+@media (max-width: 700px) {
+  .ob-controls .ob-format-tabs { flex-basis: 100%; }
+  .ob-controls .ob-collection-button { flex: 1; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ob-like-jump { display: none; animation: none; }
+  .ob-crown-face, .ob-controls .ob-format-tabs a { transition: none; }
+}

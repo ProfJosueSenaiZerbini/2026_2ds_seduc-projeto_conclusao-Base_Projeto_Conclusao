@@ -1,0 +1,13 @@
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<div class="dc-shell pf-shell"><%- include('../partials/barra-lateral',{path}) %><div class="dc-page">
+<%- include('../partials/componentes/cabecalho-descoberta',{titulo:'Portfólio',tituloId:'pf-titulo',descricao:'Trabalhos, contribuições e trajetórias na cena.'}) %>
+<main class="pf-page">
+<a class="button button-outline" href="<%= voltar %>">← Voltar ao portfólio</a>
+<article class="pf-detail"><p class="eyebrow"><%= item.nomeTipo %></p><h1><%= item.titulo %></h1><p><strong><%= titular.nome %></strong> · <%= item.proprio?'Trabalho próprio':'Participação confirmada' %></p><p><%= item.papel %></p><p>Responsável pelo registro: <%= item.autor %></p>
+<%- include('../partials/componentes/midias-publicacao',{tipo:item.tipo,id:item.id}) %>
+<% if(item.capa && !item.capa.startsWith('/publication-media/')){ %><img class="pf-detail-cover" src="<%= item.capa %>" alt="<%= item.titulo %>"><% } %>
+<p class="pf-detail-prose"><%= item.descricao %></p><dl class="pf-detail-facts"><% fatos.forEach(([nome,valor])=>{ %><div><dt><%= nome %></dt><dd><%= valor %></dd></div><% }) %></dl>
+<% if(origem){ %><a class="button button-lime" href="<%= origem %>">Abrir trabalho e materiais</a><% } %>
+<a class="button button-outline" href="/suporte/new?objeto_tipo=<%= item.tipo %>&amp;objeto_id=<%= encodeURIComponent(item.id) %>">Denunciar este registro</a>
+<p class="pf-note">A apresentação no portfólio identifica uma atuação. Não representa certificação de autoria, contratação ou reputação.</p>
+</article></main><%- include('../partials/navegacao-mobile',{rotaAtual:path}) %></div></div><%- include('../partials/fim-pagina') %>

@@ -19,6 +19,7 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+.events-map-link { display: inline-flex; align-items:center; gap:8px; min-height:44px; padding:10px 14px; border:1px solid var(--dc-line); border-radius:3px 8px 2px 6px; color:var(--dc-ink); background:var(--dc-panel); }
 
 .events-categories a {
   max-width: 100%;

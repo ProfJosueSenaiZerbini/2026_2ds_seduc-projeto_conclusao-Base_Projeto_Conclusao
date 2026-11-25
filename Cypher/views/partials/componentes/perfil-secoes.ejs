@@ -1,0 +1,92 @@
+<% const a = apresentacao, edit = '/profile?editar=1&secao=';
+const categorias = a.contexto ? [a.contexto] : pessoa.categories;
+const trajetoria = categorias.map(categoria => {
+  const registro = pessoa.atuacoes.find(i => i.categoria === categoria);
+  const perguntas = questionariosAtuacao.find(q => q.categoria === categoria)?.perguntas || [];
+  return {nome: pessoa.rotulosCategorias[categoria] || categoria, respostas: perguntas.map(p => ({
+    pergunta:p.pergunta, campo:p.campo, valor:formatarRespostaAtuacao(registro?.respostas[p.campo])
+  })).filter(r => r.valor)};
+});
+const titulos = {catalogo:'Catálogo autoral', creditos:'Participações e créditos', galeria:'Galeria e portfólio', sobre:'Sobre', atuacao:'Atuação profissional', avaliacoes:'Avaliações recebidas'};
+%>
+<section class="pf-collection" id="conteudo-perfil" aria-label="Conteúdo do perfil">
+  <div class="pf-controls">
+    <nav class="pf-nav" aria-label="Seções do perfil">
+      <% for (const aba of a.abas) { %><a href="<%= a.url(aba.id) %>" <%= a.aba === aba.id ? 'aria-current=page' : '' %>><%= aba.nome %></a><% } %>
+    </nav>
+    <% if (pessoa.categories.length > 1) { %>
+      <form method="get" action="<%= a.base %>#conteudo-perfil" class="pf-context" data-profile-context>
+        <label><%- icones.sliders %><span class="pf-sr">Filtrar por atuação profissional</span><select name="atuacao"><option value="">Todas as atuações</option>
+        <% for (const c of pessoa.categories) { %><option value="<%= c %>" <%= a.contexto === c ? 'selected' : '' %>><%= pessoa.rotulosCategorias[c] || c %></option><% } %></select><%- icones.chevronDown %></label>
+        <input type="hidden" name="aba" value="<%= a.aba %>"><button class="pf-button" type="submit">Aplicar</button>
+      </form>
+    <% } %>
+  </div>
+  <div class="pf-panel">
+    <header class="pf-section-head">
+      <h2><%= titulos[a.aba] %></h2>
+      <% if (a.portfolioUrl) { %><a class="pf-link" href="<%= a.portfolioUrl %>">Abrir portfólio <%- icones.externalLink %></a>
+      <% } else if (a.editavel && a.aba === 'galeria') { %><a class="pf-link" href="/portfolio/edit">Organizar portfólio</a><% } %>
+    </header>
+    <% if (a.obra) { %><%- include('perfil-ficha-obra',{obra:a.obra}) %><% } %>
+    <% if (['catalogo','creditos','galeria'].includes(a.aba)) { %>
+      <% if (a.itens.length) { %>
+        <div class="pf-grid">
+          <% for (const item of a.itens) { %>
+            <a class="pf-work" href="<%= item.url %>">
+              <div class="pf-work-cover"><% if (item.capa) { %><img src="<%= item.capa %>" alt="" loading="lazy" decoding="async"><% } else { %><span class="pf-work-placeholder" aria-hidden="true"><%- item.tipo==='projeto' ? icones.design : item.tipo==='evento' ? icones.calendarDays : icones.disc %></span><% } %></div>
+              <div class="pf-work-text"><small><%= item.formato %></small><h3><%= item.titulo %></h3><% if (item.detalhe) { %><p><%= item.detalhe %></p><% } %></div>
+            </a>
+          <% } %>
+        </div>
+        <% if (a.paginas > 1) { %><nav class="pf-paging" aria-label="Páginas de trabalhos">
+          <% if (a.pagina > 1) { %><a class="pf-button" href="<%= a.url(a.aba,a.pagina-1) %>">Anterior</a><% } %>
+          <span>Página <%= a.pagina %> de <%= a.paginas %></span>
+          <% if (a.pagina < a.paginas) { %><a class="pf-button" href="<%= a.url(a.aba,a.pagina+1) %>">Próxima</a><% } %>
+        </nav><% } %>
+      <% } else { %>
+        <div class="pf-empty"><p><%= a.aba === 'catalogo' ? 'Seu catálogo começa com o primeiro trabalho autoral.' : 'Ainda não há trabalhos nesta seleção.' %></p>
+          <% if (a.editavel) { %><a class="pf-link" href="<%= a.aba === 'galeria' ? '/work-projects/new' : '/espaco-de-trabalho' %>"><%= a.aba === 'galeria' ? 'Adicionar um projeto' : 'Abrir espaço de trabalho' %></a><% } %></div>
+      <% } %>
+    <% } else if (a.aba === 'sobre') { %>
+      <div class="pf-about">
+        <% if (pessoa.biography.length > 165) { %><p class="pf-biography"><%= pessoa.biography %></p><% } %>
+        <dl class="pf-facts">
+          <% if (pessoa.contact) { %><div id="contato"><dt>Contato profissional<%= a.proprio && !pessoa.contactPublic ? ' · Só você' : '' %></dt><dd><%= pessoa.contact %></dd></div><% } %>
+          <% if (pessoa.skills?.length) { %><div><dt>Competências e especializações<%= a.proprio && !pessoa.skillsPublic ? ' · Só você' : '' %></dt><dd><%= pessoa.skills.join(' · ') %></dd></div><% } %>
+          <% if (pessoa.genres?.length) { %><div><dt>Estilos e influências</dt><dd><%= pessoa.genres.join(' · ') %></dd></div><% } %>
+          <% if (pessoa.equipment.length) { %><div><dt>Equipamentos</dt><dd><%= pessoa.equipment.join(' · ') %></dd></div><% } %>
+          <% for (const g of trajetoria.filter(g => g.respostas.some(r => r.campo === 'tempoAtuacao')).slice(0,3)) { %>
+            <div><dt>Experiência · <%= g.nome %></dt><dd><%= g.respostas.find(r => r.campo === 'tempoAtuacao').valor %></dd></div>
+          <% } %>
+          <div><dt>Na Cypher desde</dt><dd><%= new Date(pessoa.createdAt).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) %></dd></div>
+        </dl>
+        <% if (a.editavel && !pessoa.biography) { %><a class="pf-link" href="<%= edit %>pessoal#editar-perfil">Adicionar biografia</a><% } %>
+        <% if (a.contexto && trajetoria[0]?.respostas.length) { %><a class="pf-link" href="<%= a.url('atuacao') %>">Ver experiência em <%= trajetoria[0].nome %></a><% } %>
+      </div>
+    <% } else if (a.aba === 'atuacao') { %>
+      <div class="pf-experience">
+        <% for (const grupo of trajetoria) { %>
+          <details <%= trajetoria.length === 1 ? 'open' : '' %>><summary><%= grupo.nome %><%- icones.chevronDown %></summary>
+          <% if (grupo.respostas.length) { %><dl class="pf-facts"><% for (const r of grupo.respostas) { %><div><dt><%= r.pergunta %></dt><dd><%= r.valor %></dd></div><% } %></dl>
+          <% } else { %><p><%= a.proprio ? 'Você ainda pode acrescentar sua experiência nesta atuação.' : 'A trajetória desta atuação ainda não foi compartilhada.' %></p><% } %></details>
+        <% } %>
+        <% if (a.editavel) { %><a class="pf-link" href="<%= edit %>profissional#editar-perfil">Editar atuação profissional</a><% } %>
+      </div>
+    <% } else if (a.aba === 'avaliacoes' && a.rep) { %>
+      <div class="pf-reviews">
+        <p class="pf-score"><strong><%= a.rep.media === null ? '—' : a.rep.media.toFixed(1).replace('.',',')+' / 5' %></strong> <%= a.rep.estado %></p>
+        <% if (a.rep.media !== null) { %><span class="pf-stars" aria-label="<%= a.rep.media.toFixed(1) %> de 5 estrelas"><%= '★'.repeat(Math.round(a.rep.media)) %></span><% } %>
+        <p><%= a.rep.avaliacoes %> avaliações liberadas · <%= a.rep.avaliadores %> profissionais diferentes</p>
+        <% for (const r of a.rep.avaliacoesPublicas.slice(0,3)) { %><article><h3><%= r.avaliador %></h3><small><%= r.titulo %> · <%= r.nota.toFixed(1).replace('.',',') %> / 5</small><% if (r.comentario) { %><p><%= r.comentario %></p><% } %></article><% } %>
+        <a class="pf-link" href="<%= a.proprio ? '/colaboracoes' : '/reputacao/' + encodeURIComponent(pessoa.handle.slice(1)) %>"><%= a.proprio ? 'Minhas colaborações e avaliações' : 'Consultar histórico de avaliações' %></a>
+      </div>
+    <% } %>
+    <% if (a.cena && (a.cena.conexoes.length || a.cena.projetos.length)) { %>
+      <details class="pf-network"><summary>Trabalhos em comum <%- icones.chevronDown %></summary>
+        <div class="pf-network-links"><% for (const c of a.cena.conexoes) { %><a href="<%= c.url %>"><strong><%= c.nome %></strong><small><%= c.obra %></small></a><% } %>
+        <% for (const p of a.cena.projetos) { %><a href="/work-projects/<%= encodeURIComponent(p.id) %>"><strong><%= p.titulo %></strong><small>Projeto em equipe</small></a><% } %></div>
+      </details>
+    <% } %>
+  </div>
+</section>

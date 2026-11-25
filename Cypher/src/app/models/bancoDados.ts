@@ -1,8 +1,24 @@
 // @ts-nocheck
+import { esquemaPreferenciasNotificacoes } from "./preferenciasNotificacoes.js";
+import { esquemaOportunidades } from "./esquemaOportunidades.js";
+import { esquemaTrabalhos } from "./esquemaTrabalhos.js";
+import { esquemaPortfolio } from "./esquemaPortfolio.js";
+import { esquemaColaboracoes } from "./esquemaColaboracoes.js";
+import { esquemaCentral } from "./esquemaCentral.js";
+import { esquemaSuporte } from "./esquemaSuporte.js";
+import { esquemaContas } from "./esquemaContas.js";
+import { esquemaBeats } from "./esquemaBeats.js";
+import { esquemaEventos } from "./esquemaEventos.js";
+import { esquemaCena } from "./esquemaCena.js";
+import { esquemaInteracoes } from "./esquemaInteracoes.js";
+import { esquemaMidiasRepresentacao } from "./esquemaMidiasRepresentacao.js";
+import { interesseEventoLegado, cancelarInteresseEventoLegado, statusInteresseEventoLegado } from "./eventos.js";
+import { contaEncerrada, menorProtegido, preferenciasPrivacidadePermitidas } from "./protecoesConta.js";
+import { objetoDisponivel, objetoSobMedida, situacaoContaModeracao } from "./politicasModeracao.js";
 import Database from "better-sqlite3";
 import { rotuloProfissional } from "./tratamentoProfissional.js";
 import { randomUUID } from "node:crypto";
-import { dataAtualCadastro, normalizarIdentificador, nomePublico, iniciaisPublicas, validarDadosIdentidade, validarIdentificador } from "../validators/validarIdentidade.js";
+import { idadeNaData, dataAtualCadastro, normalizarIdentificador, iniciaisPublicas, validarDadosIdentidade, validarIdentificador } from "../validators/validarIdentidade.js";
 import fs from "node:fs";
 import path from "node:path";
 import { podePublicar, type TipoConta, type PapelAdministrativo } from "./permissoes.js";
@@ -34,8 +50,8 @@ export type DadosNovaConta = {
   tipoConta: TipoConta;
   nome: string;
   nomeInformado?: string;
+  nomePublico?: boolean;
   vulgo?: string;
-  usarVulgo?: boolean;
   nascimento?: string;
   tratamento?: string;
   generoPersonalizado?: string;
@@ -43,7 +59,6 @@ export type DadosNovaConta = {
   funcao: string;
   identificador: string;
   iniciais: string;
-  cTag: string;
   categorias: string[];
   outraCategoria: string;
   atuacoes?: AtuacaoProfissionalPersistida[];
@@ -58,27 +73,26 @@ export type CredenciaisUsuario = {
 export type UsuarioDaSessao = {
   id: string;
   email: string | null;
-  publicCode: string;
   tipoConta: TipoConta;
   papelAdministrativo?: PapelAdministrativo | null;
   demonstracao: boolean;
   name: string;
+  namePublic?: boolean;
   nomeInformado?: string;
   vulgo?: string;
-  usarVulgo?: boolean;
   nascimento?: string;
   tratamento?: string;
   generoPersonalizado?: string;
-  identidadeRevisada?: boolean;
   identificadorAlteradoEm?: string | null;
   emailConfirmado?: string | null;
   role: string;
   city: string;
   handle: string;
   initials: string;
-  cTag: string;
   reputation: number;
   genres: string[];
+  skills?: string[];
+  skillsPublic?: boolean;
   categories: string[];
   otherCategory: string;
   biography: string;
@@ -99,6 +113,8 @@ export type DadosAtualizacaoPerfil = {
   contact: string;
   availability: string;
   genres: string[];
+  skills?: string[];
+  somenteAtuacao?: boolean;
   propostaGenero?: string;
   categories: string[];
   atuacoes?: AtuacaoProfissionalPersistida[];
@@ -109,14 +125,13 @@ export type DadosAtualizacaoPerfil = {
   tipoConta: TipoConta;
 };
 export type PerfilPublico = {
+  vulgo: string;
   rotulosCategorias: Record<string,string>;
   name: string;
   role: string;
   city: string;
   handle: string;
-  publicCode: string;
   initials: string;
-  cTag: string;
   biography: string;
   contact: string;
   availability: string;
@@ -147,6 +162,7 @@ export type FiltrosBuscaPerfisPublicos = {
   localizacao: string;
 };
 export type PerfilBuscaPublico = {
+  userId: string;
   rotulosCategorias: Record<string,string>;
   name: string;
   role: string;
@@ -402,7 +418,7 @@ export type ObraContaPersistida = ObraPersistida & {
 };
 
 let banco;
-export const versaoEsquema = 28;
+export const versaoEsquema = 37;
 function iniciaisPublicas(nome) {
   const partes = nome
     .normalize("NFD")
@@ -418,17 +434,6 @@ function iniciaisPublicas(nome) {
   if (iniciais.length === 1) return `${iniciais}${iniciais}`;
   return iniciais.slice(0, 2);
 }
-function codigoPublicoReal(iniciais, numero) {
-  const normalizadas = iniciais
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z]/gi, "")
-    .toUpperCase();
-  const prefixo = normalizadas
-    ? (normalizadas + (normalizadas[1] ?? normalizadas[0])).slice(0, 2)
-    : "AA";
-  return `CYP-${prefixo}${String(numero).padStart(7, "0")}`;
-}
 const esquema = `
   CREATE TABLE IF NOT EXISTS usuarios (
     id TEXT PRIMARY KEY,
@@ -438,8 +443,6 @@ const esquema = `
     tipo_conta TEXT NOT NULL DEFAULT 'profissional'
       CHECK (tipo_conta IN ('consumidor', 'profissional', 'administrativo')),
     demonstracao INTEGER NOT NULL DEFAULT 0 CHECK (demonstracao IN (0, 1)),
-    codigo_publico TEXT NOT NULL UNIQUE,
-    numero_sequencial INTEGER UNIQUE,
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
@@ -450,15 +453,15 @@ const esquema = `
 
   CREATE TABLE IF NOT EXISTS perfis (
     usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
-    c_tag TEXT NOT NULL UNIQUE,
     nome TEXT NOT NULL,
     nome_informado TEXT NOT NULL DEFAULT '',
+    nome_publico INTEGER NOT NULL DEFAULT 1 CHECK (nome_publico IN (0, 1)),
+    competencias_json TEXT NOT NULL DEFAULT '[]',
+    competencias_publicas INTEGER NOT NULL DEFAULT 0 CHECK (competencias_publicas IN (0, 1)),
     vulgo TEXT NOT NULL DEFAULT '',
-    usar_vulgo INTEGER NOT NULL DEFAULT 0 CHECK (usar_vulgo IN (0,1)),
     nascimento TEXT NOT NULL DEFAULT '',
     tratamento TEXT NOT NULL DEFAULT '',
     genero_personalizado TEXT NOT NULL DEFAULT '',
-    identidade_revisada INTEGER NOT NULL DEFAULT 0 CHECK (identidade_revisada IN (0,1)),
     identificador_alterado_em TEXT,
     funcao TEXT NOT NULL,
     cidade TEXT NOT NULL DEFAULT '',
@@ -513,6 +516,13 @@ const esquema = `
 
   CREATE INDEX IF NOT EXISTS indice_obras_proprietario
     ON obras(proprietario_id, criado_em);
+
+  CREATE TABLE IF NOT EXISTS curtidas_obras (
+    obra_id TEXT NOT NULL REFERENCES obras(id) ON DELETE CASCADE,
+    usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (obra_id, usuario_id)
+  );
 
   CREATE TABLE IF NOT EXISTS atuacoes_obra (
     obra_id TEXT NOT NULL REFERENCES obras(id) ON DELETE CASCADE,
@@ -651,10 +661,6 @@ const esquema = `
   CREATE INDEX IF NOT EXISTS indice_notificacoes_usuario_lida
     ON notificacoes(usuario_destino_id, lida, criada_em);
 
-  CREATE TABLE IF NOT EXISTS sequencias (
-    nome TEXT PRIMARY KEY,
-    proximo_numero INTEGER NOT NULL CHECK (proximo_numero > 0)
-  );
 
   CREATE TABLE IF NOT EXISTS propostas_generos (
     id TEXT PRIMARY KEY,
@@ -1181,7 +1187,7 @@ function linhaNotificacao(linha) {
     criadaEm: String(linha.criadaEm),
   };
 }
-export function listarNotificacoesCypher(usuarioId, limite = 8) {
+export function listarNotificacoesCypher(usuarioId, limite = 8, somenteNaoLidas = false, inicio = 0) {
   return bancoAtivo()
     .prepare(
       `
@@ -1190,31 +1196,32 @@ export function listarNotificacoesCypher(usuarioId, limite = 8) {
              entidade_id AS entidadeId,
              lida, criada_em AS criadaEm
       FROM notificacoes
-      WHERE usuario_destino_id = ?
-      ORDER BY datetime(criada_em) DESC, id DESC
-      LIMIT ?
+      WHERE usuario_destino_id = ? AND removida_em IS NULL
+        AND (? = 0 OR lida = 0)
+      ORDER BY criada_em DESC, id DESC
+      LIMIT ? OFFSET ?
       `
     )
-    .all(usuarioId, Math.max(1, Math.min(50, limite)))
+    .all(usuarioId, Number(somenteNaoLidas), Math.max(1, Math.min(50, limite)), inicio)
     .map(linha => linhaNotificacao(linha));
 }
 export function contarNotificacoesNaoLidasCypher(usuarioId) {
   return bancoAtivo()
     .prepare(
-      "SELECT COUNT(*) AS total FROM notificacoes WHERE usuario_destino_id = ? AND lida = 0"
+      "SELECT COUNT(*) AS total FROM notificacoes WHERE usuario_destino_id = ? AND lida = 0 AND removida_em IS NULL"
     )
     .get(usuarioId).total;
 }
-export function marcarNotificacaoLidaCypher(notificacaoId, usuarioId) {
+export function marcarNotificacaoLidaCypher(notificacaoId, usuarioId, lida = true) {
   const resultado = bancoAtivo()
     .prepare(
       `
       UPDATE notificacoes
-      SET lida = 1, lida_em = CURRENT_TIMESTAMP
-      WHERE id = ? AND usuario_destino_id = ? AND lida = 0
+      SET lida = ?, lida_em = CASE WHEN ? = 1 THEN CURRENT_TIMESTAMP ELSE NULL END
+      WHERE id = ? AND usuario_destino_id = ? AND lida <> ? AND removida_em IS NULL
       `
     )
-    .run(notificacaoId, usuarioId);
+    .run(Number(lida), Number(lida), notificacaoId, usuarioId, Number(lida));
   return resultado.changes > 0;
 }
 export function marcarTodasNotificacoesLidasCypher(usuarioId) {
@@ -1223,7 +1230,7 @@ export function marcarTodasNotificacoesLidasCypher(usuarioId) {
       `
       UPDATE notificacoes
       SET lida = 1, lida_em = CURRENT_TIMESTAMP
-      WHERE usuario_destino_id = ? AND lida = 0
+      WHERE usuario_destino_id = ? AND lida = 0 AND removida_em IS NULL
       `
     )
     .run(usuarioId);
@@ -1250,6 +1257,23 @@ function ofertasDoBeat(beatId) {
       return { ...oferta, ativa: Boolean(oferta.ativa) };
     });
 }
+function ofertasPublicadasDoBeat(beatId) {
+  return bancoAtivo().prepare(`
+    SELECT o.id, o.tipo, o.descricao, v.modalidade,
+           CASE WHEN v.modalidade <> 'exclusiva' THEN v.preco_centavos END AS precoCentavos,
+           (SELECT json_group_array(DISTINCT a.mime)
+            FROM json_each(v.arquivos_json) f
+            JOIN beat_arquivos a ON a.id=f.value
+            WHERE a.beat_id=o.beat_id AND a.finalidade='entrega') AS formatosJson
+    FROM ofertas_beats o
+    JOIN beat_oferta_versoes v ON v.oferta_id=o.id
+      AND v.numero=(SELECT MAX(numero) FROM beat_oferta_versoes WHERE oferta_id=o.id)
+    WHERE o.beat_id=? AND o.ativa=1
+    ORDER BY o.criado_em, o.id
+  `).all(beatId).map(({ formatosJson, ...oferta }) => ({
+    ...oferta, ativa: true, formatos: JSON.parse(formatosJson),
+  }));
+}
 function precoEmCentavos(valor) {
   if (!valor.trim()) return null;
   const normalizado = valor.replace(",", ".");
@@ -1259,6 +1283,7 @@ function precoEmCentavos(valor) {
     : null;
 }
 function substituirOfertasBeat(db, beatId, ofertas, vendaExclusiva) {
+  if (db.prepare("SELECT 1 FROM beat_oferta_versoes v JOIN ofertas_beats o ON o.id=v.oferta_id WHERE o.beat_id=? LIMIT 1").get(beatId)) return;
   db.prepare("DELETE FROM ofertas_beats WHERE beat_id = ?").run(beatId);
   const inserir = db.prepare(`
     INSERT INTO ofertas_beats (id, beat_id, tipo, preco_centavos, descricao)
@@ -1313,6 +1338,8 @@ function exigirPapelAdministrativo(usuarioId, acao) {
   if (!conta || !(conta.papel === 'super_admin' || (conta.papel === 'moderador' && acao === 'excecoes'))) throw new Error("ACESSO_ADMINISTRATIVO_NEGADO");
 }
 function exigirProfissional(usuarioId) {
+  if(contaEncerrada(bancoAtivo(),usuarioId))throw new Error("CONTA_ENCERRADA");
+  if(situacaoContaModeracao(bancoAtivo(),usuarioId).restrita)throw new Error("CONTA_RESTRITA");
   const conta = bancoAtivo().prepare("SELECT tipo_conta FROM usuarios WHERE id=? AND demonstracao=0").get(usuarioId);
   if (conta?.tipo_conta !== 'profissional') throw new Error("ACAO_PROFISSIONAL_NAO_PERMITIDA");
 }
@@ -1322,7 +1349,8 @@ export function inicializarBancoCypher() {
   const caminho = caminhoBancoCypher();
   fs.mkdirSync(path.dirname(caminho), { recursive: true });
   const conexao = new Database(caminho);
-  conexao.pragma("foreign_keys = ON");
+  // A troca das tabelas exige adiar a validação das referências até o fim da transação.
+  conexao.pragma("foreign_keys = OFF");
   conexao.pragma("busy_timeout = 5000");
   try {
     conexao.transaction(() => {
@@ -1333,7 +1361,6 @@ export function inicializarBancoCypher() {
       if (versao === 21) {
         conexao.exec(`ALTER TABLE perfis ADD COLUMN nome_informado TEXT NOT NULL DEFAULT '';
           ALTER TABLE perfis ADD COLUMN vulgo TEXT NOT NULL DEFAULT '';
-          ALTER TABLE perfis ADD COLUMN usar_vulgo INTEGER NOT NULL DEFAULT 0 CHECK (usar_vulgo IN (0,1));
           ALTER TABLE perfis ADD COLUMN nascimento TEXT NOT NULL DEFAULT '';
           ALTER TABLE perfis ADD COLUMN tratamento TEXT NOT NULL DEFAULT '';
           ALTER TABLE perfis ADD COLUMN identificador_alterado_em TEXT;
@@ -1341,15 +1368,47 @@ export function inicializarBancoCypher() {
         `);
       }
       if (versao === 21 || versao === 22) {
-        conexao.exec(`ALTER TABLE perfis ADD COLUMN genero_personalizado TEXT NOT NULL DEFAULT '';
-          ALTER TABLE perfis ADD COLUMN identidade_revisada INTEGER NOT NULL DEFAULT 0 CHECK (identidade_revisada IN (0,1));
-          UPDATE perfis SET identidade_revisada=1 WHERE usar_vulgo=1;`);
+        conexao.exec(`ALTER TABLE perfis ADD COLUMN genero_personalizado TEXT NOT NULL DEFAULT '';`);
       }
       const colunasUsuarios = versao === 0
         ? []
         : conexao.pragma("table_info(usuarios)");
       if (versao !== 0 && !colunasUsuarios.some(coluna => coluna.name === "email_confirmado_em")) {
         conexao.exec("ALTER TABLE usuarios ADD COLUMN email_confirmado_em TEXT");
+      }
+      if (versao !== 0 && versao < 37) {
+        const colunas = conexao.pragma("table_info(perfis)") as Array<{ name: string }>;
+        if (!colunas.some(coluna => coluna.name === "nome_publico")) {
+          conexao.exec(`ALTER TABLE perfis ADD COLUMN nome_publico INTEGER NOT NULL DEFAULT 1 CHECK (nome_publico IN (0, 1));
+            ALTER TABLE perfis ADD COLUMN competencias_json TEXT NOT NULL DEFAULT '[]';
+            ALTER TABLE perfis ADD COLUMN competencias_publicas INTEGER NOT NULL DEFAULT 0 CHECK (competencias_publicas IN (0, 1));`);
+        }
+      }
+      if (versao >= 21 && versao < 35) {
+        conexao.pragma("legacy_alter_table = ON");
+        conexao.exec(`
+          UPDATE perfis SET nome = trim(nome_informado) WHERE trim(nome_informado) <> '';
+          DROP TABLE IF EXISTS sequencias;
+        `);
+        for (const tabela of ["usuarios", "perfis"]) {
+          const definicao = esquema.match(new RegExp(`CREATE TABLE IF NOT EXISTS ${tabela} \\(.*?\n  \\);`, "s"))![0];
+          const nova = `${tabela}_sem_identidade_antiga`;
+          const indicesEGatilhos = conexao.prepare(
+            "SELECT sql FROM sqlite_master WHERE tbl_name = ? AND type IN ('index', 'trigger') AND sql IS NOT NULL"
+          ).all(tabela).filter(item => !/\b(codigo_publico|numero_sequencial|c_tag|usar_vulgo|identidade_revisada)\b/i.test(item.sql));
+          conexao.exec(definicao.replace(`IF NOT EXISTS ${tabela}`, nova));
+          const colunas = conexao.pragma(`table_info(${nova})`).map(coluna => coluna.name).join(", ");
+          conexao.exec(`
+            INSERT INTO ${nova} (${colunas}) SELECT ${colunas} FROM ${tabela};
+            DROP TABLE ${tabela};
+            ALTER TABLE ${nova} RENAME TO ${tabela};
+          `);
+          for (const item of indicesEGatilhos) conexao.exec(item.sql);
+        }
+        const atualizarIniciais = conexao.prepare("UPDATE perfis SET iniciais=? WHERE usuario_id=?");
+        for (const perfil of conexao.prepare("SELECT usuario_id, nome FROM perfis WHERE trim(nome_informado) <> ''").all())
+          atualizarIniciais.run(iniciaisPublicas(perfil.nome), perfil.usuario_id);
+        conexao.pragma("legacy_alter_table = OFF");
       }
       conexao.exec(esquema);
       if (!conexao.pragma("table_info(eventos)").some(coluna => coluna.name === "tema_cartao")) {
@@ -1359,8 +1418,6 @@ export function inicializarBancoCypher() {
         conexao.exec("ALTER TABLE eventos ADD COLUMN tipos_workshop_json TEXT NOT NULL DEFAULT '[]'");
       }
       conexao.exec(`
-        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_codigo_publico ON usuarios(codigo_publico);
-        CREATE UNIQUE INDEX IF NOT EXISTS indice_usuarios_numero_sequencial_real ON usuarios(numero_sequencial) WHERE demonstracao = 0 AND numero_sequencial IS NOT NULL;
         CREATE TABLE IF NOT EXISTS administradores (
           usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
           nome TEXT NOT NULL,
@@ -1422,11 +1479,47 @@ export function inicializarBancoCypher() {
           INSERT INTO auditoria_administrativa (id,autor_id,acao,alvo_id,detalhe)
           VALUES (lower(hex(randomblob(16))),NEW.revisor_id,'solicitacao_' || NEW.status,NEW.usuario_id,NEW.motivo_revisao);
         END;
-        INSERT INTO sequencias (nome, proximo_numero) VALUES ('usuarios_reais', 1) ON CONFLICT DO NOTHING;
       `);
+      conexao.exec(esquemaOportunidades);
+      conexao.exec(esquemaTrabalhos);
+      conexao.exec(esquemaPortfolio);
+      conexao.exec(esquemaColaboracoes);
+      conexao.exec(esquemaCentral);
+      conexao.exec(esquemaSuporte);
+      const definicaoMedidas = conexao.prepare("SELECT sql FROM sqlite_master WHERE name='suporte_medidas'").get().sql;
+      if (!definicaoMedidas.includes("'selo'")) {
+        conexao.exec("ALTER TABLE suporte_medidas RENAME TO suporte_medidas_anteriores; DROP INDEX IF EXISTS suporte_medidas_alvo");
+        conexao.exec(esquemaSuporte);
+        conexao.exec(`
+          INSERT INTO suporte_medidas(id,caso_id,autor_id,acao,alvo_tipo,alvo_id,motivo,criada_em,ate,revogada_em)
+          SELECT id,caso_id,autor_id,acao,alvo_tipo,alvo_id,motivo,criada_em,ate,revogada_em
+          FROM suporte_medidas_anteriores;
+          DROP TABLE suporte_medidas_anteriores;
+        `);
+      }
+      conexao.exec(esquemaContas);
+      conexao.exec(esquemaBeats);
+      conexao.exec(esquemaEventos);
+      conexao.exec(esquemaCena);
+      conexao.exec(esquemaInteracoes);
+      conexao.exec(esquemaMidiasRepresentacao);
+      if (!conexao.pragma("table_info(midias_publicacoes)").some(c => c.name === "posicao")) {
+        conexao.exec("ALTER TABLE midias_publicacoes ADD COLUMN posicao TEXT NOT NULL DEFAULT 'principal' CHECK(posicao IN ('principal','capa'))");
+        conexao.exec("DROP INDEX IF EXISTS midia_publicacao_ativa");
+      }
+      conexao.exec("CREATE UNIQUE INDEX IF NOT EXISTS midia_publicacao_posicao_ativa ON midias_publicacoes(objeto_tipo,objeto_id,finalidade,posicao) WHERE retirada_em IS NULL");
+      if (!conexao.pragma("table_info(notificacoes)").some(c => c.name === "removida_em"))
+        conexao.exec("ALTER TABLE notificacoes ADD COLUMN removida_em TEXT");
+      if (!conexao.pragma("table_info(preferencias_usuario)").some(c => c.name === "avisos_desativados_json"))
+        conexao.exec("ALTER TABLE preferencias_usuario ADD COLUMN avisos_desativados_json TEXT NOT NULL DEFAULT '[]'");
+      if (versao < 33) conexao.exec("DROP TRIGGER IF EXISTS aplicar_preferencias_notificacoes");
+      conexao.exec(esquemaPreferenciasNotificacoes);
+      if (!conexao.prepare("PRAGMA table_info(avaliacoes_colaboracao)").all().some(c => c.name === "estado_antes_vinculo"))
+        conexao.exec("ALTER TABLE avaliacoes_colaboracao ADD COLUMN estado_antes_vinculo TEXT CHECK(estado_antes_vinculo IN('ativa','oculta'))");
       if (conexao.pragma("foreign_key_check").length) throw new Error("Integridade referencial inválida.");
       conexao.pragma(`user_version = ${versaoEsquema}`);
     })();
+    conexao.pragma("foreign_keys = ON");
     banco = conexao;
   } catch (erro) { conexao.close(); throw erro; }
 }
@@ -1501,7 +1594,7 @@ export function listarEventosCypher(filtros, usuarioId) {
       `
     )
     .all(parametros);
-  return linhas.map(
+  return linhas.filter(e=>objetoDisponivel(bancoAtivo(),"evento",e.id,usuarioId)).map(
     ({
       tagsJson,
       workshopTypesJson,
@@ -1567,7 +1660,7 @@ export function obterEventoCypher(id, usuarioId) {
       `
     )
     .get(usuarioId, usuarioId, id);
-  if (!linha) return undefined;
+  if (!linha || !objetoDisponivel(bancoAtivo(),"evento",id,usuarioId)) return undefined;
   const { tagsJson, workshopTypesJson, demonstracao, owned, totalInteressados, ...evento } = linha;
   return {
     ...evento,
@@ -1610,113 +1703,24 @@ export function listarInteressesEventoCypher(eventoId) {
     )
     .all(eventoId);
 }
-export function demonstrarInteresseEventoCypher(eventoId, usuarioId) {
-  const db = bancoAtivo();
-  const evento = db
-    .prepare(
-      `
-      SELECT e.id, e.tipo_participacao AS participationType
-      FROM eventos e
-      JOIN usuarios u ON u.id = ?
-      WHERE e.id = ?
-        AND e.demonstracao = 0
-        AND e.situacao <> 'Encerrado'
-        AND u.demonstracao = 0
-        AND e.proprietario_id <> ?
-      `
-    )
-    .get(usuarioId, eventoId, usuarioId);
-  if (!evento) return null;
-  db.prepare(
-    `
-    INSERT INTO interesses_eventos (id, evento_id, usuario_id, status)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT(evento_id, usuario_id) DO UPDATE SET
-      status = excluded.status,
-      atualizado_em = CURRENT_TIMESTAMP
-    `
-  ).run(
-    randomUUID(),
-    eventoId,
-    usuarioId,
-    evento.participationType === "aprovacao" ? "inscrito" : "interessado"
-  );
-  return evento.participationType === "aprovacao" ? "inscrito" : "interessado";
-}
-export function cancelarInteresseEventoCypher(eventoId, usuarioId) {
-  const resultado = bancoAtivo()
-    .prepare(
-      `
-      UPDATE interesses_eventos
-      SET status = 'cancelado', atualizado_em = CURRENT_TIMESTAMP
-      WHERE evento_id = ? AND usuario_id = ? AND status <> 'cancelado'
-      `
-    )
-    .run(eventoId, usuarioId);
-  return resultado.changes > 0;
-}
-export function atualizarStatusInteresseEventoCypher(
-  eventoId,
-  organizadorId,
-  usuarioInteressadoId,
-  status
-) {
-  const db = bancoAtivo();
-  const atual = db
-    .prepare(
-      `
-      SELECT ie.status
-      FROM interesses_eventos ie
-      JOIN eventos e ON e.id = ie.evento_id
-      WHERE ie.evento_id = ?
-        AND ie.usuario_id = ?
-        AND e.proprietario_id = ?
-        AND e.demonstracao = 0
-        AND e.situacao <> 'Encerrado'
-      `
-    )
-    .get(eventoId, usuarioInteressadoId, organizadorId);
-  if (!atual || atual.status === "cancelado") return false;
-  const transicoes = {
-    interessado: ["interessado", "inscrito", "rejeitado"],
-    inscrito: ["interessado", "inscrito", "confirmado", "rejeitado"],
-    confirmado: ["confirmado"],
-    rejeitado: ["interessado", "rejeitado"],
-  };
-  if (!transicoes[atual.status].includes(status)) return false;
-  const resultado = db
-    .prepare(
-      `
-      UPDATE interesses_eventos
-      SET status = ?, atualizado_em = CURRENT_TIMESTAMP
-      WHERE evento_id = ?
-        AND usuario_id = ?
-        AND status <> 'cancelado'
-        AND EXISTS (
-          SELECT 1 FROM eventos e
-          WHERE e.id = interesses_eventos.evento_id
-            AND e.proprietario_id = ?
-            AND e.demonstracao = 0
-            AND e.situacao <> 'Encerrado'
-        )
-      `
-    )
-    .run(status, eventoId, usuarioInteressadoId, organizadorId);
-  return resultado.changes > 0;
-}
+export function demonstrarInteresseEventoCypher(eventoId, usuarioId) { return interesseEventoLegado(eventoId, usuarioId); }
+
+export function cancelarInteresseEventoCypher(eventoId, usuarioId) { return cancelarInteresseEventoLegado(eventoId, usuarioId); }
+
+export function atualizarStatusInteresseEventoCypher(eventoId, organizadorId, usuarioInteressadoId, status) { return statusInteresseEventoLegado(eventoId, organizadorId, usuarioInteressadoId, status); }
+
 function categoriasAtivas(usuarioId, categoriasJson) {
-  const registros = listarProfissoesUsuarioCypher(usuarioId, { incluirInativas: true });
-  const anteriores = JSON.parse(categoriasJson || "[]");
-  if (!registros.length) return anteriores.filter(categoria => categoriasGerais.includes(categoria));
-  const ativas = registros.filter(p => p.estado === "ativa").map(p => obterProfissaoCatalogo(p.profissaoId)?.rotulo).filter(Boolean);
-  return [...new Set([...anteriores.filter(c => ativas.includes(c)), ...ativas])];
+  const db=bancoAtivo();
+  const registros=db.prepare("SELECT profissao_id,estado FROM profissoes_usuario WHERE usuario_id=? ORDER BY selecionada_em,id").all(usuarioId);
+  if(registros.length)return registros.filter(r=>r.estado==='ativa').map(r=>obterProfissaoCatalogo(r.profissao_id)?.rotulo).filter(Boolean);
+  return JSON.parse(categoriasJson||'[]').filter(c=>categoriasGerais.includes(c));
+}
+function exigirPublicacao(usuarioId, modalidade, tipo) {
+  exigirProfissional(usuarioId);
+  const perfil=bancoAtivo().prepare("SELECT categorias_json FROM perfis WHERE usuario_id=?").get(usuarioId);
+  if(!perfil || !podePublicar({tipoConta:'profissional',categories:categoriasAtivas(usuarioId,perfil.categorias_json)},modalidade,tipo))throw new Error("PUBLICACAO_NAO_PERMITIDA");
 }
 
-function exigirPublicacao(usuarioId, modalidade, tipo) {
-  const conta = bancoAtivo().prepare(`SELECT u.tipo_conta AS tipoConta, u.email_confirmado_em AS confirmado, p.categorias_json AS categorias FROM usuarios u
-    LEFT JOIN perfis p ON p.usuario_id = u.id WHERE u.id = ? AND u.demonstracao = 0`).get(usuarioId);
-  if (!conta || !conta.confirmado || !podePublicar({ tipoConta: conta.tipoConta, categories: categoriasAtivas(usuarioId, conta.categorias) }, modalidade, tipo)) throw new Error("PUBLICACAO_NAO_PERMITIDA");
-}
 export function criarEventoCypher(proprietarioId, dados) {
   exigirPublicacao(proprietarioId, "evento");
   const id = randomUUID();
@@ -1754,6 +1758,7 @@ export function criarEventoCypher(proprietarioId, dados) {
   return id;
 }
 export function atualizarEventoCypher(id, proprietarioId, dados) {
+  if(!objetoDisponivel(bancoAtivo(),"evento",id,proprietarioId))return false;
   exigirProfissional(proprietarioId);
   const resultado = bancoAtivo()
     .prepare(
@@ -1789,15 +1794,8 @@ export function atualizarEventoCypher(id, proprietarioId, dados) {
     );
   return resultado.changes > 0;
 }
-export function excluirEventoCypher(id, proprietarioId) {
-  exigirProfissional(proprietarioId);
-  const resultado = bancoAtivo()
-    .prepare(
-      "DELETE FROM eventos WHERE id = ? AND proprietario_id = ? AND demonstracao = 0"
-    )
-    .run(id, proprietarioId);
-  return resultado.changes > 0;
-}
+export function excluirEventoCypher(id, proprietarioId) { return false; /* Cancelamento versionado e justificado em eventos.ts preserva o histórico. */ }
+
 export function listarBeatsCypher(usuarioId) {
   const linhas = bancoAtivo()
     .prepare(
@@ -1807,6 +1805,7 @@ export function listarBeatsCypher(usuarioId) {
         b.produtor_id AS produtorId,
         b.titulo AS title,
         p.nome AS producer,
+        p.identificador AS producerHandle,
         CASE WHEN b.demonstracao = 1 AND p.demonstracao = 1 AND p.perfil_publico = 1 THEN p.identificador ELSE '' END AS demoProducerHandle,
         b.bpm AS bpm,
         b.tom_musical AS key,
@@ -1819,20 +1818,26 @@ export function listarBeatsCypher(usuarioId) {
         b.venda_exclusiva AS vendaExclusiva,
         b.demonstracao AS demonstracao,
         (b.demonstracao = 0 AND b.produtor_id = ?) AS owned,
-        b.criado_em AS criadoEm
+        b.criado_em AS criadoEm,
+        c.previa_id AS previaId,
+        coalesce(c.disponivel, 1) AS disponivel
       FROM beats b
       JOIN perfis p ON p.usuario_id = b.produtor_id
+      LEFT JOIN beat_catalogo c ON c.beat_id = b.id
       WHERE b.demonstracao IN (0, 1)
       ORDER BY b.demonstracao DESC, datetime(b.criado_em) DESC, b.ordem_demo
       `
     )
     .all(usuarioId ?? "");
-  return linhas.map(linha => ({
+  return linhas.filter(b=>objetoDisponivel(bancoAtivo(),"beat",b.id,usuarioId)).map(linha => ({
     ...linha,
     vendaExclusiva: Boolean(linha.vendaExclusiva),
     demonstracao: Boolean(linha.demonstracao),
     owned: Boolean(linha.owned),
-    ofertas: ofertasDoBeat(linha.id),
+    disponivel: Boolean(linha.disponivel),
+    ofertas: linha.demonstracao ? ofertasDoBeat(linha.id).map(oferta => ({
+      ...oferta, modalidade: "", formatos: [],
+    })) : ofertasPublicadasDoBeat(linha.id),
   }));
 }
 export function criarBeatCypher(produtorId, dados) {
@@ -1891,7 +1896,7 @@ export function obterBeatCypher(id, produtorId) {
       `
     )
     .get(id, produtorId);
-  if (!linha) return undefined;
+  if (!linha || !objetoDisponivel(bancoAtivo(),"beat",id,produtorId)) return undefined;
   return {
     ...linha,
     vendaExclusiva: Boolean(linha.vendaExclusiva),
@@ -1901,6 +1906,7 @@ export function obterBeatCypher(id, produtorId) {
   };
 }
 export function atualizarBeatCypher(id, produtorId, dados) {
+  if(!objetoDisponivel(bancoAtivo(),"beat",id,produtorId))return false;
   exigirProfissional(produtorId);
   const db = bancoAtivo();
   const resultado = db.transaction(() => {
@@ -1935,13 +1941,15 @@ export function atualizarBeatCypher(id, produtorId, dados) {
   return resultado.changes > 0;
 }
 export function excluirBeatCypher(id, produtorId) {
+  if(!objetoDisponivel(bancoAtivo(),"beat",id,produtorId))return false;
   exigirProfissional(produtorId);
-  const resultado = bancoAtivo()
-    .prepare(
-      "DELETE FROM beats WHERE id = ? AND produtor_id = ? AND demonstracao = 0"
-    )
-    .run(id, produtorId);
-  return resultado.changes > 0;
+  const db=bancoAtivo();
+  if(!db.prepare("SELECT 1 FROM beats WHERE id=? AND produtor_id=? AND demonstracao=0").get(id,produtorId))return false;
+  db.transaction(()=>{
+    db.prepare("INSERT INTO beat_catalogo(beat_id,retirado,disponivel,atualizado_em) VALUES(?,1,0,?) ON CONFLICT(beat_id) DO UPDATE SET retirado=1,disponivel=0,versao=versao+1,atualizado_em=excluded.atualizado_em").run(id,Date.now());
+    db.prepare("UPDATE ofertas_beats SET ativa=0 WHERE beat_id=?").run(id);
+  }).immediate();
+  return true;
 }
 function salvarAtuacoesCategoria(db, usuarioId, categoriasAtivas, atuacoes) {
   const permitidas = new Set(categoriasAtivas);
@@ -2076,7 +2084,7 @@ export function salvarRespostasAtuacaoProfissaoCypher(
 }
 export function criarContaCypher(conta) {
   if (conta.nomeInformado !== undefined) {
-    const erro = validarDadosIdentidade({nomeInformado:conta.nomeInformado,vulgo:conta.vulgo ?? "",usarVulgo:Boolean(conta.usarVulgo),nascimento:conta.nascimento ?? "",tratamento:conta.tratamento ?? "",generoPersonalizado:conta.generoPersonalizado}) || validarIdentificador(conta.identificador);
+    const erro = validarDadosIdentidade({nomeInformado:conta.nomeInformado,vulgo:conta.vulgo ?? "",nascimento:conta.nascimento ?? "",tratamento:conta.tratamento ?? "",generoPersonalizado:conta.generoPersonalizado}) || validarIdentificador(conta.identificador);
     if (erro) throw new Error(erro);
   }
   if (!["profissional", "consumidor"].includes(conta.tipoConta)) throw new Error("TIPO_CONTA_INVALIDO");
@@ -2084,28 +2092,19 @@ export function criarContaCypher(conta) {
       conta.categorias.some(categoria => !categoriasGerais.includes(categoria)) ||
       (conta.tipoConta === "profissional" && conta.categorias.length === 0) ||
       (conta.tipoConta === "consumidor" && conta.categorias.length !== 0)) throw new Error("CATEGORIA_PROFISSIONAL_INVALIDA");
-  const publico = nomePublico(conta.nomeInformado ?? conta.nome, conta.vulgo ?? "", Boolean(conta.usarVulgo));
-  conta = {...conta,nome:publico,identificador:normalizarIdentificador(conta.identificador),iniciais:iniciaisPublicas(publico)};
+  const nomeInformado = (conta.nomeInformado ?? conta.nome).trim();
+  const identificador = normalizarIdentificador(conta.identificador);
+  const nomePublico = Boolean(conta.nomePublico) && !(conta.nascimento && idadeNaData(conta.nascimento) < 18);
+  const nome = nomePublico ? nomeInformado : conta.vulgo?.trim() || identificador;
+  conta = { ...conta, nome, identificador };
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
-    const sequencia = db
-      .prepare(
-        "SELECT proximo_numero AS numero FROM sequencias WHERE nome = 'usuarios_reais'"
-      )
-      .get();
-    if (!sequencia) throw new Error("SEQUENCIA_USUARIOS_NAO_INICIALIZADA");
-    db.prepare(
-      "UPDATE sequencias SET proximo_numero = proximo_numero + 1 WHERE nome = 'usuarios_reais'"
-    ).run();
-    const codigoPublico = codigoPublicoReal(conta.iniciais, sequencia.numero);
     db.prepare(
       `
       INSERT INTO usuarios (
-        id, email, senha_hash, tipo_conta, demonstracao, codigo_publico,
-        numero_sequencial
+        id, email, senha_hash, tipo_conta, demonstracao
       ) VALUES (
-        @id, @email, @senhaHash, @tipoConta, 0, @codigoPublico,
-        @numeroSequencial
+        @id, @email, @senhaHash, @tipoConta, 0
       )
     `
     ).run({
@@ -2113,32 +2112,30 @@ export function criarContaCypher(conta) {
       email: conta.email,
       senhaHash: conta.senhaHash,
       tipoConta: conta.tipoConta,
-      codigoPublico,
-      numeroSequencial: sequencia.numero,
     });
     db.prepare(
       `
       INSERT INTO perfis (
-        usuario_id, c_tag, identificador_alterado_em, nome, nome_informado, vulgo, usar_vulgo, nascimento, tratamento, genero_personalizado, funcao, identificador, iniciais,
+        usuario_id, identificador_alterado_em, nome, nome_informado, nome_publico, vulgo, nascimento, tratamento, genero_personalizado, funcao, identificador, iniciais,
         categorias_json, outra_categoria, generos_json,
         ultima_alteracao_categorias_em, perfil_publico,
         localizacao_publica, contato_publico, demonstracao
       ) VALUES (
-        @id, @cTag, CURRENT_TIMESTAMP, @nome, @nomeInformado, @vulgo, @usarVulgo, @nascimento, @tratamento, @generoPersonalizado, @funcao, @identificador, @iniciais,
+        @id, CURRENT_TIMESTAMP, @nome, @nomeInformado, @nomePublico, @vulgo, @nascimento, @tratamento, @generoPersonalizado, @funcao, @identificador, @iniciais,
         @categoriasJson, '', '[]', CURRENT_TIMESTAMP, @perfilPublico, 0, 0, 0
       )
     `
     ).run({
       id: conta.id,
-      cTag: conta.cTag,
       nome: conta.nome,
-      nomeInformado: conta.nomeInformado ?? conta.nome,
-      vulgo: conta.vulgo ?? "", usarVulgo: Number(Boolean(conta.usarVulgo)), nascimento: conta.nascimento ?? "", tratamento: conta.tratamento ?? "",
+      nomeInformado,
+      nomePublico: Number(nomePublico),
+      vulgo: conta.vulgo ?? "", nascimento: conta.nascimento ?? "", tratamento: conta.tratamento ?? "",
       generoPersonalizado: conta.tratamento === "outro" ? conta.generoPersonalizado?.trim() ?? "" : "",
-      perfilPublico: Number(conta.tipoConta === "profissional"),
+      perfilPublico: Number(conta.tipoConta === "profissional" && !(conta.nascimento && idadeNaData(conta.nascimento) < 18)),
       funcao: conta.funcao,
       identificador: conta.identificador,
-      iniciais: conta.iniciais,
+      iniciais: iniciaisPublicas(nome.replace(/^@/, "")),
       categoriasJson: JSON.stringify(conta.categorias),
     });
     db.prepare("INSERT INTO identificadores_usuario (identificador,usuario_id) VALUES (?,?)").run(conta.identificador,conta.id);
@@ -2161,6 +2158,22 @@ export function buscarCredenciaisCypher(email) {
     `
     )
     .get(email);
+}
+
+// O nome de apresentação também alimenta busca, créditos, mensagens e eventos.
+export function sincronizarNomePublicoCypher(db: Database.Database, id: string) {
+  const perfil = db.prepare(`SELECT nome, nome_informado AS completo, nome_publico AS publico,
+    vulgo, identificador FROM perfis WHERE usuario_id=?`).get(id) as {
+      nome: string; completo: string; publico: number; vulgo: string; identificador: string;
+    } | undefined;
+  if (!perfil) return;
+  const nome = (perfil.publico && perfil.completo.trim()) || perfil.vulgo.trim() || perfil.identificador;
+  if (nome === perfil.nome) return;
+  db.prepare("UPDATE perfis SET nome=?, iniciais=? WHERE usuario_id=?")
+    .run(nome, iniciaisPublicas(nome.replace(/^@/, "")), id);
+  db.prepare("UPDATE creditos SET nome_creditado=? WHERE usuario_creditado_id=?").run(nome, id);
+  db.prepare("UPDATE eventos SET organizador=? WHERE proprietario_id=? AND organizador=?")
+    .run(nome, id, perfil.nome);
 }
 export function buscarEmailPorIdentificadorCypher(identificador: string): string | undefined {
   const conta = bancoAtivo().prepare(`
@@ -2192,6 +2205,10 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
     .prepare("SELECT usuario_id, expira_em FROM sessoes WHERE token_hash = ?")
     .get(tokenHash);
   if (!sessao) return undefined;
+  if (contaEncerrada(db, sessao.usuario_id)) {
+    db.prepare("DELETE FROM sessoes WHERE token_hash=?").run(tokenHash);
+    return undefined;
+  }
   if (sessao.expira_em <= agora) {
     db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash);
     return undefined;
@@ -2200,7 +2217,7 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
     FROM usuarios u JOIN administradores a ON a.usuario_id = u.id WHERE u.id = ? AND u.tipo_conta = 'administrativo'`).get(sessao.usuario_id);
   if (interno) {
     if (!interno.ativo) { db.prepare("DELETE FROM sessoes WHERE token_hash = ?").run(tokenHash); return undefined; }
-    return { ...interno, publicCode: "", demonstracao: false, role: interno.papelAdministrativo, city: "", handle: "", initials: "AD", cTag: "", reputation: 0,
+    return { ...interno, demonstracao: false, role: interno.papelAdministrativo, city: "", handle: "", initials: "AD", reputation: 0,
       genres: [], categories: [], otherCategory: "", biography: "", contact: "", availability: "", equipment: [], profilePublic: false, locationPublic: false, contactPublic: false };
   }
   const perfil = db
@@ -2209,18 +2226,17 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
       SELECT
         u.id,
         u.email,
-        u.codigo_publico AS publicCode,
         u.tipo_conta AS tipoConta,
         u.email_confirmado_em AS emailConfirmado,
         u.demonstracao AS demonstracao,
         p.nome AS name,
-        p.nome_informado AS nomeInformado, p.vulgo, p.usar_vulgo AS usarVulgo,
-        p.nascimento, p.tratamento, p.genero_personalizado AS generoPersonalizado, p.identidade_revisada AS identidadeRevisada, p.identificador_alterado_em AS identificadorAlteradoEm,
+        p.nome_informado AS nomeInformado, p.nome_publico AS namePublic, p.vulgo,
+        p.competencias_json AS skillsJson, p.competencias_publicas AS skillsPublic,
+        p.nascimento, p.tratamento, p.genero_personalizado AS generoPersonalizado, p.identificador_alterado_em AS identificadorAlteradoEm,
         p.funcao AS role,
         p.cidade AS city,
         p.identificador AS handle,
         p.iniciais AS initials,
-        p.c_tag AS cTag,
         p.reputacao AS reputation,
         p.generos_json AS genresJson,
         p.categorias_json AS categoriesJson,
@@ -2256,11 +2272,13 @@ export function obterUsuarioDaSessaoCypher(tokenHash, agora) {
   const categories = categoriasAtivas(perfil.id, perfil.categoriesJson);
   return {
     ...perfil,
+    protecaoMenor: menorProtegido(db, perfil.id),
     role: perfil.tipoConta === "consumidor" ? "Público" : categories.map(categoria => rotuloProfissional(categoria, perfil.tratamento)).join(" · ") || perfil.role,
-    identidadeRevisada: Boolean(perfil.identidadeRevisada),
-    usarVulgo: Boolean(perfil.usarVulgo),
     demonstracao: Boolean(perfil.demonstracao),
     genres: JSON.parse(perfil.genresJson),
+    skills: JSON.parse(perfil.skillsJson),
+    namePublic: Boolean(perfil.namePublic),
+    skillsPublic: Boolean(perfil.skillsPublic),
     categories,
     equipment: JSON.parse(perfil.equipmentJson),
     profilePublic: Boolean(perfil.profilePublic),
@@ -2274,7 +2292,7 @@ export function atualizarPerfilCypher(dados) {
   const salvar = db.transaction(() => {
     const atual = db
       .prepare(
-        `SELECT categorias_json AS categoriasJson, nome, vulgo, usar_vulgo AS usarVulgo,
+        `SELECT categorias_json AS categoriasJson, nome,
                 ultima_alteracao_categorias_em AS alteradaEm
          FROM perfis WHERE usuario_id = ? AND demonstracao = 0`
       )
@@ -2306,7 +2324,7 @@ export function atualizarPerfilCypher(dados) {
       if (possuiAlteracaoAnterior && atual.alteradaEm) {
         const prazo = db
           .prepare(
-            "SELECT datetime(?, '+60 days') AS proxima, datetime(?, '+60 days') > datetime('now') AS bloqueada"
+            "SELECT datetime(?, '+30 days') AS proxima, datetime(?, '+30 days') > datetime('now') AS bloqueada"
           )
           .get(atual.alteradaEm, atual.alteradaEm);
         proximaAlteracao = prazo.proxima;
@@ -2351,14 +2369,14 @@ export function atualizarPerfilCypher(dados) {
       .prepare(
         `
         UPDATE perfis SET
-          nome = @name,
-          nome_informado = @nomeInformado,
+          nome_informado = coalesce(@nomeInformado, nome_informado),
           funcao = @role,
-          cidade = @city,
-          biografia = @biography,
-          contato = @contact,
+          cidade = coalesce(@city, cidade),
+          biografia = coalesce(@biography, biografia),
+          contato = coalesce(@contact, contato),
           disponibilidade = @availability,
           generos_json = @genresJson,
+          competencias_json = coalesce(@skillsJson, competencias_json),
           categorias_json = @categoriesJson,
           ultima_alteracao_categorias_em = CASE
             WHEN @categoriasMudaram = 1 THEN CURRENT_TIMESTAMP
@@ -2366,28 +2384,27 @@ export function atualizarPerfilCypher(dados) {
           END,
           outra_categoria = @otherCategory,
           equipamentos_json = @equipmentJson,
-          iniciais = @initials,
           atualizado_em = CURRENT_TIMESTAMP
         WHERE usuario_id = @id AND demonstracao = 0
       `
       )
       .run({
         id: dados.id,
-        name: nomePublico(dados.name,atual.vulgo,Boolean(atual.usarVulgo)),
-        nomeInformado: dados.name,
+        nomeInformado: dados.somenteAtuacao ? null : dados.name.trim(),
         role: dados.role,
-        city: dados.city,
-        biography: dados.biography,
-        contact: dados.contact,
+        city: dados.somenteAtuacao ? null : dados.city,
+        biography: dados.somenteAtuacao ? null : dados.biography,
+        contact: dados.somenteAtuacao ? null : dados.contact,
         availability: dados.availability,
         genresJson: JSON.stringify(dados.genres),
+        skillsJson: dados.skills === undefined ? null : JSON.stringify(dados.skills),
         categoriesJson: depoisJson,
         categoriasMudaram: Number(categoriasMudaram),
         otherCategory: dados.otherCategory,
         equipmentJson: JSON.stringify(dados.equipment),
-        initials: iniciaisPublicas(nomePublico(dados.name,atual.vulgo,Boolean(atual.usarVulgo))),
       });
     if (atualizado.changes !== 1) return false;
+    if (!dados.somenteAtuacao) sincronizarNomePublicoCypher(db, dados.id);
     db.prepare(
       `
       UPDATE usuarios SET atualizado_em = CURRENT_TIMESTAMP
@@ -2410,9 +2427,26 @@ export function atualizarPerfilCypher(dados) {
   });
   return salvar();
 }
+export function atualizarApresentacaoCypher(id: string, tipoConta: "consumidor" | "profissional", cidade: string, biografia: string) {
+  return bancoAtivo().prepare(
+    `UPDATE perfis SET cidade=?, biografia=?, atualizado_em=CURRENT_TIMESTAMP
+     WHERE usuario_id=? AND demonstracao=0 AND EXISTS (
+       SELECT 1 FROM usuarios WHERE id=perfis.usuario_id AND tipo_conta=?
+     )`
+  ).run(cidade, biografia, id, tipoConta).changes === 1;
+}
+
+export function atualizarContatoProfissionalCypher(id: string, contato: string) {
+  return bancoAtivo().prepare(
+    `UPDATE perfis SET contato=?, atualizado_em=CURRENT_TIMESTAMP
+     WHERE usuario_id=? AND demonstracao=0 AND EXISTS (
+       SELECT 1 FROM usuarios WHERE id=perfis.usuario_id AND tipo_conta='profissional'
+     )`
+  ).run(contato, id).changes === 1;
+}
+
 export function atualizarPrivacidadeCypher(id, preferencias) {
-  const conta = bancoAtivo().prepare("SELECT tipo_conta FROM usuarios WHERE id=?").get(id);
-  if (conta?.tipo_conta === "consumidor") preferencias = {profilePublic:false,locationPublic:false,contactPublic:false};
+  preferencias = preferenciasPrivacidadePermitidas(bancoAtivo(), id, preferencias);
   const resultado = bancoAtivo()
     .prepare(
       `
@@ -2420,6 +2454,7 @@ export function atualizarPrivacidadeCypher(id, preferencias) {
         perfil_publico = ?,
         localizacao_publica = ?,
         contato_publico = ?,
+        competencias_publicas = coalesce(?, competencias_publicas),
         atualizado_em = CURRENT_TIMESTAMP
       WHERE usuario_id = ? AND demonstracao = 0
     `
@@ -2428,6 +2463,7 @@ export function atualizarPrivacidadeCypher(id, preferencias) {
       Number(preferencias.profilePublic),
       Number(preferencias.locationPublic),
       Number(preferencias.contactPublic),
+      preferencias.skillsPublic === undefined ? null : Number(preferencias.skillsPublic),
       id
     );
   return resultado.changes === 1;
@@ -2441,14 +2477,14 @@ export function estadoAlteracaoCategoriasCypher(usuarioId) {
                SELECT 1 FROM auditoria_categorias a
                WHERE a.usuario_id = p.usuario_id
              )
-             THEN datetime(p.ultima_alteracao_categorias_em, '+60 days')
+             THEN datetime(p.ultima_alteracao_categorias_em, '+30 days')
              ELSE NULL END AS proximaAlteracao,
         CASE WHEN EXISTS (
                SELECT 1 FROM auditoria_categorias a
                WHERE a.usuario_id = p.usuario_id
              )
               AND p.ultima_alteracao_categorias_em IS NOT NULL
-              AND datetime(p.ultima_alteracao_categorias_em, '+60 days') > datetime('now')
+              AND datetime(p.ultima_alteracao_categorias_em, '+30 days') > datetime('now')
              THEN 1 ELSE 0 END AS dentroDoPrazo,
         EXISTS (SELECT 1 FROM excecoes_categorias e
                 WHERE e.usuario_id = p.usuario_id AND e.usada_em IS NULL) AS excecaoDisponivel
@@ -2495,7 +2531,7 @@ export function listarPerfisParaExcecaoCategoriaCypher(consulta = "", limite) {
       SELECT u.id AS usuarioId, p.nome, u.email,
              p.categorias_json AS categoriasJson,
              p.ultima_alteracao_categorias_em AS alteradaEm,
-             datetime(p.ultima_alteracao_categorias_em, '+60 days') AS proximaAlteracao,
+             datetime(p.ultima_alteracao_categorias_em, '+30 days') AS proximaAlteracao,
              EXISTS (SELECT 1 FROM excecoes_categorias e
                      WHERE e.usuario_id = u.id AND e.usada_em IS NULL) AS excecaoPendente,
              EXISTS (SELECT 1 FROM solicitacoes_excecao_categorias s
@@ -2652,7 +2688,7 @@ export function solicitarExcecaoCategoriaCypher(usuarioId, motivo, detalhes) {
     );
     if (!possuiAlteracaoAnterior || !perfil.alteradaEm) return "nao_bloqueada";
     const prazo = db
-      .prepare("SELECT datetime(?, '+60 days') > datetime('now') AS bloqueada")
+      .prepare("SELECT datetime(?, '+30 days') > datetime('now') AS bloqueada")
       .get(perfil.alteradaEm);
     if (!prazo.bloqueada) return "nao_bloqueada";
     const categoriasAntes = jsonLista(perfil.categoriasJson);
@@ -2800,7 +2836,7 @@ export function revisarSolicitacaoExcecaoCategoriaCypher(
         return "nao_bloqueada";
       const prazo = db
         .prepare(
-          "SELECT datetime(?, '+60 days') > datetime('now') AS bloqueada"
+          "SELECT datetime(?, '+30 days') > datetime('now') AS bloqueada"
         )
         .get(perfil.alteradaEm);
       if (!prazo.bloqueada) return "nao_bloqueada";
@@ -3003,7 +3039,7 @@ export function concederExcecaoCategoriaCypher(
     if (solicitacaoPendente) return "solicitacao_pendente";
     if (!perfil.alteradaEm) return "nao_bloqueada";
     const prazo = db
-      .prepare("SELECT datetime(?, '+60 days') > datetime('now') AS bloqueada")
+      .prepare("SELECT datetime(?, '+30 days') > datetime('now') AS bloqueada")
       .get(perfil.alteradaEm);
     if (!prazo.bloqueada) return "nao_bloqueada";
     const insercao = db
@@ -3235,18 +3271,17 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
     .prepare(
       `
       SELECT
-        u.id AS userId,
-        p.nome AS name, p.tratamento,
+        u.id AS userId, u.demonstracao AS contaDemo,
+        p.nome AS name, p.vulgo, p.tratamento,
         p.funcao AS role,
         CASE WHEN p.localizacao_publica = 1 THEN p.cidade ELSE '' END AS city,
         p.identificador AS handle,
-        u.codigo_publico AS publicCode,
         p.iniciais AS initials,
-        p.c_tag AS cTag,
         p.biografia AS biography,
         CASE WHEN p.contato_publico = 1 THEN p.contato ELSE '' END AS contact,
         p.disponibilidade AS availability,
         p.generos_json AS genresJson,
+        CASE WHEN p.competencias_publicas = 1 THEN p.competencias_json ELSE '[]' END AS skillsJson,
         p.categorias_json AS categoriesJson,
         p.equipamentos_json AS equipmentJson,
         p.criado_em AS createdAt
@@ -3260,7 +3295,7 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
     `
     )
     .get(identificador);
-  if (!resultado) return undefined;
+  if (!resultado || !objetoDisponivel(bancoAtivo(),"perfil",resultado.userId,visitanteId)) return undefined;
   const categorias = JSON.parse(resultado.categoriesJson);
   const atuacoes = atuacoesVisiveis(
     db,
@@ -3275,6 +3310,7 @@ export function obterPerfilPublicoCypher(identificador, visitanteId) {
     rotulosCategorias: Object.fromEntries(categories.map(categoria=>[categoria,rotuloProfissional(categoria,resultado.tratamento)])),
     role: categories.map(categoria=>rotuloProfissional(categoria,resultado.tratamento)).join(" · ") || "Atuação profissional",
     genres: JSON.parse(resultado.genresJson),
+    skills: JSON.parse(resultado.skillsJson),
     categories,
     atuacoes,
     equipment: JSON.parse(resultado.equipmentJson),
@@ -3302,7 +3338,6 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
   const db = bancoAtivo();
   const populares = filtrosRecebidos.ordem === "populares";
   const pontuacao = populares ? `
-    p.reputacao +
     (SELECT COUNT(*) FROM atividade_perfis ap
       WHERE ap.usuario_id = u.id AND ap.dia BETWEEN date(@hoje, '-29 days') AND @hoje) +
     (SELECT COUNT(*) FROM (
@@ -3324,7 +3359,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
       SELECT
         u.id AS userId,
         ${pontuacao} AS pontuacao,
-        p.nome AS name, p.tratamento,
+        p.nome AS name, p.vulgo, p.tratamento,
         p.funcao AS role,
         p.cidade AS city,
         p.localizacao_publica AS locationPublic,
@@ -3348,7 +3383,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
     )
     .all(populares ? { usuarioId, hoje: dataAtualCadastro() } : { usuarioId });
   const tonsPermitidos = new Set(["yellow", "green", "black", "cream"]);
-  const perfis = linhas.map(linha => {
+  const perfis = linhas.filter(p=>objetoDisponivel(bancoAtivo(),"perfil",p.userId,usuarioId)).map(linha => {
     const categories = atuacoesVisiveis(
       db,
       linha.userId,
@@ -3358,8 +3393,10 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
     ).map(atuacao => atuacao.categoria);
     return {
       name: linha.name,
+      vulgo: linha.vulgo,
       rotulosCategorias: Object.fromEntries(categories.map(categoria => [categoria, rotuloProfissional(categoria, linha.tratamento)])),
       role: categories.map(categoria => rotuloProfissional(categoria, linha.tratamento)).join(" · ") || "Atuação profissional",
+      userId: linha.userId,
       city: linha.locationPublic ? linha.city : "",
       handle: linha.handle,
       initials: linha.initials,
@@ -3409,6 +3446,7 @@ export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): Resulta
     const camposBusca = normalizarTextoBusca(
       [
         perfil.name,
+        perfil.vulgo,
         perfil.role,
         perfil.city,
         perfil.handle,
@@ -3464,10 +3502,10 @@ export function listarObrasProprietarioCypher(proprietarioId) {
     `
     )
     .all(proprietarioId);
-  return linhas.map(obra => ({ ...obra, published: Boolean(obra.published) }));
+  return linhas.filter(o=>objetoDisponivel(bancoAtivo(),"obra",o.id,proprietarioId)).map(obra => ({ ...obra, published: Boolean(obra.published) }));
 }
-export function listarObrasPublicasPerfilCypher(identificador) {
-  return bancoAtivo()
+export function listarObrasPublicasPerfilCypher(identificador, visitanteId = "", obraId = "") {
+  const linhas = bancoAtivo()
     .prepare(
       `
       SELECT
@@ -3481,10 +3519,7 @@ export function listarObrasPublicasPerfilCypher(identificador) {
         o.data_lancamento AS releaseDate,
         o.link_escuta AS listenLink,
         o.letra AS lyrics,
-        CASE WHEN o.demonstracao = 1 THEN
-          (SELECT group_concat(c.nome_creditado || ' · ' || c.funcao, ', ')
-           FROM creditos c WHERE c.obra_id = o.id AND c.demonstracao = 1)
-        END AS demoCredits
+        CASE WHEN json_valid(o.metadados) THEN CASE WHEN json_type(o.metadados,'$.faixas')='array' THEN json_extract(o.metadados,'$.faixas') END END AS faixasJson
       FROM obras o
       JOIN usuarios u ON u.id = o.proprietario_id
       JOIN perfis p ON p.usuario_id = u.id
@@ -3496,6 +3531,7 @@ export function listarObrasPublicasPerfilCypher(identificador) {
         AND o.demonstracao = u.demonstracao
         AND o.publicada = 1
         AND o.situacao IN ('', 'Lançado')
+        AND (? = '' OR o.id = ?)
       ORDER BY
         CASE WHEN o.data_lancamento = '' THEN 1 ELSE 0 END,
         o.data_lancamento DESC,
@@ -3503,7 +3539,15 @@ export function listarObrasPublicasPerfilCypher(identificador) {
         o.id DESC
       `
     )
-    .all(identificador);
+    .all(identificador, obraId, obraId);
+  const db = bancoAtivo();
+  const visiveis = linhas.filter(o=>objetoDisponivel(db,"obra",o.id,visitanteId));
+  if (!obraId) return visiveis;
+  return visiveis.map(o => ({ ...o, creditos: db.prepare(`
+    SELECT c.usuario_creditado_id AS pessoa, coalesce(p.nome,c.nome_creditado) AS nome,c.funcao
+    FROM creditos c LEFT JOIN perfis p ON p.usuario_id=c.usuario_creditado_id
+    WHERE c.obra_id=? AND c.verificado=1 ORDER BY c.criado_em,c.id
+  `).all(o.id).filter(c=>!c.pessoa || objetoDisponivel(db,"perfil",c.pessoa,visitanteId)) }));
 }
 function creditosDasObras(ids) {
   if (ids.length === 0) return new Map();
@@ -3625,7 +3669,7 @@ export function listarObrasContaCypher(proprietarioId, filtros, obraId = null) {
       role: filtro.role,
     });
   const creditos = creditosDasObras(linhas.map(obra => obra.id));
-  return linhas.map(obra => ({
+  return linhas.filter(o=>objetoDisponivel(bancoAtivo(),"obra",o.id,proprietarioId)).map(obra => ({
     ...obra,
     role: obra.owned ? obra.role : obra.participationRole,
     published: Boolean(obra.published),
@@ -3639,10 +3683,10 @@ export function obterObraContaCypher(id, proprietarioId) {
   );
 }
 export function listarPerfisParaCreditoCypher(usuarioAtualId) {
-  return bancoAtivo()
+  const linhas=bancoAtivo()
     .prepare(
       `
-      SELECT p.nome AS name, p.identificador AS handle
+      SELECT p.usuario_id id,p.nome AS name, p.identificador AS handle
       FROM usuarios u
       JOIN perfis p ON p.usuario_id = u.id
       WHERE u.demonstracao = 0
@@ -3654,6 +3698,7 @@ export function listarPerfisParaCreditoCypher(usuarioAtualId) {
       `
     )
     .all(usuarioAtualId);
+  return linhas.filter(p=>objetoDisponivel(bancoAtivo(),"perfil",p.id,usuarioAtualId)).map(({id,...p})=>p);
 }
 function metadadosObra(dados) {
   const data = dados.releaseDate
@@ -3795,6 +3840,7 @@ export function criarObraCypher(proprietarioId, dados, creditos) {
   return salvar();
 }
 export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
+  if(!objetoDisponivel(bancoAtivo(),"obra",id,proprietarioId))return false;
   exigirProfissional(proprietarioId);
   const anterior = obterObraContaCypher(id, proprietarioId);
   if (!anterior || !anterior.owned) return false;
@@ -3865,6 +3911,7 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
   return salvar();
 }
 export function excluirObraCypher(id, proprietarioId) {
+  if(!objetoDisponivel(bancoAtivo(),"obra",id,proprietarioId))return false;
   exigirProfissional(proprietarioId);
   const resultado = bancoAtivo()
     .prepare(

@@ -1,73 +1,84 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<link rel="stylesheet" href="/css/descoberta.css">
-<link rel="stylesheet" href="/css/espaco-trabalho-identidade.css">
-<div class="dc-shell et-workspace">
+<%
+  function urlFormato(valor) {
+    const params = new URLSearchParams();
+    for (const [chave, dado] of Object.entries({q, genero, ano, ordem, formato: valor})) if (dado && !(chave === 'ordem' && dado === 'recentes')) params.set(chave, dado);
+    return '/works' + (params.size ? '?' + params : '');
+  }
+%>
+<div class="dc-shell ob-acervo">
   <a class="dc-skip" href="#conteudo-obras">Pular para o conteúdo</a>
   <%- include('../partials/barra-lateral', { path }) %>
   <div class="dc-page">
-    <header class="dc-header">
-      <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
-      <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
-      <div class="dc-title"><h1 id="ob-titulo">Obras</h1><p>Explore lançamentos de profissionais da Cypher.</p></div>
-      <div class="dc-account">
-        <%- include('../partials/componentes/tema-entrada') %>
-        <%- include('../partials/componentes/acoes-conta') %>
-      </div>
-    </header>
-    <main class="et-page" id="conteudo-obras" aria-labelledby="ob-titulo" tabindex="-1">
-      <form class="dc-controls et-search-controls" role="search" aria-label="Buscar no catálogo de obras" method="get" action="/works">
-        <%- include('../partials/componentes/campo-busca', { campo: { id: 'busca-obras', nome: 'q', valor: q, limite: 120, rotulo: 'Obra ou artista', rotuloBotao: 'Buscar obras' } }) %>
-        <% if (formatos.length || generos.length) { %>
-          <details class="dc-filter">
-            <summary><span aria-hidden="true"><%- icones.sliders %></span> <%= formato || genero ? 'Filtros ativos' : 'Filtros' %></summary>
-            <div class="dc-filter-panel">
-              <% if (formatos.length) { %>
-                <label>Formato
-                  <select name="formato">
-                    <option value="">Todos os formatos</option>
-                    <% formatos.forEach(opcao => { %>
-                      <option value="<%= opcao %>"<%= opcao === formato ? ' selected' : '' %>><%= opcao %></option>
-                    <% }) %>
-                  </select>
-                </label>
-              <% } %>
-              <% if (generos.length) { %>
-                <label>Gênero
-                  <select name="genero">
-                    <option value="">Todos os gêneros</option>
-                    <% generos.forEach(opcao => { %>
-                      <option value="<%= opcao %>"<%= opcao === genero ? ' selected' : '' %>><%= opcao %></option>
-                    <% }) %>
-                  </select>
-                </label>
-              <% } %>
-              <button type="submit">Aplicar filtros</button>
+    <%- include('../partials/componentes/cabecalho-descoberta', {
+      titulo: 'Obras', tituloId: 'ob-titulo', descricao: 'Vozes, histórias e sons que ficam.',
+    }) %>
+    <main class="dc-content" id="conteudo-obras" aria-labelledby="ob-titulo" tabindex="-1">
+      <% if (permissao) { %><p class="ob-feedback" role="alert">Sua conta não tem permissão para essa ação.</p><% } %>
+      <% if (!filtrado) { %>
+        <section class="ob-editorial" aria-labelledby="ob-editorial-titulo">
+          <div class="ob-editorial-copy">
+            <span class="dc-stamp">Acervo da cena</span>
+            <h2 id="ob-editorial-titulo">Tem história<br>em cada <em>play.</em></h2>
+            <p>Do primeiro single ao álbum inteiro.<br>Encontre vozes, explore projetos e guarde os sons que ficam com você.</p>
+            <a class="dc-primary" href="#catalogo-obras">Explorar o acervo</a>
+            <div class="ob-editorial-stats"><span><strong><%= totalObras %></strong> <%= totalObras === 1 ? 'obra' : 'obras' %></span><span><strong><%= totalArtistas %></strong> <%= totalArtistas === 1 ? 'artista' : 'artistas' %></span><span>Independente por essência</span></div>
+          </div>
+          <% if (destaques.length) { %>
+            <div class="ob-mosaic" aria-label="Explore as obras da cena">
+              <span class="ob-mosaic-label">CYPHER / ACERVO MUSICAL</span>
+              <% destaques.forEach((o, i) => { %>
+                <a class="ob-mosaic-cover ob-mosaic-cover-<%= i %>" href="<%= o.url %>" aria-label="Explorar <%= o.titulo %>, de <%= o.artistas.join(', ') %>">
+                  <img src="/img/<%= o.capa %>" alt="" decoding="async" fetchpriority="<%= i === 0 ? 'high' : 'auto' %>">
+                  <span><small><%= o.tipo %> · <%= o.ano || 'Ano não informado' %></small><strong><%= o.titulo %></strong><small><%= o.autor %></small></span>
+                </a>
+              <% }) %>
+              <span class="ob-mosaic-caption">Sons de agora. Histórias pra levar.</span>
             </div>
-          </details>
-        <% } %>
-      </form>
-      <% if (permissao) { %><p class="et-feedback" role="alert">Sua conta não tem permissão para essa ação.</p><% } %>
-      <section class="et-section" id="catalogo-obras" aria-labelledby="ob-catalogo-titulo">
-        <header>
-          <div class="et-heading"><h2 id="ob-catalogo-titulo">Catálogo musical <span class="cy-count-sticker"><%= obras.length %></span></h2></div>
-          <% if (usuario.tipoConta === 'profissional') { %><a id="cadastro-obra" class="et-more" href="/espaco-de-trabalho">Espaço de Trabalho <%- icones.arrowRight %></a><% } %>
+          <% } else { %><div class="ob-editorial-art" aria-hidden="true"><%- icones.music2 %><span>A CENA TEM<br>MUITO A DIZER.</span></div><% } %>
+        </section>
+      <% } %>
+      <section class="ob-catalog" id="catalogo-obras" aria-labelledby="ob-catalogo-titulo">
+        <header class="dc-heading ob-catalog-heading">
+          <div><span class="ob-eyebrow">Encontre seu próximo favorito</span><h2 id="ob-catalogo-titulo"><%= q ? 'Resultados para “' + q + '”' : 'Explore o acervo' %></h2></div>
+          <div class="ob-heading-actions"><span class="cy-count-sticker" data-ob-total><%= obras.length %> <%= obras.length === 1 ? 'obra' : 'obras' %></span><% if (usuario.tipoConta === 'profissional' && !usuario.demonstracao) { %><a href="/espaco-de-trabalho">Minhas obras</a><% } %></div>
         </header>
+        <div class="dc-controls ob-controls">
+          <nav class="dc-tabs ob-format-tabs" aria-label="Filtrar obras por formato">
+            <a href="<%= urlFormato('') %>"<%= !formato ? ' aria-current=page' : '' %>><span aria-hidden="true"><%- icones.disc %></span> Todo o acervo</a>
+            <% formatos.forEach(opcao => { %><a href="<%= urlFormato(opcao) %>"<%= formato === opcao ? ' aria-current=page' : '' %>><%= ({'Faixa':'Faixas','Single':'Singles','EP':'EPs','Álbum':'Álbuns'})[opcao] || opcao %></a><% }) %>
+          </nav>
+            <button class="ob-collection-button" type="button" data-ob-collection aria-pressed="false" hidden><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %> Curtidos <span data-ob-favorite-count>0</span></button>
+          <details class="dc-filter ob-filter"><summary><span aria-hidden="true"><%- icones.sliders %></span> Refinar<%= genero || ano ? ' •' : '' %></summary>
+            <form action="/works">
+              <% for (const [chave, dado] of Object.entries({q, formato})) { if (dado) { %><input type="hidden" name="<%= chave %>" value="<%= dado %>"><% }} %>
+              <label>Gênero musical<select name="genero"><option value="">Todos os gêneros</option><% generos.forEach(g => { %><option value="<%= g %>"<%= g === genero ? ' selected' : '' %>><%= g %></option><% }) %></select></label>
+              <label>Ano de lançamento<select name="ano"><option value="">Todos os anos</option><% anos.forEach(a => { %><option value="<%= a %>"<%= a === ano ? ' selected' : '' %>><%= a %></option><% }) %></select></label>
+              <label for="ob-ordem">Organizar por<select id="ob-ordem" name="ordem"><% [['recentes','Mais recentes'],['antigas','Primeiros lançamentos'],['titulo','Título A–Z'],['artista','Artista A–Z']].forEach(([valor, rotulo]) => { %><option value="<%= valor %>"<%= valor === ordem ? ' selected' : '' %>><%= rotulo %></option><% }) %></select></label>
+              <button type="submit">Aplicar filtros</button>
+            </form>
+          </details>
+        </div>
+        <% if (filtrado) { %><div class="ob-active-filters"><span><%= [formato, genero, ano].filter(Boolean).join(' · ') || 'Busca no acervo' %></span><a href="/works">Limpar filtros</a></div><% } %>
         <% if (obras.length) { %>
-          <div class="et-grid et-completa">
-            <% obras.forEach(o => { %>
-              <%- include('../partials/cartao-trabalho', {item:{modalidade:'obra',titulo:o.titulo,autor:o.autor,tipo:o.tipo,metadados:o.genero,icone:'music'},href:'/p/'+encodeURIComponent(o.handle.replace(/^@/,''))+'#obra-'+encodeURIComponent(o.id),participacao:false}) %>
-            <% }) %>
-          </div>
+          <% grupos.forEach(grupo => { %>
+            <section class="ob-shelf" data-ob-shelf aria-labelledby="ob-<%= grupo.id %>-titulo">
+              <header class="ob-shelf-heading"><div><h3 id="ob-<%= grupo.id %>-titulo"><%= grupo.titulo %></h3><p><%= grupo.descricao %></p></div><span data-ob-shelf-count><%= grupo.itens.length %> <%= grupo.itens.length === 1 ? 'obra' : 'obras' %></span></header>
+              <div class="ob-grid<%= grupo.id === 'discos' ? ' ob-grid-records' : '' %>">
+                <% grupo.itens.forEach(o => { %><%- include('../partials/componentes/cartao-acervo', { o }) %><% }) %>
+              </div>
+            </section>
+          <% }) %>
+          <div class="dc-empty ob-empty" data-ob-collection-empty hidden><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %><div><h3>Sua coleção começa com uma descoberta.</h3><p>Curta uma obra pela coroa. Suas curtidas desta seleção aparecem aqui.</p><button class="ob-text-button" type="button" data-ob-show-all>Voltar ao acervo</button></div></div>
         <% } else { %>
-          <div class="et-empty">
-            <span class="et-empty-icon" aria-hidden="true"><%- icones.disc %></span>
-            <div><h3><%= q || formato || genero ? 'Nenhuma obra corresponde à sua busca ou aos filtros.' : 'Ainda não há obras públicas no catálogo.' %></h3></div>
-          </div>
+          <div class="dc-empty ob-empty"><%- icones.search %><div><h3><%= filtrado ? 'Esse som ainda não apareceu por aqui.' : 'O acervo está esperando novas histórias.' %></h3><p><%= filtrado ? 'Tente outro artista, título ou combinação de filtros.' : 'As obras públicas da comunidade vão encontrar seu lugar aqui.' %></p><% if (filtrado) { %><a class="ob-text-button" href="/works">Explorar todo o acervo</a><% } %></div></div>
         <% } %>
+        <footer class="ob-catalog-note"><span aria-hidden="true"><%- icones.headphones %></span> Cada obra tem uma voz. Encontre as que conversam com você.</footer>
       </section>
+      <p class="sr-only" role="status" aria-live="polite" data-ob-status></p>
     </main>
     <%- include('../partials/navegacao-mobile', { rotaAtual: '/works' }) %>
   </div>
 </div>
-<script src="/js/espaco-trabalho.js" defer></script>
+<script src="/js/catalogo-obras.js" defer></script>
 <%- include('../partials/fim-pagina') %>

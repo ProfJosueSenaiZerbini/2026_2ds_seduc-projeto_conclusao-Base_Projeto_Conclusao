@@ -1,0 +1,24 @@
+<% if (privacidadeSalva) { %>
+  <p class="profile-message profile-message-success" role="status">
+    Preferências de visibilidade atualizadas.
+  </p>
+<% } else if (salvo) { %>
+  <p class="profile-message profile-message-success" role="status">
+    Perfil atualizado.
+  </p>
+<% } %>
+<% if (generoPendente) { %>
+  <p class="profile-message profile-message-success" role="status">
+    Sua sugestão de gênero foi enviada para análise. Ela só será exibida no perfil após aprovação.
+  </p>
+<% } %>
+<% if (categoriaPropostaMensagem) { %>
+  <p class="profile-message<%= categoriaPropostaErro ? 'profile-message-error' : 'profile-message-success' %>" role="status">
+    <%= categoriaPropostaMensagem %>
+  </p>
+<% } %>
+<% if (erro) { %>
+  <p class="profile-message profile-message-error" role="alert">
+    <%= erro %>
+  </p>
+<% } %>

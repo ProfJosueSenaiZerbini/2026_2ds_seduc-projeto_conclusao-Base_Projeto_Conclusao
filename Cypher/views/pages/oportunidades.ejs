@@ -32,14 +32,6 @@
       titulo: 'Eventos',
       tituloId: 'titulo-eventos',
       descricao: 'Batalhas, shows, cyphers e encontros da cena.',
-      busca: {
-        acao: '/events',
-        termo: q,
-        limite: 120,
-        rotulo: 'Evento, local ou organizador',
-        filtros: filtrosBusca,
-        filtrosVazios: ['localizacao']
-      }
     }) %>
 
     <main class="dc-content" id="conteudo-eventos" aria-labelledby="titulo-eventos" tabindex="-1">
@@ -106,6 +98,7 @@
         <% if (podeGerenciar) { %>
           <a class="dc-primary" href="/events/new"><span aria-hidden="true"><%- icones.plus %></span> Cadastrar evento</a>
         <% } %>
+        <a class="events-map-link" href="/events/map"><span aria-hidden="true"><%- icones.mapPin %></span> Ver mapa</a>
       </div>
 
       <section aria-labelledby="titulo-agenda-eventos">

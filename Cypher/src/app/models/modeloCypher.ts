@@ -143,22 +143,4 @@ export const CypherModel = {
     excluirObraCypher(id, usuarioId),
   estatisticasObrasDoUsuario: (usuarioId: string) =>
     estatisticasObrasUsuarioCypher(usuarioId),
-  faqs: () => [
-    {
-      q: "O que é ISRC?",
-      a: "É um código usado para identificar gravações musicais. No Cypher, você pode guardar essa informação junto da obra e dos créditos.",
-    },
-    {
-      q: "O que é ISWC?",
-      a: "É um identificador internacional de obras musicais. Registre o código quando já tiver essa informação para manter seu histórico organizado.",
-    },
-    {
-      q: "Como conseguir shows?",
-      a: "Acompanhe oportunidades e eventos na plataforma. Mantenha o perfil profissional atualizado e registre suas participações.",
-    },
-    {
-      q: "Como funciona a reputação?",
-      a: "A reputação é uma informação profissional baseada em participação, avaliações e profissionalismo dentro da plataforma.",
-    },
-  ],
 };

@@ -1,0 +1,18 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<link rel="stylesheet" href="/css/entrada.css">
+<main class="tag-page entrada-cypher access-page"><a class="tag-brand" href="/login" aria-label="Cypher, entrar">CYPHER</a><%- include('../partials/componentes/tema-entrada') %><div class="tag-content"><div class="tag-shell"><section class="tag-panel auth-panel">
+<span class="eyebrow">SEU ESPAÇO, SEU ACESSO</span>
+<h1><%= etapa === 'encerrada' ? 'Conta encerrada' : etapa === 'sucesso' ? 'Tudo certo com sua senha' : etapa === 'solicitado' ? 'Confira seu e-mail' : etapa === 'invalido' ? 'Vamos tentar de novo' : etapa === 'redefinir' ? 'Uma nova senha' : 'Volte pra cena' %></h1>
+<% if(erro){ %><p class="auth-message auth-message-error" role="alert"><%= erro %></p><% } %>
+<% if(etapa === 'solicitar'){ %>
+<p>Informe o e-mail confirmado da sua conta. Você receberá um link para criar uma nova senha.</p>
+<form method="post" action="/recuperar-senha"><label>E-mail da conta<input name="email" type="email" maxlength="254" autocomplete="email" required></label><button class="button button-lime full" type="submit">Receber link de recuperação</button><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+<% }else if(etapa === 'redefinir'){ %>
+<p>Use entre 8 e 128 caracteres. Ao salvar, suas sessões anteriores serão encerradas.</p><%- include('../partials/componentes/olhos-senha') %>
+<form method="post" action="/redefinir-senha"><label>Nova senha<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required></label><label>Confirmar nova senha<input name="passwordConfirmation" type="password" minlength="8" maxlength="128" autocomplete="new-password" required></label><button class="button button-lime full" type="submit">Definir nova senha</button><input type="hidden" name="token" value="<%= token %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+<% }else if(etapa === 'solicitado'){ %><p role="status">Se houver uma conta com esse e-mail confirmado, você receberá um link válido por 30 minutos. Confira também o spam. Um novo envio pode ser solicitado após um minuto, até cinco vezes por hora.</p><a class="button button-outline full" href="/recuperar-senha">Solicitar outro link</a>
+<% }else if(etapa === 'invalido'){ %><p role="alert">Este link não está disponível. Ele pode ter expirado, já ter sido usado ou ter sido substituído por uma nova solicitação.</p><a class="button button-lime full" href="/recuperar-senha">Receber um novo link</a>
+<% }else if(etapa === 'encerrada'){ %><p role="status">Seu acesso foi revogado e seu perfil foi desativado. Os dados pessoais de apresentação foram removidos.</p><p>Seu identificador continua reservado. Créditos, compras, acordos e outros registros compartilhados necessários aos direitos de terceiros são preservados, sem manter seu perfil ativo.</p><a class="button button-outline full" href="/politica-privacidade">Entenda a preservação de dados</a>
+<% }else{ %><p role="status"><%= mensagem %></p><% } %>
+<p class="auth-switch"><a href="/login">Voltar para entrar</a></p>
+</section></div></div></main><%- include('../partials/fim-pagina') %>

@@ -1,0 +1,1027 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="cypher-theme" content="light">
+      <script>
+        (() => {
+          localStorage.setItem("cypher-tema","dark"); const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
+          let tema = temaConta === "light" ? "light" : "dark";
+          try {
+            const salvo = localStorage.getItem("cypher-tema");
+            if (salvo === "light" || salvo === "dark") tema = salvo;
+          } catch {}
+          document.documentElement.classList.toggle("dark", tema === "dark");
+        })();
+      </script>
+      <script>
+        // Consome apenas a próxima navegação feita com o mouse na sidebar.
+        try {
+          const chave = "cypher-sidebar-percurso";
+          const percurso = JSON.parse(sessionStorage.getItem(chave) || "null");
+          sessionStorage.removeItem(chave);
+          const destino = (location.pathname === "/" ? "/dashboard" : location.pathname) + location.search;
+          if (
+            percurso &&
+            window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)").matches &&
+            percurso.destino === destino &&
+            Number.isFinite(percurso.instante) &&
+            Date.now() - percurso.instante >= 0 &&
+            Date.now() - percurso.instante < 15000
+          ) {
+            document.documentElement.classList.add("sidebar-em-transicao");
+          }
+        } catch {}
+      </script>
+      <meta name="csrf-token" content="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#10140f" />
+      <title>
+        CYPHER —Oportunidades
+      </title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="/css/estilos.css">
+      <link rel="stylesheet" href="/css/tema-cypher-claro.css">
+      <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
+      
+        <link rel="stylesheet" href="/css/chamadas.css">
+      
+      <link rel="stylesheet" href="/css/tema.css">
+      <link rel="stylesheet" href="/css/responsivo.css">
+      <link rel="stylesheet" href="/css/formularios.css">
+      <link rel="stylesheet" href="/css/busca-global.css">
+      <link rel="stylesheet" href="/css/midias-publicacoes.css">
+      <link rel="stylesheet" href="/css/interacoes-conteudo.css">
+      
+      <link rel="stylesheet" href="/css/botao-salvar.css">
+    </head>
+    <body>
+
+
+<div class="dc-shell op-shell">
+ <a class="dc-skip" href="#op-conteudo">Pular para o conteúdo</a>
+ 
+<aside class="sidebar" id="navegacao-principal">
+  <div class="sidebar-scroll">
+    <div class="sidebar-top">
+      <div class="sidebar-brand-row">
+        <a class="logo logo-compact" href="/dashboard" aria-label="Cypher — início">
+          <span class="discovery-rail-mark" hidden aria-hidden="true">
+<svg
+  class="lucide lucide-crown"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+  <path d="M5 21h14" />
+</svg>
+</span>
+          <span class="logo-mark" aria-hidden="true">
+            <span>
+            </span>
+            <span>
+            </span>
+            <span>
+            </span>
+          </span>
+          <span class="logo-word">
+            CYPHER
+          </span>
+        </a>
+        <div class="sidebar-theme">
+          <nav class="entry-theme" aria-label="Aparência da página">
+  <label class="theme-switch">
+    <input type="checkbox" data-theme-toggle role="switch" aria-label="Tema escuro" title="Ativar tema escuro" >
+    <span class="theme-switch__slider" aria-hidden="true">
+      <span class="theme-switch__sun">
+<svg
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+</span>
+      <span class="theme-switch__moon">
+<svg
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+</span>
+    </span>
+  </label>
+</nav>
+
+        </div>
+        <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">
+          <span class="lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg>
+
+          </span>
+        </button>
+      </div>
+    </div>
+    <nav class="side-nav" aria-label="Navegação principal">
+      <div class="nav-label">
+        WORKSPACE
+      </div>
+      
+      
+        
+        <a class="side-link" aria-label="Descoberta" href="/dashboard" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Descoberta
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Espaço de Trabalho" href="/espaco-de-trabalho" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-briefcase-business"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 12h.01" />
+  <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+  <path d="M22 13a18.15 18.15 0 0 1-20 0" />
+  <rect width="20" height="14" x="2" y="6" rx="2" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Espaço de Trabalho
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Obras" href="/works" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-music"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9 18V5l12-2v13" />
+  <circle cx="6" cy="18" r="3" />
+  <circle cx="18" cy="16" r="3" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Obras
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Trabalhos e galerias" href="/work-projects" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Trabalhos e galerias
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Banco de Beats" href="/beats" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-headphones"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Banco de Beats
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Eventos" href="/events" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-calendar-days"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 2v3" />
+  <path d="M16 2v3" />
+  <rect x="3" y="3" width="18" height="18" rx="2" />
+  <path d="M3 9h18" />
+  <path d="M8 13h.01" />
+  <path d="M12 13h.01" />
+  <path d="M16 13h.01" />
+  <path d="M8 17h.01" />
+  <path d="M12 17h.01" />
+  <path d="M16 17h.01" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Eventos
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link active" aria-label="Oportunidades" href="/opportunities" aria-current="page">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-briefcase-business"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 12h.01" />
+  <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+  <path d="M22 13a18.15 18.15 0 0 1-20 0" />
+  <rect width="20" height="14" x="2" y="6" rx="2" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Oportunidades
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link" aria-label="Colaborações" href="/colaboracoes" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-users-round"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 21a8 8 0 0 0-16 0" />
+  <circle cx="10" cy="8" r="5" />
+  <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Colaborações
+          </span>
+          
+        </a>
+      
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="resource-links" id="recursos-menu" popover="manual" aria-label="Opções da conta" hidden>
+        <a class="side-link" href="/profile">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-user-round"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="8" r="5" />
+  <path d="M20 21a8 8 0 0 0-16 0" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Meu perfil
+          </span>
+        </a>
+        <a class="side-link" href="/settings">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Configurações
+          </span>
+        </a>
+<a class="side-link" href="/suporte"><span class="side-icon lucide-icon" aria-hidden="true">
+<svg
+  class="lucide lucide-circle-question-mark"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+  <path d="M12 17h.01" />
+</svg>
+</span><span class="side-link-label">Falar com a Cypher</span></a>
+        <a class="side-link" href="/purchases"><span class="side-icon lucide-icon" aria-hidden="true">
+<svg
+  class="lucide lucide-headphones"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+</svg>
+</span><span class="side-link-label">Minhas Compras</span></a>
+        <a class="side-link" href="/central">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-lightbulb"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+  <path d="M9 18h6" />
+  <path d="M10 22h4" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Cypher Central
+          </span>
+        </a>
+        
+          <a class="side-link" href="/colecoes">
+            <span class="side-icon lucide-icon" aria-hidden="true">
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+</span>
+            <span class="side-link-label">Minha coleção</span>
+          </a>
+        
+        <a class="side-link" href="/notificacoes">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-bell"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+  <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Notificações
+          </span>
+        </a>
+        
+      </div>
+
+      <a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
+        <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true">
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+</span></div>
+        <div class="rep-number">—</div><p>Ainda sem avaliações</p>
+      </a>
+      <div class="sidebar-account-row">
+      <a class="user-mini" href="/profile" aria-label="Abrir perfil deautor">
+        <div class="avatar avatar-yellow">
+          
+
+  AA
+
+
+        </div>
+        <div>
+          <strong>
+            autor
+          </strong>
+          <span>
+            Rapper
+          </span>
+        </div>
+      </a>
+      <div class="sidebar-options">
+        <input type="checkbox" id="sidebar-options-checkbox" class="sidebar-options-checkbox" aria-label="Opções da conta" aria-controls="recursos-menu" aria-expanded="false">
+        <label for="sidebar-options-checkbox" class="sidebar-options-toggle" title="Opções da conta">
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+          <span class="sidebar-options-bar" aria-hidden="true"></span>
+        </label>
+      </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+
+
+ <div class="dc-page">
+ <header class="dc-header">
+  <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir menu de navegação" aria-controls="navegacao-principal" aria-expanded="false">
+<svg
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+</button>
+  <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
+  <div class="dc-title"><h1 id="op-titulo">Oportunidades</h1><p>Encontros profissionais que fazem a cena acontecer.</p></div>
+  <div class="dc-account">
+    <form class="global-search dc-search" action="/search" method="get" role="search" aria-label="Busca global" data-global-search>
+  <button class="global-search-toggle" type="button" aria-label="Abrir busca" aria-expanded="false" aria-controls="cypher-search-field" hidden>
+<svg
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+</button>
+  <div class="global-search-field" id="cypher-search-field">
+    <label class="sr-only" for="cypher-global-search">Buscar na Cypher</label>
+    <input id="cypher-global-search" name="q" type="search" value="" maxlength="100" placeholder="Buscar na Cypher" autocomplete="off" spellcheck="false" aria-controls="cypher-search-suggestions" aria-expanded="false">
+    <button type="submit" aria-label="Pesquisar na Cypher">
+<svg
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+</button>
+  </div>
+  <div class="global-search-suggestions" id="cypher-search-suggestions" hidden>
+    <p class="global-search-status" role="status" aria-live="polite"></p>
+    <ul aria-label="Sugestões de pesquisa"></ul>
+    <a class="global-search-all" href="/search">Ver todos os resultados <span aria-hidden="true">↗</span></a>
+  </div>
+</form>
+
+        <div class="notification-center" data-notification-center>
+      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+        <span class="lucide-icon" aria-hidden="true">
+          
+<svg
+  class="lucide lucide-bell"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+  <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+</svg>
+
+        </span>
+        
+          <span class="notification-count" aria-label="23 não lida(s)">
+            23
+          </span>
+        
+      </button>
+      <section class="notification-popover" id="painel-notificacoes" data-notification-panel hidden aria-labelledby="titulo-notificacoes">
+        <div class="notification-popover-header">
+          <strong id="titulo-notificacoes">
+            Notificações
+          </strong>
+          <a href="/notificacoes">
+            Ver todas
+          </a>
+        </div>
+        
+          <div class="notification-list">
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/messages/72b7c18b-c688-4a50-af04-6d29660dbd6a">
+                  <strong>
+                    Nova mensagem
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/ce415700-c967-48b7-80cb-7fc0589e85f4/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
+                  <strong>
+                    Proposta recebida · versão 2
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/c7b2fecd-ed77-47cd-8e90-faf97e01e763/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/8e2422e2-265e-4212-b3fd-f70f740b824c">
+                  <strong>
+                    Situação da oportunidade: cancelada
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/c79c78b3-74c7-4238-abf5-a1937aa1c478/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
+                  <strong>
+                    Acordo confirmado pelas duas partes
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/c2f33663-0f80-488c-b0bb-e9829db69a15/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/1bcd08c2-ab8a-491f-a5ae-6170ff1e1916">
+                  <strong>
+                    Nova candidatura recebida
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/a95a8dbc-e1ee-40c8-8579-eecc5a884345/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+          </div>
+        
+      </section>
+    </div>
+    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de autor" title="Perfil de autor">
+      
+
+  AA
+
+
+    </a>
+
+  </div>
+</header>
+
+
+ <div class="dc-content op-content" id="op-conteudo" tabindex="-1">
+ <nav class="op-tabs" aria-label="Navegação de oportunidades">
+ 
+ <a href="/opportunities" >Explorar</a>
+ <a href="/my-applications" >Minhas candidaturas</a><a href="/my-opportunities" >Minhas oportunidades</a>
+ <a href="/messages">Mensagens</a>
+ </nav>
+ 
+ 
+ <header class="op-section-heading"><span class="op-eyebrow">Publicação profissional</span><h2>Abra espaço para o próximo encontro.</h2><p>Conte o que precisa, quem procura e quais condições oferece.</p></header>
+<form class="op-editor" method="post" action="/opportunities" data-op-review>
+ <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><input type="hidden" name="submissao" value="bd7e8fca-7e95-405e-9b60-6ab08426bc6e"><input type="hidden" name="revisao" value="1">
+ 
+ 
+ 
+ <fieldset class="op-panel"><legend>O que você quer realizar</legend><div class="op-fields"><label>Título da chamada<input name="titulo" type="text" value="" required aria-invalid="false" ></label><label>Finalidade<select name="tipo" aria-invalid="false"><option value="servico" >Prestação de serviço</option><option value="projeto" >Equipe para projeto</option><option value="colaboracao" >Colaboração</option><option value="vaga" >Vaga profissional</option></select></label><label class="op-wide">Descreva a necessidade<textarea name="descricao" rows="4" required aria-invalid="false"></textarea></label><label class="op-wide">Contexto e objetivo<textarea name="contexto" rows="4"  aria-invalid="false"></textarea></label></div></fieldset>
+ <fieldset class="op-panel"><legend>Quem você procura</legend><p>Defina vagas e critérios por função. Cada candidatura será vinculada a uma delas.</p>
+ <div data-op-functions>
+ <div class="op-function" data-op-function><div class="op-fields"><label>Profissão<select name="funcoes[0][profissao_id]" required><option value="">Selecione uma profissão</option><optgroup label="Música"><option value="rapper" >Rapper</option><option value="mc" >MC</option><option value="compositor" >Compositor(a)</option><option value="letrista" >Letrista</option><option value="beatmaker" >Beatmaker</option><option value="produtor" >Produtor(a)</option><option value="dj" >DJ</option><option value="freestyleiro" >Freestyleiro</option></optgroup><optgroup label="Dança"><option value="b-boy-b-girl" >B-boy / B-girl</option><option value="dancarino" >Dançarino(a)</option><option value="coreografo" >Coreógrafo(a)</option></optgroup><optgroup label="Artes visuais"><option value="grafiteiro" >Grafiteiro(a)</option><option value="ilustrador" >Ilustrador(a)</option><option value="designer-grafico" >Designer gráfico</option></optgroup><optgroup label="Audiovisual"><option value="fotografo" >Fotógrafo(a)</option><option value="videomaker" >Videomaker</option><option value="editor-video" >Editor(a) de vídeo</option></optgroup><optgroup label="Produção técnica"><option value="engenheiro-audio" >Engenheiro(a) de áudio</option><option value="mixador" >Mixador(a)</option><option value="masterizador" >Masterizador(a)</option></optgroup><optgroup label="Gestão e produção"><option value="empresario" >Empresário(a)</option><option value="produtor-cultural" >Produtor(a) cultural</option><option value="organizador-eventos" >Organizador(a) de eventos</option></optgroup><optgroup label="Comunicação e cultura"><option value="criador-conteudo" >Criador(a) de conteúdo</option><option value="jornalista-cultural" >Jornalista cultural</option></optgroup></select></label><label>Quantidade de vagas<input type="number" name="funcoes[0][vagas]" min="1" max="1000" required value="1"></label>
+ <label class="op-wide">Responsabilidades<textarea name="funcoes[0][responsabilidades]" rows="3" required></textarea></label><label class="">Requisitos obrigatórios<textarea name="funcoes[0][requisitos]" rows="3" ></textarea></label><label class="">Requisitos desejáveis<textarea name="funcoes[0][desejaveis]" rows="3" ></textarea></label></div><button type="button" class="op-text-link" data-op-remove>Remover função</button></div></div>
+ <button type="button" class="op-button" data-op-add>
+<svg
+  class="lucide lucide-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="M12 5v14" />
+</svg>
+ Adicionar função</button></fieldset>
+ <fieldset class="op-panel"><legend>Condições do trabalho</legend><div class="op-fields"><label>Modalidade<select name="modalidade" aria-invalid="false"><option value="remoto" >Remoto</option><option value="presencial" >Presencial</option><option value="hibrido" >Híbrido</option></select></label><label>Cidade ou região (obrigatória em trabalho presencial ou híbrido)<input name="localizacao" type="text" value=""  aria-invalid="false" ></label><label>Remuneração ou colaboração<select name="remuneracao" aria-invalid="false"><option value="a_combinar" >A combinar</option><option value="remunerada" >Remunerada</option><option value="colaboracao" >Colaboração não remunerada</option></select></label><label>Valor declarado (R$, opcional)<input name="valor" type="number" value=""  aria-invalid="false" min="0" step="0.01"></label><label>Valor por<select name="unidade" aria-invalid="false"><option value="projeto" >Projeto</option><option value="hora" >Hora</option><option value="mes" >Mês</option></select></label><label>Candidaturas até (horário de Brasília)<input name="prazo" type="date" value=""  aria-invalid="false" ></label><label>Início previsto<input name="inicio" type="date" value=""  aria-invalid="false" ></label><label>Término previsto<input name="fim" type="date" value=""  aria-invalid="false" ></label><label class="op-wide">Benefícios e condições adicionais<textarea name="condicoes" rows="4"  aria-invalid="false"></textarea></label></div></fieldset>
+ <fieldset class="op-panel"><legend>Vínculos opcionais</legend><p>Vincule registros existentes sob sua responsabilidade.</p><div class="op-fields"><label>Evento<select name="evento_id" aria-invalid="false"><option value="" >Sem vínculo</option><option value="evento-teste" >Evento teste</option></select></label><label>Projeto<select name="projeto_id" aria-invalid="false"><option value="" >Sem vínculo</option><option value="c3b832e1-1f4e-4aeb-b7e9-4c58c5497eb3" >Projeto teste</option></select></label></div><a class="op-text-link" href="/work-projects" target="_blank" rel="noopener">Gerenciar meus projetos em outra aba</a></fieldset>
+ <section class="op-panel op-review" data-op-summary hidden><h3>Revise sua chamada</h3><div data-op-summary-content></div><p>Confira as funções, vagas e condições antes de confirmar.</p></section>
+ <div class="op-actions"><button type="button" class="op-button" data-op-preview>Revisar dados</button><button class="op-button" name="acao" value="rascunho">Salvar rascunho</button><button class="op-button op-primary" name="acao" value="publicar">Publicar oportunidade</button></div>
+</form>
+
+ </div>
+ 
+<nav class="dc-bottom" aria-label="Navegação rápida" style="--dc-nav-current: -1">
+  
+    <a href="/dashboard">
+      <span aria-hidden="true">
+<svg
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+</span>
+      Descoberta
+    </a>
+  
+    <a href="/works">
+      <span aria-hidden="true">
+<svg
+  class="lucide lucide-music"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9 18V5l12-2v13" />
+  <circle cx="6" cy="18" r="3" />
+  <circle cx="18" cy="16" r="3" />
+</svg>
+</span>
+      Obras
+    </a>
+  
+    <a href="/espaco-de-trabalho">
+      <span aria-hidden="true">
+<svg
+  class="lucide lucide-briefcase-business"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 12h.01" />
+  <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+  <path d="M22 13a18.15 18.15 0 0 1-20 0" />
+  <rect width="20" height="14" x="2" y="6" rx="2" />
+</svg>
+</span>
+      Trabalho
+    </a>
+  
+    <a href="/events">
+      <span aria-hidden="true">
+<svg
+  class="lucide lucide-calendar-days"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 2v3" />
+  <path d="M16 2v3" />
+  <rect x="3" y="3" width="18" height="18" rx="2" />
+  <path d="M3 9h18" />
+  <path d="M8 13h.01" />
+  <path d="M12 13h.01" />
+  <path d="M16 13h.01" />
+  <path d="M8 17h.01" />
+  <path d="M12 17h.01" />
+  <path d="M16 17h.01" />
+</svg>
+</span>
+      Eventos
+    </a>
+  
+    <a href="/profile">
+      <span aria-hidden="true">
+<svg
+  class="lucide lucide-user-round"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="8" r="5" />
+  <path d="M20 21a8 8 0 0 0-16 0" />
+</svg>
+</span>
+      Perfil
+    </a>
+  
+  
+</nav>
+
+ </div>
+
+</div>
+<script src="/js/chamadas.js" defer></script>
+<button class="mobile-overlay" type="button" data-sidebar-close aria-label="Fechar menu de navegação" hidden>
+</button>
+<script src="/js/interacoes.js" defer>
+</script>
+<script src="/js/identidade.js" defer></script>
+<script src="/js/formularios.js" defer></script>
+<script src="/js/busca-global.js" defer></script>
+
+  <p class="sr-only" id="ci-status" role="status" aria-live="polite"></p>
+  <dialog class="dc-shell ci-dialog" id="ci-conversa" aria-labelledby="ci-dialog-title" aria-describedby="ci-dialog-subtitle">
+    <header class="ci-dialog-header">
+      <div><h2 id="ci-dialog-title"></h2><p id="ci-dialog-subtitle">Comentários</p></div>
+      <button class="ci-icon" type="button" data-ci-close aria-label="Fechar comentários" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </header>
+    <p class="ci-live" role="status" aria-live="polite" data-ci-message></p>
+    <div class="ci-dialog-content" data-ci-content></div>
+  </dialog>
+  <script src="/js/interacoes-conteudo.js" defer></script>
+
+</body>
+</html>
+

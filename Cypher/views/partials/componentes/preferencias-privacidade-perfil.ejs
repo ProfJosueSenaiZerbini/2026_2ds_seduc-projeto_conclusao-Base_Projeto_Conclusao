@@ -1,4 +1,7 @@
-<% if (!usuario.demonstracao) { %>
+<% const protegida = Boolean(usuario.protecaoMenor || (typeof protecaoMenor !== 'undefined' && protecaoMenor)); if (!usuario.demonstracao && protegida) { %>
+  <p class="account-protection">Até os 18 anos, seu perfil, sua localização e seu contato permanecem privados. Mensagens diretas entre adultos e menores ficam indisponíveis. Você pode usar o suporte e denunciar contatos ou conteúdos inadequados.</p>
+  <a class="button button-outline" href="/suporte">Acessar suporte e proteção</a>
+<% } else if (!usuario.demonstracao) { %>
   <form method="post" action="/settings/privacy" class="privacy-form<%= retornoPerfil ? ' profile-edit-form' : '' %>"<% if (retornoPerfil) { %> data-profile-section-form data-profile-section="privacidade"<% } %>>
     <% if (retornoPerfil) { %>
       <input type="hidden" name="retorno" value="perfil">
@@ -23,6 +26,11 @@
         <small>Exibe o contato informado no perfil. O e-mail de acesso nunca é publicado.</small>
       </span>
       <input type="checkbox" name="contatoPublico"<%= usuario.contactPublic ? ' checked' : '' %>>
+    </label>
+    <input type="hidden" name="competenciasPublicasPresente" value="1">
+    <label class="privacy-option">
+      <span><strong>Mostrar competências e especializações</strong><small>Inclui suas competências na apresentação profissional.</small></span>
+      <input type="checkbox" name="competenciasPublicas"<%= usuario.skillsPublic ? ' checked' : '' %>>
     </label>
     <button class="button button-lime" type="submit">Salvar visibilidade</button>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">

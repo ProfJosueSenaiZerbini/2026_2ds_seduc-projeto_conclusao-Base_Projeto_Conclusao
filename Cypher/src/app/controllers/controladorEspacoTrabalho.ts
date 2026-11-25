@@ -8,7 +8,7 @@ import {
   trabalhoDaConta,
   trabalhosDaConta,
 } from "../models/espacoTrabalho.js";
-import { publicacoesDescoberta } from "../models/modeloDescoberta.js";
+import { obrasDoCatalogo } from "../models/catalogoObras.js";
 import { CypherModel } from "../models/modeloCypher.js";
 import { obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
 
@@ -59,12 +59,14 @@ export function espacoTrabalho(req: Request, res: Response) {
     req.query.secao === "proprios" || req.query.secao === "participacoes"
       ? req.query.secao
       : "";
+  const modalidade = ["obra","beat","evento","projeto"].includes(texto(req.query.modalidade)) ? texto(req.query.modalidade) : "";
   const q = texto(req.query.q);
   const termos = normalizarBusca(q).split(/\s+/);
   const registros = trabalhosDaConta(usuario);
   const filtrados = registros.filter(
     r =>
       (profissao === "todas" || r.atuacoes.includes(profissao)) &&
+      (!modalidade || r.modalidade === modalidade) &&
       termos.every(t =>
         normalizarBusca(
           [r.titulo, r.autor, r.tipo, r.metadados, r.papel, r.descricao].join(
@@ -118,6 +120,7 @@ export function espacoTrabalho(req: Request, res: Response) {
     const parametros = new URLSearchParams();
     if (q) parametros.set("q", q);
     if (profissao !== "todas") parametros.set("profissao", profissao);
+    if (modalidade) parametros.set("modalidade", modalidade);
     if (grupo) parametros.set("secao", grupo);
     return rotaEspaco + (parametros.size ? "?" + parametros : "");
   };
@@ -128,6 +131,7 @@ export function espacoTrabalho(req: Request, res: Response) {
     temaPreferido: obterPreferenciasUsuario(usuario.id, "").tema,
     profissoes,
     profissao,
+    modalidade,
     q,
     grupos,
     secao,
@@ -171,25 +175,76 @@ export function fichaTrabalho(req: Request, res: Response) {
 export function catalogoObras(req: Request, res: Response) {
   const q = texto(req.query.q);
   const termos = normalizarBusca(q).split(/\s+/);
-  const catalogo = publicacoesDescoberta("obras");
-  const formatos = [...new Set(catalogo.map(obra => obra.tipo).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const generos = [...new Set(catalogo.map(obra => obra.genero).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const formato = formatos.find(opcao => opcao === req.query.formato) ?? "";
+  const catalogo = obrasDoCatalogo(res.locals.usuario.id);
+  const formatos = [
+    ...new Set(catalogo.map(obra => obra.tipo).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const generos = [
+    ...new Set(catalogo.map(obra => obra.genero).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const formato =
+    formatos.find(
+      opcao =>
+        opcao === (req.query.formato === "Música" ? "Faixa" : req.query.formato)
+    ) ?? "";
   const genero = generos.find(opcao => opcao === req.query.genero) ?? "";
+  const anos = [...new Set(catalogo.map(o => o.ano).filter(Boolean))]
+    .sort()
+    .reverse();
+  const ano = anos.find(opcao => opcao === req.query.ano) ?? "";
+  const ordem = ["recentes", "antigas", "titulo", "artista"].includes(
+    texto(req.query.ordem)
+  )
+    ? texto(req.query.ordem)
+    : "recentes";
   const obras = catalogo.filter(obra => {
-    if ((formato && obra.tipo !== formato) || (genero && obra.genero !== genero))
+    if (
+      (formato && obra.tipo !== formato) ||
+      (genero && obra.genero !== genero) ||
+      (ano && obra.ano !== ano)
+    )
       return false;
 
     const busca = normalizarBusca(
-      [obra.titulo, obra.autor, obra.handle, obra.tipo, obra.genero].join(" ")
+      [obra.titulo, ...obra.artistas, obra.handle, obra.tipo, obra.genero].join(
+        " "
+      )
     );
     return termos.every(termo => busca.includes(termo));
   });
+  obras.sort((a, b) => {
+    if (ordem === "titulo") return a.titulo.localeCompare(b.titulo, "pt-BR");
+    if (ordem === "artista") return a.autor.localeCompare(b.autor, "pt-BR");
+    if (!a.data || !b.data) return Number(!a.data) - Number(!b.data);
+    return ordem === "antigas"
+      ? a.data.localeCompare(b.data)
+      : b.data.localeCompare(a.data);
+  });
+  const grupos = [
+    {
+      id: "discos",
+      titulo: "Projetos para ouvir por inteiro",
+      descricao: "Álbuns e EPs. Cada faixa, parte de uma história.",
+      itens: obras.filter(o => o.colecao),
+    },
+    {
+      id: "sons",
+      titulo: "Uma faixa, muitas conexões",
+      descricao: "Singles e faixas para encontrar seu próximo som favorito.",
+      itens: obras.filter(o => ["Faixa", "Single"].includes(o.tipo)),
+    },
+    {
+      id: "outros",
+      titulo: "Outras expressões da cena",
+      descricao: "Mais formatos, outras formas de criar.",
+      itens: obras.filter(
+        o => !o.colecao && !["Faixa", "Single"].includes(o.tipo)
+      ),
+    },
+  ].filter(g => g.itens.length);
   res.render("pages/obras", {
     title: "Obras",
-    stylesheet: "espaco-trabalho",
+    stylesheet: "catalogo-obras",
     path: "/works",
     q,
     formato,
@@ -197,6 +252,19 @@ export function catalogoObras(req: Request, res: Response) {
     formatos,
     generos,
     obras,
+    grupos,
+    ano,
+    anos,
+    ordem,
+    filtrado: Boolean(q || formato || genero || ano),
+    destaques: catalogo
+      .filter(o => o.capa)
+      .sort((a, b) => b.data.localeCompare(a.data))
+      .slice(0, 3),
+    totalArtistas: new Set(
+      catalogo.flatMap(o => o.artistas.map(normalizarBusca))
+    ).size,
+    totalObras: catalogo.length,
     permissao: req.query.erro === "permissao",
   });
 }

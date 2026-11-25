@@ -114,13 +114,19 @@ export const catalogoProfissional: readonly GrupoProfissional[] = [
         rotulo: "Jornalista cultural",
         grupoId: "comunicacao-cultura",
       },
-      { id: "podcaster", rotulo: "Podcaster", grupoId: "comunicacao-cultura" },
     ],
   },
 ];
 
 export const profissoesCatalogo = catalogoProfissional.flatMap(
   grupo => grupo.profissoes
+);
+
+const gruposComEstilosMusicais = new Set(["musica", "producao-tecnica"]);
+export const profissoesComEstilosMusicais = new Set(
+  profissoesCatalogo
+    .filter(profissao => gruposComEstilosMusicais.has(profissao.grupoId))
+    .map(profissao => profissao.rotulo)
 );
 
 export function listarGruposProfissionais(): readonly GrupoProfissional[] {
@@ -136,16 +142,6 @@ export function obterProfissaoCatalogo(
 ): ProfissaoCatalogo | undefined {
   return profissoesCatalogo.find(profissao => profissao.id === id);
 }
-
-export type OpcaoStatusProfissional = {
-  value: string;
-  label: string;
-  categorias: string[];
-};
-
-type StatusComCategorias = OpcaoStatusProfissional & {
-  categorias: readonly string[];
-};
 
 export const categoriasGerais = profissoesCatalogo.map(
   profissao => profissao.rotulo
@@ -183,108 +179,26 @@ export function podeCriarEvento(categorias: readonly string[]): boolean {
   );
 }
 
-const statusProfissionais: readonly StatusComCategorias[] = [
-  {
-    value: "buscando-feats",
-    label: "Buscando feats e colaborações",
-    categorias: ["Rapper", "MC"],
-  },
-  {
-    value: "disponivel-apresentacoes",
-    label: "Disponível para apresentações",
-    categorias: ["Rapper", "MC", "DJ"],
-  },
-  {
-    value: "buscando-producao",
-    label: "Buscando beats ou produção musical",
-    categorias: ["Rapper", "MC"],
-  },
-  {
-    value: "disponivel-producao",
-    label: "Disponível para produzir",
-    categorias: ["Beatmaker", "Produtor(a)"],
-  },
-  {
-    value: "buscando-artistas",
-    label: "Buscando artistas para colaboração",
-    categorias: ["Beatmaker", "Produtor(a)"],
-  },
-  {
-    value: "disponivel-eventos",
-    label: "Disponível para eventos",
-    categorias: ["DJ"],
-  },
-  {
-    value: "buscando-parcerias",
-    label: "Buscando parcerias profissionais",
-    categorias: ["Empresário(a)"],
-  },
-  {
-    value: "recebendo-inscricoes",
-    label: "Recebendo inscrições para eventos",
-    categorias: ["Organizador(a) de eventos"],
-  },
-  {
-    value: "buscando-profissionais-eventos",
-    label: "Buscando profissionais para eventos",
-    categorias: ["Organizador(a) de eventos"],
-  },
-  {
-    value: "disponivel-colaboracao",
-    label: "Disponível para novos projetos",
-    categorias: categoriasGerais,
-  },
-  {
-    value: "indisponivel",
-    label: "Indisponível no momento",
-    categorias: categoriasGerais,
-  },
-];
+export const opcoesDisponibilidadeProfissional = [
+  { value: "disponivel-colaboracao", label: "Disponível para trabalhos e colaborações" },
+  { value: "sob-consulta", label: "Disponibilidade sob consulta" },
+  { value: "indisponivel", label: "Indisponível no momento" },
+] as const;
 
-export function opcoesStatusPorCategoria(
-  categorias: readonly string[]
-): OpcaoStatusProfissional[] {
-  const selecionadas = new Set(categorias);
-  const temCategoriaPersonalizada = categorias.some(
-    categoria => !categoriasGerais.includes(categoria as CategoriaProfissional)
-  );
-  return statusProfissionais
-    .filter(
-      status =>
-        status.categorias.some(categoria => selecionadas.has(categoria)) ||
-        (temCategoriaPersonalizada &&
-          ["disponivel-colaboracao", "indisponivel"].includes(status.value))
-    )
-    .map(({ value, label, categorias: categoriasStatus }) => ({
-      value,
-      label,
-      categorias: [
-        ...categoriasStatus,
-        ...(temCategoriaPersonalizada &&
-        ["disponivel-colaboracao", "indisponivel"].includes(value)
-          ? categorias.filter(
-              categoria =>
-                !categoriasGerais.includes(categoria as CategoriaProfissional)
-            )
-          : []),
-      ],
-    }));
-}
+// Valores de perfis anteriores permanecem legíveis até o titular editar a disponibilidade.
+const disponibilidadeAnterior: Readonly<Record<string, string>> = {
+  "buscando-feats": "Buscando feats e colaborações",
+  "disponivel-apresentacoes": "Disponível para apresentações",
+  "buscando-producao": "Buscando beats ou produção musical",
+  "disponivel-producao": "Disponível para produzir",
+  "buscando-artistas": "Buscando artistas para colaboração",
+  "disponivel-eventos": "Disponível para eventos",
+  "buscando-parcerias": "Buscando parcerias profissionais",
+  "recebendo-inscricoes": "Recebendo inscrições para eventos",
+  "buscando-profissionais-eventos": "Buscando profissionais para eventos",
+};
 
-export function todasOpcoesStatus(): OpcaoStatusProfissional[] {
-  return statusProfissionais.map(({ value, label, categorias }) => ({
-    value,
-    label,
-    categorias: [...categorias],
-  }));
-}
-
-export function rotuloStatusProfissional(
-  status: string,
-  categorias: readonly string[]
-): string {
-  return (
-    opcoesStatusPorCategoria(categorias).find(opcao => opcao.value === status)
-      ?.label ?? "Disponibilidade não informada"
-  );
+export function rotuloStatusProfissional(valor: string): string {
+  return opcoesDisponibilidadeProfissional.find(opcao => opcao.value === valor)?.label
+    ?? (Object.hasOwn(disponibilidadeAnterior, valor) ? disponibilidadeAnterior[valor] : "Disponibilidade não informada");
 }

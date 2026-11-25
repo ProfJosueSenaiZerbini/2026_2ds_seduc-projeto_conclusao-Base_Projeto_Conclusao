@@ -1,0 +1,12 @@
+<form class="global-search <%= typeof classeBusca !== 'undefined' ? classeBusca : '' %>" action="/search" method="get" role="search" aria-label="Busca global" data-global-search>
+  <div class="global-search-field">
+    <label class="sr-only" for="cypher-global-search">Buscar na Cypher</label>
+    <input id="cypher-global-search" name="q" type="search" value="<%= typeof q !== 'undefined' ? q : '' %>" maxlength="100" placeholder="Buscar na Cypher" autocomplete="off" spellcheck="false" aria-controls="cypher-search-suggestions" aria-expanded="false">
+    <button class="global-search-button" type="submit" aria-label="Pesquisar na Cypher"><%- icones.search %></button>
+  </div>
+  <div class="global-search-suggestions" id="cypher-search-suggestions" hidden>
+    <p class="global-search-status" role="status" aria-live="polite"></p>
+    <ul aria-label="Sugestões de pesquisa"></ul>
+    <a class="global-search-all" href="/search">Ver todos os resultados <span aria-hidden="true">↗</span></a>
+  </div>
+</form>

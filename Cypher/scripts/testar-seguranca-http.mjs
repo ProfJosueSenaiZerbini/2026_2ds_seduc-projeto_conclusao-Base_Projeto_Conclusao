@@ -53,7 +53,6 @@ for (const [id, tipo, categorias] of [
     funcao: categorias.join(" · "),
     identificador: `@${id}`,
     iniciais: "TE",
-    cTag: `TAG-${id}`,
     categorias,
     outraCategoria: "",
   });
@@ -240,7 +239,8 @@ try {
     });
     assert.ok([302, 303, 403].includes(evento.status));
   }
-  assert.equal((await request("/p/consumidor")).status, 404);
+  assert.equal((await request("/p/consumidor")).status, 302);
+  assert.equal((await request("/p/consumidor", { cookie: rapper })).status, 404);
   const busca = await request("/search", { cookie: rapper });
   const buscaHtml = await busca.text();
   assert.doesNotMatch(
@@ -348,6 +348,49 @@ try {
     0
   );
   await verificarEspacoTrabalho({ request, banco:b, rapper, letrista, consumidor });
+  const emitir = (usuarioDestinoId, tipo, titulo, chaveOrigem = titulo) =>
+    b.criarNotificacaoCypher({ usuarioDestinoId, tipo, titulo, chaveOrigem, mensagem: "", url: "" });
+  emitir("consumidor", "mensagem", "Aviso antes da preferência");
+  emitir("letrista", "suporte", "Aviso reservado de outra conta");
+  const aviso = b.listarNotificacoesCypher("consumidor", 50)
+    .find(n => n.titulo === "Aviso antes da preferência");
+  const outraConta = b.listarNotificacoesCypher("letrista", 50)
+    .find(n => n.titulo === "Aviso reservado de outra conta");
+  const postAviso = (sufixo, body = {}, cookie = consumidor, proteger = true) =>
+    request("/notificacoes/" + sufixo, { method: "POST", cookie, body, proteger });
+  const caixa = async (sufixo = "") => {
+    const r = await request("/notificacoes" + sufixo, { cookie: consumidor });
+    assert.equal(r.status, 200);
+    return r.text();
+  };
+  assert.equal((await postAviso(aviso.id + "/lida")).status, 303);
+  const caixaFiltrada = async () => (await caixa("?filtro=nao-lidas")).split("<main")[1].split("</main>")[0];
+  assert.ok(!(await caixaFiltrada()).includes("Aviso antes da preferência"));
+  await postAviso(aviso.id + "/nao-lida");
+  assert.match(await caixaFiltrada(), /Aviso antes da preferência/);
+  await postAviso(outraConta.id + "/excluir");
+  assert.ok(b.listarNotificacoesCypher("letrista", 50).some(n => n.id === outraConta.id));
+  assert.equal((await postAviso(aviso.id + "/excluir", {}, consumidor, false)).status, 403);
+  assert.equal((await postAviso(aviso.id + "/excluir")).status, 303);
+  emitir("consumidor", "mensagem", "Aviso antes da preferência");
+  assert.doesNotMatch(await caixa(), /Aviso antes da preferência/);
+  assert.equal((await postAviso("preferencias", { salvar: "sim", ativadas: "publicacoes" })).status, 303);
+  emitir("consumidor", "mensagem", "Mensagem opcional desativada");
+  emitir("consumidor", "evento_lembrete", "Lembrete opcional desativado");
+  emitir("consumidor", "obra_atualizada", "Publicação opcional ativa");
+  emitir("consumidor", "suporte", "Decisão administrativa obrigatória");
+  const comPreferencias = await caixa();
+  assert.doesNotMatch(comPreferencias, /Mensagem opcional desativada|Lembrete opcional desativado/);
+  assert.match(comPreferencias, /Publicação opcional ativa/);
+  assert.match(comPreferencias, /Decisão administrativa obrigatória/);
+  if (process.env.CYPHER_NOTIFICACOES_QA_OUTPUT) {
+    fs.writeFileSync(process.env.CYPHER_NOTIFICACOES_QA_OUTPUT, comPreferencias.replaceAll(token, "fixture"));
+  }
+  assert.equal((await postAviso("limpar")).status, 400);
+  assert.equal((await postAviso("limpar", { confirmar: "sim" })).status, 303);
+  assert.equal(b.contarNotificacoesNaoLidasCypher("consumidor"), 0);
+  assert.match(await caixa(), /Sua caixa de notificações está vazia/);
+  assert.ok(b.listarNotificacoesCypher("letrista", 50).some(n => n.id === outraConta.id));
   b.fecharBancoCypher();
   console.log(
     "OK: HTTP compilado, CSRF, limite de login, permissões contextuais, consumidor privado, sessões separadas, RBAC e equipe sem perfil público."

@@ -30,54 +30,157 @@ const processo=spawn(process.execPath,['dist/src/aplicacao.js'],{cwd:process.cwd
 let log='';processo.stdout.on('data',d=>log+=d);processo.stderr.on('data',d=>log+=d);const fim=new Promise(resolve=>processo.once('exit',resolve));
 let db;
 try{
-  let pagina;for(let n=0;n<80;n++){try{const r=await fetch(`${base}/register`);if(r.ok){pagina=r;break;}}catch{}await new Promise(resolve=>setTimeout(resolve,100));}assert.ok(pagina,log);
+  let pagina;for(let n=0;n<80;n++){try{const r=await fetch(`${base}/register`);if(r.ok){pagina=r;break;}if(r.status===500){log+=await r.text();break;}}catch{}await new Promise(resolve=>setTimeout(resolve,100));}assert.ok(pagina,log);
   const inicial=await pagina.text();assert.match(inicial,/value="consumidor"/);assert.match(inicial,/passwordConfirmation/);assert.doesNotMatch(inicial,/data-resposta-atuacao="(?:etapaProjetos|participacaoColetiva|atividadePratica)"/);
+  assert.doesNotMatch(inicial, /name="(?:tratamento|generoPersonalizado|possuiVulgo|visibilidadesAtuacoesJson)"/);
+  assert.match(inicial, /name="nomePublico"/);
   const csrf=pagina.headers.getSetCookie().find(c=>c.startsWith('cypher_csrf='))?.split(';')[0];const tokenCSRF=csrf.slice('cypher_csrf='.length);
   const params=body=>{const p=new URLSearchParams();for(const [k,v]of Object.entries(body))for(const item of Array.isArray(v)?v:[v])p.append(k,String(item));return p;};
   const req=(rota,{method='GET',cookie='',body}={})=>fetch(`${base}${rota}`,{method,redirect:'manual',headers:{cookie:[cookie,csrf].filter(Boolean).join('; '),...(method==='POST'?{'content-type':'application/x-www-form-urlencoded','x-csrf-token':tokenCSRF}:{})},body:body?params(body):undefined});
   const post=(rota,body,cookie='')=>req(rota,{method:'POST',body,cookie});
-  const dados=(email,identificador,tipoConta='consumidor')=>({name:'Pessoa Consumidora',email,identificador,tipoConta,nascimento:'1990-06-15',password:senha,passwordConfirmation:senha});
+  const dados=(email,identificador,tipoConta='consumidor')=>({name:'Pessoa Consumidora',email,identificador,tipoConta,nascimento:'1990-06-15',password:senha,passwordConfirmation:senha,aceiteTermos:'sim',versaoTermos:'2026-11-24',versaoPrivacidade:'2026-11-24'});
   const tokenEmail=email=>{const mensagens=fs.readdirSync(caixa).filter(n=>n.endsWith('.eml')).sort().reverse().map(n=>fs.readFileSync(path.join(caixa,n),'utf8'));const mensagem=mensagens.find(m=>m.startsWith(`To: ${email}\n`)&&m.includes('/confirmar-email?'));assert.ok(mensagem);return mensagem.match(/token=([a-f0-9]{64})/)[1];};
   const login=async(identificador,interno=false)=>{const r=await post(interno?'/admin/login':'/login',{[interno?'email':'identificador']:identificador,password:senha});assert.equal(r.status,interno?303:302);const prefixo=interno?'cypher_admin_session=':'cypher_session=';return r.headers.getSetCookie().find(c=>c.startsWith(prefixo))?.split(';')[0];};
   db=new Database(arquivo);
   for(const alteracao of [{nascimento:'2012-01-01'},{nascimento:'2099-01-01'},{nascimento:'2025-02-29'},{identificador:'admin'},{identificador:'nome-com-hifen'},{identificador:'a'.repeat(25)},{passwordConfirmation:'OutraSenha2026'}]){const r=await post('/register',{...dados('invalido@teste.local','invalido'),...alteracao});assert.equal(r.status,400);}
   assert.equal(db.prepare("SELECT count(*) AS total FROM usuarios WHERE tipo_conta<>'administrativo'").get().total,0,'Cadastro inválido não pode criar conta parcial');
-  const pro={...dados('pro@teste.local','artista.teste','profissional'),name:'Nome Civil Totalmente Privado',possuiVulgo:'1',vulgo:'Artista Singular',usarVulgo:'1',tratamento:'feminino',categorias:['Rapper','Letrista'],vertentes:['Trap','Drill'],respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'1-3a'},Letrista:{tempoAtuacao:'iniciando'}}),visibilidadesAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'publico'}})};
+  const pro={...dados('pro@teste.local','artista.teste','profissional'),name:'Nome Completo do Artista',nomePublico:'1',vulgo:'Artista Singular',tratamento:'valor-obsoleto',categorias:['Rapper','Letrista'],vertentes:['Trap','Drill'],respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'1-3a',etapaProjetos:'publicados'},Letrista:{tempoAtuacao:'iniciando'}}),visibilidadesAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'publico'}})};
+  assert.equal((await post('/register',{...pro,respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'iniciando'}})})).status,400);
   const registro=await post('/register',pro);assert.equal(registro.status,303);assert.equal(registro.headers.get('location'),'/email/pendente');
-  const idPro=db.prepare("SELECT id,codigo_publico FROM usuarios WHERE email='pro@teste.local'").get();
+  const idPro=db.prepare("SELECT id FROM usuarios WHERE email='pro@teste.local'").get();
   assert.equal(db.prepare('SELECT nome,nome_informado FROM perfis WHERE usuario_id=?').get(idPro.id).nome,pro.name);
+  assert.equal(db.prepare('SELECT tratamento FROM perfis WHERE usuario_id=?').get(idPro.id).tratamento, '');
+  const atuacaoInicial = db.prepare('SELECT respostas_json,visibilidades_json FROM respostas_atuacao_categoria WHERE usuario_id=? AND categoria=?').get(idPro.id,'Rapper');
+  assert.deepEqual(JSON.parse(atuacaoInicial.respostas_json), {tempoAtuacao:'1-3a'});
+  assert.equal(JSON.parse(atuacaoInicial.visibilidades_json).tempoAtuacao,'privado');
   assert.equal(db.prepare('SELECT email_confirmado_em FROM usuarios WHERE id=?').get(idPro.id).email_confirmado_em,null);
-  assert.equal((await post('/login',{email:pro.email,password:senha})).status,401);assert.equal((await req('/p/artista.teste')).status,404);
+  assert.equal((await post('/login',{email:pro.email,password:senha})).status,401);assert.equal((await req('/p/artista.teste')).status,302);
   const codigo=tokenEmail(pro.email);const salvo=db.prepare('SELECT token_hash,expira_em,criado_em FROM tokens_confirmacao_email WHERE usuario_id=?').get(idPro.id);assert.equal(salvo.token_hash,createHash('sha256').update(codigo).digest('hex'));assert.notEqual(salvo.token_hash,codigo);assert.equal(salvo.expira_em-salvo.criado_em,30*60*1000);
   assert.equal((await post('/confirmar-email',{token:codigo})).status,200);assert.equal((await post('/confirmar-email',{token:codigo})).status,400);
   let cookiePro=await login('@ARTISTA.TESTE');
-  const nomeInicial = await (await req('/p/artista.teste')).text();
-  assert.match(nomeInicial,/Nome Civil Totalmente Privado/);
-  assert.doesNotMatch(nomeInicial,/Artista Singular/);
-  assert.match(await (await req('/profile',{cookie:cookiePro})).text(),/Complete seu perfil/);
-  const escolha = {nomeInformado:pro.name,vulgo:pro.vulgo,usarVulgo:'1',nascimento:pro.nascimento,tratamento:'outro',generoPersonalizado:'Identidade privada de teste'};
-  assert.equal((await post('/settings/identidade',escolha,cookiePro)).status,303);
+  const nomeInicial = await (await req('/p/artista.teste',{cookie:cookiePro})).text();
+  assert.match(nomeInicial,/Nome Completo do Artista/);
+  assert.match(nomeInicial,/Artista Singular/);
+  assert.match(await (await req('/profile',{cookie:cookiePro})).text(),/href="\/profile\/completar"/);
+  const identidadeInicial = {nomeInformado:pro.name,vulgo:pro.vulgo,nascimento:pro.nascimento,tratamento:'outro',generoPersonalizado:'Identidade privada de teste'};
+  assert.equal((await post('/settings/identidade',identidadeInicial,cookiePro)).status,303);
   assert.match(await (await req('/settings',{cookie:cookiePro})).text(),/Identidade privada de teste/);
-  assert.doesNotMatch(await (await req('/profile',{cookie:cookiePro})).text(),/Complete seu perfil/);
-  const publico=await req('/p/artista.teste');assert.equal(publico.status,200);const htmlPublico=await publico.text();assert.match(htmlPublico,/Artista Singular/);assert.doesNotMatch(htmlPublico,/Identidade privada de teste|Nome Civil Totalmente Privado|1990-06-15|pro@teste.local/);
+  assert.match(await (await req('/profile',{cookie:cookiePro})).text(),/href="\/profile\/completar"/);
+  const publico=await req('/p/artista.teste',{cookie:cookiePro});assert.equal(publico.status,200);const htmlPublico=await publico.text();assert.match(htmlPublico,/Artista Singular/);assert.match(htmlPublico,/Nome Completo do Artista/);assert.doesNotMatch(htmlPublico,/Identidade privada de teste|1990-06-15|pro@teste.local/);
+  const pendencias = await (await req('/profile/completar',{cookie:cookiePro})).text();
+  assert.match(pendencias,/Adicione uma foto de perfil|Informe sua cidade e estado/);
+  assert.match(pendencias,/Adicione uma biografia/);
+  assert.match(pendencias,/Desenvolvimento profissional/);
+  assert.doesNotMatch(pendencias,/nomePublico|Nome completo|Data de nascimento|Gênero<|Vertentes de Rapper|Equipamentos|Status profissional|etapa dos projetos/);
+  assert.doesNotMatch(htmlPublico,/CYP-[A-Z0-9]+|ID CYPHER/);
   const duplicado=await post('/register',dados('duplicado@teste.local','ARTISTA.TESTE'));assert.equal(duplicado.status,409);
   assert.equal((await post('/register',{...dados('consumidor@teste.local','consumidor'),categorias:'Rapper'})).status,400);
   assert.equal((await post('/register',dados('consumidor@teste.local','consumidor'))).status,303);assert.equal((await post('/confirmar-email',{token:tokenEmail('consumidor@teste.local')})).status,200);
-  const cookieConsumidor=await login('consumidor');const antes=db.prepare("SELECT id,codigo_publico,email,senha_hash FROM usuarios WHERE email='consumidor@teste.local'").get();
-  const perfilCons=await req('/profile',{cookie:cookieConsumidor});assert.equal(perfilCons.status,200);const perfilConsHtml=await perfilCons.text();assert.match(perfilConsHtml,/SEU ESPAÇO PRIVADO/);assert.doesNotMatch(perfilConsHtml,/reputation-mini|data-atuacao-questionario|Suas categorias/);
-  assert.equal((await req('/p/consumidor')).status,404);
+  const cookieConsumidor=await login('consumidor');const antes=db.prepare("SELECT id,email,senha_hash FROM usuarios WHERE email='consumidor@teste.local'").get();
+  const perfilCons=await req('/profile',{cookie:cookieConsumidor});assert.equal(perfilCons.status,200);const perfilConsHtml=await perfilCons.text();assert.match(perfilConsHtml,/Espaço privado/);assert.doesNotMatch(perfilConsHtml,/data-profile-context|data-seal-editor|Catálogo autoral|Avaliações recebidas/);
+  assert.equal((await req('/p/consumidor',{cookie:cookiePro})).status,404);
+  const visitante = await req('/p/artista.teste?aba=atuacao',{cookie:cookieConsumidor});
+  assert.doesNotMatch(await visitante.text(), /De 1 a 3 anos/);
+  assert.equal((await post('/settings/identidade',{...identidadeInicial,nomePublicoPresente:'1'},cookiePro)).status,303);
+  assert.doesNotMatch(await (await req('/p/artista.teste',{cookie:cookieConsumidor})).text(),/Nome Completo do Artista/);
+  assert.doesNotMatch(await (await req('/search',{cookie:cookieConsumidor})).text(),/Nome Completo do Artista/);
+  assert.equal((await post('/settings/identidade',{...identidadeInicial,nomePublicoPresente:'1',nomePublico:'1'},cookiePro)).status,303);
+  const progressoConsumidor = await (await req('/profile/completar',{cookie:cookieConsumidor})).text();
+  assert.match(progressoConsumidor,/0% completo/);
+  assert.doesNotMatch(progressoConsumidor,/Tempo de atuação|Desenvolvimento profissional|Contato profissional/);
+  assert.equal((await post('/profile/apresentacao',{cidade:'São Paulo',biografia:'Acompanho a cena.'},cookieConsumidor)).status,303);
+  assert.match(await (await req('/profile/completar',{cookie:cookieConsumidor})).text(),/Informe sua cidade e estado/);
+  assert.match(await (await req('/profile?editar=apresentacao',{cookie:cookieConsumidor})).text(),/<details class="pf-expand" open>/);
+  assert.equal((await post('/profile/apresentacao',{cidade:'São Paulo, SP',biografia:'Acompanho a cena.'},cookieConsumidor)).status,303);
+
+  const solo = {...dados('solo@teste.local','foto.solo','profissional'),name:'Nome Privado de Fotógrafa',categorias:'Fotógrafo(a)',respostasAtuacoesJson:JSON.stringify({'Fotógrafo(a)':{tempoAtuacao:'iniciando'}})};
+  assert.equal((await post('/register',solo)).status,303);
+  assert.equal((await post('/confirmar-email',{token:tokenEmail(solo.email)})).status,200);
+  const cookieSolo = await login('foto.solo');
+  const idSolo = db.prepare("SELECT id FROM usuarios WHERE email=?").get(solo.email).id;
+  const perfilSolo = await (await req('/p/foto.solo',{cookie:cookieConsumidor})).text();
+  assert.match(perfilSolo, /@foto.solo/);
+  assert.doesNotMatch(perfilSolo, /Nome Privado de Fotógrafa/);
+  assert.doesNotMatch(await (await req('/profile/completar',{cookie:cookieSolo})).text(),/Informe seus gêneros e estilos musicais/);
+  assert.equal((await post('/profile/secoes/pessoal',{cidade:'Recife, PE',biografia:'Começando na fotografia.'},cookieSolo)).status,303);
+  assert.equal((await post('/profile/secoes/contato',{contato:'foto@contato.test'},cookieSolo)).status,303);
+  assert.equal((await post('/profile/secoes/profissional',{
+    categorias:solo.categorias,respostasAtuacoesJson:solo.respostasAtuacoesJson,visibilidadesAtuacoesJson:'{}',
+    competencias:'Fotografia de shows',disponibilidade:'sob-consulta'
+  },cookieSolo)).status,303);
+  const editorSolo = await req('/profile?editar=1&secao=profissional',{cookie:cookieSolo});
+  assert.equal(editorSolo.status,200);
+  assert.match(await editorSolo.text(),/id="profile-estilos"[^>]* hidden/);
+  const assinatura = {letras:'AS',forma:'disco',cor:'oliva'};
+  assert.equal((await post('/profile/selo',assinatura,cookieConsumidor)).status,403);
+  assert.equal((await post('/profile/selo',assinatura,cookiePro)).status,303);
+  assert.equal((await post('/profile/selo',{...assinatura,cor:'cobre'},cookiePro)).status,303);
+  assert.equal(db.prepare('SELECT count(*) n FROM selos_perfil WHERE autor_id=? AND retirado_em IS NULL').get(idPro.id).n,1);
+  assert.equal(db.prepare('SELECT count(*) n FROM selos_perfil WHERE autor_id=?').get(idPro.id).n,2);
+  const perfilComSelo = await (await req('/p/artista.teste',{cookie:cookieConsumidor})).text();
+  assert.match(perfilComSelo,/Selo profissional de Artista Singular/);
+  assert.doesNotMatch(perfilComSelo,/Propor colaboração|Editar perfil<\/a>|Propor representação/);
+  assert.equal((await post('/profile/selo',{...assinatura,letras:'ABCD'},cookiePro)).status,400);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAADklEQVR4nGNgGAUMSAAAARAAAVrp4sUAAAAASUVORK5CYII=','base64');
+  const enviarImagem = async (finalidade, { id = idPro.id, cookie = cookiePro } = {}) => {
+    const resposta = await fetch(base+'/publicacoes/perfil/'+id+'/midias?finalidade='+finalidade, {
+      method:'POST', headers:{cookie:csrf+'; '+cookie,'X-CSRF-Token':tokenCSRF,'Content-Type':'application/octet-stream',
+        'X-Midia-Autorizada':'sim','X-File-Name':'imagem.png'}, body:png
+    });
+    assert.equal(resposta.status,201);
+    return (await resposta.json()).id;
+  };
+  const foto = await enviarImagem('imagem'), anterior = await enviarImagem('capa'), capa = await enviarImagem('capa');
+  await enviarImagem('imagem', {id:antes.id,cookie:cookieConsumidor});
+  await enviarImagem('imagem', {id:idSolo,cookie:cookieSolo});
+  assert.match(await (await req('/profile/completar',{cookie:cookieConsumidor})).text(),/100% completo/);
+  const progressoSolo = await (await req('/profile/completar',{cookie:cookieSolo})).text();
+  assert.match(progressoSolo,/100% completo/);
+  assert.match(progressoSolo,/Construa seu portfólio/);
+  assert.match(progressoSolo,/Personalize seu selo profissional/);
+  const sobreSolo = async () => (await req('/p/foto.solo?aba=sobre',{cookie:cookieConsumidor})).text();
+  assert.doesNotMatch(await sobreSolo(), /Recife|Fotografia de shows|foto@contato.test|Ainda estou começando/);
+  assert.match(await sobreSolo(), /Disponibilidade sob consulta/);
+  assert.equal((await post('/settings/privacy',{perfilPublico:'on',competenciasPublicasPresente:'1',competenciasPublicas:'on'},cookieSolo)).status,303);
+  assert.match(await sobreSolo(), /Fotografia de shows/);
+  assert.match(await (await req('/profile/completar',{cookie:cookieSolo})).text(),/100% completo/);
+  const comCapa = await (await req('/p/artista.teste',{cookie:cookieConsumidor})).text();
+  assert.ok(comCapa.includes('class="pf-cover-art" src="/publication-media/'+capa+'"'));
+  assert.ok(comCapa.includes('src="/publication-media/'+foto+'"'));
+  assert.equal((await req('/publication-media/'+anterior,{cookie:cookieConsumidor})).status,404);
+  assert.equal((await req('/publication-media/'+capa,{cookie:cookieConsumidor})).status,200);
+  assert.equal((await post('/profile/selo',{acao:'retirar'},cookiePro)).status,303);
+  assert.doesNotMatch(await (await req('/p/artista.teste',{cookie:cookieConsumidor})).text(),/Selo profissional de Artista Singular/);
   await post('/settings/privacy',{perfilPublico:'on',localizacaoPublica:'on',contatoPublico:'on'},cookieConsumidor);assert.equal(db.prepare('SELECT perfil_publico FROM perfis WHERE usuario_id=?').get(antes.id).perfil_publico,0);
-  const busca=await req('/search',{cookie:cookieConsumidor});const buscaHtml=await busca.text();assert.doesNotMatch(buscaHtml,/Nome Civil Totalmente Privado|href="\/p\/consumidor"/);assert.match(buscaHtml,/Artista Singular/);
-  const descoberta = await req('/dashboard?tipo=profissionais&q=artista', {cookie:cookieConsumidor});
+  assert.equal((await post('/profile/secoes/pessoal',{cidade:'Belo Horizonte, MG',biografia:'Trabalho com rap e escrita.'},cookiePro)).status,303);
+  assert.equal((await post('/profile/secoes/contato',{contato:'artista@contato.test'},cookiePro)).status,303);
+  const atuacoesCompletas = {
+    categorias:pro.categorias, competencias:'Rimas e escrita', generos:'Rap',
+    respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'1-3a',atividadePratica:'aprendizado'},Letrista:{tempoAtuacao:'iniciando'}}),
+    visibilidadesAtuacoesJson:JSON.stringify({Rapper:{__categoria__:'privado',tempoAtuacao:'privado'}}),
+    vertentesPresentes:'1'
+  };
+  assert.equal((await post('/profile/secoes/profissional',atuacoesCompletas,cookiePro)).status,303);
+  const progressoMulti = await (await req('/profile/completar',{cookie:cookiePro})).text();
+  assert.match(progressoMulti,/100% completo/);
+  assert.match(progressoMulti,/Personalize seu selo profissional/);
+  assert.equal((await post('/profile/secoes/profissional',{
+    ...atuacoesCompletas, respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'1-3a'},Letrista:{}})
+  },cookiePro)).status,303);
+  const progressoSemTempo = await (await req('/profile/completar',{cookie:cookiePro})).text();
+  assert.match(progressoSemTempo,/Informe o tempo de atuação em Letrista/);
+  assert.doesNotMatch(progressoSemTempo,/Informe o tempo de atuação em Rapper|100% completo/);
+  const busca=await req('/search',{cookie:cookieConsumidor});const buscaHtml=await busca.text();assert.doesNotMatch(buscaHtml,/href="\/p\/consumidor"/);assert.match(buscaHtml,/Nome Completo do Artista/);
+  const descoberta = await req('/dashboard?tipo=profissionais&q=singular', {cookie:cookieConsumidor});
   const htmlDescoberta = await descoberta.text();
   assert.equal(descoberta.status,200);
   assert.match(htmlDescoberta,/class="dc-result-grid"/);
   assert.match(htmlDescoberta,/href="\/p\/artista\.teste"/);
-  assert.doesNotMatch(htmlDescoberta,/Nome Civil Totalmente Privado|class="dc-create"/);
+  assert.doesNotMatch(htmlDescoberta,/class="dc-create"/);
   const ativacao={categorias:['Rapper','Letrista'],respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'<6m'},Letrista:{tempoAtuacao:'iniciando'}}),visibilidadesAtuacoesJson:'{}'};
   assert.equal((await post('/profile/profissionalizar',ativacao,cookieConsumidor)).status,400);assert.equal(db.prepare('SELECT tipo_conta FROM usuarios WHERE id=?').get(antes.id).tipo_conta,'consumidor');
   assert.equal((await post('/profile/profissionalizar',{...ativacao,confirmar:'1'},cookieConsumidor)).status,303);
-  assert.deepEqual(db.prepare('SELECT id,codigo_publico,email,senha_hash FROM usuarios WHERE id=?').get(antes.id),antes);assert.equal(db.prepare('SELECT tipo_conta FROM usuarios WHERE id=?').get(antes.id).tipo_conta,'profissional');assert.equal(db.prepare('SELECT count(*) AS total FROM ativacoes_profissionais WHERE usuario_id=?').get(antes.id).total,1);
+  assert.deepEqual(db.prepare('SELECT id,email,senha_hash FROM usuarios WHERE id=?').get(antes.id),antes);assert.equal(db.prepare('SELECT tipo_conta FROM usuarios WHERE id=?').get(antes.id).tipo_conta,'profissional');assert.equal(db.prepare('SELECT count(*) AS total FROM ativacoes_profissionais WHERE usuario_id=?').get(antes.id).total,1);
   await post('/profile/profissionalizar',{...ativacao,confirmar:'1'},cookieConsumidor);assert.equal(db.prepare('SELECT count(*) AS total FROM ativacoes_profissionais WHERE usuario_id=?').get(antes.id).total,1);
   const categoriaNova={categorias:['Rapper','Beatmaker'],respostasAtuacoesJson:JSON.stringify({Rapper:{tempoAtuacao:'1-3a'},Beatmaker:{tempoAtuacao:'iniciando'}}),visibilidadesAtuacoesJson:'{}',vertentesPresentes:'1',vertentes:['Trap']};
   assert.equal((await post('/profile/secoes/profissional',categoriaNova,cookiePro)).status,303);
@@ -87,21 +190,25 @@ try{
   b.inicializarBancoCypher();
   b.criarObraCypher(antes.id,{title:'Obra com crédito público',type:'Música',typeDetail:'',status:'Lançado',role:'Artista principal',roleDetail:'',description:'',genre:'Rap',genreDetail:'',lyrics:'',bpm:'',isrc:'',iswc:'',releaseDate:'2026-01-01',listenLink:''},[{handle:'@artista.teste',name:'Artista Singular',role:'Produção musical',participation:''}]);
   b.fecharBancoCypher();
-  const identidade={nomeInformado:'Outro Nome Civil Privado',vulgo:'Nova Identidade Pública',usarVulgo:'1',nascimento:'1990-06-15',tratamento:'feminino'};
+  const identidade={nomeInformado:'Outro Nome Completo',vulgo:'Nova Identidade Pública',nascimento:'1990-06-15',tratamento:'feminino'};
   assert.equal((await post('/settings/identidade',identidade,cookiePro)).status,303);
-  assert.equal(db.prepare('SELECT nome_creditado FROM creditos WHERE usuario_creditado_id=?').get(idPro.id).nome_creditado,'Nova Identidade Pública'); const creditos=await req('/p/artista.teste',{cookie:cookieConsumidor});const htmlCreditos=await creditos.text();assert.match(htmlCreditos,/Nova Identidade Pública/);assert.doesNotMatch(htmlCreditos,/Outro Nome Civil Privado|Nome Civil Totalmente Privado/);
+  assert.equal(db.prepare('SELECT nome_creditado FROM creditos WHERE usuario_creditado_id=?').get(idPro.id).nome_creditado,'Outro Nome Completo'); const creditos=await req('/p/artista.teste',{cookie:cookieConsumidor});const htmlCreditos=await creditos.text();assert.match(htmlCreditos,/Nova Identidade Pública/);assert.match(htmlCreditos,/Outro Nome Completo/);assert.doesNotMatch(htmlCreditos,/Nome Completo do Artista/);
+  assert.equal((await post('/settings/identidade',{...identidade,nomePublicoPresente:'1'},cookiePro)).status,303);
+  assert.equal(db.prepare('SELECT nome_creditado FROM creditos WHERE usuario_creditado_id=?').get(idPro.id).nome_creditado,'Nova Identidade Pública');
+  assert.doesNotMatch(await (await req('/p/artista.teste',{cookie:cookieConsumidor})).text(),/Outro Nome Completo/);
   assert.equal(db.prepare('SELECT genero_personalizado FROM perfis WHERE usuario_id=?').get(idPro.id).genero_personalizado,'');
   const nascimentoForjado=await post('/settings/identidade',{...identidade,nascimento:'1991-01-01'},cookiePro);assert.equal(nascimentoForjado.status,400);assert.equal(db.prepare('SELECT nascimento FROM perfis WHERE usuario_id=?').get(idPro.id).nascimento,'1990-06-15');
   const imediato=await post('/settings/identificador',{identificador:'artista.novo'},cookiePro);assert.equal(imediato.status,303);assert.match(imediato.headers.get('location'),/erro=/);
   db.prepare("UPDATE perfis SET identificador_alterado_em=datetime('now','-31 days') WHERE usuario_id=?").run(idPro.id);
-  assert.equal((await post('/settings/identificador',{identificador:'artista.novo'},cookiePro)).status,303);const antigo=await req('/p/artista.teste');assert.equal(antigo.status,308);assert.equal(antigo.headers.get('location'),'/p/artista.novo');
+  assert.equal((await post('/settings/identificador',{identificador:'artista.novo'},cookiePro)).status,303);const antigo=await req('/p/artista.teste',{cookie:cookieConsumidor});assert.equal(antigo.status,308);assert.equal(antigo.headers.get('location'),'/p/artista.novo');
   assert.equal((await post('/register',dados('captura@teste.local','artista.teste'))).status,409);
-  assert.equal(db.prepare('SELECT codigo_publico FROM usuarios WHERE id=?').get(idPro.id).codigo_publico,idPro.codigo_publico);
   const mod=await login('mod@teste.local',true);const editor=await login('editor@teste.local',true);
   const excecao={atual:'artista.novo',novo:'artista.final',motivo:'Correção solicitada pelo titular e revisada pela equipe.'};
   assert.equal((await post('/admin/identificador',excecao,editor)).status,403);assert.equal((await post('/admin/identificador',excecao,mod)).status,303);assert.equal(db.prepare('SELECT identificador FROM perfis WHERE usuario_id=?').get(idPro.id).identificador,'@artista.final');
-  assert.equal((await req('/p/artista.teste')).headers.get('location'),'/p/artista.final');
-  await post('/settings/privacy',{},cookiePro);assert.equal((await req('/p/artista.teste')).status,404);assert.equal((await req('/p/artista.final')).status,404);
+  assert.equal((await req('/p/artista.teste',{cookie:cookieConsumidor})).headers.get('location'),'/p/artista.final');
+  await post('/settings/privacy',{},cookiePro);assert.equal((await req('/p/artista.teste',{cookie:cookieConsumidor})).status,404);assert.equal((await req('/p/artista.final',{cookie:cookieConsumidor})).status,404);
+  assert.equal((await req('/publication-media/'+capa,{cookie:cookieConsumidor})).status,404);
+  assert.equal((await req('/publication-media/'+foto,{cookie:cookieConsumidor})).status,404);
   assert.equal((await post('/settings/preferencias',{regiao:'São Paulo',generos:['Trap','Rap'],tema:'dark'},cookiePro)).status,303);
   const configuracoes=await req('/settings',{cookie:cookiePro});const cfgHtml=await configuracoes.text();assert.match(cfgHtml,/name="cypher-theme" content="dark"/);assert.match(cfgHtml,/value="São Paulo"/);assert.doesNotMatch(cfgHtml,/Ajuda e sobre/);
   db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('sp',?,'Evento da região','Show','2030-01-01','República, São Paulo')").run(idPro.id);db.prepare("INSERT INTO eventos (id,proprietario_id,titulo,categoria,data_texto,local) VALUES ('rj',?,'Evento em outra região','Show','2030-01-01','Rio de Janeiro')").run(idPro.id);
@@ -119,7 +226,7 @@ try{
   const totalAntes=db.prepare("SELECT count(*) AS total FROM tokens_confirmacao_email WHERE usuario_id=(SELECT id FROM usuarios WHERE email='expirado@teste.local')").get().total;await post('/email/reenviar',{email:'expirado@teste.local'});assert.equal(db.prepare("SELECT count(*) AS total FROM tokens_confirmacao_email WHERE usuario_id=(SELECT id FROM usuarios WHERE email='expirado@teste.local')").get().total,totalAntes);
   db.prepare("UPDATE tokens_confirmacao_email SET criado_em=criado_em-61000 WHERE usuario_id=(SELECT id FROM usuarios WHERE email='expirado@teste.local')").run();await post('/email/reenviar',{email:'expirado@teste.local'});const novoToken=tokenEmail('expirado@teste.local');assert.notEqual(novoToken,expirado);assert.equal((await post('/confirmar-email',{token:novoToken})).status,200);
   assert.deepEqual(db.pragma('foreign_key_check'),[]);
-  console.log('OK: cadastro em duas modalidades, 18 anos, @ de 3–24 caracteres, confirmação/expiração/reenvio e troca de e-mail, nome privado, conversão irreversível, questionário mínimo, 30/60 dias, exceções, preferências e privacidade.');
+  console.log('OK: cadastro em duas modalidades, aceite versionado, @ de 3–24 caracteres, confirmação/expiração/reenvio e troca de e-mail, nome completo e vulgo no perfil público, conversão irreversível, questionário mínimo, intervalos de 30 dias, exceções, preferências e privacidade.');
 }finally{db?.close();b.fecharBancoCypher();processo.kill();await fim;assert.equal(path.dirname(path.resolve(pasta)),path.resolve(os.tmpdir()));fs.rmSync(pasta,{recursive:true,force:true});}
 
 

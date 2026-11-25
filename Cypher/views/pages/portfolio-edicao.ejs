@@ -1,0 +1,57 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<div class="dc-shell pf-shell">
+  <a class="dc-skip" href="#portfolio-editor">Pular para a edição do portfólio</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: 'Meu portfólio', tituloId: 'portfolio-titulo', descricao: 'Escolha como apresentar seus trabalhos e contribuições.' }) %>
+    <main class="pf-page pf-editor" id="portfolio-editor" aria-labelledby="portfolio-titulo" tabindex="-1">
+      <a class="pf-back" href="/espaco-de-trabalho"><span class="lucide-icon" aria-hidden="true"><%- icones.arrowLeft %></span> Espaço de Trabalho</a>
+      <header class="pf-editor-intro"><span class="pf-eyebrow">SUA IDENTIDADE / SUA CURADORIA</span><h2>Uma vitrine, várias formas de criar.</h2><p>Organize trabalhos próprios e participações confirmadas. As escolhas de apresentação preservam a origem de cada registro.</p></header>
+      <% if (erro) { %><p class="pf-notice pf-error" role="alert"><%= erro %></p><% } %>
+      <% if (salvo) { %><p class="pf-notice" role="status">Portfólio salvo. Suas escolhas estão disponíveis nas próximas sessões.</p><% } %>
+      <% if (typeof titular !== "undefined") { %><a class="pf-button" href="/portfolio/<%= encodeURIComponent(titular.handle.replace(/^@/,'')) %>">Abrir meu portfólio</a><% } %>
+      <form id="pf-form" method="post" action="/portfolio/edit">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <textarea name="itens" id="pf-dados" hidden><%= JSON.stringify(itens.map(item => ({ chave: item.chave, selecionado: Boolean(item.selecionado), oculto: Boolean(item.oculto), destaque: Boolean(item.destaque), ordem: item.ordem, secao: item.secao || '' }))) %></textarea>
+        <section class="pf-panel" aria-labelledby="pf-selecao-titulo">
+          <header class="pf-panel-heading"><span class="pf-step">01 / SELEÇÃO</span><h3 id="pf-selecao-titulo">Como o portfólio se atualiza</h3></header>
+          <div class="pf-mode-grid">
+            <label class="pf-choice"><input type="radio" name="modo" value="manual" <%= config.modo === 'manual' ? 'checked' : '' %>><span><strong>Manual</strong><small>Você escolhe os trabalhos que entram na vitrine e organiza sua apresentação.</small></span></label>
+            <label class="pf-choice"><input type="radio" name="modo" value="inteligente" <%= config.modo === 'inteligente' ? 'checked' : '' %>><span><strong>Inteligente</strong><small>Novos trabalhos elegíveis entram automaticamente. Suas ocultações continuam valendo.</small></span></label>
+          </div>
+          <p class="pf-help">Trocar de modo preserva a seleção manual e os itens ocultados. Uma menção sem confirmação não entra como participação.</p>
+        </section>
+        <section class="pf-panel" aria-labelledby="pf-molde-titulo">
+          <header class="pf-panel-heading"><span class="pf-step">02 / APRESENTAÇÃO</span><h3 id="pf-molde-titulo">Escolha o molde da vitrine</h3><p>O molde muda a distribuição visual. Seus trabalhos, arquivos e créditos mantêm o mesmo registro.</p></header>
+          <div class="pf-mold-grid">
+            <% [ ['grade','Grade','Uma visão equilibrada de diferentes formatos.'], ['editorial','Editorial','Destaques maiores para valorizar imagens e produções.'], ['lista','Lista','Mais espaço para função, contexto e trajetória.'] ].forEach(([id, nome, descricao]) => { %>
+              <label class="pf-choice pf-mold-choice"><input type="radio" name="molde" value="<%= id %>" <%= config.molde === id ? 'checked' : '' %>><span><span class="pf-mold-sample pf-sample-<%= id %>" aria-hidden="true"><i></i><i></i><i></i></span><strong><%= nome %></strong><small><%= descricao %></small></span></label>
+            <% }) %>
+          </div>
+        </section>
+        <section class="pf-panel" aria-labelledby="pf-trabalhos-titulo">
+          <header class="pf-panel-heading"><span class="pf-step">03 / CURADORIA</span><h3 id="pf-trabalhos-titulo">Trabalhos e participações <span class="pf-section-count"><%= itens.length %></span></h3><p>Defina a ordem, o destaque e a seção. Ocultar remove apenas da vitrine; o registro de origem permanece no acervo.</p></header>
+          <div class="pf-editor-toolbar"><p id="pf-mode-help" class="pf-help"></p><span id="pf-total" class="pf-status" aria-live="polite"></span></div>
+          <noscript><p class="pf-notice">Ative o JavaScript para selecionar e reorganizar os trabalhos. Sem ele, o salvamento preserva a seleção atual.</p></noscript>
+          <% if (itens.length) { %><ol class="pf-edit-list" id="pf-edit-list">
+            <% itens.forEach(item => { %>
+              <li class="pf-edit-item<%= item.oculto ? ' is-hidden' : '' %>" data-chave="<%= item.chave %>" data-publicavel="<%= item.publicavel ? 'sim' : '' %>">
+                <div class="pf-edit-art"><% if (item.capa) { %><img src="<%= item.capa %>" alt="" loading="lazy"><% } else { %><span class="lucide-icon" aria-hidden="true"><%- icones[({obra:'music',beat:'headphones',evento:'calendarDays',projeto:'briefcase'})[item.tipo] || 'briefcase'] %></span><% } %></div>
+                <div class="pf-edit-content"><div class="pf-work-meta"><span><%= item.nomeTipo %></span><span class="pf-relation"><%= item.proprio ? 'Trabalho próprio' : 'Participação confirmada' %></span></div><h4><%= item.titulo %></h4><p><%= item.autor %><%= item.papel ? ' · ' + item.papel : '' %></p><% if (!item.publicavel) { %><p class="pf-reserved"><span class="lucide-icon" aria-hidden="true"><%- icones.eyeOff %></span> Reservado ou indisponível na origem. Não será exposto na vitrine.</p><% } %>
+                  <div class="pf-item-options"><label class="pf-check"><input type="checkbox" data-pf="selecionado" <%= item.selecionado ? 'checked' : '' %>> Selecionar no modo Manual</label><label class="pf-check"><input type="checkbox" data-pf="oculto" <%= item.oculto ? 'checked' : '' %>> Ocultar da vitrine</label><label class="pf-check"><input type="checkbox" data-pf="destaque" <%= item.destaque ? 'checked' : '' %>> Em destaque</label></div>
+                  <label class="pf-section-field">Seção / área de apresentação<input type="text" data-pf="secao" maxlength="60" value="<%= item.secao || '' %>" placeholder="Automática pelo tipo de trabalho"></label>
+                </div>
+                <div class="pf-reorder"><button class="pf-button pf-icon-button" type="button" data-mover="-1" aria-label="Mover <%= item.titulo %> para cima" title="Mover para cima">↑</button><button class="pf-button pf-icon-button" type="button" data-mover="1" aria-label="Mover <%= item.titulo %> para baixo" title="Mover para baixo">↓</button><span class="pf-order" aria-hidden="true"></span></div>
+              </li>
+            <% }) %>
+          </ol><% } else { %><div class="pf-empty"><span class="lucide-icon" aria-hidden="true"><%- icones.briefcase %></span><h4>Seu acervo começa com o primeiro trabalho.</h4><p>Cadastre uma produção ou acompanhe suas participações confirmadas pelo Espaço de Trabalho.</p><a class="pf-button" href="/espaco-de-trabalho">Abrir Espaço de Trabalho</a></div><% } %>
+        </section>
+        <section class="pf-panel" aria-labelledby="pf-visibilidade-titulo"><header class="pf-panel-heading"><span class="pf-step">04 / VISIBILIDADE</span><h3 id="pf-visibilidade-titulo">Confira antes de apresentar</h3></header><label class="pf-check"><input type="checkbox" name="visivel" value="sim" <%= config.visivel ? 'checked' : '' %>> Exibir meu portfólio para pessoas autenticadas na Cypher</label><p class="pf-help">A vitrine acompanha a privacidade do perfil e de cada trabalho. Adicionar um item não libera materiais privados.</p><div class="pf-form-actions"><button class="pf-button" type="submit" formaction="/portfolio/preview" formtarget="_blank">Ver prévia <span class="lucide-icon" aria-hidden="true"><%- icones.eye %></span></button><button class="pf-button pf-primary" type="submit">Salvar portfólio <span class="lucide-icon" aria-hidden="true"><%- icones.check %></span></button></div></section>
+      </form>
+      <span class="pf-sr" id="pf-aviso" aria-live="polite"></span>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual: path }) %>
+  </div>
+</div>
+<script src="/js/portfolio.js" defer></script>
+<%- include('../partials/fim-pagina') %>

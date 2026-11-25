@@ -465,3 +465,4 @@
     height: 42px;
   }
 }
+.et-workspace-links{display:flex;flex-wrap:wrap;gap:16px 24px;margin:22px 0}

@@ -1,0 +1,134 @@
+@import "./descoberta.css";
+
+.nc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 48px;
+}
+.nc-panel {
+  min-width: 0;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--dc-line);
+  border-radius: 4px 22px 4px 4px;
+  background: var(--dc-panel);
+}
+.nc-heading,
+.nc-toolbar,
+.nc-toolbar nav,
+.nc-paging,
+.nc-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.nc-heading,
+.nc-toolbar {
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.nc-heading span,
+.nc-item small,
+.nc-choice small {
+  color: var(--dc-muted);
+}
+.nc-toolbar nav a,
+.nc-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 11px;
+  border-radius: 5px;
+  color: var(--dc-ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+.nc-toolbar nav a[aria-current="page"] {
+  background: var(--dc-selected);
+  font-weight: 700;
+}
+.nc-button {
+  border: 1px solid var(--dc-line);
+  background: var(--dc-field);
+  cursor: pointer;
+}
+.nc-button:hover,
+.nc-toolbar nav a:hover {
+  background: var(--dc-hover);
+}
+.nc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nc-list li {
+  display: grid;
+  gap: 10px;
+  padding: 14px 12px;
+  border-top: 1px solid var(--dc-line);
+}
+.nc-list .nc-unread {
+  border-inline-start: 3px solid var(--dc-accent);
+  background: var(--dc-card);
+}
+.nc-item {
+  overflow-wrap: anywhere;
+}
+.nc-item h3 {
+  font-size: 16px;
+}
+.nc-item p {
+  margin-block: 4px;
+}
+.nc-actions {
+  gap: 6px;
+}
+.nc-clear,
+.nc-paging,
+.nc-empty,
+.nc-preferences form {
+  margin-top: 18px;
+}
+.nc-clear summary {
+  min-height: 44px;
+  padding-block: 10px;
+  cursor: pointer;
+}
+.nc-clear form,
+.nc-choice {
+  margin-top: 12px;
+}
+.nc-preferences > p {
+  margin-top: 8px;
+  color: var(--dc-muted);
+}
+.nc-choice {
+  display: flex;
+  gap: 10px;
+  padding-block: 10px;
+  cursor: pointer;
+}
+.nc-choice input {
+  flex: 0 0 auto;
+  align-self: start;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--dc-accent);
+}
+.nc-choice small {
+  display: block;
+}
+.nc-preferences button {
+  margin-top: 16px;
+}
+.nc-preferences .nc-status {
+  color: var(--dc-accent);
+}
+@media (max-width: 960px) {
+  .nc-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -18,7 +18,6 @@
   const questionNext = form?.querySelector("[data-question-next]");
   const questionPrevious = form?.querySelector("[data-question-previous]");
   const finishButton = form?.querySelector("[data-register-submit]");
-  const ctagNote = form?.querySelector("[data-register-ctag]");
   const categoryValidation = form?.querySelector("[data-category-validation]");
   const areaPicker = form?.querySelector("[data-category-area-picker]");
   const categoryBrowser = form?.querySelector("[data-category-browser]");
@@ -36,12 +35,12 @@
   let questions = [];
   let pendingQuestion = null;
   const pageByStage = {
-    conta: ["Como você se chama?", "Seu nome completo aparece no perfil. Se você usa um vulgo, pode informá-lo agora."],
+    conta: ["Como você se chama?", "Informe seu nome e escolha se ele aparece publicamente."],
     contato: ["Como te encontrar?", "Escolha seu @ e informe seu e-mail."],
-    acesso: ["Crie seu acesso", "Informe sua data de nascimento, escolha uma senha e, se quiser, indique seu gênero."],
+    acesso: ["Crie seu acesso", "Informe sua data de nascimento e escolha uma senha."],
     categorias: ["Como você movimenta a cena?", "Selecione uma ou mais profissões. Você pode escolher em áreas diferentes."],
     vertentes: ["Qual é a sua sonoridade?", "Esta etapa é opcional. Você pode mudar suas escolhas depois."],
-    questionarios: ["Conte sua trajetória", "Informe seu tempo de atuação em cada profissão selecionada."],
+    questionarios: ["Tempo de atuação", "Informe seu tempo de atuação em cada profissão selecionada."],
 
   };
 
@@ -91,7 +90,6 @@
     if (title && description) {
       [title.textContent, description.textContent] = pageByStage[stage];
     }
-    if (ctagNote) ctagNote.hidden = stage !== "questionarios";
     if (stage === "questionarios") {
       rebuildQuestions();
       if (pendingQuestion) {
@@ -412,6 +410,11 @@
       .forEach(formulario => {
         const atualizarQuestionariosSelecionados = () => {
           const selecionadas = selectedCategories(formulario);
+          const estilos = formulario.querySelector("[data-estilos-profissionais]");
+          if (estilos) {
+            estilos.hidden = estilos.dataset.temGeneros !== "true" &&
+              !formulario.querySelector('[data-estilos-musicais]:checked');
+          }
           formulario
             .querySelectorAll("[data-atuacao-questionario][data-categoria]")
             .forEach(painel => {
@@ -739,7 +742,6 @@
     }
     if(form.querySelector('[name="tipoConta"]:checked')?.value === 'consumidor') {
       form.querySelector('[data-respostas-atuacoes-json]').value='{}';
-      form.querySelector('[data-visibilidades-atuacoes-json]').value='{}';
       lockSubmission(accountNext);
       return;
     }

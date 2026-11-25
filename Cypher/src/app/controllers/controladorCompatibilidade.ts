@@ -1,4 +1,8 @@
 // @ts-nocheck
+import { conexaoInternaCypher } from "../models/bancoDados.js";
+import { montarApresentacao, type NavegacaoPerfil } from "../models/apresentacaoPerfil.js";
+import { coresSelo, formasSelo, seloPerfil } from "../models/seloPerfil.js";
+import { situacaoContaModeracao, objetoDisponivel } from "../models/politicasModeracao.js";
 import { rotuloProfissional } from "../models/tratamentoProfissional.js";
 import { resolverPerfilPublico, obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
 import { normalizarIdentificador, validarIdentificador } from "../validators/validarIdentidade.js";
@@ -19,7 +23,6 @@ import {
 } from "../models/modeloCypher.js";
 import {
   autenticarUsuario,
-  cadastrarUsuario,
   encerrarSessao,
   iniciarSessao,
   usuarioDaSessao,
@@ -27,6 +30,8 @@ import {
 } from "../models/autenticacaoCypher.js";
 import {
   atualizarPerfilCypher,
+  atualizarApresentacaoCypher,
+  atualizarContatoProfissionalCypher,
   atualizarPrivacidadeCypher,
   estadoAlteracaoCategoriasCypher,
   listarCategoriasProfissionaisCypher,
@@ -46,8 +51,6 @@ import {
   revisarPropostaCategoriaCypher,
   revisarPropostaGeneroCypher,
   excluirContaCypher,
-  listarObrasPublicasPerfilCypher,
-  listarObrasProprietarioCypher,
   listarAtuacoesUsuarioCypher,
   listarProfissoesUsuarioCypher,
   listarVertentesProfissionaisUsuarioCypher,
@@ -64,26 +67,22 @@ import {
   listarProfissoesCatalogo,
   podeCriarBeat,
   podeCriarObra,
-  opcoesStatusPorCategoria,
   rotuloStatusProfissional,
+  opcoesDisponibilidadeProfissional,
+  profissoesComEstilosMusicais,
 } from "../models/modeloPerfil.js";
 import {
   catalogoPerguntasPorCategoria,
   formatarRespostaAtuacao,
   validarRespostasAtuacao,
 } from "../models/questionarioAtuacao.js";
-import {
-  validarEmail,
-  validarNomeCadastro,
-  validarSenha,
-} from "../validators/validarAutenticacao.js";
 import { mensagemErroCredito } from "../validators/validarCredito.js";
 import {
   validarConfirmacaoExclusao,
   validarSenhaExclusao,
 } from "../validators/validarConta.js";
 import { validarBpm, validarLinkEscuta } from "../validators/validarObra.js";
-import { listaDeLinhas, validarPerfil } from "../validators/validarPerfil.js";
+import { listaDeLinhas, validarApresentacaoPerfil, validarPerfil } from "../validators/validarPerfil.js";
 
 const nomeCookieSessao = "cypher_session";
 const caminhosProtegidos = new Set([
@@ -91,6 +90,7 @@ const caminhosProtegidos = new Set([
   "/dashboard",
   "/espaco-de-trabalho",
   "/search",
+  "/search/suggestions",
   "/events",
   "/events/new",
   "/works",
@@ -114,12 +114,15 @@ const caminhosProtegidos = new Set([
 function caminhoProtegido(caminho: string): boolean {
   caminho = caminho.toLowerCase().replace(/\/+$/, "") || "/";
   return (
+    /^\/(interacoes|colecoes|publicacoes|publication-media|representacoes)(\/|$)/.test(caminho) ||
+    /^\/(opportunities|my-opportunities|my-applications|service-requests|service-mediation|messages|work-projects|work-media|portfolio|colaboracoes|reputacao|central|suporte|p|beats|purchases|events)(\/|$)/.test(caminho) ||
     caminhosProtegidos.has(caminho) || caminho.startsWith("/espaco-de-trabalho/") || caminho.startsWith("/profile/") || caminho.startsWith("/settings/") || caminho.startsWith("/admin/") || caminho === "/admin" ||
     /^\/(?:works|events|beats)\/[^/]+\/(?:edit|delete)$/.test(caminho) ||
     /^\/events\/[^/]+\/(?:interest|interest\/cancel|interests\/[^/]+\/status)$/.test(
       caminho
     ) ||
-    /^\/notificacoes\/[^/]+\/lida$/.test(caminho) ||
+    /^\/works\/[^/]+\/like$/.test(caminho) ||
+    caminho.startsWith("/notificacoes/") ||
     /^\/admin\/revisao\/(?:generos|categorias-profissionais|excecoes-categorias|solicitacoes-excecao)\/[^/]+$/.test(
       caminho
     )
@@ -160,10 +163,7 @@ function usuarioParaView(usuario: UsuarioDaSessao) {
     ...usuario,
     ehAdministrador: ehAdministrador(usuario),
     role: usuario.tipoConta === "consumidor" ? "Público" : usuario.categories.map(categoria=>rotuloProfissional(categoria,usuario.tratamento)).join(" · ") || usuario.role,
-    availabilityLabel: rotuloStatusProfissional(
-      usuario.availability,
-      usuario.categories
-    ),
+    availabilityLabel: rotuloStatusProfissional(usuario.availability),
   };
 }
 
@@ -194,12 +194,18 @@ export function middlewareAutorizacao(
     if (interno && req.headers.cookie?.split(";").some(item => item.trim().startsWith("cypher_session="))) return res.sendStatus(403);
     return res.redirect(interno ? "/admin/login" : "/login");
   }
+  if (!interno && usuario.tipoConta!=='administrativo' && situacaoContaModeracao(conexaoInternaCypher(),usuario.id).restrita && !/^\/suporte(?:\/|$)/.test(caminho) && caminho!=='/logout' && caminho!=='/settings/encerramento' && caminho!=='/settings/delete-account') {
+    if(req.method==='GET'||req.method==='HEAD')return res.redirect(303,'/suporte?restricao=1');
+    return res.status(403).send('Sua conta está restrita. Acesse o suporte para consultar a decisão e recorrer.');
+  }
   if (interno && !ehAdministrador(usuario)) return res.sendStatus(403);
   if (!interno && usuario.tipoConta === "administrativo") return res.sendStatus(403);
   if (interno && caminho.startsWith("/admin/revisao")) {
     const acao = caminho.includes("excecoes") || caminho.includes("solicitacoes-excecao") ? "excecoes" : "taxonomia";
     if (!podeAdministrar(usuario,acao)) return res.sendStatus(403);
   }
+  const alvo=/^\/(works|beats|events)\/([^/]+)\/(edit|delete|like|interest|interests)/.exec(caminho);
+  if(alvo && alvo[2]!=='new' && !objetoDisponivel(conexaoInternaCypher(),({works:'obra',beats:'beat',events:'evento'})[alvo[1]],alvo[2],usuario.id))return res.sendStatus(404);
   res.locals.origemEspaco = req.query.origem === "espaco" || req.body?.origem === "espaco";
   res.locals.usuario = usuarioParaView(usuario);
   res.locals.temaPreferido = interno ? "light" : obterPreferenciasUsuario(usuario.id).tema;
@@ -227,42 +233,6 @@ function substituirSessao(
   const tokenAnterior = tokenDaRequisicao(req);
   if (tokenAnterior) encerrarSessao(tokenAnterior);
   definirCookieSessao(req, res, iniciarSessao(usuarioId));
-}
-
-function renderizarCadastro(
-  res: Response,
-  status: number,
-  erro: string,
-  dados: {
-    nome?: string;
-    email?: string;
-    categoriasSelecionadas?: string[];
-    outraCategoria?: string;
-    atuacoesExistentes?: AtuacaoProfissionalPersistida[];
-  },
-  etapaInicial: "conta" | "categorias" | "questionarios" = "conta"
-) {
-  return res.status(status).render("pages/cadastro", {
-    title: "Criar conta",
-    path: "/register",
-    stylesheet: "autenticacao",
-    authenticated: false,
-    erro,
-    categoriasDisponiveis: listarCategoriasProfissionaisCypher(),
-    gruposProfissionais: listarGruposProfissionais(),
-    questionariosAtuacao: listarProfissoesCatalogo().map(profissao => ({
-      categoria: profissao.rotulo,
-      perguntas: catalogoPerguntasPorCategoria(profissao.rotulo),
-      legada: false,
-    })),
-    formatarRespostaAtuacao,
-    nome: dados.nome ?? "",
-    email: dados.email ?? "",
-    categoriasSelecionadas: dados.categoriasSelecionadas ?? [],
-    outraCategoria: dados.outraCategoria ?? "",
-    atuacoesExistentes: dados.atuacoesExistentes ?? [],
-    etapaInicial,
-  });
 }
 
 function categoriasRecebidas(valor: unknown): string[] {
@@ -408,42 +378,14 @@ function normalizarCategoriaFormulario(texto: string): string {
 }
 
 export function paginaAutenticacao(req: Request, res: Response) {
-  const cadastro = req.path === "/register";
-  const cadastroConcluido = req.query.cadastro === "sucesso";
-  const contaExcluida = req.query.conta === "excluida";
-  const categoriaEmAnalise = req.query.categoria === "analise";
-  const categoriasDisponiveis = listarCategoriasProfissionaisCypher();
-  return res.render(cadastro ? "pages/cadastro" : "pages/entrar", {
-    title: cadastro ? "Criar conta" : "Entrar",
+  return res.render("pages/entrar", {
+    title: "Entrar",
     path: req.path,
     stylesheet: "autenticacao",
     authenticated: false,
     erro: null,
-    mensagem: !cadastro
-      ? cadastroConcluido
-        ? categoriaEmAnalise
-          ? "Conta criada. Sua sugestão de categoria profissional foi enviada para análise; ela ficará disponível após aprovação."
-          : "Conta criada. Entre com seu e-mail e senha para continuar."
-        : contaExcluida
-          ? "A conta e o perfil foram excluídos."
-          : null
-      : null,
-    categoriasDisponiveis,
-    gruposProfissionais: listarGruposProfissionais(),
-    categoriasSelecionadas: [],
-    questionariosAtuacao: cadastro
-      ? listarProfissoesCatalogo().map(profissao => ({
-          categoria: profissao.rotulo,
-          perguntas: catalogoPerguntasPorCategoria(profissao.rotulo),
-          legada: false,
-        }))
-      : [],
-    formatarRespostaAtuacao,
-    atuacoesExistentes: [],
-    etapaInicial: "conta",
-    nome: "",
+    mensagem: req.query.conta === "excluida" ? "A conta e o perfil foram excluídos." : null,
     email: "",
-    outraCategoria: "",
   });
 }
 
@@ -530,152 +472,6 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-export function validarDadosCadastro(req: Request, res: Response) {
-  const nome = String(req.body.name ?? "").trim();
-  const email = String(req.body.email ?? "")
-    .trim()
-    .toLowerCase();
-  const senha = String(req.body.password ?? "");
-  const erroNome = validarNomeCadastro(nome);
-  if (erroNome)
-    return res.status(400).json({ field: "name", message: erroNome });
-  const erroEmail = validarEmail(email);
-  if (erroEmail)
-    return res.status(400).json({ field: "email", message: erroEmail });
-  const erroSenha = validarSenha(senha);
-  if (erroSenha)
-    return res.status(400).json({ field: "password", message: erroSenha });
-  if (buscarCredenciaisCypher(email)) {
-    return res.status(409).json({
-      field: "email",
-      message:
-        "Este e-mail já está cadastrado. Entre na sua conta ou use outro e-mail.",
-    });
-  }
-  return res.json({ valido: true });
-}
-
-export async function register(req: Request, res: Response) {
-  if (req.body.tipoConta !== undefined && req.body.tipoConta !== "profissional") return res.status(400).send("Este fluxo aceita somente contas profissionais. O acesso administrativo é interno.");
-  const nome = String(req.body.name ?? "").trim();
-  const email = String(req.body.email ?? "")
-    .trim()
-    .toLowerCase();
-  const senha = String(req.body.password ?? "");
-  const categorias = categoriasRecebidas(req.body.categorias);
-  const outrasCategorias = String(req.body.outraCategoria ?? "").trim();
-  const dadosFormulario = {
-    nome,
-    email,
-    categoriasSelecionadas: categorias,
-    outraCategoria: outrasCategorias,
-    atuacoesExistentes: atuacoesParaRenderizar(
-      categorias,
-      req.body.respostasAtuacoesJson,
-      req.body.visibilidadesAtuacoesJson
-    ),
-  };
-
-  if (validarNomeCadastro(nome)) {
-    return renderizarCadastro(
-      res,
-      400,
-      "Informe um nome entre 2 e 80 caracteres.",
-      dadosFormulario,
-      "conta"
-    );
-  }
-  if (validarEmail(email)) {
-    return renderizarCadastro(
-      res,
-      400,
-      "Informe um endereço de e-mail válido.",
-      dadosFormulario,
-      "conta"
-    );
-  }
-  if (validarSenha(senha)) {
-    return renderizarCadastro(
-      res,
-      400,
-      "A senha precisa ter entre 8 e 128 caracteres.",
-      dadosFormulario,
-      "conta"
-    );
-  }
-  if (
-    categorias.length === 0 ||
-    categorias.some(
-      categoria => !listarCategoriasProfissionaisCypher().includes(categoria)
-    )
-  ) {
-    return renderizarCadastro(
-      res,
-      400,
-      "Selecione pelo menos uma categoria válida.",
-      dadosFormulario,
-      "categorias"
-    );
-  }
-  try {
-    const categoriasDaConta = categorias;
-    const respostasAtuacoesJson = req.body.respostasAtuacoesJson;
-    const visibilidadesAtuacoesJson = req.body.visibilidadesAtuacoesJson;
-    const atuacoes = atuacoesRecebidas(
-      categoriasDaConta,
-      respostasAtuacoesJson,
-      visibilidadesAtuacoesJson,
-      categoriasDaConta
-    );
-    if (!atuacoes) {
-      return renderizarCadastro(
-        res,
-        400,
-        "Preencha as respostas obrigatórias de cada categoria selecionada e confira as opções informadas.",
-        {
-          ...dadosFormulario,
-          categoriasSelecionadas: categoriasDaConta,
-          atuacoesExistentes: atuacoesParaRenderizar(
-            categoriasDaConta,
-            respostasAtuacoesJson,
-            visibilidadesAtuacoesJson
-          ),
-        },
-        "questionarios"
-      );
-    }
-    await cadastrarUsuario({
-      nome,
-      email,
-      senha,
-      categorias: categoriasDaConta,
-      outraCategoria: "",
-      atuacoes,
-    });
-    return res.redirect(303, "/login?cadastro=sucesso");
-  } catch (erro) {
-    const mensagemErro = erro instanceof Error ? erro.message : "";
-    if (mensagemErro === "EMAIL_DUPLICADO") {
-      return renderizarCadastro(
-        res,
-        409,
-        "Este e-mail já está cadastrado. Entre na sua conta ou use outro e-mail.",
-        dadosFormulario,
-        "conta"
-      );
-    }
-
-    console.error("Falha ao criar conta Cypher:", erro);
-    return renderizarCadastro(
-      res,
-      500,
-      "Não foi possível criar sua conta agora. Tente novamente.",
-      dadosFormulario,
-      "questionarios"
-    );
-  }
-}
-
 export function logout(req: Request, res: Response) {
   const token = tokenDaRequisicao(req);
   if (token) encerrarSessao(token);
@@ -720,51 +516,7 @@ export const analisarCategoria = (req: Request, res: Response) => {
   });
 };
 
-export const buscarPessoas = (req: Request, res: Response) => {
-  const usuario = exigeAcesso(req, res);
-  if (!usuario) return;
-
-  const resultado = CypherModel.buscarPessoasPublicas(
-    {
-      ordem: req.query.ordem === "populares" ? "populares" : undefined,
-      q: parametroTexto(req, "q"),
-      categoria: parametroTexto(req, "categoria"),
-      genero: parametroTexto(req, "genero"),
-      localizacao: parametroTexto(req, "localizacao"),
-    },
-    usuario.id
-  );
-  const pessoas = resultado.pessoas.map(pessoa => {
-    const categories = pessoa.categories.flatMap(categoria =>
-      categoria === "Outros" && pessoa.otherCategory
-        ? [pessoa.otherCategory]
-        : [categoria]
-    );
-    return {
-      ...pessoa,
-      availabilityLabel: rotuloStatusProfissional(
-        pessoa.availability,
-        pessoa.categories
-      ),
-      statusClass: classeStatusBusca(pessoa.availability),
-      categoryLabels: categories.map(categoria => pessoa.rotulosCategorias[categoria] ?? categoria),
-      publicSlug: pessoa.handle.replace(/^@/, ""),
-    };
-  });
-  const filtrosAtivos = Object.values(resultado.filtros).some(Boolean);
-
-  return res.render("pages/busca-pessoas", {
-    title: "Buscar pessoas",
-    path: req.path,
-    stylesheet: "busca-pessoas",
-    authenticated: true,
-    usuario: usuarioParaView(usuario),
-    pessoas,
-    filtros: resultado.filtros,
-    opcoesFiltros: resultado.opcoes,
-    filtrosAtivos,
-  });
-};
+export { buscaGlobal as buscarPessoas } from "./controladorBusca.js";
 export const oportunidades = renderizarPagina(
   "pages/oportunidades",
   "Oportunidades",
@@ -1358,9 +1110,6 @@ export const bancoBeats = renderizarPagina(
     beats: CypherModel.beats(),
   })
 );
-export const central = renderizarPagina("pages/central", "Cypher Central", {
-  faqs: CypherModel.faqs(),
-});
 function valoresPerfil(usuario: UsuarioDaSessao) {
   const generosConhecidos = generosObra.filter(genero => genero !== "Outro");
   return {
@@ -1375,6 +1124,7 @@ function valoresPerfil(usuario: UsuarioDaSessao) {
     ),
     outroGenero: "",
     equipamentos: usuario.equipment.join("\n"),
+    competencias: (usuario.skills ?? []).join("\n"),
     disponibilidade: usuario.availability,
   };
 }
@@ -1400,7 +1150,7 @@ function renderizarPerfil(
     categoriaPropostaResultado?: string;
     valores?: ReturnType<typeof valoresPerfil>;
     atuacoesExistentes?: AtuacaoProfissionalPersistida[];
-    atuacaoSelecionada?: string;
+    navegacao?: NavegacaoPerfil;
     atuacoesSolicitadas?: AtuacaoProfissionalPersistida[];
     categoriasSolicitadas?: string[];
     secaoEdicao?: string;
@@ -1438,12 +1188,16 @@ function renderizarPerfil(
   return res.status(opcoes.status ?? 200).render("pages/perfil", {
     title: "Meu perfil",
     path: "/profile",
-    stylesheet: "perfil",
+    stylesheet: "cena-perfil",
     authenticated: true,
     usuario: usuarioParaView(usuario),
     notificacoesRecentes: CypherModel.notificacoes(usuario.id, 5),
     quantidadeNaoLidas: CypherModel.notificacoesNaoLidas(usuario.id),
-    obras: listarObrasProprietarioCypher(usuario.id),
+    pessoa: { ...usuarioParaView(usuario), atuacoes: atuacoesExistentes, rotulosCategorias: Object.fromEntries(usuario.categories.map(c => [c, rotuloProfissional(c,usuario.tratamento)])) },
+    apresentacao: opcoes.editando && !usuario.demonstracao ? null : montarApresentacao({
+      id: usuario.id, handle: usuario.handle, categorias: usuario.categories, demo: usuario.demonstracao,
+    }, usuario, true, opcoes.navegacao ?? {}),
+    selo: opcoes.editando ? seloPerfil(usuario.id) : null, coresSelo, formasSelo,
     categoriasDisponiveis,
     gruposProfissionais: listarGruposProfissionais(),
     questionariosAtuacao,
@@ -1455,18 +1209,15 @@ function renderizarPerfil(
     atuacoesSolicitadas: opcoes.atuacoesSolicitadas ?? atuacoesExistentes,
     categoriasSolicitadas: opcoes.categoriasSolicitadas ?? usuario.categories,
     formatarRespostaAtuacao,
-    atuacaoSelecionada:
-      atuacoesExistentes.find(
-        item => item.categoria === opcoes.atuacaoSelecionada
-      ) ?? null,
     generosDisponiveis: generosObra.filter(genero => genero !== "Outro"),
     categoriasBloqueadas: estadoCategorias.bloqueada,
     excecaoCategoriaDisponivel: estadoCategorias.excecaoDisponivel,
     solicitacaoExcecao,
     proximaAlteracaoCategorias: proximaAlteracaoFormatada,
-    statusOptions: opcoesStatusPorCategoria(
-      opcoes.valores?.categorias ?? usuario.categories
-    ),
+    opcoesDisponibilidade: opcoesDisponibilidadeProfissional,
+    disponibilidadeAnterior: usuario.availability,
+    profissoesComEstilosMusicais,
+    rotuloStatusProfissional,
     editando: opcoes.editando ?? false,
     erro: opcoes.erro ?? null,
     salvo: opcoes.salvo ?? false,
@@ -1505,11 +1256,11 @@ export const perfil = (req: Request, res: Response) => {
     erroSolicitado.startsWith("excecao_")
   );
   const erros: Record<string, string> = {
-    catalogo: "O catálogo vigente tem 26 profissões. Uma nova profissão exige integração de atuação, questionário e permissões antes de ser disponibilizada.",
+    catalogo: "O catálogo vigente tem 25 profissões. Uma nova profissão exige integração de atuação, questionário e permissões antes de ser disponibilizada.",
     excecao_justificativa:
       "Informe o motivo da solicitação em 10 a 500 caracteres.",
     excecao_nao_necessaria:
-      "O prazo de 60 dias já terminou; você pode alterar suas categorias sem solicitar exceção.",
+      "O prazo de 30 dias já terminou; você pode alterar suas categorias sem solicitar exceção.",
     excecao_ja_autorizada:
       "Você já tem uma autorização excepcional disponível para uma mudança.",
     excecao_questionario:
@@ -1532,7 +1283,7 @@ export const perfil = (req: Request, res: Response) => {
     privacidadeSalva: parametroTexto(req, "privacidade") === "salva",
     generoPendente: req.query.genero === "analise",
     categoriaPropostaResultado: parametroTexto(req, "categoria"),
-    atuacaoSelecionada: parametroTexto(req, "atuacao"),
+    navegacao: navegacaoPerfil(req),
     erro: erros[parametroTexto(req, "erro")] ?? null,
   });
 };
@@ -1692,55 +1443,31 @@ export const configuracoes = (req: Request, res: Response) => {
   });
 };
 
+function navegacaoPerfil(req: Request): NavegacaoPerfil {
+  return { aba: parametroTexto(req, "aba"), atuacao: parametroTexto(req, "atuacao"),
+    pagina: parametroTexto(req, "pagina"), obra: parametroTexto(req, "obra") };
+}
+
 export const perfilPublico = (req: Request, res: Response) => {
+  const visitante = exigeAcesso(req, res);
+  if (!visitante) return;
   const slug = String(req.params.identificador ?? "").trim();
-  const visitante = usuarioDaRequisicao(req);
-  if (!/^[a-z0-9_.]{3,24}$/i.test(slug)) {
-    return res.status(404).render("pages/perfil-publico", {
-      title: "Perfil indisponível",
-      stylesheet: "perfil",
-      authenticated: Boolean(visitante),
-      perfil: null,
-      obras: [],
-    });
+  const handle = /^[a-z0-9_.]{3,24}$/i.test(slug) ? resolverPerfilPublico(slug) ?? normalizarIdentificador(slug) : "";
+  const pessoa = handle ? obterPerfilPublicoCypher(handle, handle === normalizarIdentificador(visitante.handle) ? undefined : visitante.id) : null;
+  const pagina = { stylesheet: "cena-perfil", path: "/search", authenticated: true, editando: false };
+  if (!pessoa) return res.status(404).render("pages/perfil", { ...pagina,
+    title: "Perfil indisponível", pessoa: null, apresentacao: null });
+  if (handle !== normalizarIdentificador(slug)) {
+    const parametros = new URLSearchParams();
+    for (const [k, v] of Object.entries(navegacaoPerfil(req))) if (v) parametros.set(k, v);
+    return res.redirect(308, "/p/" + encodeURIComponent(handle.slice(1)) + (parametros.size ? "?" + parametros : ""));
   }
-
-  const destino = resolverPerfilPublico(slug);
-  if (destino && destino !== normalizarIdentificador(slug)) return res.redirect(308, `/p/${encodeURIComponent(destino.slice(1))}`);
-  const perfilPublico = obterPerfilPublicoCypher(`@${slug}`, visitante?.id);
-  if (!perfilPublico) {
-    return res.status(404).render("pages/perfil-publico", {
-      title: "Perfil indisponível",
-      stylesheet: "perfil",
-      authenticated: Boolean(visitante),
-      perfil: null,
-      obras: [],
-    });
-  }
-
-  const atuacaoSelecionada = String(req.query.atuacao ?? "");
-  return res.render("pages/perfil-publico", {
-    title: perfilPublico.name,
-    stylesheet: "perfil",
-    authenticated: Boolean(visitante),
-    visitante: visitante ? usuarioParaView(visitante) : null,
-    perfil: {
-      ...perfilPublico,
-      availabilityLabel: rotuloStatusProfissional(
-        perfilPublico.availability,
-        perfilPublico.categories
-      ),
-    },
-    obras: listarObrasPublicasPerfilCypher(perfilPublico.handle),
-    atuacaoSelecionada:
-      perfilPublico.atuacoes.find(
-        item => item.categoria === atuacaoSelecionada
-      ) ?? null,
-    questionariosAtuacao: perfilPublico.categories.map(categoria => ({
-      categoria,
-      perguntas: catalogoPerguntasPorCategoria(categoria),
-    })),
-    gruposProfissionais: listarGruposProfissionais(),
+  return res.render("pages/perfil", {
+    ...pagina, title: pessoa.vulgo || pessoa.name,
+    pessoa: { ...pessoa, id: pessoa.userId, availabilityLabel: rotuloStatusProfissional(pessoa.availability) },
+    apresentacao: montarApresentacao({ id: pessoa.userId, handle: pessoa.handle, categorias: pessoa.categories,
+      demo: Boolean(pessoa.contaDemo) }, visitante, false, navegacaoPerfil(req)),
+    questionariosAtuacao: pessoa.categories.map(categoria => ({ categoria, perguntas: catalogoPerguntasPorCategoria(categoria) })),
     formatarRespostaAtuacao,
   });
 };
@@ -1776,6 +1503,8 @@ export function atualizarPerfil(req: Request, res: Response) {
       (!outrosGeneros || (outroGenero.length >= 2 && outroGenero.length <= 40)),
   };
   const equipamentos = listaDeLinhas(equipamentosTexto, 12, 80);
+  const competenciasTexto = typeof req.body.competencias === "string" ? req.body.competencias : (usuario.skills ?? []).join("\n");
+  const competencias = listaDeLinhas(competenciasTexto, 12, 80);
   const valores = {
     nome,
     cidade,
@@ -1786,10 +1515,10 @@ export function atualizarPerfil(req: Request, res: Response) {
     generos: generosRecebidos,
     outroGenero,
     equipamentos: equipamentosTexto,
+    competencias: competenciasTexto,
     disponibilidade,
   };
   const categoriasAceitas = listarCategoriasProfissionaisCypher();
-  const statusPermitidos = opcoesStatusPorCategoria(categorias);
 
   const erro = validarPerfil({
     nome,
@@ -1802,7 +1531,8 @@ export function atualizarPerfil(req: Request, res: Response) {
     generos,
     equipamentos,
     categoriasDisponiveis: categoriasAceitas,
-    statusPermitidos,
+    competencias,
+    disponibilidadeAnterior: usuario.availability,
   });
 
   if (erro) {
@@ -1875,6 +1605,8 @@ export function atualizarPerfil(req: Request, res: Response) {
       vertentes: req.body.vertentesPresentes === "1" ? listaTextual(req.body.vertentes) : undefined,
       otherCategory: "",
       equipment: equipamentos.itens,
+      skills: typeof req.body.competencias === "string" ? competencias.itens : undefined,
+      somenteAtuacao: req.params.secao === "profissional",
       initials: iniciais,
       tipoConta: usuario.tipoConta,
     });
@@ -1896,7 +1628,7 @@ export function atualizarPerfil(req: Request, res: Response) {
         ? new Date(`${bloqueio[1].replace(" ", "T")}Z`).toLocaleDateString(
             "pt-BR"
           )
-        : "após o prazo de 60 dias";
+        : "após o prazo de 30 dias";
       return renderizarPerfil(res, usuario, {
         status: 409,
         editando: true,
@@ -1926,6 +1658,28 @@ export function atualizarPerfilPorSecao(req: Request, res: Response) {
     return res.sendStatus(404);
   }
 
+  if (usuario.tipoConta !== "profissional") return res.sendStatus(403);
+  if (secao === "pessoal") {
+    const cidade = String(req.body.cidade ?? "").trim();
+    const biografia = String(req.body.biografia ?? "").trim();
+    const erro = validarApresentacaoPerfil(cidade, biografia);
+    if (erro) return renderizarPerfil(res, usuario, {
+      status: 400, editando: true, secaoEdicao: "pessoal", erro,
+      valores: { ...valoresPerfil(usuario), cidade, biografia },
+    });
+    if (!atualizarApresentacaoCypher(usuario.id, "profissional", cidade, biografia)) return res.sendStatus(404);
+    return res.redirect(303, "/profile?editar=1&secao=pessoal&salvo=1");
+  }
+  if (secao === "contato") {
+    const contato = String(req.body.contato ?? "").trim();
+    if (contato.length > 200) return renderizarPerfil(res, usuario, {
+      status: 400, editando: true, secaoEdicao: "privacidade", erro: "O contato deve ter no máximo 200 caracteres.",
+      valores: { ...valoresPerfil(usuario), contato },
+    });
+    if (!atualizarContatoProfissionalCypher(usuario.id, contato)) return res.sendStatus(404);
+    return res.redirect(303, "/profile?editar=1&secao=privacidade&salvo=1");
+  }
+
   const valoresAtuais = valoresPerfil(usuario);
   const atuacoesAtuais = listarAtuacoesUsuarioCypher(usuario.id);
   const bodyRecebido = (req.body ?? {}) as Record<string, unknown>;
@@ -1953,43 +1707,21 @@ export function atualizarPerfilPorSecao(req: Request, res: Response) {
     ),
   };
 
-  const camposPermitidos: Record<string, string[]> = {
-    pessoal: ["nome", "cidade", "biografia"],
-    contato: ["contato"],
-    profissional: [
-      "disponibilidade",
-      "equipamentos",
-      "respostasAtuacoesJson",
-      "visibilidadesAtuacoesJson",
-      "vertentes",
-      "vertentesPresentes",
-    ],
-  };
-  for (const campo of camposPermitidos[secao]) {
-    if (Object.hasOwn(bodyRecebido, campo)) {
-      corpoCompleto[campo] = bodyRecebido[campo];
-    }
+  const camposPermitidos = [
+    "disponibilidade", "equipamentos", "competencias", "respostasAtuacoesJson",
+    "visibilidadesAtuacoesJson", "vertentes", "vertentesPresentes",
+  ];
+  for (const campo of camposPermitidos) {
+    if (Object.hasOwn(bodyRecebido, campo)) corpoCompleto[campo] = bodyRecebido[campo];
   }
 
-  if (secao === "profissional") {
-    corpoCompleto.categorias = Object.hasOwn(bodyRecebido, "categorias")
-      ? bodyRecebido.categorias
-      : [];
-    corpoCompleto.generos = Object.hasOwn(bodyRecebido, "generos")
-      ? bodyRecebido.generos
-      : [];
-    const generosRecebidos = categoriasRecebidas(corpoCompleto.generos);
-    if (!generosRecebidos.includes("Outro")) {
-      corpoCompleto.outroGenero = "";
-    } else if (Object.hasOwn(bodyRecebido, "outroGenero")) {
-      corpoCompleto.outroGenero = bodyRecebido.outroGenero;
-    }
+  corpoCompleto.categorias = bodyRecebido.categorias ?? [];
+  corpoCompleto.generos = bodyRecebido.generos ?? [];
+  if (categoriasRecebidas(corpoCompleto.generos).includes("Outro")) {
+    corpoCompleto.outroGenero = bodyRecebido.outroGenero ?? "";
   }
 
-  req.body = {
-    ...corpoCompleto,
-    secaoEdicao: secao === "contato" ? "privacidade" : secao,
-  };
+  req.body = { ...corpoCompleto, secaoEdicao: "profissional" };
   return atualizarPerfil(req, res);
 }
 
@@ -2070,7 +1802,7 @@ export function revisaoAdministrativa(req: Request, res: Response) {
     );
   return res.render("pages/admin-revisao", {
     title: "Administrador",
-    path: "/admin/revisao",
+    path: req.path,
     stylesheet: "configuracoes",
     authenticated: true,
     usuario: usuarioParaView(usuario),
@@ -2319,6 +2051,7 @@ export function atualizarPrivacidade(req: Request, res: Response) {
     profilePublic: req.body.perfilPublico === "on",
     locationPublic: req.body.localizacaoPublica === "on",
     contactPublic: req.body.contatoPublico === "on",
+    skillsPublic: req.body.competenciasPublicasPresente === "1" ? req.body.competenciasPublicas === "on" : undefined,
   });
   if (!atualizado) return res.sendStatus(404);
   return res.redirect(

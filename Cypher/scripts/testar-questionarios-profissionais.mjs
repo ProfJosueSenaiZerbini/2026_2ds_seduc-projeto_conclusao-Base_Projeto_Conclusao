@@ -16,17 +16,17 @@ banco.inicializarBancoCypher();
 const db = new Database(process.env.CYPHER_DB_PATH);
 const usuarioId = "teste-questionarios-profissionais";
 db.prepare(
-  `INSERT INTO usuarios (id, email, senha_hash, codigo_publico, numero_sequencial)
-  VALUES (?, ?, ?, ?, ?)`
-).run(usuarioId, "questionarios@teste.local", "hash", "CYP-TESTE0000001", 1);
+  `INSERT INTO usuarios (id, email, senha_hash)
+  VALUES (?, ?, ?)`
+).run(usuarioId, "questionarios@teste.local", "hash");
 
 db.prepare(
-  `INSERT INTO perfis (usuario_id, c_tag, nome, funcao, identificador)
-  VALUES (?, ?, ?, ?, ?)`
-).run(usuarioId, "CTAG-TESTE-QUESTIONARIOS", "Teste", "Rapper", "teste");
+  `INSERT INTO perfis (usuario_id, nome, funcao, identificador)
+  VALUES (?, ?, ?, ?)`
+).run(usuarioId, "Teste", "Rapper", "teste");
 
 const profissoes = listarProfissoesCatalogo();
-assert.equal(profissoes.length, 26);
+assert.equal(profissoes.length, 25);
 for (const profissao of profissoes) {
   const perguntas = questionarios.catalogoPerguntasPorProfissao(profissao.id);
   assert.equal(
@@ -125,7 +125,7 @@ assert.throws(
   () => banco.listarRespostasAtuacaoProfissaoCypher("usuario-que-nao-existe"),
   /USUARIO_NAO_ENCONTRADO/
 );
-assert.equal(db.pragma("user_version", { simple: true }), 26);
+assert.equal(db.pragma("user_version", { simple: true }), banco.versaoEsquema);
 console.log(
-  "OK: 26 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional."
+  "OK: 25 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional."
 );

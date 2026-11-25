@@ -1,11 +1,16 @@
 // @ts-nocheck
+import { audioCatalogoLocal } from "../models/audioCatalogoLocal.js";
+import { conexaoInternaCypher } from "../models/bancoDados.js";
 import { podePublicar } from "../models/permissoes.js";
 
 import type { Request, Response } from "express";
 import { CypherModel, type DadosBeatCypher } from "../models/modeloCypher.js";
 import type { UsuarioDaSessao } from "../models/bancoDados.js";
 import { imagemPublicacaoDemo } from "../models/catalogoDemonstrativo.js";
-import { normalizarBusca } from "../models/espacoTrabalho.js";
+import {
+  lerFiltrosBeats, filtrarCatalogoBeats, modalidadesCatalogoBeat,
+  disponibilidadesCatalogoBeat, formatosCatalogoBeat,
+} from "../models/filtrosBancoBeats.js";
 import {
   licencasBeat,
   validarBpm,
@@ -151,7 +156,7 @@ function renderizarFormularioBeat(
   return res.status(opcoes.erro ? 422 : 200).render("pages/cadastro-beat", {
     title: opcoes.editando ? "Editar beat" : "Cadastrar beat",
     path: res.locals.origemEspaco ? "/espaco-de-trabalho" : "/beats",
-    stylesheet: "cadastro-obra",
+    stylesheet: "beats-licencas",
     authenticated: true,
     valores: dados,
     erro: opcoes.erro ?? "",
@@ -163,29 +168,28 @@ function renderizarFormularioBeat(
 
 export function bancoBeats(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  const catalogo = CypherModel.beats(usuario?.id);
-  const opcoes = (campo: "genre" | "license") =>
+  const catalogo = CypherModel.beats(usuario?.id).map(beat => {
+    const r=conexaoInternaCypher().prepare("SELECT dados_json FROM catalogo_cena WHERE tipo='beat' AND id=?").get(beat.id);
+    const cena=r?JSON.parse(r.dados_json):null;
+    return {
+    ...beat,
+    vendido: Boolean(cena?.vendidoPara),
+    compradorExclusivo: cena?.comprador||'',
+    valorExclusivo: cena?.preco||null,
+    disponibilidade: cena?.vendidoPara ? "vendido" : !beat.disponivel ? "pausado" : beat.ofertas.some(o => o.modalidade === "free" || o.modalidade === "premium") ? "disponivel" : "sem_oferta",
+    previewUrl: beat.demonstracao ? audioCatalogoLocal[beat.id] || "" : beat.previaId ? `/beats/${beat.id}/preview` : "",
+  };});
+  const opcoes = (campo: "genre" | "license" | "key") =>
     [...new Set(catalogo.map(beat => beat[campo]).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b, "pt-BR")
     );
-  const generos = opcoes("genre");
-  const licencas = opcoes("license");
-  const genero = generos.find(valor => valor === req.query.genero) ?? "";
-  const licenca = licencas.find(valor => valor === req.query.licenca) ?? "";
-  const q = typeof req.query.q === "string" ? req.query.q.trim().slice(0, 120) : "";
-  const termos = normalizarBusca(q).split(/\s+/);
-  const filtrado = Boolean(q || genero || licenca);
-  const beats = catalogo.filter(beat => {
-    if ((genero && beat.genre !== genero) || (licenca && beat.license !== licenca)) return false;
-    const busca = normalizarBusca(
-      [beat.title, beat.producer, beat.genre, beat.bpm ? `${beat.bpm} BPM` : ""].join(" ")
-    );
-    return termos.every(termo => busca.includes(termo));
-  });
+  const filtros = lerFiltrosBeats(req.query);
+  const filtrado = Object.values(filtros).some(Boolean);
+  const beats = filtrarCatalogoBeats(catalogo, filtros);
   const destaque = filtrado
     ? undefined
     : catalogo.find(beat => beat.id === "demo-beat-visao-de-rua") ??
-      catalogo.find(beat => beat.demonstracao && imagemPublicacaoDemo(beat.id));
+      catalogo.find(beat => imagemPublicacaoDemo(beat.id));
 
   return res.render("pages/banco-beats", {
     title: "Banco de Beats",
@@ -195,11 +199,18 @@ export function bancoBeats(req: Request, res: Response) {
     beats,
     destaque,
     filtrado,
-    q,
-    genero,
-    generos,
-    licenca,
-    licencas,
+    q: filtros.q,
+    genero: filtros.genero,
+    filtros,
+    disponibilidades: disponibilidadesCatalogoBeat,
+    camposSelecao: [
+      ["licenca", "Tipo de licença", opcoes("license").map(v => [v, v])],
+      ["tonalidade", "Tonalidade", opcoes("key").map(v => [v.trim(), v.trim()])],
+      ["modalidade", "Modalidade da oferta", Object.entries(modalidadesCatalogoBeat)],
+      ["disponibilidade", "Disponibilidade", Object.entries(disponibilidadesCatalogoBeat)],
+      ["arquivo", "Formato de entrega", Object.entries(formatosCatalogoBeat)],
+    ],
+    generos: opcoes("genre"),
     podeCadastrarBeat: Boolean(
       usuario && !usuario.demonstracao && podePublicar(usuario,"beat")
     ),
@@ -234,7 +245,7 @@ export function criarBeat(req: Request, res: Response) {
     entidadeId: beatId,
     chaveOrigem: `beat-criado:${beatId}`,
   });
-  return res.redirect(303, res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=beatCriado" : "/beats?resultado=criado");
+  return res.redirect(303, `/beats/${beatId}/manage`);
 }
 
 export function editarBeat(req: Request, res: Response) {
@@ -307,5 +318,5 @@ export function excluirBeat(req: Request, res: Response) {
 }
 
 export { licencasBeat };
-export { central } from "./controladorCompatibilidade.js";
+
 

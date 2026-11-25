@@ -1,0 +1,47 @@
+testar-banco: OK
+OK: schema 29, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis.
+
+testar-politicas-perfil: OK
+OK: cooldown, governança, moderação de taxonomia e filtro de privacidade (titular, colaborador creditado em obra publicada e visitante externo).
+
+testar-catalogo-profissional: OK
+OK: catálogo profissional com 7 grupos, 25 profissões e IDs estáveis.
+
+testar-questionarios-profissionais: OK
+OK: 25 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional.
+
+testar-persistencia-profissional: OK
+OK: persistência profissional define 16 vertentes e elegibilidade exclusiva de Rapper.
+
+testar-relacoes-profissionais: OK
+OK: operações de profissões e vertentes preservam seleção, inativação e reativação.
+
+testar-integracao-cadastro-profissional: OK
+OK: cadastro e edição usam somente relações profissionais canônicas.
+
+testar-fundacao: OK
+OK: 25 profissões, permissões contextuais, bloqueios nos models, consumidor, administradores sem perfil, RBAC, revogação e auditoria.
+
+testar-admin-ui: OK
+OK: admin e busca; cadastro/profissional; propostas de categoria; dependências Outro; obras e eventos detalhados com moderação; solicitações de exceção e permissões.
+
+testar-seguranca-http: OK
+OK: Espaço de Trabalho, filtros combinados, fichas, autoria, créditos, eventos e catálogo coletivo.
+OK: HTTP compilado, CSRF, limite de login, permissões contextuais, consumidor privado, sessões separadas, RBAC e equipe sem perfil público.
+
+testar-identidade-http: OK
+OK: cadastro em duas modalidades, 18 anos, @ de 3–24 caracteres, confirmação/expiração/reenvio e troca de e-mail, nome privado, conversão irreversível, questionário mínimo, 30/60 dias, exceções, preferências e privacidade.
+
+testar-busca-global: OK
+Busca global: categorias, filtros, links legados, renderização, sugestões, sessão e privacidade validados.
+
+testar-curtidas-obras: OK
+Curtidas: 32 → 33, idempotência, persistência, remoção, visibilidade e templates OK.
+
+testar-entrega-email: OK
+OK: SMTP TLS, confirmação, rejeição de falha sem expor resposta privada, token invalidado e HTTPS em produção. Nenhuma mensagem externa enviada.
+
+testar-oportunidades: OK
+Oportunidades: 108 verificações passaram; banco isolado, regras, acordos, pedidos, mensagens, persistência, rotas e EJS.
+
+15/15 suítes passaram.

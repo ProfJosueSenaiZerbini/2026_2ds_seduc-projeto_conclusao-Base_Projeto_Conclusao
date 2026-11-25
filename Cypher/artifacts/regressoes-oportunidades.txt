@@ -1,0 +1,168 @@
+testar-banco: OK
+OK: schema 29, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis.
+
+testar-politicas-perfil: OK
+OK: cooldown, governança, moderação de taxonomia e filtro de privacidade (titular, colaborador creditado em obra publicada e visitante externo).
+
+testar-catalogo-profissional: OK
+OK: catálogo profissional com 7 grupos, 26 profissões e IDs estáveis.
+
+testar-questionarios-profissionais: OK
+OK: 26 profissões têm exatamente quatro eixos; respostas são validadas e isoladas por ID profissional.
+
+testar-persistencia-profissional: OK
+OK: persistência profissional define 16 vertentes e elegibilidade exclusiva de Rapper.
+
+testar-relacoes-profissionais: OK
+OK: operações de profissões e vertentes preservam seleção, inativação e reativação.
+
+testar-integracao-cadastro-profissional: OK
+OK: cadastro e edição usam somente relações profissionais canônicas.
+
+testar-fundacao: OK
+OK: 26 profissões, permissões contextuais, bloqueios nos models, consumidor, administradores sem perfil, RBAC, revogação e auditoria.
+
+testar-admin-ui: FALHOU
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression />Próximo /. Input:
+
+'<!doctype html>\r\n' +
+  '  <html lang="pt-BR">\r\n' +
+  '    <head>\r\n' +
+  '      <meta charset="UTF-8" />\r\n' +
+  '      <meta name="cypher-theme" content="">\r\n' +
+  '      <script>\r\n' +
+  '        (() => {\r\n' +
+  `          const temaConta = document.querySelector('meta[name="cypher-theme"]').content;\r\n` +
+  '          let tema = temaConta === "light" ? "light" : "dark";\r\n' +
+  '          try {\r\n' +
+  '            const salvo = localStorage.getItem("cypher-tema");\r\n' +
+  '            if (salvo === "light" || salvo === "dark") tema = salvo;\r\n' +
+  '          } catch {}\r\n' +
+  '          document.documentElement.classList.toggle("dark", tema === "dark");\r\n' +
+  '        })();\r\n' +
+  '      </script>\r\n' +
+  '      <script>\r\n' +
+  '        // Consome apenas a próxima navegação feita com o mouse na sidebar.\r\n' +
+  '        try {\r\n' +
+  '          const chave = "cypher-sidebar-percurso";\r\n' +
+  '          const percurso = JSON.parse(sessionStorage.getItem(chave) || "null");\r\n' +
+  '          sessionStorage.removeItem(chave);\r\n' +
+  '          const destino = (location.pathname === "/" ? "/dashboard" : location.pathname) + location.search;\r\n' +
+  '          if (\r\n' +
+  '            percurso &&\r\n' +
+  '            window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)").matches &&\r\n' +
+  '            percurso.destino === destino &&\r\n' +
+  '            Number.isFinite(percurso.instante) &&\r\n' +
+  '            Date.now() - percurso.instante >= 0 &&\r\n' +
+  '            Date.now() - percurso.instante < 15000\r\n' +
+  '          ) {\r\n' +
+  '            document.documentElement.classList.add("sidebar-em-transicao");\r\n' +
+  '          }\r\n' +
+  '        } catch {}\r\n' +
+  '      </script>\r\n' +
+  '      <meta name="csrf-token" content="58a8d63674060dc9bb588022ee8e677f5fb7ad00c70423c6b12c8ec376574e9b">\r\n' +
+  '      <meta name="viewport" content="width=device-width, initial-scale=1" />\r\n' +
+  '      <meta name="theme-color" content="#10140f" />\r\n' +
+  '      <title>\r\n' +
+  '        CYPHE
+testar-seguranca-http: FALHOU
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /<details class="et-create"/. Input:
+
+'<!doctype html>\r\n' +
+  '  <html lang="pt-BR">\r\n' +
+  '    <head>\r\n' +
+  '      <meta charset="UTF-8" />\r\n' +
+  '      <meta name="cypher-theme" content="">\r\n' +
+  '      <script>\r\n' +
+  '        (() => {\r\n' +
+  `          const temaConta = document.querySelector('meta[name="cypher-theme"]').content;\r\n` +
+  '          let tema = temaConta === "light" ? "light" : "dark";\r\n' +
+  '          try {\r\n' +
+  '            const salvo = localStorage.getItem("cypher-tema");\r\n' +
+  '            if (salvo === "light" || salvo === "dark") tema = salvo;\r\n' +
+  '          } catch {}\r\n' +
+  '          document.documentElement.classList.toggle("dark", tema === "dark");\r\n' +
+  '        })();\r\n' +
+  '      </script>\r\n' +
+  '      <script>\r\n' +
+  '        // Consome apenas a próxima navegação feita com o mouse na sidebar.\r\n' +
+  '        try {\r\n' +
+  '          const chave = "cypher-sidebar-percurso";\r\n' +
+  '          const percurso = JSON.parse(sessionStorage.getItem(chave) || "null");\r\n' +
+  '          sessionStorage.removeItem(chave);\r\n' +
+  '          const destino = (location.pathname === "/" ? "/dashboard" : location.pathname) + location.search;\r\n' +
+  '          if (\r\n' +
+  '            percurso &&\r\n' +
+  '            window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)").matches &&\r\n' +
+  '            percurso.destino === destino &&\r\n' +
+  '            Number.isFinite(percurso.instante) &&\r\n' +
+  '            Date.now() - percurso.instante >= 0 &&\r\n' +
+  '            Date.now() - percurso.instante < 15000\r\n' +
+  '          ) {\r\n' +
+  '            document.documentElement.classList.add("sidebar-em-transicao");\r\n' +
+  '          }\r\n' +
+  '        } catch {}\r\n' +
+  '      </script>\r\n' +
+  '      <meta name="csrf-token" content="0219163f060eefdd6eda2d36788035435696ece6b258891f29c0d3f612ea1dab">\r\n' +
+  '      <meta name="viewport" content="width=
+testar-identidade-http: FALHOU
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Complete seu perfil/. Input:
+
+'<!doctype html>\r\n' +
+  '  <html lang="pt-BR">\r\n' +
+  '    <head>\r\n' +
+  '      <meta charset="UTF-8" />\r\n' +
+  '      <meta name="cypher-theme" content="light">\r\n' +
+  '      <script>\r\n' +
+  '        (() => {\r\n' +
+  `          const temaConta = document.querySelector('meta[name="cypher-theme"]').content;\r\n` +
+  '          let tema = temaConta === "light" ? "light" : "dark";\r\n' +
+  '          try {\r\n' +
+  '            const salvo = localStorage.getItem("cypher-tema");\r\n' +
+  '            if (salvo === "light" || salvo === "dark") tema = salvo;\r\n' +
+  '          } catch {}\r\n' +
+  '          document.documentElement.classList.toggle("dark", tema === "dark");\r\n' +
+  '        })();\r\n' +
+  '      </script>\r\n' +
+  '      <script>\r\n' +
+  '        // Consome apenas a próxima navegação feita com o mouse na sidebar.\r\n' +
+  '        try {\r\n' +
+  '          const chave = "cypher-sidebar-percurso";\r\n' +
+  '          const percurso = JSON.parse(sessionStorage.getItem(chave) || "null");\r\n' +
+  '          sessionStorage.removeItem(chave);\r\n' +
+  '          const destino = (location.pathname === "/" ? "/dashboard" : location.pathname) + location.search;\r\n' +
+  '          if (\r\n' +
+  '            percurso &&\r\n' +
+  '            window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)").matches &&\r\n' +
+  '            percurso.destino === destino &&\r\n' +
+  '            Number.isFinite(percurso.instante) &&\r\n' +
+  '            Date.now() - percurso.instante >= 0 &&\r\n' +
+  '            Date.now() - percurso.instante < 15000\r\n' +
+  '          ) {\r\n' +
+  '            document.documentElement.classList.add("sidebar-em-transicao");\r\n' +
+  '          }\r\n' +
+  '        } catch {}\r\n' +
+  '      </script>\r\n' +
+  '      <meta name="csrf-token" content="52e2cd43c7f3e5166181b033da53f2bfc81cf878ab4573fd50e3f282d0f90d98">\r\n' +
+  '      <meta name="viewport" content="width=device-width, 
+testar-busca-global: OK
+Busca global: categorias, filtros, links legados, renderização, sugestões, sessão e privacidade validados.
+
+testar-curtidas-obras: OK
+Curtidas: 32 → 33, idempotência, persistência, remoção, visibilidade e templates OK.
+
+testar-entrega-email: OK
+OK: SMTP TLS, confirmação, rejeição de falha sem expor resposta privada, token invalidado e HTTPS em produção. Nenhuma mensagem externa enviada.
+
+testar-oportunidades: OK
+Oportunidades: 100 verificações passaram; banco isolado, regras, acordos, pedidos, mensagens, persistência, rotas e EJS.
+
+12/15 suítes passaram.

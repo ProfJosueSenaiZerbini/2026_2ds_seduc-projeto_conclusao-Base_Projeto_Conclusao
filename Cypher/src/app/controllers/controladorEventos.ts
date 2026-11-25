@@ -3,7 +3,20 @@ import { obterPreferenciasUsuario } from "../models/identidadeUsuario.js";
 import { podePublicar } from "../models/permissoes.js";
 import { normalizarBusca } from "../models/espacoTrabalho.js";
 import { fotoEventoDemonstrativo } from "../models/modeloDescoberta.js";
-import { resolverTemaEvento, temaEventoPadrao, temasEvento } from "../models/temasEvento.js";
+import {
+  resolverTemaEvento,
+  temaEventoPadrao,
+  temasEvento,
+} from "../models/temasEvento.js";
+import { conexaoInternaCypher } from "../models/bancoDados.js";
+import {
+  validarConfiguracaoEvento,
+  salvarConfiguracaoEvento,
+  configuracaoFormularioEvento,
+  eventoAntesDeEditar,
+  cancelarEvento,
+  ErroEvento,
+} from "../models/eventos.js";
 
 import type { Request, Response } from "express";
 import {
@@ -47,6 +60,16 @@ const valoresVazios: ValoresFormularioEvento = {
   premio: "",
   etiquetas: "",
   tipoParticipacao: "aberta",
+  capacidade: "",
+  criterios: "",
+  fuso: "America/Sao_Paulo",
+  fimData: "",
+  fimHorario: "",
+  localConfirmado: "",
+  latitude: "",
+  longitude: "",
+  serieId: "",
+  versao: 1,
 };
 
 function usuarioAtual(res: Response): UsuarioDaSessao {
@@ -56,10 +79,7 @@ function usuarioAtual(res: Response): UsuarioDaSessao {
 function usuarioParaView(usuario: UsuarioDaSessao) {
   return {
     ...usuario,
-    availabilityLabel: rotuloStatusProfissional(
-      usuario.availability,
-      usuario.categories
-    ),
+    availabilityLabel: rotuloStatusProfissional(usuario.availability),
   };
 }
 
@@ -100,10 +120,15 @@ function prepararEventoParaView(evento: EventoContaPersistido) {
     .toUpperCase();
 
   return {
-    evento: { ...evento, date: dia && mes ? `${dia} ${mes}` : evento.date || "A confirmar" },
+    evento: {
+      ...evento,
+      date: dia && mes ? `${dia} ${mes}` : evento.date || "A confirmar",
+    },
     item: {
       titulo: evento.title,
-      tipo: [evento.category, evento.categoryDetail, ...evento.workshopTypes].filter(Boolean).join(" · "),
+      tipo: [evento.category, evento.categoryDetail, ...evento.workshopTypes]
+        .filter(Boolean)
+        .join(" · "),
       workshopTypes: evento.workshopTypes,
       categoria: evento.category,
       temaCartao: resolverTemaEvento(evento.temaCartao),
@@ -117,7 +142,7 @@ function prepararEventoParaView(evento: EventoContaPersistido) {
       status: evento.status,
       descricao: evento.description,
       demonstracao: evento.demonstracao,
-      fotoDestaque: evento.demonstracao ? fotoEventoDemonstrativo(evento.id) : undefined,
+      fotoDestaque: fotoEventoDemonstrativo(evento.id),
     },
   };
 }
@@ -143,13 +168,27 @@ function formularioDoEvento(
     premio: evento.prize,
     etiquetas: evento.tags.join(", "),
     tipoParticipacao: evento.participationType,
+    ...configuracaoFormularioEvento(evento.proprietarioId, evento.id),
   };
 }
 
-function dadosDoFormulario(req: Request, temaAtual = temaEventoPadrao): ValoresFormularioEvento {
+function dadosDoFormulario(
+  req: Request,
+  temaAtual = temaEventoPadrao
+): ValoresFormularioEvento {
   const valor = (chave: string) => String(req.body[chave] ?? "").trim();
   return {
     titulo: valor("titulo"),
+    capacidade: valor("capacidade"),
+    criterios: valor("criterios"),
+    fuso: valor("fuso"),
+    fimData: valor("fimData"),
+    fimHorario: valor("fimHorario"),
+    localConfirmado: valor("localConfirmado"),
+    latitude: valor("latitude"),
+    longitude: valor("longitude"),
+    serieId: valor("serieId"),
+    versao: valor("versao"),
     categoria: valor("categoria"),
     categoriaDetalhe:
       valor("categoria") === "Outro" ? valor("categoriaDetalhe") : "",
@@ -170,7 +209,8 @@ function dadosDoFormulario(req: Request, temaAtual = temaEventoPadrao): ValoresF
     organizador: valor("organizador"),
     situacao: valor("situacao"),
     cor: valor("cor") || "yellow",
-    temaCartao: req.body.temaCartao === undefined ? temaAtual : valor("temaCartao"),
+    temaCartao:
+      req.body.temaCartao === undefined ? temaAtual : valor("temaCartao"),
     descricao: valor("descricao"),
     formato: valor("formato"),
     inscricao: valor("inscricao"),
@@ -220,7 +260,7 @@ function renderizarFormulario(
   return res.status(erro ? 400 : 200).render("pages/cadastro-evento", {
     title: editando ? "Editar evento" : "Cadastrar evento",
     path: res.locals.origemEspaco ? "/espaco-de-trabalho" : req.path,
-    stylesheet: "cadastro-obra",
+    stylesheet: "cadastro-evento",
     authenticated: true,
     usuario: usuarioParaView(usuario),
     valores,
@@ -244,7 +284,7 @@ function exigirOrganizador(
   res: Response
 ): UsuarioDaSessao | undefined {
   const usuario = usuarioAtual(res);
-  if (!podePublicar(usuario,"evento")) {
+  if (!podePublicar(usuario, "evento")) {
     res.redirect("/events?erro=permissao");
     return undefined;
   }
@@ -293,11 +333,16 @@ export function oportunidades(req: Request, res: Response) {
     .filter(Boolean);
   const refinoAtivo = Boolean(
     filtros.formato ||
-    filtros.periodo !== "todos" || filtros.ordem !== "recentes"
+    filtros.periodo !== "todos" ||
+    filtros.ordem !== "recentes"
   );
-  const fonte = refinoAtivo || filtros.categoria
-    ? CypherModel.eventosDisponiveis({ ...filtros, localizacao: "" }, usuario.id)
-    : todos;
+  const fonte =
+    refinoAtivo || filtros.categoria
+      ? CypherModel.eventosDisponiveis(
+          { ...filtros, localizacao: "" },
+          usuario.id
+        )
+      : todos;
   const eventos = fonte.filter(evento => {
     if (termosLocal.length) {
       const local = normalizarBusca(evento.location);
@@ -317,13 +362,23 @@ export function oportunidades(req: Request, res: Response) {
     const texto = normalizarBusca(campos.join(" "));
     return termos.every(termo => texto.includes(termo));
   });
-  const opcoesCategorias = [...new Set([
-    "Batalha", "Show", "Cypher", "Workshop",
-    ...todos.map(evento => evento.category), filtros.categoria,
-  ].filter(Boolean))];
-  const opcoesFormatos = [...new Set([
-    ...todos.map(evento => evento.format), filtros.formato,
-  ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const opcoesCategorias = [
+    ...new Set(
+      [
+        "Batalha",
+        "Show",
+        "Cypher",
+        "Workshop",
+        ...todos.map(evento => evento.category),
+        filtros.categoria,
+      ].filter(Boolean)
+    ),
+  ];
+  const opcoesFormatos = [
+    ...new Set(
+      [...todos.map(evento => evento.format), filtros.formato].filter(Boolean)
+    ),
+  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   return res.render("pages/oportunidades", {
     title: "Eventos",
@@ -336,7 +391,9 @@ export function oportunidades(req: Request, res: Response) {
     q,
     filtros,
     refinoAtivo,
-    filtrado: Boolean(q || filtros.categoria || filtros.localizacao || refinoAtivo),
+    filtrado: Boolean(
+      q || filtros.categoria || filtros.localizacao || refinoAtivo
+    ),
     localizacaoSelecionada: localizacao,
     opcoesCategorias,
     opcoesFormatos,
@@ -446,10 +503,24 @@ export function criarEvento(req: Request, res: Response) {
   const valores = dadosDoFormulario(req);
   const erro = validarFormularioEvento(valores);
   if (erro) return renderizarFormulario(req, res, valores, erro, false);
-  const eventoId = CypherModel.criarEvento(
-    usuario.id,
-    dadosPersistidos(valores)
-  );
+  let eventoId;
+  try {
+    validarConfiguracaoEvento(valores);
+    eventoId = conexaoInternaCypher()
+      .transaction(() => {
+        const id = CypherModel.criarEvento(
+          usuario.id,
+          dadosPersistidos(valores)
+        );
+        salvarConfiguracaoEvento(usuario.id, id, valores);
+        return id;
+      })
+      .immediate();
+  } catch (e) {
+    if (e instanceof ErroEvento)
+      return renderizarFormulario(req, res, valores, e.message, false);
+    throw e;
+  }
   CypherModel.criarNotificacao({
     usuarioDestinoId: usuario.id,
     tipo: "evento_criado",
@@ -460,7 +531,11 @@ export function criarEvento(req: Request, res: Response) {
     entidadeId: eventoId,
     chaveOrigem: `evento-criado:${eventoId}`,
   });
-  return res.redirect(res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoCriado" : "/events?mensagem=Evento criado com sucesso.");
+  return res.redirect(
+    res.locals.origemEspaco
+      ? "/espaco-de-trabalho?resultado=eventoCriado"
+      : "/events?mensagem=Evento criado com sucesso."
+  );
 }
 
 export function editarEvento(req: Request, res: Response) {
@@ -496,11 +571,40 @@ export function atualizarEvento(req: Request, res: Response) {
       String(req.params.id),
       categoriaOutroLegadaVazia
     );
-  const atualizado = CypherModel.atualizarEvento(
-    String(req.params.id),
-    usuario.id,
-    dadosPersistidos(valores)
-  );
+  let atualizado;
+  try {
+    validarConfiguracaoEvento(valores);
+    atualizado = conexaoInternaCypher()
+      .transaction(() => {
+        const antes = eventoAntesDeEditar(usuario.id, String(req.params.id));
+        const ok = CypherModel.atualizarEvento(
+          String(req.params.id),
+          usuario.id,
+          dadosPersistidos(valores)
+        );
+        if (ok)
+          salvarConfiguracaoEvento(
+            usuario.id,
+            String(req.params.id),
+            valores,
+            antes
+          );
+        return ok;
+      })
+      .immediate();
+  } catch (e) {
+    if (e instanceof ErroEvento)
+      return renderizarFormulario(
+        req,
+        res,
+        valores,
+        e.message,
+        true,
+        String(req.params.id),
+        categoriaOutroLegadaVazia
+      );
+    throw e;
+  }
   if (atualizado) {
     CypherModel.criarNotificacao({
       usuarioDestinoId: usuario.id,
@@ -515,7 +619,9 @@ export function atualizarEvento(req: Request, res: Response) {
   }
   return res.redirect(
     atualizado
-      ? (res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoAtualizado" : "/events?mensagem=Evento atualizado com sucesso.")
+      ? res.locals.origemEspaco
+        ? "/espaco-de-trabalho?resultado=eventoAtualizado"
+        : "/events?mensagem=Evento atualizado com sucesso."
       : "/events?erro=evento"
   );
 }
@@ -524,9 +630,8 @@ export function excluirEvento(req: Request, res: Response) {
   const responsavel = exigirResponsavelEvento(req, res);
   if (!responsavel) return;
   const { usuario } = responsavel;
-  const excluido = CypherModel.excluirEvento(String(req.params.id), usuario.id);
   return res.redirect(
-    excluido ? (res.locals.origemEspaco ? "/espaco-de-trabalho?resultado=eventoExcluido" : "/events?mensagem=Evento excluído.") : "/events?erro=evento"
+    303,
+    `/events/${encodeURIComponent(String(req.params.id))}#gestao`
   );
 }
-

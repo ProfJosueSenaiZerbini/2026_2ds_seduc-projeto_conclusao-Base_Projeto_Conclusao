@@ -1,0 +1,45 @@
+<%- include('../partials/cabecalho', { title, stylesheet }) %>
+<div class="dc-shell">
+  <a class="dc-skip" href="#ci-main">Pular para o conteúdo</a>
+  <%- include('../partials/barra-lateral', { path }) %>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', { titulo: title, tituloId: 'ci-titulo', descricao: tela === 'colecao' ? 'Seus conteúdos salvos e profissionais que você segue.' : '' }) %>
+    <main class="dc-content ci-page" id="ci-main" tabindex="-1" aria-labelledby="ci-titulo">
+      <% if (erro) { %><p class="ci-error" role="alert"><%= erro %></p><% } %>
+      <% if (tela === 'erro') { %><a class="ci-button" href="/colecoes">Ir para minha coleção</a><% } %>
+      <% if (tela === 'colecao') { %>
+        <nav class="ci-tabs" aria-label="Minha coleção">
+          <a class="ci-button" href="/colecoes" <%- aba === 'salvos' ? 'aria-current="page"' : '' %>>Conteúdos salvos</a>
+          <a class="ci-button" href="/colecoes?aba=seguindo" <%- aba === 'seguindo' ? 'aria-current="page"' : '' %>>Profissionais que sigo</a>
+        </nav>
+        <% if (itens.length) { %>
+          <ul class="ci-collection">
+            <% for (const item of itens) { %>
+              <li class="ci-panel">
+                <div>
+                  <small><%= item.rotulo %></small>
+                  <h2><a href="<%= item.url %>"><%= item.titulo %></a></h2>
+                  <% if (item.tipo === 'perfil') { %><p><%= item.identificador %></p><% } %>
+                </div>
+                <%- include('../partials/componentes/acoes-conteudo', { tipo:item.tipo, id:item.id, colecaoAtual:aba }) %>
+              </li>
+            <% } %>
+          </ul>
+        <% } else { %>
+          <p class="ci-panel"><%= aba === 'salvos' ? 'Sua coleção de conteúdos salvos está vazia.' : 'Você ainda não segue nenhum profissional.' %></p>
+        <% } %>
+      <% } else if (tela === 'ficha') { %>
+        <section class="ci-panel ci-context">
+          <div><small><%= alvo.rotulo %></small><h2><a href="<%= alvo.url %>"><%= alvo.titulo %></a></h2></div>
+          <%- include('../partials/componentes/acoes-conteudo', { tipo:alvo.tipo, id:alvo.id, ocultarComentarios:true }) %>
+          <a class="ci-button" href="<%= alvo.url %>">Abrir <%= alvo.rotulo.toLowerCase() %></a>
+        </section>
+        <% if (alvo.tipo !== 'perfil') { %>
+          <%- include('../partials/componentes/conversa-conteudo', { comentarios, base, envio, texto, data }) %>
+        <% } %>
+      <% } %>
+    </main>
+    <%- include('../partials/navegacao-mobile', { rotaAtual:path }) %>
+  </div>
+</div>
+<%- include('../partials/fim-pagina') %>

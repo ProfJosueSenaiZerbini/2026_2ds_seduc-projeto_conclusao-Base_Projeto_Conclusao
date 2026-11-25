@@ -1,3 +1,6 @@
+import { objetoDisponivel } from "./politicasModeracao.js";
+import { listarProjetos, formatosTrabalho } from "./projetosTrabalho.js";
+import { profissoesAtivas } from "./oportunidades.js";
 import { conexaoInternaCypher, type UsuarioDaSessao } from "./bancoDados.js";
 import { profissoesCatalogo } from "./modeloPerfil.js";
 import { podePublicar } from "./permissoes.js";
@@ -5,6 +8,7 @@ import { rotuloProfissional } from "./tratamentoProfissional.js";
 
 export const rotaEspaco = "/espaco-de-trabalho";
 export const modalidades = [
+  {modalidade:"projeto",nome:"Criar trabalho / galeria",base:"/work-projects",icone:"brush"},
   { modalidade: "obra", nome: "Criar obra", base: "/works", icone: "music" },
   {
     modalidade: "beat",
@@ -22,9 +26,11 @@ export const modalidades = [
 export type Modalidade = (typeof modalidades)[number]["modalidade"];
 
 export function acoesCriacao(usuario: UsuarioDaSessao) {
-  return modalidades.filter(
-    acao => !usuario.demonstracao && podePublicar(usuario, acao.modalidade)
+  const acoes: {modalidade:string;nome:string;base:string;icone:string}[] = modalidades.filter(
+    acao => !usuario.demonstracao && (acao.modalidade === "projeto" ? usuario.tipoConta === "profissional" && profissoesAtivas(usuario.id).length > 0 : podePublicar(usuario, acao.modalidade))
   );
+  if (!usuario.demonstracao && usuario.tipoConta === "profissional" && profissoesAtivas(usuario.id).length) acoes.push({modalidade:"oportunidade",nome:"Criar oportunidade",base:"/opportunities",icone:"briefcase"});
+  return acoes;
 }
 
 export function normalizarBusca(texto: string) {
@@ -107,12 +113,13 @@ const registros = `
     UNION ALL
     SELECT e.id,'evento',e.titulo,coalesce(nullif(e.organizador,''),p.nome),'Evento',
       coalesce(nullif(e.categoria_detalhe,''),e.categoria),e.descricao,'',e.proprietario_id=@usuario,
-      CASE WHEN e.proprietario_id=@usuario THEN '[]' ELSE '[{"papel":"Participação confirmada","detalhe":""}]' END,
+      CASE WHEN e.proprietario_id=@usuario THEN '[]' WHEN pr.usuario_id IS NOT NULL THEN '[{"papel":"Comparecimento registrado","detalhe":"Não comprova contribuição profissional"}]' ELSE '[{"papel":"Participação confirmada","detalhe":"Registro anterior à separação de inscrições e presença"}]' END,
       CASE WHEN e.proprietario_id=@usuario THEN '["organizador-eventos"]' ELSE '[]' END,
       json_object('Data',e.data_texto,'Horário',e.horario,'Local',e.local,'Formato',e.formato,'Inscrição',e.inscricao,'Premiação',e.premio),e.criado_em
     FROM eventos e JOIN perfis p ON p.usuario_id=e.proprietario_id
-    LEFT JOIN interesses_eventos i ON i.evento_id=e.id AND i.usuario_id=@usuario AND i.status='confirmado'
-    WHERE e.demonstracao=0 AND p.demonstracao=0 AND (e.proprietario_id=@usuario OR i.id IS NOT NULL)
+    LEFT JOIN eventos_presencas pr ON pr.evento_id=e.id AND pr.usuario_id=@usuario AND pr.revogada_em IS NULL
+    LEFT JOIN interesses_eventos i ON i.evento_id=e.id AND i.usuario_id=@usuario AND i.status='confirmado' AND NOT EXISTS(SELECT 1 FROM eventos_inscricoes ni WHERE ni.evento_id=e.id AND ni.usuario_id=@usuario)
+    WHERE e.demonstracao=0 AND p.demonstracao=0 AND (e.proprietario_id=@usuario OR pr.usuario_id IS NOT NULL OR i.id IS NOT NULL)
   )`;
 
 // Créditos legados têm função em texto livre. Usamos correspondências de funções inteiras.
@@ -199,7 +206,12 @@ export function trabalhosDaConta(usuario: UsuarioDaSessao) {
       '' AS link, '{}' AS ficha FROM trabalhos ORDER BY criado_em DESC, modalidade, id DESC`
     )
     .all({ usuario: usuario.id }) as Linha[];
-  return linhas.map(linha => apresentar(linha, usuario));
+  return [...linhas.filter(l=>objetoDisponivel(conexaoInternaCypher(),l.modalidade,l.id,usuario.id)).map(linha => apresentar(linha, usuario)),...listarProjetos(usuario.id,true).map(p=>({
+    id:p.id as string,modalidade:'projeto' as const,titulo:p.titulo as string,autor:p.autor as string,
+    tipo:formatosTrabalho.find(f=>f.id===p.modalidade)?.nome??'Projeto',metadados:p.publico?'Visível na Cypher':'Privado',
+    descricao:p.descricao as string,link:'',proprio:true,papeis:'[]',papel:p.papel||'Atuação declarada',atuacoes:p.profissoes,
+    ficha:'{}',fatos:[] as [string,string|number][],icone:'briefcase',detalhes:'/work-projects/'+p.id,base:'/work-projects/'+p.id
+  }))];
 }
 
 export function trabalhoDaConta(
@@ -213,5 +225,5 @@ export function trabalhoDaConta(
         " SELECT * FROM trabalhos WHERE modalidade=@modalidade AND id=@id"
     )
     .get({ usuario: usuario.id, modalidade, id }) as Linha | undefined;
-  return linha && apresentar(linha, usuario);
+  return linha && objetoDisponivel(conexaoInternaCypher(),modalidade,id,usuario.id) && apresentar(linha, usuario);
 }

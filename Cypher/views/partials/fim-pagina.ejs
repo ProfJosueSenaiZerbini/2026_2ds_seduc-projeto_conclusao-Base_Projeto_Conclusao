@@ -4,5 +4,18 @@
 </script>
 <script src="/js/identidade.js" defer></script>
 <script src="/js/formularios.js" defer></script>
+<script src="/js/busca-global.js" defer></script>
+<% if (typeof interacao === 'function') { %>
+  <p class="sr-only" id="ci-status" role="status" aria-live="polite"></p>
+  <dialog class="dc-shell ci-dialog" id="ci-conversa" aria-labelledby="ci-dialog-title" aria-describedby="ci-dialog-subtitle">
+    <header class="ci-dialog-header">
+      <div><h2 id="ci-dialog-title"></h2><p id="ci-dialog-subtitle">Comentários</p></div>
+      <button class="ci-icon" type="button" data-ci-close aria-label="Fechar comentários" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </header>
+    <p class="ci-live" role="status" aria-live="polite" data-ci-message></p>
+    <div class="ci-dialog-content" data-ci-content></div>
+  </dialog>
+  <script src="/js/interacoes-conteudo.js" defer></script>
+<% } %>
 </body>
 </html>

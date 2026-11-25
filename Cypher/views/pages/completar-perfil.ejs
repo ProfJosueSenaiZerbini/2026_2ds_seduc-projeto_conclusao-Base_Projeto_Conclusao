@@ -1,42 +1,44 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
+<div class="dc-shell pf-shell">
+  <a class="dc-skip" href="#progresso">Pular para o progresso</a>
   <%- include('../partials/barra-lateral', { path }) %>
-  <main class="main-shell">
-    <%- include('../partials/barra-superior', { breadcrumb: title }) %>
-    <div class="page-content">
-      <header class="page-header"><h1><%= title %></h1></header>
-      <form class="card-surface profile-edit-panel profile-edit-form profile-completion-form" method="post" action="/profile/completar">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <% if (erro) { %><p class="profile-message profile-message-error" role="alert"><%= erro %></p><% } %>
-        <% if (pendencias.includes('nome')) { %>
-          <label>Nome<input name="nomeInformado" value="<%= valores.nomeInformado %>" autocomplete="name" minlength="2" maxlength="80" required></label>
-        <% } %>
-        <% if (pendencias.includes('nascimento')) { %>
-          <label>Data de nascimento<input name="nascimento" value="<%= valores.nascimento %>" type="date" autocomplete="bday" max="<%= hoje %>" required></label>
-        <% } %>
-        <% if (pendencias.includes('nomePublico')) { %>
-          <fieldset class="profile-completion-choice">
-            <legend>Como você quer aparecer no Cypher?</legend>
-            <label><input name="nomePublico" type="radio" value="nome"<%= valores.nomePublico !== 'vulgo' ? ' checked' : '' %>> <%= usuario.nomeInformado || 'Usar meu nome' %></label>
-            <label><input name="nomePublico" type="radio" value="vulgo"<%= valores.nomePublico === 'vulgo' ? ' checked' : '' %>> <%= usuario.vulgo || 'Usar um vulgo' %></label>
-            <% if (!usuario.vulgo) { %>
-              <label class="profile-completion-vulgo">Seu vulgo<input name="vulgo" value="<%= valores.vulgo %>" minlength="2" maxlength="80"></label>
-              <script src="/js/completar-perfil.js" defer></script>
-            <% } %>
-          </fieldset>
-        <% } %>
-        <% if (pendencias.includes('cidade')) { %>
-          <label>Cidade e estado<input name="cidade" value="<%= valores.cidade %>" autocomplete="address-level2" maxlength="100" required></label>
-        <% } %>
-        <% if (pendencias.includes('biografia')) { %>
-          <label>Biografia<textarea name="biografia" rows="4" maxlength="500" required><%= valores.biografia %></textarea></label>
-        <% } %>
-        <div class="profile-completion-actions">
-          <button class="button button-lime" type="submit">Salvar e voltar à Descoberta</button>
-          <a class="button button-outline" href="/dashboard">Preencher depois</a>
+  <div class="dc-page">
+    <%- include('../partials/componentes/cabecalho-descoberta', {titulo: title, tituloId: 'titulo-progresso', descricao: ''}) %>
+    <main class="pf-page" id="progresso" aria-labelledby="titulo-progresso">
+      <section class="pf-panel profile-progress-details" aria-labelledby="progresso-essencial">
+        <header class="pf-section-head">
+          <h2 id="progresso-essencial">Informações essenciais</h2>
+          <a class="pf-link" href="/profile">Voltar ao perfil</a>
+        </header>
+        <div class="profile-progress-value">
+          <strong><%= completude.percentual %>% completo</strong>
+          <progress max="100" value="<%= completude.percentual %>" aria-labelledby="progresso-essencial"></progress>
         </div>
-      </form>
-    </div>
-  </main>
+        <% if (completude.pendencias.length) { %>
+          <ul class="profile-progress-links">
+            <% completude.pendencias.forEach(item => { %>
+              <li><a href="<%= item.url %>"><%= item.rotulo %> <%- icones.arrowRight %></a></li>
+            <% }); %>
+          </ul>
+        <% } else { %>
+          <p>Você preencheu as informações essenciais do seu perfil.</p>
+        <% } %>
+      </section>
+      <% if (completude.sugestoes.length) { %>
+        <section class="pf-panel profile-progress-details profile-progress-optional" aria-labelledby="progresso-desenvolvimento">
+          <header class="pf-section-head">
+            <h2 id="progresso-desenvolvimento">Desenvolvimento profissional</h2>
+          </header>
+          <p>Sugestões opcionais para aprofundar sua apresentação.</p>
+          <ul class="profile-progress-links">
+            <% completude.sugestoes.forEach(item => { %>
+              <li><a href="<%= item.url %>"><%= item.rotulo %> <%- icones.arrowRight %></a></li>
+            <% }); %>
+          </ul>
+        </section>
+      <% } %>
+    </main>
+    <%- include('../partials/navegacao-mobile', {rotaAtual: path}) %>
+  </div>
 </div>
 <%- include('../partials/fim-pagina') %>

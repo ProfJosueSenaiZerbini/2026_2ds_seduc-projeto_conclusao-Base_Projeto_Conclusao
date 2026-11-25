@@ -11,8 +11,8 @@ const profissoes = listarProfissoesCatalogo();
 assert.equal(grupos.length, 7, "O catálogo deve ter exatamente 7 grupos");
 assert.equal(
   profissoes.length,
-  26,
-  "O catálogo deve ter exatamente 26 profissões"
+  25,
+  "O catálogo deve ter exatamente 25 profissões"
 );
 assert.equal(
   new Set(grupos.map(grupo => grupo.id)).size,
@@ -42,5 +42,5 @@ for (const id of ["freestyler", "muralista", "artista-digital", "manager", "prod
 }
 
 console.log(
-  "OK: catálogo profissional com 7 grupos, 26 profissões e IDs estáveis."
+  "OK: catálogo profissional com 7 grupos, 25 profissões e IDs estáveis."
 );

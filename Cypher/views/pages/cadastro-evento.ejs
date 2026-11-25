@@ -1,274 +1,48 @@
-<%- include('../partials/cabecalho', { title, stylesheet }) %>
-<link rel="stylesheet" href="/css/descoberta.css">
-<link rel="stylesheet" href="/css/temas-evento-form.css">
-<div class="app-shell">
-<%- include('../partials/barra-lateral', { path }) %>
-<main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: editando ? 'Oportunidades / Editar' : 'Oportunidades / Cadastrar' }) %>
-<div class="page-content work-form-page">
-<a href="<%= origemEspaco ? '/espaco-de-trabalho' : '/events' %>" class="back-link">
-  <span class="lucide-icon" aria-hidden="true">
-    <%- icones.arrowLeft %>
-  </span>
-  <%= origemEspaco ? 'Voltar ao Espaço de Trabalho' : 'Voltar para Oportunidades' %>
-</a>
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      <%= editando ? 'ATUALIZAÇÃO DE EVENTO' : 'NOVO EVENTO' %>
-    </div>
-    <h1>
-      <%= editando ? 'Editar evento' : 'Cadastrar evento' %>
-    </h1>
-    <p>
-      Organize uma oportunidade real para a comunidade Cypher encontrar e acompanhar.
-    </p>
-  </div>
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<div class="dc-shell ev-page ev-editor">
+ <a class="dc-skip" href="#evento-editor">Pular para o formulário</a>
+ <%- include('../partials/barra-lateral',{path}) %>
+ <div class="dc-page">
+  <%- include('../partials/componentes/cabecalho-descoberta',{titulo:editando?'Editar evento':'Novo evento',tituloId:'titulo-evento-editor',descricao:'Um encontro da cena, com informações que orientam de verdade.'}) %>
+  <main class="dc-content" id="evento-editor" tabindex="-1">
+   <a class="ev-back" href="<%= origemEspaco?'/espaco-de-trabalho':'/events' %>"><%- icones.arrowLeft %> Voltar à agenda</a>
+   <% if(erro){ %><p class="ev-notice" role="alert"><%= erro %></p><% } %>
+   <form class="ev-form ev-editor-form" method="post" action="<%= editando?'/events/'+encodeURIComponent(eventoId)+'/edit':'/events/new' %>" data-event-form data-category-other-legacy-empty="<%= categoriaOutroLegadaVazia %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="versao" value="<%= valores.versao??1 %>">
+    <% if(origemEspaco){ %><input type="hidden" name="origem" value="espaco"><% } %>
+    <section class="ev-panel"><header class="dc-heading"><h2>01 · Apresente o encontro</h2></header><p class="ev-muted">Seu evento fica disponível na agenda e na Descoberta. Publique o que já está confirmado.</p><div class="ev-editor-grid">
+     <label class="ev-full">Título<input name="titulo" required minlength="2" maxlength="120" value="<%= valores.titulo %>" placeholder="Ex.: Batalha da Praça 011"></label>
+     <label>Categoria<select name="categoria" data-event-category-select required><option value="">Selecione</option><% categoriasEvento.forEach(v=>{ %><option value="<%= v %>"<% if(valores.categoria===v){ %> selected<% } %>><%= v %></option><% }) %></select></label>
+     <label>Situação<select name="situacao" required><% situacoesEvento.forEach(v=>{ %><option value="<%= v %>"<% if(valores.situacao===v){ %> selected<% } %>><%= v %></option><% }) %></select></label>
+     <label class="ev-full" data-event-category-other-field<% if(valores.categoria!=='Outro'){ %> hidden<% } %>>Especifique a categoria<span data-event-category-other-required<% if(categoriaOutroLegadaVazia){ %> hidden<% } %>>Obrigatório para “Outro”</span><input name="categoriaDetalhe" data-event-category-other-input minlength="2" maxlength="80" value="<%= valores.categoriaDetalhe %>"<% if(valores.categoria==='Outro'&&!categoriaOutroLegadaVazia){ %> required<% } %><% if(valores.categoria!=='Outro'){ %> disabled<% } %>></label>
+     <fieldset class="ev-full" data-workshop-types-field<% if(valores.categoria!=='Workshop'){ %> hidden<% } %>><legend>Áreas do workshop</legend><div class="ev-workshop-options"><% tiposWorkshop.forEach(v=>{ %><label class="ev-check workshop-type-option"><input type="checkbox" name="tiposWorkshop" value="<%= v %>"<% if(valores.tiposWorkshop.includes(v)){ %> checked<% } %>><span><%= v %></span></label><% }) %></div><small data-workshop-types-error role="status" hidden>Selecione pelo menos uma área.</small></fieldset>
+     <label class="ev-full">Descrição<textarea name="descricao" rows="4" maxlength="1000" placeholder="Explique a proposta e o público."><%= valores.descricao %></textarea></label>
+     <label>Organização responsável<input name="organizador" required minlength="2" maxlength="120" value="<%= valores.organizador %>"></label>
+     <label>Formato<input name="formato" required minlength="2" maxlength="120" value="<%= valores.formato %>" placeholder="Ex.: encontro presencial ou workshop online"></label>
+    </div></section>
+    <section class="ev-panel"><header class="dc-heading"><h2>02 · Data e localização</h2></header><div class="ev-editor-grid">
+     <label>Data de início<input type="date" name="data" required value="<%= valores.data %>"></label><label>Horário de início<input type="time" name="horario" required value="<%= /^\d{2}:\d{2}$/.test(valores.horario)?valores.horario:'' %>"></label>
+     <label>Data de término<input type="date" name="fimData" required value="<%= valores.fimData??'' %>"></label><label>Horário de término<input type="time" name="fimHorario" required value="<%= valores.fimHorario??'' %>"></label>
+     <label>Fuso do evento<select name="fuso"><% for(const z of ['America/Sao_Paulo','America/Manaus','America/Rio_Branco','America/Noronha','UTC']){ %><option value="<%= z %>"<% if(z===valores.fuso){ %> selected<% } %>><%= z %></option><% } %></select></label>
+     <label>Local ou link oficial<input name="local" required minlength="2" maxlength="160" value="<%= valores.local %>" placeholder="Endereço publicável ou link da sala online"></label>
+     <details class="ev-details ev-full"><summary>Localização no mapa · opcional</summary><p class="ev-muted">Informe somente coordenadas conferidas de um local que pode ser divulgado. Eventos online e locais não confirmados continuam na lista.</p><label class="ev-check"><input type="checkbox" name="localConfirmado" value="sim"<% if(valores.localConfirmado==='sim'){ %> checked<% } %>> Conferi o ponto e autorizo exibi-lo no mapa.</label><div class="ev-editor-grid"><label>Latitude<input type="number" step="any" min="-90" max="90" name="latitude" value="<%= valores.latitude??'' %>"></label><label>Longitude<input type="number" step="any" min="-180" max="180" name="longitude" value="<%= valores.longitude??'' %>"></label></div></details>
+     <details class="ev-details ev-full"><summary>Relacionar uma edição anterior · opcional</summary><label>Código da edição principal<input name="serieId" maxlength="100" value="<%= valores.serieId??'' %>"><small>Use o código no endereço de um evento da sua organização. Inscrições e presenças de cada edição permanecem independentes.</small></label></details>
+    </div></section>
+    <section class="ev-panel"><header class="dc-heading"><h2>03 · Participação</h2></header><div class="ev-editor-grid">
+     <label>Admissão<select name="tipoParticipacao" required><option value="aberta"<% if(valores.tipoParticipacao==='aberta'){ %> selected<% } %>>Aberta · confirmação até o limite de vagas</option><option value="aprovacao"<% if(valores.tipoParticipacao==='aprovacao'){ %> selected<% } %>>Mediante aprovação da organização</option></select></label>
+     <label>Limite de vagas <small>Em branco significa sem limite informado.</small><input type="number" name="capacidade" min="1" max="100000" step="1" value="<%= valores.capacidade??'' %>"></label>
+     <label class="ev-full">Critérios e regras de participação<textarea name="criterios" required minlength="10" maxlength="1500" rows="4" placeholder="Público, condições de acesso, critérios de aprovação e orientações de segurança."><%= valores.criterios??'' %></textarea></label>
+     <label>Informações de inscrição <small>Opcional</small><input name="inscricao" maxlength="240" value="<%= valores.inscricao %>"></label><label>Destaque ou prêmio <small>Opcional</small><input name="premio" maxlength="240" value="<%= valores.premio %>"></label>
+     <label class="ev-full">Etiquetas <small>Até oito, separadas por vírgula.</small><input name="etiquetas" maxlength="260" value="<%= valores.etiquetas %>"></label>
+    </div></section>
+    <section class="ev-panel"><header class="dc-heading"><h2>04 · Cartaz na agenda</h2></header><label>Cor de destaque<select name="cor" required><% coresEvento.forEach(c=>{ %><option value="<%= c %>"<% if(c===valores.cor){ %> selected<% } %>><%= ({yellow:'Amarelo',green:'Verde',cream:'Creme',blue:'Azul',violet:'Violeta',red:'Vermelho'})[c] %></option><% }) %></select></label>
+     <fieldset class="event-theme-fieldset"><legend>Tema do cartão</legend><div class="event-theme-options"><% temasEvento.forEach(t=>{ %><div class="event-theme-option"><label class="event-theme-choice"><input type="radio" name="temaCartao" value="<%= t.id %>" required<% if(temaSelecionado===t.id){ %> checked<% } %>><span><strong><%= t.nome %></strong><small><%= t.descricao %></small></span></label><div class="event-theme-preview" aria-hidden="true"><%- include('../partials/componentes/evento-descoberta',{previa:true,item:{temaCartao:t.id,categoria:valores.categoria,tipo:valores.categoria||'Batalha de rima',workshopTypes:valores.tiposWorkshop,titulo:valores.titulo||'Batalha da Praça',autor:valores.organizador,local:valores.local||'Local do evento',hora:valores.horario||'19:30',data:valores.data||'',dia:valores.data?valores.data.slice(8):'DD',mes:'DATA',dataCurta:valores.data,cor:valores.cor}}) %></div></div><% }) %></div></fieldset>
+    </section>
+    <div class="ev-editor-actions"><a class="ev-secondary" href="<%= editando?'/events/'+encodeURIComponent(eventoId):'/events' %>">Cancelar</a><button class="dc-primary" type="submit"><%- icones.circleCheck %> <%= editando?'Salvar e comunicar alterações':'Publicar evento' %></button></div>
+   </form>
+  </main>
+  <%- include('../partials/navegacao-mobile',{rotaAtual:'/events'}) %>
+ </div>
 </div>
-<% if (erro) { %>
-  <div class="form-feedback error-feedback" role="alert">
-    <span class="lucide-icon" aria-hidden="true">
-      <%- icones.circleHelp %>
-    </span>
-    <%= erro %>
-  </div>
-<% } %>
-<div class="work-form-notice">
-  <span class="lucide-icon" aria-hidden="true">
-    <%- icones.calendarCheck %>
-  </span>
-  <div>
-    <strong>
-      Evento público
-    </strong>
-    <p>
-      O evento ficará disponível na descoberta de oportunidades. Revise os dados antes de publicar.
-    </p>
-  </div>
-</div>
-<form class="work-form" method="post" action="<%= editando ? `/events/${encodeURIComponent(eventoId)}/edit` : '/events/new' %>" data-event-form data-category-other-legacy-empty="<%= categoriaOutroLegadaVazia %>">
-  <section class="form-section">
-    <div class="form-section-heading">
-      <span class="form-step">
-        01
-      </span>
-      <div>
-        <h2>
-          Identidade do evento
-        </h2>
-        <p>
-          Comece pelos dados que apresentam a oportunidade.
-        </p>
-      </div>
-    </div>
-    <div class="form-grid">
-      <label class="field-full">
-        Título
-        <span class="required-mark">
-          *
-        </span>
-        <input name="titulo" required minlength="2" maxlength="120" value="<%= valores.titulo %>" placeholder="Ex.: Batalha da Praça 011">
-      </label>
-      <label>
-        Categoria
-        <span class="required-mark">
-          *
-        </span>
-        <select name="categoria" data-event-category-select required>
-          <option value="">
-            Selecione
-          </option>
-          <% categoriasEvento.forEach(categoria => { %>
-            <option value="<%= categoria %>"<%= valores.categoria === categoria ? 'selected' : '' %>>
-              <%= categoria %>
-            </option>
-          <% }) %>
-        </select>
-      </label>
-      <label class="field-full" data-event-category-other-field<%= valores.categoria === 'Outro' ? '' : ' hidden' %>>
-        Especifique a categoria do evento
-        <span class="required-mark" data-event-category-other-required<%= categoriaOutroLegadaVazia ? ' hidden' : '' %>*</span>
-        <input name="categoriaDetalhe" data-event-category-other-input minlength="2" maxlength="80" value="<%= valores.categoriaDetalhe %>"<%= valores.categoria === 'Outro' && !categoriaOutroLegadaVazia ? ' required' : '' %><%= valores.categoria === 'Outro' ? '' : ' disabled' %> placeholder="Ex.: encontro de DJs, feira de música independente">
-        <small>O detalhe será exibido junto ao evento; a categoria continua “Outro” para os filtros e relatórios.</small>
-      </label>
-      <fieldset class="workshop-type-fieldset field-full" data-workshop-types-field<%= valores.categoria === 'Workshop' ? '' : ' hidden' %> aria-describedby="workshop-types-help workshop-types-error">
-        <legend>Tipo de workshop <span class="required-mark">*</span></legend>
-        <p id="workshop-types-help">Selecione uma ou mais áreas.</p>
-        <div class="workshop-type-options">
-          <% tiposWorkshop.forEach(tipo => { %>
-            <label class="workshop-type-option<%= valores.tiposWorkshop.includes(tipo) ? ' selected' : '' %>">
-              <input type="checkbox" name="tiposWorkshop" value="<%= tipo %>"<%= valores.tiposWorkshop.includes(tipo) ? ' checked' : '' %>>
-              <span><%= tipo %></span>
-            </label>
-          <% }) %>
-        </div>
-        <small id="workshop-types-error" data-workshop-types-error role="status" hidden>Selecione pelo menos um tipo de workshop.</small>
-      </fieldset>
-      <label>
-        Situação
-        <span class="required-mark">
-          *
-        </span>
-        <select name="situacao" required>
-          <% situacoesEvento.forEach(situacao => { %>
-            <option value="<%= situacao %>"<%= valores.situacao === situacao ? 'selected' : '' %>>
-              <%= situacao %>
-            </option>
-          <% }) %>
-        </select>
-      </label>
-      <label>
-        Participação
-        <span class="required-mark">
-          *
-        </span>
-        <select name="tipoParticipacao" required>
-          <option value="aberta"<%= valores.tipoParticipacao === 'aberta' ? 'selected' : '' %>>
-            Aberta — participação registrada na hora
-          </option>
-          <option value="aprovacao"<%= valores.tipoParticipacao === 'aprovacao' ? 'selected' : '' %>>
-            Mediante aprovação — solicitar participação
-          </option>
-        </select>
-      </label>
-      <label>
-        Data
-        <span class="required-mark">
-          *
-        </span>
-        <input type="date" name="data" required value="<%= valores.data %>">
-      </label>
-      <label>
-        Horário
-        <span class="optional-mark">
-          Opcional
-        </span>
-        <input name="horario" maxlength="20" value="<%= valores.horario %>" placeholder="Ex.: 19h30">
-      </label>
-      <label class="field-full">
-        Local ou link
-        <span class="required-mark">
-          *
-        </span>
-        <input name="local" required maxlength="160" value="<%= valores.local %>" placeholder="Ex.: Galpão 9 · Belo Horizonte, MG">
-      </label>
-    </div>
-  </section>
-  <section class="form-section">
-    <div class="form-section-heading">
-      <span class="form-step">
-        02
-      </span>
-      <div>
-        <h2>
-          Organização
-        </h2>
-        <p>
-          Ajude as pessoas a entenderem quem realiza e como participar.
-        </p>
-      </div>
-    </div>
-    <div class="form-grid">
-      <label>
-        Organizador
-        <span class="required-mark">
-          *
-        </span>
-        <input name="organizador" required maxlength="120" value="<%= valores.organizador %>" placeholder="Nome do coletivo ou organização">
-      </label>
-      <label>
-        Formato
-        <span class="required-mark">
-          *
-        </span>
-        <input name="formato" required maxlength="120" value="<%= valores.formato %>" placeholder="Ex.: Workshop online · 90 minutos">
-      </label>
-      <label class="field-full">
-        Descrição
-        <span class="optional-mark">
-          Opcional
-        </span>
-        <textarea name="descricao" rows="5" maxlength="1000" placeholder="Explique a proposta e para quem é o evento.">
-          <%= valores.descricao %>
-        </textarea>
-      </label>
-      <label>
-        Inscrições
-        <span class="optional-mark">
-          Opcional
-        </span>
-        <input name="inscricao" maxlength="240" value="<%= valores.inscricao %>" placeholder="Ex.: Gratuita · vagas limitadas">
-      </label>
-      <label>
-        Destaque ou prêmio
-        <span class="optional-mark">
-          Opcional
-        </span>
-        <input name="premio" maxlength="240" value="<%= valores.premio %>" placeholder="Ex.: Troféu e divulgação">
-      </label>
-      <label class="field-full">
-        Etiquetas
-        <span class="optional-mark">
-          Separadas por vírgula
-        </span>
-        <input name="etiquetas" maxlength="260" value="<%= valores.etiquetas %>" placeholder="Ex.: MCs, Presencial, Inscrições abertas">
-      </label>
-      <label>
-        Cor visual
-        <span class="required-mark">
-          *
-        </span>
-        <select name="cor" required>
-          <% coresEvento.forEach(cor => { %>
-            <option value="<%= cor %>"<%= valores.cor === cor ? 'selected' : '' %>>
-              <%= cor === 'yellow' ? 'Amarela' : cor === 'green' ? 'Verde' : cor === 'cream' ? 'Creme' : cor === 'blue' ? 'Azul' : cor === 'violet' ? 'Violeta' : 'Vermelha' %>
-            </option>
-          <% }) %>
-        </select>
-      </label>
-    </div>
-  </section>
-  <fieldset class="form-section event-theme-fieldset">
-    <legend>Tema do cartão</legend>
-    <div class="event-theme-options dc-shell">
-      <% temasEvento.forEach(tema => { %>
-        <div class="event-theme-option">
-          <label class="event-theme-choice">
-            <input type="radio" name="temaCartao" value="<%= tema.id %>"<% if (temaSelecionado === tema.id) { %> checked<% } %> required>
-            <span><strong><%= tema.nome %></strong><small><%= tema.descricao %></small></span>
-          </label>
-          <div class="event-theme-preview" aria-hidden="true">
-            <%- include('../partials/componentes/evento-descoberta', {
-              previa: true,
-              item: {
-                temaCartao: tema.id, categoria: valores.categoria, tipo: valores.categoria || 'Batalha de rima', workshopTypes: valores.tiposWorkshop,
-                titulo: valores.titulo || 'Batalha da Praça', autor: valores.organizador,
-                local: valores.local || 'Praça Roosevelt, São Paulo', hora: valores.horario || '19h30',
-                data: '2026-11-23', dia: '23', mes: 'NOV', dataCurta: '23 de novembro', cor: valores.cor
-              }
-            }) %>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-  </fieldset>
-  <div class="work-form-actions">
-    <a class="button button-outline" href="<%= origemEspaco ? '/espaco-de-trabalho' : '/events' %>">
-      Cancelar
-    </a>
-    <button class="button button-lime" type="submit">
-      <span class="lucide-icon" aria-hidden="true">
-        <%- icones.circleCheck %>
-      </span>
-      <%= editando ? 'Salvar alterações' : 'Publicar evento' %>
-    </button>
-  </div>
-  <% if (origemEspaco) { %><input type="hidden" name="origem" value="espaco"><% } %>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-</form>
-</div>
-</main>
-</div>
-<script src="/js/temas-evento.js" defer></script>
-<script src="/js/descoberta.js" defer></script>
+<script src="/js/temas-evento.js" defer></script><script src="/js/descoberta.js" defer></script>
 <%- include('../partials/fim-pagina') %>

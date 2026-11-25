@@ -16,7 +16,6 @@
   <div class="dc-page">
     <%- include('../partials/componentes/cabecalho-descoberta', {
       titulo: 'Descoberta', tituloId: 'titulo-descoberta', descricao: 'Obras, artistas, profissionais e a cultura em movimento.',
-      busca: { acao: '/dashboard', termo: q, limite: 100, rotulo: 'Buscar na Cypher', filtros: { tipo: categoria === 'tudo' ? '' : categoria, detalhe } }
     }) %>
     <main class="dc-content" id="conteudo-descoberta" tabindex="-1">
       <%- include('../partials/componentes/completar-identidade', { usuario }) %>
@@ -66,16 +65,10 @@
               </a><% }) %>
               </div>
               <div class="dc-feature-nav" role="group" aria-label="Navegar pelos destaques" hidden>
-                <button class="dc-feature-arrow dc-feature-prev" type="button" aria-label="Destaque anterior" aria-controls="destaques-conteudo"><%- icones.arrowLeft %></button>
-                <div class="dc-dots" role="radiogroup" aria-label="Escolher destaque">
-                  <% destaques.forEach((slide,i) => { %>
-                    <label class="dc-dot dc-dot-<%= i % 2 === 0 ? 'green' : 'yellow' %>">
-                      <input type="radio" name="destaque" aria-label="Destaque <%= i + 1 %> de <%= destaques.length %>: <%= slide.titulo %>" aria-controls="destaques-conteudo"<% if (i === 0) { %> checked<% } %>>
-                    </label>
-                  <% }) %>
-                </div>
-                <button class="dc-feature-arrow dc-feature-next" type="button" aria-label="Próximo destaque" aria-controls="destaques-conteudo"><%- icones.arrowRight %></button>
-                <span class="dc-feature-status" role="status" aria-live="polite" aria-atomic="true"></span>
+                <div class="dc-feature-toolbar"><div><span class="dc-feature-caption">SEU PRÓXIMO ENCONTRO</span><span class="dc-feature-counter" aria-hidden="true">01 / <%= String(destaques.length).padStart(2,'0') %></span></div><div class="dc-feature-controls"><button class="dc-feature-arrow dc-feature-prev" type="button" aria-label="Destaque anterior" aria-controls="destaques-conteudo"><%- icones.arrowLeft %></button><button class="dc-feature-arrow dc-feature-next" type="button" aria-label="Próximo destaque" aria-controls="destaques-conteudo"><%- icones.arrowRight %></button></div></div>
+                <div class="dc-feature-choices" role="radiogroup" aria-label="Escolher destaque">
+                  <% destaques.forEach((slide,i) => { %><label class="dc-feature-choice"><input type="radio" name="destaque" aria-label="Destaque <%= i + 1 %> de <%= destaques.length %>: <%= slide.titulo %>" aria-controls="destaques-conteudo"<% if(i===0){ %> checked<% } %>><% if(slide.foto){ %><img src="/img/<%= slide.foto %>" alt="" loading="lazy"><% } %><span><small><%= slide.acao.replace(/^Ver /,'') %></small><strong><%= slide.titulo %></strong></span></label><% }) %>
+                </div><span class="dc-feature-status" role="status" aria-live="polite" aria-atomic="true"></span>
               </div>
             </section>
             <% } %>
@@ -89,7 +82,7 @@
                 <% }); } %>
               </div>
             </section>
-            <section><% cabecao('Profissionais para colaborar', '/search'); %>
+            <section><% cabecao('Profissionais para colaborar', '/search?tipo=pessoas'); %>
               <% if (pessoas.length) { %><div class="dc-people"><% pessoas.slice(0,3).forEach(item => { %><%- include('../partials/componentes/item-descoberta', { item }) %><% }) %></div>
               <% } else { %><div class="dc-empty"><%- icones.users %><div><strong>Novos nomes por aqui em breve</strong><p>Os perfis públicos de outros profissionais aparecem aqui.</p></div></div><% } %>
             </section>
@@ -130,8 +123,9 @@
             </section>
             <section class="dc-panel dc-guide">
               <div class="dc-heading"><h2>Cypher Central</h2><a class="dc-central-info" href="/central" aria-label="Abrir Cypher Central" title="Abrir Cypher Central"><span aria-hidden="true">&#128712;</span></a></div>
+              <% if(!guias.length){ %><p class="dc-empty">Os guias publicados pela equipe aparecerão aqui.</p><% } %>
               <% guias.forEach(guia => { %>
-                <%- include('../partials/componentes/cartao-central', { rotulo: 'Guia da cena', titulo: guia.q, descricao: guia.a, href: '/central' }) %>
+                <%- include('../partials/componentes/cartao-central', { rotulo: 'Guia da cena', titulo: guia.q, descricao: guia.a, href: guia.href }) %>
               <% }); %>
             </section>
           </aside>

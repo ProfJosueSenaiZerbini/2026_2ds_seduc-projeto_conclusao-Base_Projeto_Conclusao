@@ -1,8 +1,9 @@
 <%
   const ficha = typeof evento !== 'undefined' && evento;
+  const cartazUsuario=typeof capaUsuario==='function'?(ficha?.id?capaUsuario('evento',ficha.id):item.id?capaUsuario('evento',item.id):''):'';
   const amostra = typeof previa !== 'undefined' && previa;
-  const elemento = amostra ? 'div' : ficha ? 'button' : 'a';
-  const capaVazia = (ficha || amostra) && !item.fotoDestaque;
+  const elemento = amostra ? 'div' : ficha && ficha.demonstracao ? 'button' : 'a';
+  const capaVazia = (ficha || amostra) && !item.fotoDestaque && !cartazUsuario;
   const metadados = [item.autor, item.local, item.hora, item.status].filter(Boolean);
   const cartazWorkshop = item.temaCartao === 'cartaz-de-rua' && item.categoria === 'Workshop';
   const tiposWorkshop = item.workshopTypes?.length
@@ -13,8 +14,11 @@
   <<%= elemento %> class="dc-event-card<%= capaVazia ? ' events-card-placeholder' : '' %>"
     data-event-theme="<%= item.temaCartao ?? 'classico' %>"
     data-event-category="<%= item.categoria %>"
-    <% if (item.fotoDestaque) { %>data-event-cover data-event-cover-src="/img/descoberta/<%= item.fotoDestaque %>" style="--dc-event-photo: url('/img/descoberta/<%= item.fotoDestaque %>')"<% } %>
-    <% if (ficha) { %>
+    <% if (cartazUsuario || item.fotoDestaque) { const fotoCartaz = cartazUsuario || '/img/'+(item.fotoDestaque.includes('/') ? item.fotoDestaque : 'descoberta/'+item.fotoDestaque); %>data-event-cover data-event-cover-src="<%= fotoCartaz %>" style="--dc-event-photo: url('<%= fotoCartaz %>')"<% } %>
+    <% if (ficha && !ficha.demonstracao) { %>
+      id="evento-<%= ficha.id %>"
+      href="/events/<%= encodeURIComponent(ficha.id) %>"
+    <% } else if (ficha) { %>
       type="button"
       id="evento-<%= ficha.id %>"
       aria-haspopup="dialog"
@@ -43,7 +47,7 @@
       data-detail-tags="<%= ficha.tags.join('|') %>"
     <% } else if (!amostra) { %>href="<%= item.url %>"<% } %>
   >
-    <% if (capaVazia) { %>
+    <% if (capaVazia && !cartazUsuario) { %>
       <span class="events-cover-icon" aria-hidden="true"><%- icones.calendarDays %></span>
     <% } %>
     <% if (item.dia && item.mes) { %>
@@ -75,4 +79,6 @@
       </span>
     </span>
   </<%= elemento %>>
+  <% if (ficha?.demonstracao && !amostra) { %><%- include('acoes-conteudo', { tipo:'evento', id:ficha.id }) %><% } %>
+  <% if(ficha&&!amostra&&!ficha.demonstracao){ %><a class="cy-report-link" href="/suporte/new?objeto_tipo=evento&amp;objeto_id=<%= encodeURIComponent(ficha.id) %>">Denunciar evento</a><% } %>
 </div>

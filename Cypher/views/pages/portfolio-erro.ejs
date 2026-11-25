@@ -1,0 +1,5 @@
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<div class="dc-shell pf-shell"><%- include('../partials/barra-lateral',{path}) %><div class="dc-page">
+<%- include('../partials/componentes/cabecalho-descoberta',{titulo:'Portfólio',tituloId:'pf-titulo',descricao:'Trabalhos e contribuições profissionais.'}) %>
+<main class="pf-page"><section class="pf-empty"><span class="lucide-icon" aria-hidden="true"><%- icones.eyeOff %></span><h2>Não foi possível abrir o portfólio</h2><p role="alert"><%= erro %></p><a class="pf-button" href="/dashboard">Voltar à Descoberta</a></section></main>
+<%- include('../partials/navegacao-mobile',{rotaAtual:path}) %></div></div><%- include('../partials/fim-pagina') %>
