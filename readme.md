@@ -69,6 +69,8 @@ Ou, pelo **phpMyAdmin / MySQL Workbench**, abra o arquivo `schema.sql` e execute
 
 > **Banco já criado antes do cancelamento de bico?** Execute uma vez `migrations/001_estorno.sql` (adiciona o tipo `ESTORNO` à tabela `movimentacoes_carteira`). Quem criou o banco com o `schema.sql` atual não precisa.
 
+> **Banco criado antes da foto de perfil?** Execute uma vez `migrations/004_foto_perfil.sql` (cria a tabela `fotos_perfil`). As demais migrações estão descritas em `Docs/Scripts Banco Dados/readme.md`.
+
 ### 4. 🔐 Configure as variáveis de ambiente
 
 Crie um arquivo chamado `.env` na raiz do projeto com as seguintes variáveis:

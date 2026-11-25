@@ -3,6 +3,8 @@ import pool from '../config/database.js';
 import { validarEmail, validarIdade, validarNome, validarSenha } from '../validations/usuarioValidation.js';
 import { buscarReputacao } from './reputacao.js';
 import { renovarSessao, versaoDaSenha } from '../services/sessaoService.js';
+import { detectarTipoImagem, urlDaFoto } from '../services/fotoPerfil.js';
+import { definirAlerta } from '../middleware/sessaoMiddleware.js';
 
 const MESES = [
     'janeiro',
@@ -36,7 +38,12 @@ export const exibirPerfil = async (req, res) => {
     if (!sessao) return res.redirect('/login');
     try {
         const rows = await pool.query(
-            "SELECT id, nome, email, cpf, idade, tipo_perfil, saldo_simulado, criado_em, DATE_FORMAT(criado_em, '%d/%m/%Y') AS data_cadastro_formatada FROM usuarios WHERE id = ?",
+            `SELECT u.id, u.nome, u.email, u.cpf, u.idade, u.tipo_perfil, u.saldo_simulado, u.criado_em,
+                    DATE_FORMAT(u.criado_em, '%d/%m/%Y') AS data_cadastro_formatada,
+                    f.atualizado_em AS foto_atualizada_em
+             FROM usuarios u
+             LEFT JOIN fotos_perfil f ON f.usuario_id = u.id
+             WHERE u.id = ?`,
             [sessao.id || sessao.id_usuario]
         );
         const usuario = rows[0];
@@ -50,7 +57,8 @@ export const exibirPerfil = async (req, res) => {
                 usuario,
                 reputacao,
                 membroDesde: formatarMembroDesde(usuario.criado_em),
-                membroRecente: cadastroRecente(usuario.criado_em)
+                membroRecente: cadastroRecente(usuario.criado_em),
+                fotoUrl: urlDaFoto(usuario.id, usuario.foto_atualizada_em)
             });
         }
         return res.status(403).send('Acesso negado para o perfil desta conta.');
@@ -127,6 +135,94 @@ export const criarAtualizadorSenha =
     };
 export const atualizarSenha = criarAtualizadorSenha(pool, bcrypt);
 
+// Foto de perfil (contratante e trabalhador). A imagem fica em fotos_perfil; quem não tem foto aparece com
+// as iniciais. As recusas voltam para /perfil com o alerta da página (padrão "flash").
+export const MENSAGENS_FOTO = Object.freeze({
+    semArquivo: 'Escolha uma imagem para a foto de perfil.',
+    tipoInvalido: 'A foto precisa ser uma imagem JPG, PNG ou WebP.',
+    grandeDemais: 'A foto pode ter no máximo 2 MB.',
+    erroInterno: 'Não foi possível salvar a foto agora. Tente novamente.'
+});
+
+const usuarioDaSessao = (req) => {
+    const id = Number(req.session?.usuario?.id || req.session?.usuario?.id_usuario);
+    return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+export const recusarFoto = (req, res, mensagem) => {
+    definirAlerta(req, { tipo: 'erro', mensagem });
+    return res.redirect('/perfil');
+};
+
+// POST /perfil/foto (multipart, campo "foto"); o arquivo chega em req.file pelo multer (routes/perfilRoutes.js).
+export const criarSalvadorFoto = (banco) => async (req, res) => {
+    const usuarioId = usuarioDaSessao(req);
+    if (!usuarioId) return res.redirect('/login');
+
+    const dados = req.file?.buffer;
+    if (!dados || dados.length === 0) return recusarFoto(req, res, MENSAGENS_FOTO.semArquivo);
+
+    const tipo = detectarTipoImagem(dados);
+    if (!tipo) return recusarFoto(req, res, MENSAGENS_FOTO.tipoInvalido);
+
+    try {
+        await banco.query(
+            `INSERT INTO fotos_perfil (usuario_id, tipo, dados)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE tipo = VALUES(tipo), dados = VALUES(dados)`,
+            [usuarioId, tipo, dados]
+        );
+        return res.redirect('/perfil');
+    } catch (erro) {
+        console.error('Erro ao salvar a foto de perfil:', erro?.code || 'erro inesperado');
+        return recusarFoto(req, res, MENSAGENS_FOTO.erroInterno);
+    }
+};
+export const salvarFoto = criarSalvadorFoto(pool);
+
+// POST /perfil/foto/remover: apaga só a foto de quem está logado.
+export const criarRemovedorFoto = (banco) => async (req, res) => {
+    const usuarioId = usuarioDaSessao(req);
+    if (!usuarioId) return res.redirect('/login');
+
+    try {
+        await banco.query('DELETE FROM fotos_perfil WHERE usuario_id = ?', [usuarioId]);
+        return res.redirect('/perfil');
+    } catch (erro) {
+        console.error('Erro ao remover a foto de perfil:', erro?.code || 'erro inesperado');
+        return recusarFoto(req, res, MENSAGENS_FOTO.erroInterno);
+    }
+};
+export const removerFoto = criarRemovedorFoto(pool);
+
+// GET /perfil/:id/foto: a imagem, para quem está logado (o perfil público também exige login).
+// O tipo salvo veio da detecção dos bytes; nosniff impede o navegador de tratar o arquivo como outra coisa.
+export const criarServidorFoto = (banco) => async (req, res) => {
+    const idRecebido = req.params?.id;
+    const usuarioId = typeof idRecebido === 'string' && /^\d+$/.test(idRecebido) ? Number(idRecebido) : NaN;
+
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0 || usuarioId > 2147483647) {
+        return res.status(400).send('Identificador de usuário inválido.');
+    }
+
+    try {
+        const linhas = await banco.query('SELECT tipo, dados FROM fotos_perfil WHERE usuario_id = ?', [usuarioId]);
+        const foto = linhas[0];
+        if (!foto) return res.status(404).send('Foto não encontrada.');
+
+        res.set({
+            'Content-Type': foto.tipo,
+            'X-Content-Type-Options': 'nosniff',
+            'Cache-Control': 'private, max-age=86400'
+        });
+        return res.send(foto.dados);
+    } catch (erro) {
+        console.error('Erro ao carregar a foto de perfil:', erro?.code || 'erro inesperado');
+        return res.status(500).send('Erro ao carregar a foto.');
+    }
+};
+export const servirFoto = criarServidorFoto(pool);
+
 // Perfil público de trabalhador ou contratante. Expõe SOMENTE: nome, tipo de perfil, membro desde, último
 // serviço concluído, indicadores de reputação (média, distribuição das notas, bicos) e as avaliações recebidas.
 // Nunca devolve e-mail, CPF, idade ou saldo (as consultas nem selecionam essas colunas).
@@ -140,9 +236,10 @@ export const exibirPerfilPublico = async (req, res) => {
 
     try {
         const usuarios = await pool.query(
-            `SELECT id, nome, LOWER(tipo_perfil) AS tipo_perfil, criado_em
-             FROM usuarios
-             WHERE id = ? AND LOWER(tipo_perfil) IN ('trabalhador', 'contratante')
+            `SELECT u.id, u.nome, LOWER(u.tipo_perfil) AS tipo_perfil, u.criado_em, f.atualizado_em AS foto_atualizada_em
+             FROM usuarios u
+             LEFT JOIN fotos_perfil f ON f.usuario_id = u.id
+             WHERE u.id = ? AND LOWER(u.tipo_perfil) IN ('trabalhador', 'contratante')
              LIMIT 1`,
             [usuarioId]
         );
@@ -177,6 +274,7 @@ export const exibirPerfilPublico = async (req, res) => {
                 rotuloTipo: perfil.tipo_perfil === 'trabalhador' ? 'Trabalhador' : 'Contratante',
                 membroDesde: formatarMembroDesde(perfil.criado_em)
             },
+            fotoUrl: urlDaFoto(perfil.id, perfil.foto_atualizada_em),
             reputacao,
             avaliacoes: avaliacoes.map((avaliacao) => ({
                 ...avaliacao,

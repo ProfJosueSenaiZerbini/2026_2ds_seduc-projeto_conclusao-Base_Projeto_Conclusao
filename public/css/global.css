@@ -852,3 +852,86 @@ body:has(.contractor-sidebar.is-collapsed) {
     gap: 24px;
   }
 }
+
+/* =========================================================
+   FOTO DE PERFIL (perfis privados e perfil público)
+   ========================================================= */
+
+/* Conteúdo do quadro do avatar: a foto preenche o quadro; sem foto, as iniciais herdam a fonte dele. */
+.perfil-avatar-miolo.avatar-foto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.perfil-avatar-miolo.avatar-iniciais {
+  line-height: 1;
+}
+
+/* Botões "Adicionar/Trocar foto" e "Remover foto" sobre o banner escuro dos perfis privados. */
+.foto-perfil-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 14px;
+}
+
+.foto-perfil-form {
+  margin: 0;
+}
+
+.foto-perfil-form.enviando {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.foto-perfil-botao {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--cor-branco-a35);
+  border-radius: 999px;
+  background: var(--cor-branco-a12);
+  color: var(--cor-branco);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.foto-perfil-botao:hover {
+  background: var(--cor-branco-a22);
+}
+
+.foto-perfil-botao--secundario {
+  background: transparent;
+}
+
+/* O input fica invisível sobre o rótulo, mas continua focável pelo teclado. */
+.foto-perfil-arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.foto-perfil-botao:focus-within,
+.foto-perfil-botao:focus-visible {
+  outline: 2px solid var(--cor-branco);
+  outline-offset: 2px;
+}
+
+.foto-perfil-dica {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--cor-branco-a85);
+  font-size: 12px;
+}

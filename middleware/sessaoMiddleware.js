@@ -1,5 +1,6 @@
 import pool from '../config/database.js';
 import { renovarSessao, versaoDaSenha } from '../services/sessaoService.js';
+import { urlDaFoto } from '../services/fotoPerfil.js';
 
 export const MENSAGEM_SESSAO_ENCERRADA = 'Sua senha foi alterada ou a conta não existe mais. Entre novamente.';
 
@@ -27,6 +28,7 @@ const encerrarSessao = async (req, res) => {
 // sessão) ou a conta sumiu, a sessão é renovada sem usuário e o requireAuth da rota manda para o login.
 export const criarCarregadorDadosDaSessao = (banco) => async (req, res, next) => {
     res.locals.alerta = null;
+    res.locals.fotoPerfilUrl = null;
 
     // Só uma página (GET) consome o alerta: não conta JSON/polling do chat nem arquivos como /favicon.ico.
     const pedePaginaHtml =
@@ -43,7 +45,14 @@ export const criarCarregadorDadosDaSessao = (banco) => async (req, res, next) =>
     if (!usuario?.id) return next();
 
     try {
-        const linhas = await banco.query('SELECT saldo_simulado, senha FROM usuarios WHERE id = ?', [usuario.id]);
+        // Na mesma consulta: o saldo, a versão da senha (#162) e a data da foto de perfil (barra lateral).
+        const linhas = await banco.query(
+            `SELECT u.saldo_simulado, u.senha, f.atualizado_em AS foto_atualizada_em
+             FROM usuarios u
+             LEFT JOIN fotos_perfil f ON f.usuario_id = u.id
+             WHERE u.id = ?`,
+            [usuario.id]
+        );
 
         if (!linhas[0] || req.session.versaoSenha !== versaoDaSenha(linhas[0].senha)) {
             await encerrarSessao(req, res);
@@ -53,6 +62,7 @@ export const criarCarregadorDadosDaSessao = (banco) => async (req, res, next) =>
         const saldo = Number(linhas[0].saldo_simulado);
         if (Number(usuario.saldo_simulado) !== saldo) usuario.saldo_simulado = saldo;
         res.locals.saldoAtual = saldo;
+        res.locals.fotoPerfilUrl = urlDaFoto(usuario.id, linhas[0].foto_atualizada_em);
     } catch (erro) {
         // Sem o saldo novo a página ainda funciona com o valor da sessão (como antes; a conferência da senha
         // fica para a próxima requisição).
