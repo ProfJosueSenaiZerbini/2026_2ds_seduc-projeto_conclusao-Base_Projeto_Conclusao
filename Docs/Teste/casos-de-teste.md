@@ -55,8 +55,8 @@ Todos os valores financeiros são **simulados** (não existe pagamento real).
 
 ## CT03 – Login válido/inválido e rota interna sem login
 **Procedimento:** (a) entrar com e-mail e senha corretos; (b) entrar com e-mail não cadastrado, senha incorreta ou perfil trocado; (c) acessar `/homeContratante` sem estar logado.
-**Resultado esperado:** (a) vai para a home do perfil; (b) permanece em `/login` com mensagem ("E-mail não cadastrado!", "Senha incorreta!" ou "Sua conta está cadastrada como …"); (c) redireciona para `/login`.
-**Status:** Aprovado. E2E em `auth/roteiro-cadastro-login.spec.js`: senha errada ("Senha incorreta!", permanece em `/login`); e-mail não cadastrado e perfil trocado; rotas internas sem login redirecionam (302) para `/login`; após o logout a rota interna volta a redirecionar. Login válido nos E2E de cadastro e login.
+**Resultado esperado:** (a) vai para a home do perfil; (b) permanece em `/login` com a mesma mensagem para e-mail não cadastrado e senha incorreta ("E-mail ou senha incorretos.", para não revelar quais e-mails têm conta) ou, com a senha certa e o perfil trocado, "Sua conta está cadastrada como …"; depois de 5 falhas do mesmo IP e e-mail em 15 minutos, o login fica bloqueado (HTTP 429) até a janela vencer; (c) redireciona para `/login`.
+**Status:** Aprovado. E2E em `auth/roteiro-cadastro-login.spec.js`: senha errada ("E-mail ou senha incorretos.", permanece em `/login`); e-mail não cadastrado e perfil trocado; rotas internas sem login redirecionam (302) para `/login`; após o logout a rota interna volta a redirecionar. Login válido nos E2E de cadastro e login.
 
 ## CT04 – Acesso a rota de outro perfil
 **Procedimento:** logado como trabalhador, abrir `/homeContratante`, `/bicos/novo` e `/carteira/contratante`; logado como contratante, abrir `/hometrabalhador` e `/carteira/trabalhador`.

@@ -111,7 +111,7 @@ test.describe('Seletor de perfil mostra só a ave do perfil', () => {
         // Contratar: araponga, triste.
         await enviar('#btnHire');
         const alerta = page.locator('#alerta-sistema');
-        await expect(alerta).toContainText('E-mail não cadastrado!');
+        await expect(alerta).toContainText('E-mail ou senha incorretos.');
         await expect(alerta.locator('.mascote:visible')).toHaveCount(1);
         await expect(alerta.locator('.mascote.araponga')).toBeVisible();
         await expect(alerta.locator('.mascote.araponga')).toHaveClass(/estado-triste/);

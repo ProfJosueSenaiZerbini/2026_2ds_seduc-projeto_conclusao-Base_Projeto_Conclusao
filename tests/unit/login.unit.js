@@ -157,3 +157,196 @@ describe('login renova a sessão (#161)', () => {
         assert.equal(sessao.versaoSenha, undefined);
     });
 });
+
+// ------------------------------------------------- mensagem única e limite de tentativas (#160)
+const { MENSAGEM_LOGIN_INVALIDO, MENSAGEM_LOGIN_BLOQUEADO } = await import('../../controllers/authController.js');
+const { criarLimitadorTentativas, MAXIMO_TENTATIVAS_LOGIN, JANELA_TENTATIVAS_LOGIN_MS } =
+    await import('../../services/limiteTentativas.js');
+
+// Relógio controlado pelo teste.
+const criarRelogio = () => {
+    let instante = 1_000_000;
+    return { agora: () => instante, avancar: (ms) => (instante += ms) };
+};
+
+// Banco falso: só a conta ana@exemplo.com existe. Conta as consultas.
+const criarBancoLogin = () => {
+    const banco = {
+        consultas: 0,
+        query: async (_sql, [email]) => {
+            banco.consultas += 1;
+            return email === 'ana@exemplo.com' ? [{ ...usuarioDoBanco }] : [];
+        }
+    };
+    return banco;
+};
+
+// Hasher que registra cada comparação.
+const criarHasherEspiao = () => {
+    const comparacoes = [];
+    return {
+        comparacoes,
+        compare: async (senha, hash) => {
+            comparacoes.push(hash);
+            return hasherFalso.compare(senha, hash);
+        }
+    };
+};
+
+const tentarLogin = async ({ banco, hasher = hasherFalso, limitador, email, senha, ip = '9.9.9.9' }) => {
+    const res = criarRespostaLogin();
+    await criarAutenticadorUsuario(
+        banco,
+        hasher,
+        limitador
+    )({ body: { email, senha }, session: criarSessaoFalsa(), ip }, res);
+    return res;
+};
+
+describe('login não revela quais e-mails têm conta (#160)', () => {
+    test('e-mail sem conta e senha errada têm a mesma resposta', async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        const semConta = await tentarLogin({ banco, limitador, email: 'nao@exemplo.com', senha: 'certa1' });
+        const senhaErrada = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1' });
+
+        assert.equal(semConta.statusCode, 400);
+        assert.equal(senhaErrada.statusCode, 400);
+        assert.equal(semConta.dados.erro, MENSAGEM_LOGIN_INVALIDO);
+        assert.deepEqual(semConta.dados, senhaErrada.dados);
+    });
+
+    test('e-mail sem conta também compara a senha (com um hash falso), para gastar o mesmo tempo', async () => {
+        const hasher = criarHasherEspiao();
+
+        await tentarLogin({
+            banco: criarBancoLogin(),
+            hasher,
+            limitador: criarLimitadorTentativas(),
+            email: 'nao@exemplo.com',
+            senha: 'certa1'
+        });
+
+        assert.equal(hasher.comparacoes.length, 1);
+        assert.match(hasher.comparacoes[0], /^\$2[aby]\$10\$/, 'compara com um hash bcrypt de mesmo custo');
+    });
+
+    test('perfil trocado continua com a mensagem própria (só aparece com a senha certa)', async () => {
+        const res = criarRespostaLogin();
+        await criarAutenticadorUsuario(
+            criarBancoLogin(),
+            hasherFalso,
+            criarLimitadorTentativas()
+        )(
+            {
+                body: { email: 'ana@exemplo.com', senha: 'certa1', tipoPerfil: 'trabalhador' },
+                session: criarSessaoFalsa(),
+                ip: '9.9.9.9'
+            },
+            res
+        );
+
+        assert.equal(res.statusCode, 400);
+        assert.match(res.dados.erro, /Sua conta está cadastrada como Contratante/);
+    });
+});
+
+describe('limite de tentativas de login (#160)', () => {
+    test(`depois de ${MAXIMO_TENTATIVAS_LOGIN} falhas, bloqueia com 429 sem consultar o banco`, async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN; i++) {
+            const res = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1' });
+            assert.equal(res.statusCode, 400, `tentativa ${i + 1}`);
+        }
+        const consultasAntes = banco.consultas;
+
+        const bloqueada = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' });
+
+        assert.equal(bloqueada.statusCode, 429);
+        assert.equal(bloqueada.dados.erro, MENSAGEM_LOGIN_BLOQUEADO);
+        assert.equal(banco.consultas, consultasAntes, 'nem consulta o banco');
+    });
+
+    test('e-mails sem conta também contam (senão daria para testar e-mails à vontade)', async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN; i++) {
+            await tentarLogin({ banco, limitador, email: 'nao@exemplo.com', senha: 'qualquer1' });
+        }
+        const res = await tentarLogin({ banco, limitador, email: 'nao@exemplo.com', senha: 'qualquer1' });
+
+        assert.equal(res.statusCode, 429);
+    });
+
+    test('o bloqueio vale para o mesmo IP e e-mail; outro IP ou outro e-mail seguem livres', async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN; i++) {
+            await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1', ip: '1.1.1.1' });
+        }
+
+        const outroIp = await tentarLogin({
+            banco,
+            limitador,
+            email: 'ana@exemplo.com',
+            senha: 'certa1',
+            ip: '2.2.2.2'
+        });
+        const outroEmail = await tentarLogin({ banco, limitador, email: 'nao@exemplo.com', senha: 'x', ip: '1.1.1.1' });
+
+        assert.equal(outroIp.destino, '/homeContratante');
+        assert.equal(outroEmail.statusCode, 400);
+    });
+
+    test('o bloqueio acaba quando a janela de 15 minutos vence', async () => {
+        const relogio = criarRelogio();
+        const limitador = criarLimitadorTentativas({ agora: relogio.agora });
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN; i++) {
+            await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1' });
+        }
+        relogio.avancar(JANELA_TENTATIVAS_LOGIN_MS - 1);
+        assert.equal(
+            (await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' })).statusCode,
+            429
+        );
+
+        relogio.avancar(1);
+        const liberado = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' });
+        assert.equal(liberado.destino, '/homeContratante');
+    });
+
+    test('login certo zera o contador de falhas', async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN - 1; i++) {
+            await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1' });
+        }
+        await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' });
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN - 1; i++) {
+            await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'errada1' });
+        }
+
+        const res = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' });
+        assert.equal(res.destino, '/homeContratante', 'as falhas de antes do login certo não contam');
+    });
+
+    test('campos vazios ou inválidos não contam como tentativa', async () => {
+        const limitador = criarLimitadorTentativas();
+        const banco = criarBancoLogin();
+
+        for (let i = 0; i < MAXIMO_TENTATIVAS_LOGIN + 2; i++) {
+            await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: '' });
+        }
+
+        const res = await tentarLogin({ banco, limitador, email: 'ana@exemplo.com', senha: 'certa1' });
+        assert.equal(res.destino, '/homeContratante');
+    });
+});
