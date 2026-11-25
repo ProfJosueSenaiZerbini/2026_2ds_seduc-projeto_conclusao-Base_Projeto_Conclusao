@@ -16,7 +16,8 @@ router.get('/cadastrar', (_req, res) => {
 });
 
 router.get('/login', (req, res) => {
-    res.render('login', { erro: null });
+    // Mostra o aviso "flash" quando houver, por exemplo a sessão encerrada por troca de senha (#162).
+    res.render('login', { erro: res.locals.alerta?.mensagem || null });
 });
 
 const renderHomeTrabalhador = async (req, res) => {

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import pool from '../config/database.js';
 import { validarEmail, validarIdade, validarNome, validarSenha } from '../validations/usuarioValidation.js';
 import { buscarReputacao } from './reputacao.js';
+import { renovarSessao, versaoDaSenha } from '../services/sessaoService.js';
 
 const MESES = [
     'janeiro',
@@ -110,6 +111,14 @@ export const criarAtualizadorSenha =
                 return res.status(401).send('A senha atual esta incorreta.');
             const hash = await hasher.hash(novaSenha, 10);
             await banco.query('UPDATE usuarios SET senha = ? WHERE id = ?', [hash, Number(id)]);
+
+            // #162: a versão da senha muda, então as outras sessões desta conta caem na próxima requisição
+            // (carregarDadosDaSessao). Esta sessão segue logada, com id novo e a versão nova.
+            const usuarioLogado = req.session.usuario;
+            await renovarSessao(req);
+            req.session.usuario = usuarioLogado;
+            req.session.versaoSenha = versaoDaSenha(hash);
+
             return res.redirect('/perfil');
         } catch (erro) {
             console.error('Erro ao alterar senha:', erro?.code || 'erro inesperado');
