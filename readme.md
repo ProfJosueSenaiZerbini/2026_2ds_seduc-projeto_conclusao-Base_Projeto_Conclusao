@@ -10,15 +10,18 @@ O **iBico** é uma plataforma desenvolvida para conectar **contratantes** a **pr
 - **Pedro Henrique** — [GitHub](https://github.com/Pedrin-com)
 - **Bruno Henrique** — [GitHub](https://github.com/araujonascimentobrunohentique-crypto)
 - **Francisco Kaique** — [GitHub](https://github.com/francisco292)
-- **Victor Barros** — [GitHub](https://github.com/usuario4)
+- **Victor Barros** — [GitHub](https://github.com/Vitin-00)
 
 ---
 
 ## 🛠️ Tecnologias
 
-- **Backend:** Node.js + Express
-- **Banco de dados:** MySQL / MariaDB
-- **Modelagem:** DBML / dbdiagram.io
+- **Front-end:** HTML, CSS, JavaScript e EJS
+- **Back-end:** Node.js e Express 5, express-session, bcrypt e Multer
+- **Banco de dados:** MariaDB 10.11+ (compatível com MySQL)
+- **Endereço:** ViaCEP, com a BrasilAPI de reserva
+- **Testes e qualidade:** Playwright, node:test, GitHub Actions, ESLint, Prettier e Stylelint
+- **Gestão:** Git, GitHub e GitHub Projects
 
 ---
 
@@ -185,6 +188,6 @@ O arquivo `.git-blame-ignore-revs` lista os commits só de formatação. A visua
 
 ## 📌 Status
 
-🚧 **Em desenvolvimento**
+✅ **Versão final do TCC (entrega em 03/12/2026)**
 
 Projeto desenvolvido para fins educacionais.
