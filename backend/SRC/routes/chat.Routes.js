@@ -5,65 +5,30 @@ const authMiddleware = require("../middleware/authMiddleware");
 const { authOpcional } = require("../middleware/authMiddleware");
 const { gerarRespostaIA } = require("../services/aiService");
 
-// Estrutura de armazenamento em memória/contingência caso tabelas SQL não existam no momento
-let publicMessagesMemory = [
-  {
-    id: 1,
-    usuario_id: 1,
-    autor: "Juliana Mendes",
-    autor_foto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop",
-    texto: "Meninas, alguém assistiu ao novo documentário de moda? Achei a fotografia deslumbrante! ✧",
-    criado_em: new Date(Date.now() - 1000 * 60 * 35).toISOString()
-  },
-  {
-    id: 2,
-    usuario_id: 2,
-    autor: "Beatriz Vasconcelos",
-    autor_foto: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop",
-    texto: "Eu assisti ontem! O figurino retrô dos anos 2000 me inspirou a voltar a fazer scrapbook analógico.",
-    criado_em: new Date(Date.now() - 1000 * 60 * 18).toISOString()
-  },
-  {
-    id: 3,
-    usuario_id: 3,
-    autor: "Camila Duarte",
-    autor_foto: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop",
-    texto: "Sejam bem-vindas todas as novas assinantes! Esse espaço é todo nosso para trocar referências e cafés virtuais ☕✨",
-    criado_em: new Date(Date.now() - 1000 * 60 * 5).toISOString()
-  }
-];
-
+let publicMessagesMemory = [];
 let privateMessagesMemory = {};
 
 // 1. Obter mensagens do Chat Público da Comunidade
 router.get("/publico", async (req, res) => {
   try {
-    try {
-      const [rows] = await database.query(`
-        SELECT 
-          m.id, 
-          m.usuario_id, 
-          m.texto, 
-          m.criado_em, 
-          u.nome AS autor, 
-          u.foto AS autor_foto
-        FROM chat_publico m
-        JOIN usuario u ON u.id = m.usuario_id
-        ORDER BY m.criado_em ASC
-        LIMIT 100
-      `);
+    const [rows] = await database.query(`
+      SELECT 
+        m.id, 
+        m.usuario_id, 
+        m.texto, 
+        m.criado_em, 
+        u.nome AS autor, 
+        u.foto AS autor_foto
+      FROM chat_publico m
+      JOIN usuario u ON u.id = m.usuario_id
+      ORDER BY m.criado_em ASC
+      LIMIT 100
+    `);
 
-      if (rows && rows.length > 0) {
-        return res.json(rows);
-      }
-    } catch (sqlErr) {
-      // Se a tabela ainda não existir no MySQL, usa a lista em memória
-    }
-
-    return res.json(publicMessagesMemory);
+    return res.json(rows || []);
   } catch (err) {
     console.error("Erro no chat público:", err);
-    return res.json(publicMessagesMemory);
+    return res.json([]);
   }
 });
 

@@ -84,8 +84,8 @@ const Navbar = () => {
           <span>
             {isLogin && '✦ ACESSO AO SISTEMA — DIGITE SUAS CREDENCIAIS PARA ENTRAR ✦'}
             {isRegister && '✦ CADASTRO DE NOVA INTEGRANTE — JUNTE-SE À NOSSA COMUNIDADE ✦'}
-            {isLanding && 'REDE SOCIAL & REVISTA DIGITAL FEMININA — BEM-VINDA AO SEU ESPAÇO'}
-            {!isLogin && !isRegister && !isLanding && 'REDE SOCIAL & REVISTA DIGITAL — BEM-VINDA'}
+            {isLanding && 'REVISTA CULTURAL & FANZINE INDEPENDENTE — ESPAÇO DE LEITURA LENTA ✧'}
+            {!isLogin && !isRegister && !isLanding && 'REVISTA CULTURAL & FANZINE INDEPENDENTE — BEM-VINDA ✧'}
           </span>
           <span>✧</span>
         </div>

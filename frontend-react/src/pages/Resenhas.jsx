@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePosts } from '../hooks/usePosts';
-import { Heart, Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
+import { Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
 import Badge from '../components/ui/Badge';
 import Sparkle from '../components/ui/Sparkle';
 import CommentsModal from '../components/comments/CommentsModal';
-import { toggleLike } from '../services/api';
 
 const CATEGORIES = ['TODAS', 'MODA & ESTILO', 'CINEMA & TV', 'LITERATURA', 'MÚSICA', 'BEM-ESTAR'];
 
@@ -13,7 +12,6 @@ const Resenhas = () => {
   const navigate = useNavigate();
   const { posts, loading, error } = usePosts();
   const [selectedCategory, setSelectedCategory] = useState('TODAS');
-  const [postsCurtidos, setPostsCurtidos] = useState({});
   const [modalComentariosAberto, setModalComentariosAberto] = useState(false);
   const [postParaComentar, setPostParaComentar] = useState(null);
   const [comentariosExtras, setComentariosExtras] = useState({});
@@ -21,19 +19,6 @@ const Resenhas = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const alternarCurtida = async (id) => {
-    const token = localStorage.getItem('plural_token');
-    setPostsCurtidos(prev => ({ ...prev, [id]: !prev[id] }));
-
-    if (token) {
-      try {
-        await toggleLike(id);
-      } catch (e) {
-        console.error('Erro ao curtir no backend:', e);
-      }
-    }
-  };
 
   // Mapeia exclusivamente os posts reais do banco de dados
   const allPosts = (posts && posts.length > 0)
@@ -45,7 +30,6 @@ const Resenhas = () => {
         tempoLeitura: p.tempoLeitura || '5 min de leitura',
         resumo: p.resumo || (p.conteudo ? p.conteudo.substring(0, 160) + '...' : 'Sem resumo disponível.'),
         imagem: p.imagem || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
-        curtidas: p.likes !== undefined ? p.likes : (p.curtidas || 0),
         total_comentarios: p.total_comentarios || 0
       }))
     : [];
@@ -125,9 +109,6 @@ const Resenhas = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
           {filteredPosts.length > 0 ? (
             filteredPosts.map((post) => {
-              const foiCurtido = !!postsCurtidos[post.id];
-              const totalCurtidas = post.curtidas + (foiCurtido ? 1 : 0);
-
               return (
                 <article
                   key={post.id}
@@ -174,26 +155,6 @@ const Resenhas = () => {
                   {/* Rodapé do Card */}
                   <div className="p-6 pt-0 border-t border-gray-200 mt-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          alternarCurtida(post.id);
-                        }}
-                        className={`flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1.5 border transition-all ${
-                          foiCurtido
-                            ? 'bg-red-editorial text-white border-red-editorial shadow-[2px_2px_0_0_#111111]'
-                            : 'bg-white text-graphite border-graphite hover:border-red-editorial hover:text-red-editorial'
-                        }`}
-                        title="Curtir postagem"
-                      >
-                        <Heart
-                          size={14}
-                          className={foiCurtido ? 'fill-white text-white' : 'text-red-editorial'}
-                        />
-                        <span>{totalCurtidas}</span>
-                      </button>
-
                       <button
                         type="button"
                         onClick={(e) => {

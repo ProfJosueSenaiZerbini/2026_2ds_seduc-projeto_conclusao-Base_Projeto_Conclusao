@@ -191,6 +191,31 @@ if (useSupabase) {
                 return [{ affectedRows: 1 }, []];
             }
 
+            // 10.1 Tabela POSTS - UPDATE
+            if (upperSql.startsWith("UPDATE POSTS")) {
+                const [titulo, resumo, conteudo, imagem, categoria, id] = params;
+                const updatePayload = {};
+                if (titulo !== undefined) updatePayload.titulo = titulo;
+                if (resumo !== undefined) updatePayload.resumo = resumo;
+                if (conteudo !== undefined) updatePayload.conteudo = conteudo;
+                if (imagem !== undefined) updatePayload.imagem = imagem;
+                if (categoria !== undefined) updatePayload.categoria = categoria;
+
+                let { error } = await supabase
+                    .from("posts")
+                    .update(updatePayload)
+                    .eq("id", id);
+
+                if (error && (error.code === "PGRST204" || error.message?.includes("categoria"))) {
+                    delete updatePayload.categoria;
+                    const retry = await supabase.from("posts").update(updatePayload).eq("id", id);
+                    error = retry.error;
+                }
+
+                if (error) throw error;
+                return [{ affectedRows: 1 }, []];
+            }
+
             // 11. Tabela POSTS - SELECT por id específico
             if (upperSql.includes("FROM POSTS") && (upperSql.includes("P.ID = ?") || upperSql.includes("WHERE ID = ?"))) {
                 const [id] = params;

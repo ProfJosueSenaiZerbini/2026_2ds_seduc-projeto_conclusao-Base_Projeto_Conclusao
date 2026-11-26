@@ -56,6 +56,10 @@ export const createPost = (postData) => {
   return api.post('/posts/criar', postData);
 };
 
+export const getUsers = () => {
+  return api.get('/users');
+};
+
 export const getUserProfile = (userId) => {
   return api.get(`/users/${userId}`);
 };
@@ -66,6 +70,10 @@ export const getUserPosts = (userId) => {
 
 export const deletePost = (postId) => {
   return api.delete(`/posts/${postId}`);
+};
+
+export const updatePost = (postId, data) => {
+  return api.put(`/posts/${postId}`, data);
 };
 
 export const updateUserProfile = (userId, data) => {

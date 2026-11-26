@@ -8,19 +8,11 @@ import Tape from '../components/ui/Tape';
 import Badge from '../components/ui/Badge';
 import { 
   getPublicMessages, sendPublicMessage, 
-  getPrivateMessages, sendPrivateMessage, chatWithAI 
+  getPrivateMessages, sendPrivateMessage, chatWithAI,
+  getUsers
 } from '../services/api';
 
 const QUICK_EMOJIS = ['❤️', '✨', '👏', '😍', '✍️', '☕', '🌿', '📖', '🔥'];
-
-// Contatos da comunidade disponíveis para chamar para conversa íntima
-const CONTATOS_PADRAO = [
-  { id: '1', nome: 'Ezinne Iheanacho', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop', status: 'Online agora', bio: 'Colunista de Cinema Y2K & Artes' },
-  { id: '2', nome: 'Juliana Mendes', foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop', status: 'Online há 10m', bio: 'Apaixonada por moda retrô & cafés' },
-  { id: '3', nome: 'Beatriz Vasconcelos', foto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop', status: 'Online agora', bio: 'Crítica cultural & fotografia 35mm' },
-  { id: '4', nome: 'Camila Duarte', foto: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop', status: 'Online há 1h', bio: 'Autora de ensaios sobre autocuidado' },
-  { id: '5', nome: 'Mariana Sales', foto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop', status: 'Online agora', bio: 'Clube de Leitura & Poesia contemporânea' }
-];
 
 const SUGESTOES_IA = [
   'Como desacelerar após um dia agitado? 🌿',
@@ -48,8 +40,9 @@ const ChatPage = () => {
   const [loadingPublico, setLoadingPublico] = useState(true);
 
   // ✦ ESTADOS DO CHAT PRIVADO (INDIVIDUAL)
+  const [contatos, setContatos] = useState([]);
   const [contatoSelecionado, setContatoSelecionado] = useState(
-    queryUserId ? { id: queryUserId, nome: queryUserName || 'Amiga Lumina', foto: '' } : CONTATOS_PADRAO[0]
+    queryUserId ? { id: queryUserId, nome: queryUserName || 'Amiga Lumina', foto: '' } : null
   );
   const [mensagensPrivadas, setMensagensPrivadas] = useState([]);
   const [inputPrivado, setInputPrivado] = useState('');
@@ -79,7 +72,7 @@ const ChatPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // 1. Carregar mensagens do Chat Público
+  // 1. Carregar mensagens do Chat Público e Usuários reais da comunidade
   useEffect(() => {
     getPublicMessages()
       .then((data) => {
@@ -87,13 +80,25 @@ const ChatPage = () => {
       })
       .catch((err) => console.warn('Erro ao carregar chat público:', err))
       .finally(() => setLoadingPublico(false));
-  }, []);
+
+    getUsers()
+      .then((users) => {
+        if (Array.isArray(users)) {
+          const outros = users.filter((u) => String(u.id) !== String(meuId));
+          setContatos(outros);
+          if (!queryUserId && outros.length > 0 && !contatoSelecionado) {
+            setContatoSelecionado(outros[0]);
+          }
+        }
+      })
+      .catch((err) => console.warn('Erro ao carregar usuários:', err));
+  }, [meuId, queryUserId]);
 
   // 2. Carregar mensagens do Chat Privado
   useEffect(() => {
     if (!contatoSelecionado?.id) return;
     
-    // Recupera do storage ou API
+    // Recupera do storage ou API real
     const chaveStorage = `plural_chat_privado_${meuId}_${contatoSelecionado.id}`;
     const salvas = localStorage.getItem(chaveStorage);
     if (salvas) {
@@ -101,18 +106,7 @@ const ChatPage = () => {
         setMensagensPrivadas(JSON.parse(salvas));
       } catch (e) {}
     } else {
-      // Mensagem inicial de acolhimento na conversa privada
-      const msgInicial = [
-        {
-          id: 'init-1',
-          remetente_id: contatoSelecionado.id,
-          autor: contatoSelecionado.nome,
-          texto: `Oi, ${userLogado.nome || 'amiga'}! ✧ Fico feliz que me chamou para conversar. O que você achou das últimas resenhas publicadas?`,
-          criado_em: new Date(Date.now() - 1000 * 60 * 15).toISOString()
-        }
-      ];
-      setMensagensPrivadas(msgInicial);
-      localStorage.setItem(chaveStorage, JSON.stringify(msgInicial));
+      setMensagensPrivadas([]);
     }
   }, [contatoSelecionado, meuId]);
 
@@ -422,29 +416,42 @@ const ChatPage = () => {
                 </button>
               </div>
 
-              {/* Lista de Contatos */}
+              {/* Lista de Contatos Reais */}
               <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
-                {CONTATOS_PADRAO.map((c) => {
-                  const isAtivo = String(contatoSelecionado?.id) === String(c.id);
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => setContatoSelecionado(c)}
-                      className={`w-full text-left p-3.5 flex items-center gap-3 transition-colors cursor-pointer ${
-                        isAtivo ? 'bg-white border-l-4 border-l-red-editorial shadow-xs' : 'hover:bg-white/60'
-                      }`}
-                    >
-                      <img src={c.foto} alt={c.nome} className="w-10 h-10 rounded-full border border-graphite object-cover flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-serif font-bold text-sm text-graphite truncate">{c.nome}</h4>
-                          <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                {contatos.length > 0 ? (
+                  contatos.map((c) => {
+                    const isAtivo = String(contatoSelecionado?.id) === String(c.id);
+                    const iniciais = (c.nome || 'U').slice(0, 2).toUpperCase();
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => setContatoSelecionado(c)}
+                        className={`w-full text-left p-3.5 flex items-center gap-3 transition-colors cursor-pointer ${
+                          isAtivo ? 'bg-white border-l-4 border-l-red-editorial shadow-xs' : 'hover:bg-white/60'
+                        }`}
+                      >
+                        {c.foto ? (
+                          <img src={c.foto} alt={c.nome} className="w-10 h-10 rounded-full border border-graphite object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full border border-graphite bg-cream flex items-center justify-center font-mono font-bold text-xs text-graphite flex-shrink-0">
+                            {iniciais}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-serif font-bold text-sm text-graphite truncate">{c.nome}</h4>
+                            <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                          </div>
+                          <p className="font-sans text-[11px] text-gray-500 truncate">{c.headline || c.email || 'Membro da Comunidade'}</p>
                         </div>
-                        <p className="font-sans text-[11px] text-gray-500 truncate">{c.bio}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="p-6 text-center font-mono text-xs text-gray-400">
+                    Nenhum outro membro cadastrado ainda.
+                  </div>
+                )}
               </div>
             </div>
 

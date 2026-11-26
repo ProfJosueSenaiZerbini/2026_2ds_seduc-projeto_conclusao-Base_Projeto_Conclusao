@@ -3,6 +3,18 @@ const router = express.Router();
 const database = require("../DATABASE/connection");
 const authMiddleware = require("../middleware/authMiddleware");
 
+// Listar todos os usuários reais cadastrados na comunidade
+router.get("/", async (req, res) => {
+    try {
+        const [usuarios] = await database.query(
+            "SELECT id, nome, email, foto, headline FROM usuario ORDER BY id ASC"
+        );
+        return res.json(usuarios || []);
+    } catch (err) {
+        return res.json([]);
+    }
+});
+
 // Obter perfil público do usuário
 router.get("/:id", async (req, res) => {
     try {

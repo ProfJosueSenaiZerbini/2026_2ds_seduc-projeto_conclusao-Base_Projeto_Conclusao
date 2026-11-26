@@ -287,6 +287,57 @@ async function adicionarComentario(req, res) {
     }
 }
 
+// ✦ Atualizar post (pela própria autora)
+async function atualizarPost(req, res) {
+    try {
+        const { id } = req.params;
+        const usuarioId = req.usuario?.id || req.body.usuarioId || req.body.usuario_id;
+        const { titulo, resumo, conteudo, imagem, categoria } = req.body;
+
+        if (!usuarioId) {
+            return res.status(401).json({ mensagem: "Usuário não autenticado." });
+        }
+
+        if (!titulo || !conteudo) {
+            return res.status(400).json({ mensagem: "Título e conteúdo são obrigatórios." });
+        }
+
+        const [posts] = await database.query("SELECT usuario_id FROM posts WHERE id = ?", [id]);
+        if (posts.length === 0) {
+            return res.status(404).json({ mensagem: "Publicação não encontrada." });
+        }
+
+        if (String(posts[0].usuario_id) !== String(usuarioId)) {
+            return res.status(403).json({ mensagem: "Você só pode editar suas próprias publicações." });
+        }
+
+        const resumoFinal = (resumo || (conteudo ? (conteudo.length > 150 ? conteudo.substring(0, 150) + '...' : conteudo) : null))?.substring(0, 240);
+        const imagemFinal = imagem && typeof imagem === 'string' && imagem.trim() ? imagem.trim() : null;
+        const categoriaFinal = categoria && typeof categoria === 'string' && categoria.trim() ? categoria.trim().toUpperCase() : 'MODA & ESTILO';
+
+        await database.query(
+            "UPDATE posts SET titulo = ?, resumo = ?, conteudo = ?, imagem = ?, categoria = ? WHERE id = ?",
+            [titulo, resumoFinal, conteudo, imagemFinal, categoriaFinal, id]
+        );
+
+        return res.json({
+            mensagem: "Publicação atualizada com sucesso! ✧",
+            post: {
+                id: Number(id),
+                titulo,
+                resumo: resumoFinal,
+                conteudo,
+                imagem: imagemFinal,
+                categoria: categoriaFinal,
+                usuario_id: usuarioId
+            }
+        });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ mensagem: "Erro ao atualizar publicação." });
+    }
+}
+
 // ✦ Excluir post (pelo próprio autor)
 async function excluirPost(req, res) {
     try {
@@ -318,6 +369,7 @@ module.exports = {
     listarPublicos,
     buscarPublicos,
     criar,
+    atualizarPost,
     excluirPost,
     alternarCurtida,
     statusCurtida,

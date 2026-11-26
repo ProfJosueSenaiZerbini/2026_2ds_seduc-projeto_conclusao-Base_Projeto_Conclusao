@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
+import { Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
 import Badge from '../components/ui/Badge';
 import CommentsModal from '../components/comments/CommentsModal';
 import { usePosts } from '../hooks/usePosts';
-import { toggleLike } from '../services/api';
 
 const Home = () => {
   const navigate = useNavigate();
   const { posts: dbPosts, loading } = usePosts();
   const [postsList, setPostsList] = useState([]);
-  const [postsCurtidos, setPostsCurtidos] = useState({});
   const [modalComentariosAberto, setModalComentariosAberto] = useState(false);
   const [postParaComentar, setPostParaComentar] = useState(null);
 
@@ -30,41 +28,11 @@ const Home = () => {
         tempoLeitura: p.tempoLeitura || '5 min de leitura',
         resumo: p.resumo || (p.conteudo ? p.conteudo.substring(0, 150) + '...' : 'Sem resumo disponível.'),
         imagem: p.imagem || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
-        curtidas: p.likes !== undefined ? p.likes : (p.curtidas || 0),
         total_comentarios: p.total_comentarios || 0
       }));
       setPostsList(formatados);
     }
   }, [dbPosts]);
-
-  // Função para gerenciar a curtida de cada post com persistência
-  const alternarCurtida = async (id) => {
-    const token = localStorage.getItem('plural_token');
-    const jaCurtiu = !!postsCurtidos[id];
-    setPostsCurtidos(prev => ({ ...prev, [id]: !jaCurtiu }));
-
-    setPostsList(prevPosts =>
-      prevPosts.map(post => {
-        if (post.id === id) {
-          const currentCount = post.curtidas || post.likes || 0;
-          return {
-            ...post,
-            curtidas: jaCurtiu ? Math.max(0, currentCount - 1) : currentCount + 1,
-            likes: jaCurtiu ? Math.max(0, currentCount - 1) : currentCount + 1
-          };
-        }
-        return post;
-      })
-    );
-
-    if (token) {
-      try {
-        await toggleLike(id);
-      } catch (e) {
-        console.error('Erro ao curtir no backend:', e);
-      }
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
@@ -112,8 +80,6 @@ const Home = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
           {postsList.map((post) => {
-            const foiCurtido = !!postsCurtidos[post.id];
-
             return (
               <article
                 key={post.id}
@@ -160,31 +126,9 @@ const Home = () => {
                   </div>
                 </div>
 
-                {/* Rodapé do Card: Ações (Curtir, Comentários & Ler Mais) */}
+                {/* Rodapé do Card: Ações (Comentários & Ler Mais) */}
                 <div className="p-6 pt-0 border-t border-gray-200 mt-2 flex items-center justify-between">
-
                   <div className="flex items-center gap-2">
-                    {/* Botão de Curtir com contador e estado reativo */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alternarCurtida(post.id);
-                      }}
-                      className={`flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1.5 border transition-all ${
-                        foiCurtido
-                          ? 'bg-red-editorial text-white border-red-editorial shadow-[2px_2px_0_0_#111111]'
-                          : 'bg-white text-graphite border-graphite hover:border-red-editorial hover:text-red-editorial'
-                      }`}
-                      title="Curtir postagem"
-                    >
-                      <Heart
-                        size={14}
-                        className={foiCurtido ? 'fill-white text-white' : 'text-red-editorial'}
-                      />
-                      <span>{post.curtidas || post.likes || 0}</span>
-                    </button>
-
                     {/* Botão de Comentários Interativo */}
                     <button
                       type="button"

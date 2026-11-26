@@ -139,11 +139,11 @@ const PerfilUsuario = () => {
         if (!userData) {
           userData = {
             id: targetId,
-            nome: isProprioPerfil ? (localUser?.nome || 'Garota Lumina') : 'Ezinne Iheanacho - Owelle',
-            email: isProprioPerfil ? (localUser?.email || 'contato@lumina.com') : 'ezinne.owelle@lumina.com',
-            criado_em: '2026-03-15T10:00:00.000Z',
-            total_posts: 14,
-            total_likes: 289
+            nome: isProprioPerfil ? (localUser?.nome || 'Membro Lumina') : 'Autora Lumina',
+            email: isProprioPerfil ? (localUser?.email || '') : '',
+            criado_em: localUser?.criado_em || new Date().toISOString(),
+            total_posts: 0,
+            total_likes: 0
           };
         }
 
@@ -151,18 +151,18 @@ const PerfilUsuario = () => {
         const dadosCompletos = {
           ...userData,
           ...(perfilSalvo || {}),
-          nome: perfilSalvo?.nome || userData?.nome || 'Garota Lumina',
+          nome: perfilSalvo?.nome || userData?.nome || (isProprioPerfil ? (localUser?.nome || 'Membro Lumina') : 'Autora Lumina'),
           headline: perfilSalvo?.headline || userData?.headline || (isProprioPerfil
-            ? 'Colunista & Crítica Cultural | Apaixonada por cinema anos 2000, literatura e artes plásticas'
-            : 'Pesquisadora Cultural & Colunista Independente | Explorando estética Y2K e cultura pop'),
-          bio: perfilSalvo?.bio || userData?.bio || 'Integrante da comunidade Lumina. Atua como leitora crítica e articulista independente, dedicada à valorização de obras literárias e cinematográficas feitas por mulheres, além do resgate da cultura analógica, diários visuais e fanzines dos anos 2000.',
+            ? 'Integrante da comunidade Lumina'
+            : 'Autora e colunista na Lumina'),
+          bio: perfilSalvo?.bio || userData?.bio || 'Integrante da comunidade Lumina. Leitora e articulista dedicada à valorização de obras culturais e desaceleração digital.',
           localizacao: perfilSalvo?.localizacao || userData?.localizacao || 'São Paulo, Brasil',
           status_tag: perfilSalvo?.status_tag || userData?.status_tag || '#CRIADORA ATIVA',
           foto: perfilSalvo?.foto || userData?.foto || '',
           capa: perfilSalvo?.capa || userData?.capa || '',
           afiliacao1: perfilSalvo?.afiliacao1 || 'Redação Coletiva Lumina',
           afiliacao2: perfilSalvo?.afiliacao2 || 'Clube de Leitura & Crítica Cultural',
-          interesses: perfilSalvo?.interesses || userData?.interesses || 'Cinema dos Anos 2000, Literatura Contemporânea, Estética Y2K, Feminismo & Cultura, Artes Visuais, Scrapbook & DIY'
+          interesses: perfilSalvo?.interesses || userData?.interesses || 'Cinema, Literatura, Música, Scrapbook & DIY'
         };
 
         setUsuario(dadosCompletos);
@@ -213,35 +213,7 @@ const PerfilUsuario = () => {
             }
           }
 
-          // Se for mock/perfil de demonstração da plataforma e ainda não houver posts no banco
-          if (listaPosts.length === 0 && (targetId === '1' || targetId === 'mock') && !localUser) {
-            listaPosts = [
-              {
-                id: 1,
-                usuario_id: targetId,
-                titulo: 'O Retorno Triunfal da Estética Y2K: Nostalgia, Moda e Redes',
-                categoria: 'MODA & ESTILO',
-                autor: dadosCompletos.nome,
-                criando_em: '2026-10-15T10:00:00.000Z',
-                resumo: 'Como as tendências dos anos 2000 voltaram com força total na cultura pop contemporânea.',
-                imagem: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
-                likes: 42,
-                total_comentarios: 6
-              },
-              {
-                id: 2,
-                usuario_id: targetId,
-                titulo: 'Girlhood no Cinema: Filmes Clássicos dos Anos 2000 que Marcaram Gerações',
-                categoria: 'CINEMA & TV',
-                autor: dadosCompletos.nome,
-                criando_em: '2026-10-14T14:00:00.000Z',
-                resumo: 'De Meninas Malvadas a Legalmente Loira: produções que moldaram a autoexpressão feminina.',
-                imagem: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
-                likes: 89,
-                total_comentarios: 14
-              }
-            ];
-          }
+
 
           // Mescla com posts criados localmente pelo próprio usuário
           const postsLocaisRaw = localStorage.getItem('plural_user_posts');
@@ -729,18 +701,14 @@ const PerfilUsuario = () => {
                 </button>
               </div>
 
-              {/* Linha de Métricas / Conexões */}
-              <div className="pt-1">
-                <span className="font-mono text-xs font-bold text-graphite hover:text-red-editorial transition-colors cursor-pointer">
-                  {totalConexoes} conexões
+              {/* Linha Editorial / Conexões */}
+              <div className="pt-1 flex items-center gap-2 font-mono text-xs text-gray-600">
+                <span className="font-bold text-graphite hover:text-red-editorial transition-colors">
+                  {totalConexoes} conexões na comunidade
                 </span>
-                <span className="text-gray-300 mx-2">·</span>
-                <span className="font-mono text-xs text-gray-600">
-                  {totalPosts} publicações
-                </span>
-                <span className="text-gray-300 mx-2">·</span>
-                <span className="font-mono text-xs text-gray-600">
-                  {usuario.total_likes || 289} curtidas recebidas
+                <span className="text-gray-300">·</span>
+                <span>
+                  {totalPosts} {totalPosts === 1 ? 'publicação no acervo' : 'publicações no acervo'}
                 </span>
               </div>
 
@@ -1221,22 +1189,7 @@ const PerfilUsuario = () => {
 
                       <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs font-mono">
                         <div className="flex items-center gap-2">
-                          {/* Curtir */}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleLikePost(post.id);
-                            }}
-                            className="flex items-center gap-1 text-red-editorial font-bold hover:scale-105 transition-transform cursor-pointer"
-                            title="Curtir"
-                          >
-                            <Heart
-                            size={14}                               className={postsCurtidos[post.id] ? "fill-red-editorial text-red-editorial" : "text-red-editorial"}
-                            />                            <span>{post.likes || post.curtidas || 0}</span>
-                          </button>
-
-                          {/* Botão de Comentários estilo Instagram */}
+                          {/* Botão de Comentários / Mural */}
                           <button
                             type="button"
                             onClick={(e) => {
@@ -1245,26 +1198,39 @@ const PerfilUsuario = () => {
                               setModalComentariosAberto(true);
                             }}
                             className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-700 hover:text-red-editorial bg-white hover:bg-red-50 border border-gray-300 hover:border-red-editorial px-2.5 py-1 shadow-2xs transition-all cursor-pointer group/cmt"
-                            title="Abrir comentários (estilo Instagram) ✧"
+                            title="Abrir comentários ✧"
                           >
                             <MessageCircle size={13} className="text-gray-500 group-hover/cmt:text-red-editorial transition-colors" />
                             <span>{post.total_comentarios || 0}</span>
                           </button>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           {isProprioPerfil && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleExcluirPost(post.id);
-                              }}
-                              className="text-gray-400 hover:text-red-editorial p-1 transition-colors cursor-pointer"
-                              title="Excluir postagem"
-                            >
-                              <Trash2 size={13} />
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/post/${post.id}`);
+                                }}
+                                className="text-gray-500 hover:text-amber-600 p-1 transition-colors cursor-pointer"
+                                title="Editar postagem"
+                              >
+                                <Edit3 size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleExcluirPost(post.id);
+                                }}
+                                className="text-gray-400 hover:text-red-editorial p-1 transition-colors cursor-pointer"
+                                title="Excluir postagem"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </>
                           )}
 
                           <span className="group-hover:translate-x-1 transition-transform font-bold text-graphite flex items-center gap-1">

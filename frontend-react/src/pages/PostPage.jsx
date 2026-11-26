@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { usePost } from '../hooks/usePost';
-import { ArrowLeft, User, Clock, Heart, Share2, Loader2, MessageCircle, Send, Sparkles } from 'lucide-react';
-import { toggleLike, getLikeStatus, getComments, addComment } from '../services/api';
+import { ArrowLeft, User, Clock, Bookmark, Share2, Loader2, MessageCircle, Send, Sparkles, Edit3, Trash2, X } from 'lucide-react';
+import { getComments, addComment, deletePost, updatePost } from '../services/api';
 import Tape from '../components/ui/Tape';
 
 const PostPage = () => {
@@ -10,8 +10,7 @@ const PostPage = () => {
   const navigate = useNavigate();
   const { post, loading, error } = usePost(id);
 
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
+  const [savedBookmark, setSavedBookmark] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -20,31 +19,39 @@ const PostPage = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Estados de Edição e Exclusão (exclusivos para a autora)
+  const [modalEditarAberto, setModalEditarAberto] = useState(false);
+  const [editForm, setEditForm] = useState({
+    titulo: '',
+    categoria: 'MODA & ESTILO',
+    imagem: '',
+    resumo: '',
+    conteudo: ''
+  });
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+  const [excluindoPost, setExcluindoPost] = useState(false);
+
+  // Identificação do usuário logado e verificação de autoria
+  const localUserRaw = localStorage.getItem('plural_user');
+  const localUser = localUserRaw ? JSON.parse(localUserRaw) : null;
+  const currentLoggedId = String(localUser?.id || localUser?.usuario_id || '');
+  const isAutor = Boolean(localUser && post && String(post.usuario_id) === currentLoggedId);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const token = localStorage.getItem('plural_token');
     setIsLogged(!!token);
+
+    // Carrega status do caderno de leitura (Bookmark privado - Slow Media)
+    if (id) {
+      const bookmarks = JSON.parse(localStorage.getItem('lumina_saved_bookmarks') || '[]');
+      setSavedBookmark(bookmarks.includes(String(id)));
+    }
   }, [id]);
 
-  // Carregar status da curtida e lista de comentários
+  // Carregar comentários reais
   useEffect(() => {
     if (!id) return;
-
-    // Busca status da curtida no banco
-    getLikeStatus(id)
-      .then((data) => {
-        if (data) {
-          setLiked(!!data.curtido);
-          if (typeof data.likes === 'number') {
-            setLikesCount(data.likes);
-          }
-        }
-      })
-      .catch((err) => {
-        console.error('Erro ao buscar status de curtida:', err);
-      });
-
-    // Busca comentários reais no banco
     setLoadingComments(true);
     getComments(id)
       .then((data) => {
@@ -58,37 +65,72 @@ const PostPage = () => {
       });
   }, [id]);
 
-  // Sincroniza contador caso o post já venha com likes
-  useEffect(() => {
-    if (post?.likes !== undefined && likesCount === 0) {
-      setLikesCount(post.likes);
+  // Alternar salvar no caderno de leitura pessoal
+  const handleToggleBookmark = () => {
+    const bookmarks = JSON.parse(localStorage.getItem('lumina_saved_bookmarks') || '[]');
+    const strId = String(id);
+    let updated;
+    if (bookmarks.includes(strId)) {
+      updated = bookmarks.filter(b => b !== strId);
+      setSavedBookmark(false);
+    } else {
+      updated = [...bookmarks, strId];
+      setSavedBookmark(true);
     }
-  }, [post]);
+    localStorage.setItem('lumina_saved_bookmarks', JSON.stringify(updated));
+  };
 
-  const handleLike = async () => {
-    if (!isLogged) {
-      alert('✧ Faça login para curtir e interagir com as publicações!');
-      navigate('/login');
+  // Abrir modal de edição com os dados atuais do post
+  const abrirModalEdicao = () => {
+    setEditForm({
+      titulo: post.titulo || '',
+      categoria: post.categoria || 'MODA & ESTILO',
+      imagem: post.imagem || '',
+      resumo: post.resumo || '',
+      conteudo: post.conteudo || ''
+    });
+    setModalEditarAberto(true);
+  };
+
+  // Salvar alterações da edição
+  const handleSalvarEdicao = async (e) => {
+    e.preventDefault();
+    if (!editForm.titulo.trim() || !editForm.conteudo.trim()) {
+      alert('Título e conteúdo são obrigatórios.');
       return;
     }
-
-    // Atualização otimista
-    const prevLiked = liked;
-    const prevLikes = likesCount;
-    setLiked(!prevLiked);
-    setLikesCount(prev => (prevLiked ? Math.max(0, prev - 1) : prev + 1));
-
     try {
-      const res = await toggleLike(id);
-      if (res && res.curtido !== undefined) {
-        setLiked(res.curtido);
-        setLikesCount(res.likes);
-      }
+      setSalvandoEdicao(true);
+      await updatePost(id, editForm);
+      post.titulo = editForm.titulo;
+      post.categoria = editForm.categoria;
+      post.imagem = editForm.imagem;
+      post.resumo = editForm.resumo;
+      post.conteudo = editForm.conteudo;
+      setModalEditarAberto(false);
+      alert('✧ Publicação atualizada com sucesso!');
     } catch (err) {
-      console.error('Erro ao alternar curtida:', err);
-      // Reverter se falhar
-      setLiked(prevLiked);
-      setLikesCount(prevLikes);
+      console.error(err);
+      alert('Erro ao atualizar a publicação. Tente novamente.');
+    } finally {
+      setSalvandoEdicao(false);
+    }
+  };
+
+  // Excluir post com confirmação
+  const handleExcluirPost = async () => {
+    if (!window.confirm('Tem certeza que deseja excluir esta publicação? Esta ação é definitiva e não pode ser desfeita.')) {
+      return;
+    }
+    try {
+      setExcluindoPost(true);
+      await deletePost(id);
+      alert('✧ Publicação excluída com sucesso.');
+      navigate('/home');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir a publicação.');
+      setExcluindoPost(false);
     }
   };
 
@@ -176,8 +218,8 @@ const PostPage = () => {
     <div className="w-full bg-[#F4F1EA] min-h-screen py-10 sm:py-16">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Barra Superior / Voltar */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-300">
+        {/* Barra Superior / Voltar e Ações da Autora */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-300">
           <Link 
             to="/home" 
             className="text-xs font-mono uppercase font-bold tracking-widest text-graphite hover:text-red-editorial transition-colors inline-flex items-center gap-2"
@@ -185,9 +227,33 @@ const PostPage = () => {
             <ArrowLeft size={14} /> VOLTAR AO FEED
           </Link>
 
-          <span className="text-[11px] font-mono tracking-widest text-gray-500 uppercase">
-            ID: #{String(post.id).padStart(4, '0')}
-          </span>
+          <div className="flex items-center gap-3">
+            {isAutor && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={abrirModalEdicao}
+                  className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-mono text-[11px] font-bold px-3 py-1.5 uppercase tracking-wider border border-black shadow-[2px_2px_0_0_#111111] transition-all cursor-pointer"
+                  title="Editar sua publicação"
+                >
+                  <Edit3 size={13} /> EDITAR
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExcluirPost}
+                  disabled={excluindoPost}
+                  className="inline-flex items-center gap-1.5 bg-red-editorial hover:bg-black text-white font-mono text-[11px] font-bold px-3 py-1.5 uppercase tracking-wider border border-black shadow-[2px_2px_0_0_#111111] transition-all disabled:opacity-50 cursor-pointer"
+                  title="Excluir sua publicação"
+                >
+                  <Trash2 size={13} /> {excluindoPost ? 'EXCLUINDO...' : 'EXCLUIR'}
+                </button>
+              </div>
+            )}
+
+            <span className="text-[11px] font-mono tracking-widest text-gray-500 uppercase">
+              ID: #{String(post.id).padStart(4, '0')}
+            </span>
+          </div>
         </div>
 
         {/* Cabeçalho do Artigo */}
@@ -249,31 +315,56 @@ const PostPage = () => {
           </div>
         </div>
 
-        {/* Barra de Ações (Curtir / Compartilhar / Voltar) */}
+        {/* Barra de Ações (Guardar no Caderno / Compartilhar / Ações da Autora) */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t-2 border-b-2 border-gray-300 mb-12">
-          <div className="flex items-center gap-3">
-            {/* Botão de Curtir com persistência real no MySQL */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Guardar no Caderno de Leituras (Slow Media / Leitura Lenta) */}
             <button
-              onClick={handleLike}
-              className={`flex items-center gap-2 border-2 border-graphite px-5 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#111111] ${
-                liked
-                  ? 'bg-red-editorial text-white border-graphite'
-                  : 'bg-white text-graphite hover:text-red-editorial hover:border-red-editorial'
+              type="button"
+              onClick={handleToggleBookmark}
+              className={`flex items-center gap-2 border-2 border-graphite px-4 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer ${
+                savedBookmark
+                  ? 'bg-graphite text-white'
+                  : 'bg-white text-graphite hover:bg-gray-100'
               }`}
-              title={liked ? "Descurtir postagem" : "Curtir postagem"}
+              title={savedBookmark ? "Remover do caderno de leituras" : "Guardar no caderno de leituras"}
             >
-              <Heart size={16} className={liked ? "fill-white text-white" : "text-red-editorial"} />
-              <span>{likesCount} {likesCount === 1 ? 'CURTIDA' : 'CURTIDAS'} ✧</span>
+              <Bookmark size={15} className={savedBookmark ? "fill-white text-white" : "text-graphite"} />
+              <span>{savedBookmark ? 'MARCADO NO CADERNO ✧' : 'GUARDAR PÁGINA'}</span>
             </button>
 
             {/* Botão de Compartilhar */}
             <button
+              type="button"
               onClick={handleShare}
-              className="flex items-center gap-2 border-2 border-graphite bg-white text-graphite hover:bg-red-50 hover:text-red-editorial px-4 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111]"
+              className="flex items-center gap-2 border-2 border-graphite bg-white text-graphite hover:bg-red-50 hover:text-red-editorial px-4 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111] cursor-pointer"
             >
               <Share2 size={15} />
               <span>{copiedLink ? 'LINK COPIADO! ✧' : 'COMPARTILHAR'}</span>
             </button>
+
+            {/* Ações Rápidas da Autora */}
+            {isAutor && (
+              <>
+                <button
+                  type="button"
+                  onClick={abrirModalEdicao}
+                  className="flex items-center gap-1.5 border-2 border-graphite bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111] cursor-pointer"
+                  title="Editar publicação"
+                >
+                  <Edit3 size={14} /> EDITAR ARTIGO
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExcluirPost}
+                  disabled={excluindoPost}
+                  className="flex items-center gap-1.5 border-2 border-graphite bg-red-editorial hover:bg-black text-white px-4 py-2.5 rounded-sm text-xs font-mono font-bold transition-all shadow-[3px_3px_0_0_#111111] disabled:opacity-50 cursor-pointer"
+                  title="Excluir publicação"
+                >
+                  <Trash2 size={14} /> {excluindoPost ? 'EXCLUINDO...' : 'EXCLUIR'}
+                </button>
+              </>
+            )}
           </div>
 
           <Link
@@ -422,6 +513,108 @@ const PostPage = () => {
             </div>
           )}
         </section>
+
+        {/* ✦ MODAL DE EDIÇÃO DE PUBLICAÇÃO (Apenas para a Autora) ✦ */}
+        {modalEditarAberto && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-[#F4F1EA] border-2 border-graphite p-6 sm:p-8 max-w-2xl w-full shadow-[8px_8px_0_0_#111111] my-8 animate-in fade-in zoom-in duration-150">
+              <div className="flex items-center justify-between pb-4 border-b-2 border-graphite mb-6">
+                <div className="flex items-center gap-2">
+                  <Edit3 size={20} className="text-red-editorial" />
+                  <h3 className="font-serif font-black text-xl text-graphite">
+                    Editar Publicação ✧
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setModalEditarAberto(false)}
+                  className="text-graphite hover:text-red-editorial font-bold p-1 cursor-pointer"
+                  title="Fechar"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSalvarEdicao} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-mono uppercase font-bold text-gray-700 mb-1">
+                    Título da Publicação *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.titulo}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, titulo: e.target.value }))}
+                    className="w-full bg-white border-2 border-graphite px-3 py-2 text-sm font-sans focus:outline-hidden focus:border-red-editorial"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase font-bold text-gray-700 mb-1">
+                      Categoria *
+                    </label>
+                    <select
+                      value={editForm.categoria}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, categoria: e.target.value }))}
+                      className="w-full bg-white border-2 border-graphite px-3 py-2 text-sm font-sans focus:outline-hidden focus:border-red-editorial"
+                    >
+                      <option value="MODA & ESTILO">MODA & ESTILO</option>
+                      <option value="CINEMA & MÚSICA">CINEMA & MÚSICA</option>
+                      <option value="LITERATURA">LITERATURA</option>
+                      <option value="CRÔNICAS">CRÔNICAS</option>
+                      <option value="RESENHA">RESENHA</option>
+                      <option value="ARTE & DESIGN">ARTE & DESIGN</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase font-bold text-gray-700 mb-1">
+                      URL da Imagem de Capa
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://exemplo.com/foto.jpg"
+                      value={editForm.imagem}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, imagem: e.target.value }))}
+                      className="w-full bg-white border-2 border-graphite px-3 py-2 text-sm font-sans focus:outline-hidden focus:border-red-editorial"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono uppercase font-bold text-gray-700 mb-1">
+                    Conteúdo da Publicação *
+                  </label>
+                  <textarea
+                    required
+                    rows={8}
+                    value={editForm.conteudo}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, conteudo: e.target.value }))}
+                    className="w-full bg-white border-2 border-graphite p-3 text-sm font-sans focus:outline-hidden focus:border-red-editorial resize-y"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-300">
+                  <button
+                    type="button"
+                    onClick={() => setModalEditarAberto(false)}
+                    className="px-4 py-2 border-2 border-graphite bg-white text-graphite font-mono text-xs font-bold uppercase tracking-wider hover:bg-gray-100 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={salvandoEdicao}
+                    className="px-5 py-2 border-2 border-graphite bg-red-editorial hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider shadow-[3px_3px_0_0_#111111] transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    {salvandoEdicao ? 'Salvando...' : 'Salvar Alterações ✧'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </article>
     </div>
