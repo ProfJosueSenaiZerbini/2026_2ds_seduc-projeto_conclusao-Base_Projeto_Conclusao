@@ -2,82 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePosts } from '../hooks/usePosts';
 import { Heart, Clock, User, ArrowRight, MessageCircle } from 'lucide-react';
-import Tape from '../components/ui/Tape';
 import Badge from '../components/ui/Badge';
 import Sparkle from '../components/ui/Sparkle';
 import CommentsModal from '../components/comments/CommentsModal';
 import { toggleLike } from '../services/api';
 
 const CATEGORIES = ['TODAS', 'MODA & ESTILO', 'CINEMA & TV', 'LITERATURA', 'MÚSICA', 'BEM-ESTAR'];
-
-const POSTS_PADRAO = [
-  {
-    id: 1,
-    titulo: 'O Retorno Triunfal da Estética Y2K: Nostalgia, Moda e Redes',
-    categoria: 'MODA & ESTILO',
-    autor: 'Juliana Mendes',
-    tempoLeitura: '5 min de leitura',
-    resumo: 'Como as tendências dos anos 2000 — do brilho labial aos jeans cintura baixa — voltaram com força total na cultura pop contemporânea.',
-    imagem: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
-    curtidas: 42,
-    total_comentarios: 6
-  },
-  {
-    id: 2,
-    titulo: 'Girlhood no Cinema: Filmes Clássicos dos Anos 2000 que Marcaram Gerações',
-    categoria: 'CINEMA & TV',
-    autor: 'Beatriz Vasconcelos',
-    tempoLeitura: '8 min de leitura',
-    resumo: 'De Meninas Malvadas a Legalmente Loira: como essas produções moldaram a nossa percepção sobre amizade feminina, moda e autoexpressão.',
-    imagem: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
-    curtidas: 89,
-    total_comentarios: 14
-  },
-  {
-    id: 3,
-    titulo: 'Elogio à Lentidão: Como Redescobrir o Prazer do Diário e do Autocuidado',
-    categoria: 'BEM-ESTAR',
-    autor: 'Camila Duarte',
-    tempoLeitura: '4 min de leitura',
-    resumo: 'Em uma rotina acelerada, resgatar pequenos rituais sem telas como scrapbook, journaling e momentos de chá é essencial para a mente.',
-    imagem: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop',
-    curtidas: 65,
-    total_comentarios: 4
-  },
-  {
-    id: 4,
-    titulo: 'Livros de Autoras Contemporâneas que Você Precisa Ler Este Ano',
-    categoria: 'LITERATURA',
-    autor: 'Mariana Sales',
-    tempoLeitura: '7 min de leitura',
-    resumo: 'Uma curadoria especial de romances e ensaios escritos por mulheres que retratam os desafios, os afetos e os encontros modernos.',
-    imagem: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&h=400&fit=crop',
-    curtidas: 112,
-    total_comentarios: 19
-  },
-  {
-    id: 5,
-    titulo: 'Playlist Nostalgia: Os Ícones Pop Femininos que Definiram a Década de 2000',
-    categoria: 'MÚSICA',
-    autor: 'Larissa Moura',
-    tempoLeitura: '6 min de leitura',
-    resumo: 'Relembre as batidas contagiantes do R&B e do pop que embalaram os tocadores de MP3 e continuam na ponta da língua até hoje.',
-    imagem: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=400&fit=crop',
-    curtidas: 73,
-    total_comentarios: 8
-  },
-  {
-    id: 6,
-    titulo: 'Design, Colagens e Scrapbooks: O Resgate do Artesanal no Meio Digital',
-    categoria: 'MODA & ESTILO',
-    autor: 'Fernanda Lima',
-    tempoLeitura: '9 min de leitura',
-    resumo: 'A estética DIY das fanzines e dos adesivos encontrou um novo lar na internet, inspirando criadoras a produzir peças afetivas.',
-    imagem: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=400&fit=crop',
-    curtidas: 54,
-    total_comentarios: 5
-  }
-];
 
 const Resenhas = () => {
   const navigate = useNavigate();
@@ -105,20 +35,20 @@ const Resenhas = () => {
     }
   };
 
-  // Se houver posts no banco, usa os posts reais; senão, complementa com os padrões da Home
+  // Mapeia exclusivamente os posts reais do banco de dados
   const allPosts = (posts && posts.length > 0)
-    ? posts.map((p, idx) => ({
+    ? posts.map((p) => ({
         id: p.id,
         titulo: p.titulo,
         categoria: p.categoria || 'MODA & ESTILO',
-        autor: p.autor || 'Redação Plural',
+        autor: p.autor || 'Membro da Comunidade',
         tempoLeitura: p.tempoLeitura || '5 min de leitura',
         resumo: p.resumo || (p.conteudo ? p.conteudo.substring(0, 160) + '...' : 'Sem resumo disponível.'),
-        imagem: p.imagem || POSTS_PADRAO[idx % POSTS_PADRAO.length].imagem,
-        curtidas: p.likes !== undefined ? p.likes : (p.curtidas || (40 + ((p.id * 7) % 60))),
+        imagem: p.imagem || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
+        curtidas: p.likes !== undefined ? p.likes : (p.curtidas || 0),
         total_comentarios: p.total_comentarios || 0
       }))
-    : POSTS_PADRAO;
+    : [];
 
   // Normalizador e filtro por categoria resiliente e bidirecional
   const normalizar = (str = '') =>
@@ -177,31 +107,24 @@ const Resenhas = () => {
 
       {/* Estado: Carregando (Loading) */}
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div key={item} className="bg-cream-light border-2 border-graphite p-6 space-y-4 animate-pulse">
-              <div className="w-full aspect-[16/10] bg-gray-300/60" />
-              <div className="h-4 bg-gray-300/60 w-1/3" />
-              <div className="h-6 bg-gray-300/60 w-3/4" />
-              <div className="h-16 bg-gray-300/60 w-full" />
-            </div>
-          ))}
+        <div className="py-20 text-center font-mono text-xs uppercase tracking-widest text-gray-500">
+          Carregando resenhas do banco de dados... ✧
         </div>
       )}
 
       {/* Estado: Erro */}
-      {error && !loading && posts.length === 0 && (
+      {error && !loading && allPosts.length === 0 && (
         <div className="py-16 text-center">
           <h3 className="font-serif text-2xl font-bold text-graphite mb-2">Não foi possível carregar as resenhas do servidor</h3>
           <p className="text-gray-editorial text-sm mb-6">{error}</p>
         </div>
       )}
 
-      {/* Grid de Postagens no mesmo estilo da Home */}
+      {/* Grid de Postagens */}
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
           {filteredPosts.length > 0 ? (
-            filteredPosts.map((post, index) => {
+            filteredPosts.map((post) => {
               const foiCurtido = !!postsCurtidos[post.id];
               const totalCurtidas = post.curtidas + (foiCurtido ? 1 : 0);
 
@@ -220,7 +143,7 @@ const Resenhas = () => {
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                       />
-                      {/* Tag / Categoria em destaque sobreposta */}
+                      {/* Tag / Categoria em destaque */}
                       <span className="absolute top-3 left-3 bg-graphite text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 border border-white shadow-xs">
                         ✧ {post.categoria}
                       </span>
@@ -228,7 +151,6 @@ const Resenhas = () => {
 
                     {/* Conteúdo textual do Card */}
                     <div className="p-6 flex flex-col flex-1 min-w-0">
-                      {/* Metadados: Autor e Tempo de Leitura */}
                       <div className="flex items-center justify-between gap-2 text-xs font-mono text-gray-editorial mb-3 pb-3 border-b border-gray-300/60 min-w-0">
                         <span className="flex items-center gap-1.5 font-bold text-graphite min-w-0 truncate">
                           <User size={13} className="text-red-editorial flex-shrink-0" />
@@ -239,23 +161,19 @@ const Resenhas = () => {
                         </span>
                       </div>
 
-                      {/* Título do Post */}
                       <h2 className="font-serif font-bold text-xl sm:text-2xl text-graphite leading-snug mb-3 group-hover:text-red-editorial transition-colors line-clamp-2 break-words">
                         {post.titulo}
                       </h2>
 
-                      {/* Resumo / Trecho */}
                       <p className="font-sans text-sm text-gray-600 leading-relaxed line-clamp-3 break-words">
                         {post.resumo}
                       </p>
                     </div>
                   </div>
 
-                  {/* Rodapé do Card: Ações (Curtir, Comentários & Ler Mais) */}
+                  {/* Rodapé do Card */}
                   <div className="p-6 pt-0 border-t border-gray-200 mt-2 flex items-center justify-between">
-
                     <div className="flex items-center gap-2">
-                      {/* Botão de Curtir com contador e estado reativo */}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -276,7 +194,6 @@ const Resenhas = () => {
                         <span>{totalCurtidas}</span>
                       </button>
 
-                      {/* Botão de Comentários Interativo (Estilo Instagram) */}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -285,14 +202,13 @@ const Resenhas = () => {
                           setModalComentariosAberto(true);
                         }}
                         className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-700 hover:text-red-editorial bg-white hover:bg-red-50 border border-gray-300 hover:border-red-editorial px-2.5 py-1.5 shadow-xs transition-all cursor-pointer group"
-                        title="Abrir comentários (estilo Instagram) ✧"
+                        title="Abrir comentários ✧"
                       >
                         <MessageCircle size={13} className="text-gray-500 group-hover:text-red-editorial transition-colors" />
                         <span>{comentariosExtras[post.id] !== undefined ? comentariosExtras[post.id] : (post.total_comentarios || 0)}</span>
                       </button>
                     </div>
 
-                    {/* Botão de Ler Mais */}
                     <Link
                       to={`/post/${post.id}`}
                       onClick={(e) => e.stopPropagation()}
@@ -301,15 +217,16 @@ const Resenhas = () => {
                       <span>Ler mais</span>
                       <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
-
                   </div>
                 </article>
               );
             })
           ) : (
             <div className="col-span-full py-16 text-center">
-              <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
-                Nenhuma resenha encontrada para a categoria "{selectedCategory}".
+              <p className="font-mono text-xs uppercase tracking-widest text-gray-500">
+                {allPosts.length === 0
+                  ? 'Nenhuma resenha cadastrada no banco de dados ainda.'
+                  : `Nenhuma resenha encontrada para a categoria "${selectedCategory}".`}
               </p>
             </div>
           )}

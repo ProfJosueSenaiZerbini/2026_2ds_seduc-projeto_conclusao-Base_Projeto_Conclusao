@@ -15,69 +15,6 @@ const CATEGORIES = [
   { id: 'MODA', label: 'MODA' }
 ];
 
-const MOCK_CARDS = [
-  {
-    id: 'mock-1',
-    categoria: 'TECNOLOGIA',
-    autor: 'Lucas Almeida',
-    tempoLeitura: '5 min de leitura',
-    titulo: 'O Futuro da Inteligência Artificial no Design e na Criatividade',
-    resumo: 'Como os novos modelos gerativos estão transformando o fluxo de trabalho dos criativos e o debate ético sobre autoria nas artes digitais.',
-    likes: 42,
-    imagem: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop'
-  },
-  {
-    id: 'mock-2',
-    categoria: 'FILMES & CINEMA',
-    autor: 'Beatriz Vasconcelos',
-    tempoLeitura: '8 min de leitura',
-    titulo: 'O Renascimento do Cinema em Película de 35mm',
-    resumo: 'Grandes diretores contemporâneos voltam a escolher rolos analógicos para capturar a textura e a nostalgia que o sensor digital não reproduz.',
-    likes: 89,
-    imagem: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&h=400&fit=crop'
-  },
-  {
-    id: 'mock-3',
-    categoria: 'COTIDIANO & ESTILO',
-    autor: 'Juliana Mendes',
-    tempoLeitura: '4 min de leitura',
-    titulo: 'Elogio à Lentidão: Como Redescobrir o Prazer do Café e da Manhã',
-    resumo: 'Em uma rotina hiperconectada e acelerada, resgatar pequenos rituais sem telas é um ato de resistência e cuidado com a saúde mental.',
-    likes: 65,
-    imagem: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop'
-  },
-  {
-    id: 'mock-4',
-    categoria: 'LIVROS & LITERATURA',
-    autor: 'Rafael Costa',
-    tempoLeitura: '6 min de leitura',
-    titulo: 'Vozes Emergentes na Literatura Latino-Americana',
-    resumo: 'Novos romances que exploram realismo mágico contemporâneo e conflitos sociais através de narrativas viscerais e inovadoras.',
-    likes: 54,
-    imagem: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&h=400&fit=crop'
-  },
-  {
-    id: 'mock-5',
-    categoria: 'MÚSICA & CULTURA',
-    autor: 'Camila Rocha',
-    tempoLeitura: '7 min de leitura',
-    titulo: 'A Ressonância do Jazz nas Batidas Urbanas Modernas',
-    resumo: 'Produtores independentes redescobrem a improvisação do jazz para reinventar os ritmos do hip-hop e da música instrumental.',
-    likes: 71,
-    imagem: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=400&fit=crop'
-  },
-  {
-    id: 'mock-6',
-    categoria: 'DESIGN & ESPAÇO',
-    autor: 'Thiago Silva',
-    tempoLeitura: '5 min de leitura',
-    titulo: 'Minimalismo Quente: A Arquitetura dos Espaços Acolhedores',
-    resumo: 'Como o design de interiores contemporâneo substituiu a frieza do concreto por madeira natural, iluminação orgânica e memória afetiva.',
-    likes: 38,
-    imagem: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=400&fit=crop'
-  }
-];
-
 const ResenhasPage = ({ initialCategory }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryCat = searchParams.get('categoria');
@@ -125,23 +62,20 @@ const ResenhasPage = ({ initialCategory }) => {
     });
   };
 
-  // Consolidação dos posts reais + mock
+  // Mapeia apenas os posts reais do banco de dados
   let allPosts = [];
   if (posts && posts.length > 0) {
-    const realPosts = posts.map((p, idx) => ({
+    allPosts = posts.map((p) => ({
       id: p.id,
       categoria: (p.categoria || 'RESENHA & CRÍTICA').toUpperCase(),
       autor: p.autor || p.a || 'Redação Lumina',
       tempoLeitura: '5 min de leitura',
       titulo: p.titulo,
       resumo: p.resumo || (p.conteudo ? p.conteudo.substring(0, 160) + '...' : 'Sem resumo.'),
-      likes: 24 + ((p.id * 7) % 70),
-      imagem: p.imagem || MOCK_CARDS[idx % MOCK_CARDS.length].imagem,
+      likes: p.likes !== undefined ? p.likes : (p.curtidas || 0),
+      imagem: p.imagem || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop',
       isReal: true
     }));
-    allPosts = [...realPosts, ...MOCK_CARDS];
-  } else {
-    allPosts = MOCK_CARDS;
   }
 
   const normalizarCat = (str = '') =>

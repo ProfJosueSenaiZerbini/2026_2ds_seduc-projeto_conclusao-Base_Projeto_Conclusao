@@ -69,9 +69,6 @@ const LoginPage = () => {
           <ArrowLeft size={16} /> Voltar para a Capa
         </Link>
         <div className="relative">
-          <h1 className="font-serif font-black text-2xl tracking-tight text-graphite">
-            PLURAL
-          </h1>
           <span className="absolute -top-1 -right-3 text-red-editorial text-xs sparkle">✦</span>
         </div>
       </div>

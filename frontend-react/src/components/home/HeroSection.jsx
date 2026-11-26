@@ -2,37 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
-import { searchPosts, getDemo } from '../../services/api';
-import { Search, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const HeroSection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
-
   const navigate = useNavigate();
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      // Chama o endpoint de busca mapeado na API
-      const results = await searchPosts(searchQuery);
-      console.log('Resultados da busca:', results);
-      // Aqui você poderia redirecionar para uma página de resultados ou atualizar um estado global
-      alert(`Busca concluída para: ${searchQuery}`);
-    } catch (error) {
-      console.error('Erro na busca:', error);
-      alert('Erro ao realizar a busca. Tente novamente.');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   const handleDemoClick = () => {
-    // Redireciona para o login/apresentação conforme solicitado
     navigate('/login');
   };
 
@@ -62,30 +38,9 @@ const HeroSection = () => {
          Arte que transforma. Nossa plataforma une o design clássico editorial com a interatividade moderna.
       </p>
 
-      {/* Search Bar (Estilo Editorial) */}
-      <form onSubmit={handleSearch} className="relative max-w-md w-full">
-        <div className="flex items-center border-2 border-graphite rounded-sm overflow-hidden bg-white/50 focus-within:bg-white transition-colors">
-          <input
-            type="text"
-            placeholder="Pesquisar artigos, edições..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent px-4 py-3 text-graphite placeholder-gray-400 font-sans text-sm focus:outline-none"
-            disabled={isSearching}
-          />
-          <button
-            type="submit"
-            disabled={isSearching}
-            className="bg-graphite text-white px-4 py-3 hover:bg-black transition-colors flex items-center justify-center min-w-[3rem]"
-          >
-            {isSearching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
-          </button>
-        </div>
-      </form>
-
       {/* CTAs */}
       <div className="flex flex-wrap items-center gap-3 pt-2">
-        {/* Botão 1: Ação Principal (Demo/Free Trial) */}
+        {/* Botão 1: Ação Principal (Entrar / Conhecer) */}
         <Button 
           variant="solid" 
           onClick={handleDemoClick}
@@ -98,9 +53,9 @@ const HeroSection = () => {
           )}
         </Button>
 
-        {/* Botão 2: Ação Secundária (See More) */}
-        <Button variant="outline" onClick={() => document.getElementById('recursos')?.scrollIntoView({ behavior: 'smooth' })}>
-          EXPLORAR CATEGORIAS
+        {/* Botão 2: Ação Secundária */}
+        <Button variant="outline" onClick={() => navigate('/login')}>
+          ENTRAR NA COMUNIDADE
         </Button>
       </div>
 

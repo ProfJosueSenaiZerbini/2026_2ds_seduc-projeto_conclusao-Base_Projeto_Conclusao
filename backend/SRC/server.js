@@ -48,7 +48,21 @@ app.use(express.static(frontendDistPath));
 // Qualquer rota GET de navegação (ex: /login, /home, /perfil, /chat) é entregue ao React Router
 app.use((req, res) => {
     if (req.method === "GET") {
-        return res.sendFile(path.join(frontendDistPath, "index.html"));
+        const indexPath = path.join(frontendDistPath, "index.html");
+        if (fs.existsSync(indexPath)) {
+            return res.sendFile(indexPath);
+        }
+        return res.status(200).send(`
+            <div style="font-family: system-ui, sans-serif; text-align: center; padding: 60px 20px; line-height: 1.6;">
+                <h2 style="color: #c8102e;">⚠️ Frontend ainda não compilado nesta máquina</h2>
+                <p>A pasta <code>frontend-react/dist</code> não existe no computador da sua colega porque pastas de build são ignoradas pelo Git.</p>
+                <p>Para resolver e rodar tudo na porta 3000, basta executar no terminal da raiz:</p>
+                <div style="margin: 20px auto; max-width: 350px; background: #222; color: #4ade80; padding: 14px 20px; border-radius: 6px; font-family: monospace; font-size: 16px; font-weight: bold; text-align: center;">
+                    npm run build
+                </div>
+                <p style="color: #666; font-size: 14px;">Depois disso, atualize (F5) esta página!</p>
+            </div>
+        `);
     }
     res.status(404).json({ mensagem: "Rota não encontrada na API" });
 });

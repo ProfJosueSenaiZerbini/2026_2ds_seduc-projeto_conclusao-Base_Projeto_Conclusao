@@ -388,7 +388,7 @@ if (useSupabase) {
                     .from("comentarios")
                     .select("id, post_id, usuario_id, texto, criado_em")
                     .eq("post_id", postId)
-                    .order("criando_em", { ascending: true });
+                    .order("criado_em", { ascending: true });
 
                 if (error || !comments) return [[], []];
 
