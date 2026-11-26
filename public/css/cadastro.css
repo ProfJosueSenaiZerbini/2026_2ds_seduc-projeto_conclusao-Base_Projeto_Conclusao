@@ -404,6 +404,12 @@ input:focus-visible {
   padding-right: 48px;
 }
 
+/* Esconde o olho nativo do Edge/IE, que duplicaria o botão do iBico */
+.input-with-icon .input::-ms-reveal,
+.input-with-icon .input::-ms-clear {
+  display: none;
+}
+
 .input-icon-btn {
   position: absolute;
   right: 8px;
