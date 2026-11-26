@@ -1,10 +1,10 @@
 # ✧ Lumina — Blog Editorial & Rede Social Cultural
 
-Plataforma web que combina a profundidade editorial de uma revista cultural com a dinâmica de uma rede social, inspirada na estética visual **Y2K (anos 2000)** com arquitetura moderna fullstack.
+Plataforma web que combina a profundidade editorial de uma revista cultural com a dinâmica de uma rede social. 
 
 ---
 
-## 👥 Integrantes
+##  Integrantes
 * Anna Clara Mansano Santos
 * Haifa Cecilia Rios Antunes
 * Sofia Vicente de Souza
@@ -13,7 +13,7 @@ Plataforma web que combina a profundidade editorial de uma revista cultural com 
 
 ---
 
-## 📖 Descrição do Projeto
+##  Descrição do Projeto
 
 O **Lumina** foi concebido como um espaço de lazer, partilha e conexão cultural. O sistema permite o compartilhamento de saberes por meio de artigos, resenhas de livros/filmes/moda, interações em comunidade (curtidas, comentários), chat público, perfis personalizados e uma assistente virtual de recomendações culturais.
 
@@ -27,7 +27,7 @@ O **Lumina** foi concebido como um espaço de lazer, partilha e conexão cultura
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 * **Frontend**: React 18, Tailwind CSS, Lucide React, React Router 6, Vite.
 * **Backend**: Node.js, Express 5, JWT, BcryptJS, @supabase/supabase-js, MySQL2.
@@ -35,7 +35,7 @@ O **Lumina** foi concebido como um espaço de lazer, partilha e conexão cultura
 
 ---
 
-## 🚀 Como Instalar e Rodar o Projeto
+##  Como Instalar e Rodar o Projeto
 
 ### 1. Clonar o Repositório
 ```bash
@@ -86,7 +86,7 @@ npm run criar-admin
 
 ---
 
-## 🖥️ Como Executar a Aplicação
+##  Como Executar a Aplicação
 
 ### Modo 1: Servidor Único Unificado (Recomendado)
 O backend Express serve a aplicação completa (frontend compilado + APIs) na porta **3000**:
@@ -114,7 +114,7 @@ Acesse no navegador: **http://localhost:5173**
 
 ---
 
-## 📁 Estrutura de Diretórios
+##  Estrutura de Diretórios
 
 ```
 projeto-conclusao-blog/
