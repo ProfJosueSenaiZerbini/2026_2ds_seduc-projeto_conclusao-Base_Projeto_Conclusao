@@ -95,14 +95,20 @@ SELECT o.id AS id,'obra' tipo,o.proprietario_id responsavel,o.titulo,p.nome auto
 FROM obras o JOIN perfis p ON p.usuario_id=o.proprietario_id WHERE o.demonstracao=0 AND p.demonstracao=0 AND
  (o.proprietario_id=@titular OR EXISTS(SELECT 1 FROM creditos c WHERE c.obra_id=o.id AND c.usuario_creditado_id=@titular AND c.verificado=1 AND c.demonstracao=0))
 UNION ALL
-SELECT b.id,'beat',b.produtor_id,b.titulo,p.nome,'Beat',b.descricao,b.criado_em,1,1,'Produção do beat','["beatmaker"]'
-FROM beats b JOIN perfis p ON p.usuario_id=b.produtor_id WHERE b.produtor_id=@titular AND b.demonstracao=0 AND p.demonstracao=0
+SELECT b.id,'beat',b.produtor_id,b.titulo,p.nome,'Beat',b.descricao,b.criado_em,b.produtor_id=@titular,1,
+ CASE WHEN b.produtor_id=@titular THEN 'Produção do beat' ELSE
+ (SELECT group_concat(c.funcao,' / ') FROM creditos_publicacoes c WHERE c.tipo='beat' AND c.objeto_id=b.id AND c.usuario_id=@titular AND c.confirmado=1 AND c.retirado_em IS NULL) END,
+ CASE WHEN b.produtor_id=@titular THEN '["beatmaker"]' ELSE '[]' END
+FROM beats b JOIN perfis p ON p.usuario_id=b.produtor_id WHERE b.demonstracao=0 AND p.demonstracao=0 AND
+ (b.produtor_id=@titular OR EXISTS(SELECT 1 FROM creditos_publicacoes c WHERE c.tipo='beat' AND c.objeto_id=b.id AND c.usuario_id=@titular AND c.confirmado=1 AND c.retirado_em IS NULL))
 UNION ALL
 SELECT e.id,'evento',e.proprietario_id,e.titulo,p.nome,'Evento',e.descricao,e.criado_em,e.proprietario_id=@titular,1,
- CASE WHEN e.proprietario_id=@titular THEN 'Organização' WHEN EXISTS(SELECT 1 FROM eventos_presencas pr WHERE pr.evento_id=e.id AND pr.usuario_id=@titular AND pr.revogada_em IS NULL) THEN 'Comparecimento registrado; não comprova contribuição profissional' ELSE 'Participação confirmada no evento (registro legado)' END,
+ CASE WHEN e.proprietario_id=@titular THEN 'Organização' ELSE coalesce(
+ (SELECT group_concat(c.funcao,' / ') FROM creditos_publicacoes c WHERE c.tipo='evento' AND c.objeto_id=e.id AND c.usuario_id=@titular AND c.confirmado=1 AND c.retirado_em IS NULL),
+ CASE WHEN EXISTS(SELECT 1 FROM eventos_presencas pr WHERE pr.evento_id=e.id AND pr.usuario_id=@titular AND pr.revogada_em IS NULL) THEN 'Comparecimento registrado; não comprova contribuição profissional' ELSE 'Participação confirmada no evento (registro legado)' END) END,
  CASE WHEN e.proprietario_id=@titular THEN '["organizador-eventos"]' ELSE '[]' END
 FROM eventos e JOIN perfis p ON p.usuario_id=e.proprietario_id WHERE e.demonstracao=0 AND p.demonstracao=0 AND
- (e.proprietario_id=@titular OR EXISTS(SELECT 1 FROM eventos_presencas pr WHERE pr.evento_id=e.id AND pr.usuario_id=@titular AND pr.revogada_em IS NULL) OR EXISTS(SELECT 1 FROM interesses_eventos i WHERE i.evento_id=e.id AND i.usuario_id=@titular AND i.status='confirmado' AND NOT EXISTS(SELECT 1 FROM eventos_inscricoes ni WHERE ni.evento_id=e.id AND ni.usuario_id=@titular)))
+ (e.proprietario_id=@titular OR EXISTS(SELECT 1 FROM creditos_publicacoes c WHERE c.tipo='evento' AND c.objeto_id=e.id AND c.usuario_id=@titular AND c.confirmado=1 AND c.retirado_em IS NULL) OR EXISTS(SELECT 1 FROM eventos_presencas pr WHERE pr.evento_id=e.id AND pr.usuario_id=@titular AND pr.revogada_em IS NULL) OR EXISTS(SELECT 1 FROM interesses_eventos i WHERE i.evento_id=e.id AND i.usuario_id=@titular AND i.status='confirmado' AND NOT EXISTS(SELECT 1 FROM eventos_inscricoes ni WHERE ni.evento_id=e.id AND ni.usuario_id=@titular)))
 UNION ALL
 SELECT p.id,'projeto',p.autor_id,p.titulo,pf.nome,coalesce(d.modalidade,'Projeto'),p.descricao,p.criado_em,1,p.publico,
  coalesce(nullif(d.papel,''),'Atuação declarada'),coalesce(d.profissoes_json,'[]')

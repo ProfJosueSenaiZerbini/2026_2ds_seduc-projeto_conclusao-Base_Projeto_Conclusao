@@ -2,16 +2,35 @@
 <a class="et-back" href="<%= voltar %>"><%- icones.arrowLeft %> Voltar aos trabalhos</a>
 <article class="et-sheet">
   <div class="et-sheet-head"><span class="et-sheet-icon" aria-hidden="true"><%- icones[item.icone] %></span>
-    <div class="et-heading"><h1><%= item.titulo %></h1><p><%= item.autor %> · <%= item.tipo %><%= item.metadados ? ' · ' + item.metadados : '' %></p></div></div>
+    <div class="et-heading"><h2 class="cy-work-heading"><%= item.titulo %></h2><p><%= item.autor %> · <%= item.tipo %><%= item.metadados ? ' · ' + item.metadados : '' %></p></div></div>
   <% if (item.papel) { %><p class="et-role"><%= item.proprio ? 'Seu papel' : 'Sua participação' %> · <%= item.papel %></p><% } %>
   <% if (item.descricao) { %><p class="et-description"><%= item.descricao %></p><% } %>
   <%- include('../partials/componentes/midias-publicacao',{tipo:item.modalidade,id:item.id}) %>
   <% if (item.fatos.length) { %><dl class="et-facts"><% item.fatos.forEach(([label,valor]) => { %><div><dt><%= label %></dt><dd><%= valor %></dd></div><% }) %></dl><% } %>
-  <% if (creditos.length) { %><h2>Créditos</h2><ul><% creditos.forEach(c => { %><li><strong><%= c.name %></strong> · <%= [c.role,c.participation].filter(Boolean).join(' · ') %> · <%= c.verified && c.userId ? 'Confirmado' : 'Não confirmado' %></li><% }) %></ul><% } %>
+  <% if (musical) { %>
+    <%- include('../partials/componentes/dados-musicais', { musical, base: '/espaco-de-trabalho/obra/' }) %>
+    <% if (musical.lancamento && item.proprio) { %>
+      <details>
+        <summary>Comprovar lançamento</summary>
+        <%- include('../partials/componentes/evidencia-lancamento', { id: item.id, valores: { tipo: 'audio', data: '', url: '', autorizado: false } }) %>
+      </details>
+    <% } %>
+    <% if (historicoMusical.length) { %>
+      <details><summary>Histórico de alterações</summary><ul>
+        <% const acoes = { migrado: 'Migrado do acervo anterior', criado: 'Lançamento cadastrado', editado: 'Registro atualizado', evidencia_enviada: 'Evidência enviada', evidencia_revisada: 'Evidência revisada' }; %>
+        <% for (const revisao of historicoMusical) { %><li><%= acoes[revisao.acao] %> · <%= revisao.criado_em.slice(0,10).split('-').reverse().join('/') %></li><% } %>
+      </ul></details>
+    <% } %>
+  <% } %>
+  <% if (creditos.length) { %><h2>Créditos</h2><ul><% creditos.forEach(c => { %><li><strong><%= c.name %></strong> · <%= [c.role,c.participation].filter(Boolean).join(' · ') %> · <%= c.userId ? (c.verified ? 'Confirmado' : 'Aguardando confirmação') : 'Menção externa' %></li><% }) %></ul><% } %>
+  <% if (item.modalidade === 'obra' && !item.proprio) { %>
+    <a class="et-more" href="/portfolio/edit">Organizar esta participação no portfólio <%- icones.arrowRight %></a>
+  <% } %>
   <% if (ofertas.length) { %><h2>Ofertas de licença</h2><ul><% ofertas.forEach(o => { %><li><strong><%= o.tipo %></strong><%= o.precoCentavos == null ? '' : ' · '+(o.precoCentavos/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) %><%= o.descricao ? ' · '+o.descricao : '' %></li><% }) %></ul><% } %>
   <% if (item.link) { %><a class="et-more" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">Abrir link de escuta <%- icones.externalLink %></a><% } %>
   <% if (item.modalidade === 'evento') { %><a class="et-more" href="/events?localizacao=#evento-<%= encodeURIComponent(item.id) %>">Abrir evento <%- icones.arrowRight %></a><% } %>
   <% if (item.proprio) { %><footer class="et-sheet-actions">
+    <% if (['obra','beat','evento'].includes(item.modalidade)) { %><a class="et-action" href="/creditos/gerir/<%= item.modalidade %>/<%= encodeURIComponent(item.id) %>">Gerenciar créditos</a><% } %>
     <a class="et-action" href="/publicacoes/<%= item.modalidade %>/<%= encodeURIComponent(item.id) %>/midias">Gerenciar mídias</a>
     <a class="et-action" href="<%= item.base %>/edit?origem=espaco">Editar <%= item.modalidade %></a>
     <details><summary>Excluir <%= item.modalidade %></summary><form action="<%= item.base %>/delete" method="post">

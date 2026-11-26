@@ -293,33 +293,34 @@
     });
   });
 
-  const opcoesSidebar = document.getElementById("sidebar-options-checkbox");
+  const opcoesSidebar = document.querySelector("[data-sidebar-more]");
   const menuOpcoesSidebar = document.getElementById("recursos-menu");
   if (opcoesSidebar && menuOpcoesSidebar) {
     const fecharOpcoes = () => {
-      opcoesSidebar.checked = false;
       opcoesSidebar.setAttribute("aria-expanded", "false");
-      menuOpcoesSidebar.hidePopover();
+      menuOpcoesSidebar.hidePopover?.();
       menuOpcoesSidebar.hidden = true;
     };
     const posicionarOpcoes = () => {
-      if (!opcoesSidebar.checked) return;
+      if (opcoesSidebar.getAttribute("aria-expanded") !== "true") return;
       const sidebar = opcoesSidebar.closest(".sidebar");
       const limites = sidebar.getBoundingClientRect();
-      const botao = opcoesSidebar.nextElementSibling.getBoundingClientRect();
+      const botao = opcoesSidebar.getBoundingClientRect();
       const largura = menuOpcoesSidebar.getBoundingClientRect().width;
       menuOpcoesSidebar.style.left = `${Math.max(12, Math.min(limites.right + 8, window.innerWidth - largura - 12))}px`;
       menuOpcoesSidebar.style.bottom = `${Math.max(12, window.innerHeight - botao.bottom)}px`;
+      menuOpcoesSidebar.style.maxHeight = `${Math.max(120, Math.min(window.innerHeight - 24, botao.bottom - 12))}px`;
     };
-    opcoesSidebar.addEventListener("change", () => {
-      if (!opcoesSidebar.checked) {
+    opcoesSidebar.addEventListener("click", () => {
+      if (opcoesSidebar.getAttribute("aria-expanded") === "true") {
         fecharOpcoes();
         return;
       }
       opcoesSidebar.setAttribute("aria-expanded", "true");
       menuOpcoesSidebar.hidden = false;
-      menuOpcoesSidebar.showPopover();
+      menuOpcoesSidebar.showPopover?.();
       posicionarOpcoes();
+      menuOpcoesSidebar.querySelector("a, button, input")?.focus();
     });
     new ResizeObserver(posicionarOpcoes).observe(opcoesSidebar.closest(".sidebar"));
     window.addEventListener("resize", posicionarOpcoes);
@@ -329,8 +330,12 @@
     document.addEventListener("click", evento => {
       if (!evento.target.closest(".sidebar-bottom")) fecharOpcoes();
     });
+    document.addEventListener("focusin", evento => {
+      if (!evento.target.closest(".sidebar-bottom")) fecharOpcoes();
+    });
     document.addEventListener("keydown", evento => {
-      if (evento.key === "Escape" && opcoesSidebar.checked) {
+      if (evento.key === "Escape" && opcoesSidebar.getAttribute("aria-expanded") === "true") {
+        evento.preventDefault();
         fecharOpcoes();
         opcoesSidebar.focus();
       }
@@ -338,6 +343,10 @@
   }
 
   const barraLateral = document.querySelector(".sidebar");
+  const criacaoSidebar = barraLateral?.querySelector(".sidebar-create");
+  criacaoSidebar?.addEventListener("toggle", () => {
+    if (criacaoSidebar.open) criacaoSidebar.scrollIntoView({ block: "nearest" });
+  });
   // Continuidade do rail: estado de uma navegação, não uma preferência fixa.
   const raizSidebar = document.documentElement;
   const chaveSidebar = "cypher-sidebar-percurso";
@@ -446,7 +455,7 @@
     link.addEventListener("click", fecharMenu);
   });
   document.addEventListener("keydown", evento => {
-    if (evento.key === "Escape") fecharMenu();
+    if (evento.key === "Escape" && !evento.defaultPrevented) fecharMenu();
   });
 
   const atualizarInteresse = (
@@ -655,6 +664,11 @@
       if (!dialogo) return;
       const dados = cartao.dataset;
       dialogo.dataset.eventId = dados.detailId || "";
+      const denunciar = dialogo.querySelector("[data-event-report-link]");
+      if (denunciar) {
+        denunciar.href = `/suporte/new?objeto_tipo=evento&objeto_id=${encodeURIComponent(dados.detailId || "")}`;
+        denunciar.hidden = !dados.detailId || dados.detailDemonstracao === "true";
+      }
       definirTexto(dialogo, "[data-event-title-detail]", dados.detailTitle);
       definirTexto(
         dialogo,
@@ -807,11 +821,9 @@
       if (excluir) {
         excluir.action = `/works/${id}/delete`;
         excluir.hidden = !obraDoUsuario;
-        excluir.onsubmit = evento => {
-          if (!window.confirm("Excluir esta obra e os créditos associados?")) {
-            evento.preventDefault();
-          }
-        };
+        excluir.dataset.confirm = "Excluir esta obra e os créditos associados?";
+        excluir.dataset.confirmDestrutiva = "true";
+        excluir.dataset.confirmRotulo = "Excluir obra";
       }
       abrirDialogo(dialogo, cartao);
     });

@@ -9,7 +9,8 @@
     if (status) status.textContent = texto;
   };
   const favoritos = new Set(cards.filter(c => c.dataset.obLiked === "true").map(c => c.dataset.obId));
-  let soFavoritos = new URL(location.href).searchParams.get("curtidos") === "1";
+  const soFavoritos = new URL(location.href).searchParams.get("curtidos") === "1";
+  const contador = pagina.querySelector("[data-ob-favorite-count]");
   const movimentoReduzido = matchMedia("(prefers-reduced-motion: reduce)");
   function saltarCurtida(botao, total) {
     botao.querySelector(".ob-like-jump")?.remove();
@@ -20,26 +21,6 @@
     numero.textContent = total;
     botao.append(numero);
     numero.addEventListener("animationend", () => numero.remove(), { once: true });
-  }
-  function preservarFiltro() {
-    const url = new URL(location.href);
-    if (soFavoritos) url.searchParams.set("curtidos", "1");
-    else url.searchParams.delete("curtidos");
-    history.replaceState(null, "", url);
-    pagina.querySelectorAll(".ob-format-tabs a").forEach(link => {
-      const destino = new URL(link.href);
-      if (soFavoritos) destino.searchParams.set("curtidos", "1");
-      else destino.searchParams.delete("curtidos");
-      link.href = destino;
-    });
-    pagina.querySelectorAll(".ob-filter form, .ob-sort").forEach(form => {
-      form.querySelector('[name="curtidos"]')?.remove();
-      if (soFavoritos) {
-        const campo = document.createElement("input");
-        campo.type = "hidden"; campo.name = "curtidos"; campo.value = "1";
-        form.append(campo);
-      }
-    });
   }
   const audio = new Audio();
   audio.preload = "none";
@@ -71,16 +52,6 @@
       prateleira.querySelector("[data-ob-shelf-count]").textContent =
         `${total} ${total === 1 ? "obra" : "obras"}`;
     }
-    const total = pagina.querySelector("[data-ob-total]");
-    if (total)
-      total.textContent = `${quantidade} ${quantidade === 1 ? "obra" : "obras"}`;
-    const contador = pagina.querySelector("[data-ob-favorite-count]");
-    if (contador)
-      contador.textContent = cards.filter(c =>
-        favoritos.has(c.dataset.obId)
-      ).length;
-    colecao?.setAttribute("aria-pressed", String(soFavoritos));
-    preservarFiltro();
     const vazio = pagina.querySelector("[data-ob-collection-empty]");
     if (vazio) vazio.hidden = !soFavoritos || quantidade > 0;
   }
@@ -101,6 +72,7 @@
         const resultado = await resposta.json();
         if (resultado.curtida) favoritos.add(id);
         else favoritos.delete(id);
+        if (contador) contador.textContent = Number(contador.textContent) + (resultado.curtida ? 1 : -1);
         card.dataset.obLikes = String(resultado.total);
         atualizarColecao();
         if (resultado.curtida) saltarCurtida(botao, resultado.total);
@@ -112,21 +84,6 @@
       } finally { botao.disabled = false; }
     });
   });
-  colecao?.addEventListener("click", () => {
-    soFavoritos = !soFavoritos;
-    atualizarColecao();
-    anunciar(
-      soFavoritos
-        ? "Exibindo seus favoritos nesta seleção."
-        : "Exibindo todo o acervo da seleção."
-    );
-  });
-  pagina.querySelector("[data-ob-show-all]")?.addEventListener("click", () => {
-    soFavoritos = false;
-    atualizarColecao();
-    colecao?.focus();
-  });
-  if (colecao) colecao.hidden = false;
   atualizarColecao();
   function atualizarPlayer() {
     for (const card of cards) {

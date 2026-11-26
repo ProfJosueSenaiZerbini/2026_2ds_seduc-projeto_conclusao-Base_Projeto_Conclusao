@@ -1,0 +1,453 @@
+/* Capas, etiquetas de formato e fichas da vitrine de lançamentos. */
+.dc-release {
+  --release-tone: var(--dc-paper);
+  --release-voice: var(--dc-ink);
+  --release-tag-shape: 4px 8px 4px 6px;
+  display: grid;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.dc-shell .dc-release-open {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--dc-ink);
+  background: var(--dc-surface);
+  border: 1px solid var(--dc-line);
+  border-radius: 5px 15px 6px 10px;
+  box-shadow: 3px 4px 0 color-mix(in srgb, var(--release-tone) 15%, transparent);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.dc-shell .dc-release-open:is(:hover, :focus-visible) {
+  border-color: var(--dc-olive);
+  box-shadow:
+    3px 4px 0 #080f0b45,
+    0 0 0 1px var(--dc-line);
+}
+.dc-shell .dc-release-open:focus-visible {
+  outline-offset: -3px;
+}
+.dc-release-artwork,
+.dc-release-jacket {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--dc-art) var(--dc-wall) center / cover;
+  color: var(--release-voice);
+}
+.dc-release-artwork::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow:
+    inset 0 -12px 20px -14px #000b,
+    inset 0 0 0 1px #fff2;
+}
+.dc-release-artwork::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0 auto auto 10px;
+  width: 40px;
+  height: 3px;
+  background: var(--release-tone);
+  clip-path: polygon(0 0, 100% 0, 91% 100%, 5% 100%);
+  pointer-events: none;
+}
+.dc-release-artwork > img,
+.dc-release-jacket > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dc-release-artwork > img {
+  transition: transform 300ms ease;
+}
+.dc-shell .dc-release-fallback > svg,
+.dc-shell .dc-release-jacket > svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+.dc-release-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 9px;
+  background: #22271c;
+  color: #f5f1de;
+  border: 1px solid #ad9c64;
+  border-radius: var(--release-tag-shape);
+  font:
+    700 11px/1.15 "Space Grotesk",
+    sans-serif;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.dc-release-tag > span {
+  display: flex;
+  color: #ead078;
+}
+.dc-release-artwork .dc-release-tag {
+  position: absolute;
+  z-index: 2;
+  inset: 10px auto auto 10px;
+  max-width: calc(100% - 20px);
+}
+
+.dc-release-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 13px 12px;
+  border-top: 1px solid var(--dc-line);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--dc-art) 45%, var(--dc-surface)),
+    var(--dc-surface) 85%
+  );
+}
+.dc-release-meta {
+  min-height: 1.25em;
+  color: var(--dc-muted);
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+.dc-shell .dc-release-body h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 3px;
+  font:
+    700 clamp(17px, 1.4vw, 22px)/1.12 "Space Grotesk",
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+.dc-shell .dc-release-artist {
+  margin: 4px 0 0;
+  color: var(--dc-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+.dc-release-body h3,
+.dc-release-artist,
+.dc-release-meta {
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) {
+  .dc-release-open:is(:hover, :focus-visible) .dc-release-artwork > img {
+    transform: scale(1.045);
+  }
+}
+@media (max-width: 600px) {
+  .dc-tiles.dc-release-tiles {
+    grid-auto-columns: clamp(155px, 44%, 195px);
+  }
+}
+
+.dc-result-grid .dc-release-open {
+  grid-template-columns: 102px minmax(0, 1fr);
+  grid-template-rows: 1fr;
+}
+.dc-result-grid .dc-release-artwork {
+  aspect-ratio: auto;
+}
+.dc-result-grid .dc-release-artwork .dc-release-tag {
+  inset: 8px auto auto 6px;
+  max-width: calc(100% - 12px);
+  gap: 4px;
+  padding-inline: 6px;
+  font-size: 9px;
+}
+
+body:has(.dc-release-dialog[open]) {
+  overflow: hidden;
+}
+.dc-shell .dc-release-dialog {
+  width: min(640px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--dc-line);
+  border-radius: 4px 12px 6px 8px;
+  background: var(--dc-surface);
+  color: var(--dc-ink);
+  box-shadow:
+    5px 7px 0 #080f0b80,
+    0 14px 55px #050b0790;
+}
+.dc-release-dialog::backdrop {
+  background: #070a08b8;
+  backdrop-filter: blur(3px);
+}
+.dc-release-dialog[open] {
+  animation: dc-release-arrive 180ms ease-out both;
+}
+@keyframes dc-release-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dc-release-sheet {
+  border-top: 5px solid var(--release-tone);
+}
+.dc-release-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(65px, 22%, 112px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(12px, 3vw, 21px);
+  padding: clamp(13px, 3vw, 22px);
+  padding-right: 56px;
+  background:
+    linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--release-tone) 18%, transparent),
+      transparent 75%
+    ),
+    var(--dc-panel);
+}
+.dc-release-jacket {
+  border: 1px solid var(--dc-line);
+  border-radius: 2px 6px 3px 4px;
+  box-shadow: 3px 3px 0 var(--release-tone);
+}
+.dc-shell .dc-release-header-copy h2 {
+  margin: 7px 0 2px;
+  font:
+    700 clamp(22px, 5vw, 39px)/1.02 "Space Grotesk",
+    sans-serif;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+.dc-release-header-copy a {
+  color: var(--dc-muted);
+  overflow-wrap: anywhere;
+}
+.dc-shell .dc-release-header-copy a:hover {
+  text-decoration: underline;
+}
+.dc-release-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  margin: 0;
+}
+.dc-release-close button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--dc-line);
+  border-radius: 50%;
+  background: var(--dc-surface);
+  color: var(--dc-ink);
+  cursor: pointer;
+}
+.dc-release-close button > span {
+  display: flex;
+}
+.dc-release-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(128px, 100%), 1fr));
+  gap: 0.9rem 1.1rem;
+  margin: 0;
+  padding: 13px clamp(13px, 3vw, 22px);
+  border-block: 1px solid var(--dc-line);
+}
+.dc-release-details dt {
+  color: var(--dc-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.dc-release-details dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.dc-release-repertoire {
+  padding: 10px clamp(13px, 3vw, 22px) 0;
+}
+.dc-release-track-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 6px;
+}
+.dc-release-track-heading h3 {
+  font:
+    700 17px/1.2 "Space Grotesk",
+    sans-serif;
+}
+.dc-release-track-heading > span {
+  color: var(--dc-muted);
+  font-size: 12px;
+}
+.dc-release-tracks {
+  max-height: min(16rem, 32dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  scrollbar-color: var(--dc-olive) transparent;
+  border-block: 1px solid var(--dc-line);
+}
+.dc-release-tracks:focus-visible {
+  outline: 2px solid var(--dc-olive);
+  outline-offset: 2px;
+}
+.dc-release-tracks > li + li {
+  border-top: 1px solid var(--dc-line);
+}
+.dc-release-tracks :is(button, a) {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr) auto 22px;
+  align-items: center;
+  gap: clamp(6px, 2vw, 11px);
+  width: 100%;
+  min-height: 44px;
+  padding: 5px 7px;
+  border: 0;
+  color: var(--dc-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: pointer;
+}
+.dc-shell .dc-release-tracks :is(button, a):focus-visible {
+  outline-offset: -2px;
+}
+.dc-release-tracks :is(button, a):hover,
+.dc-release-tracks button[aria-current="true"] {
+  background: color-mix(in srgb, var(--release-tone) 16%, var(--dc-surface));
+}
+.dc-release-tracks strong {
+  overflow-wrap: anywhere;
+}
+.dc-release-track-number,
+.dc-release-track-time {
+  color: var(--dc-muted);
+  font:
+    600 11px/1.2 "Space Grotesk",
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.dc-release-track-icon,
+.dc-release-play,
+.dc-release-pause {
+  display: grid;
+  place-items: center;
+  color: var(--release-voice);
+}
+.dc-release-tracks [aria-pressed="true"] .dc-release-play,
+.dc-release-tracks [aria-pressed="false"] .dc-release-pause {
+  display: none;
+}
+.dc-release-player {
+  display: grid;
+  gap: 6px;
+  padding: 12px clamp(13px, 3vw, 22px);
+}
+.dc-release-player-title {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.dc-release-player audio {
+  width: 100%;
+  height: 42px;
+}
+.dc-release-player-status {
+  color: var(--dc-muted);
+  font-size: 12px;
+}
+.dc-release-player-status:empty {
+  margin-top: -6px;
+}
+.dc-release-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 12px clamp(13px, 3vw, 22px);
+  border-top: 1px solid var(--dc-line);
+  background: var(--dc-panel);
+}
+.dc-release-footer :is(.dc-release-full, .obra-ouvir) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 11px;
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 6px 3px 4px;
+  background: var(--dc-surface);
+  color: var(--dc-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.dc-release-footer .dc-release-full {
+  background: var(--release-tone);
+  color: #1b1e15;
+}
+.dc-release-footer .obra-ouvir.obra-ouvir-spotify {
+  flex: 0 0 auto;
+  inline-size: auto;
+  padding: 6px 11px;
+  border: 1px solid var(--dc-line);
+  border-radius: 3px 6px 3px 4px;
+  background: var(--dc-surface);
+  color: var(--dc-ink);
+}
+.dc-release-footer .obra-ouvir-spotify::before {
+  content: none;
+}
+.dc-release-footer .obra-ouvir.obra-ouvir-spotify svg,
+.dc-release-footer .obra-ouvir.obra-ouvir-spotify .obra-ouvir-rotulo {
+  translate: none;
+}
+.dc-release-footer .obra-ouvir-rotulo {
+  position: static;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 1;
+}
+.dc-release-footer a:hover {
+  text-decoration: underline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dc-release-open,
+  .dc-release-artwork > img {
+    transition: none;
+  }
+  .dc-release-open:is(:hover, :focus-visible) .dc-release-artwork > img {
+    transform: none;
+  }
+  .dc-release-dialog[open] {
+    animation: none;
+  }
+}

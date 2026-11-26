@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, raw } from "express";
 import * as c from "../controllers/controladorOportunidades.js";
 const r = Router(),
   s = c.seguro;
@@ -35,6 +35,12 @@ r.post("/admin/oportunidades/:id/state", s(c.estado));
 r.get("/messages", s(c.mensagens));
 r.post("/messages/preferences", s(c.preferencias));
 r.post("/messages/block", s(c.bloquear));
+r.post("/messages/start", s(c.iniciarMensagem));
+r.post("/messages/:id/hide", s(c.ocultarMensagem));
+for (const base of ["/messages", "/admin/oportunidades/mensagens"]) {
+  r.get(base + "/attachments/:attachmentId", s(c.baixarAnexo));
+  r.post(base + "/:id/attachments", raw({ type: "application/octet-stream", limit: "25mb" }), s(c.anexarMensagem));
+}
 for (const base of ["/messages", "/admin/oportunidades/mensagens"]) {
   r.get(base + "/:id", s(c.mensagem));
   r.post(base + "/:id", s(c.enviar));

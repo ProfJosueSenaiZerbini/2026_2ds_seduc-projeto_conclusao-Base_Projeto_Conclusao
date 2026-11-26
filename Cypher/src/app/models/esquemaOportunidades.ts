@@ -84,6 +84,21 @@ CREATE TABLE IF NOT EXISTS mensagens (
  texto TEXT NOT NULL, chave TEXT NOT NULL, criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(autor_id,chave)
 );
 CREATE INDEX IF NOT EXISTS indice_mensagens_conversa ON mensagens(conversa_id,criada_em);
+CREATE TABLE IF NOT EXISTS mensagens_anexos (
+ id TEXT PRIMARY KEY, mensagem_id TEXT NOT NULL UNIQUE REFERENCES mensagens(id) ON DELETE CASCADE,
+ nome TEXT NOT NULL, mime TEXT NOT NULL, bytes INTEGER NOT NULL, criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS conversa_direta_par
+ ON conversas(participante_a,participante_b) WHERE contexto='Conversa direta';
+CREATE TABLE IF NOT EXISTS conversas_ocultas (
+ conversa_id TEXT NOT NULL REFERENCES conversas(id) ON DELETE CASCADE,
+ usuario_id TEXT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+ PRIMARY KEY(conversa_id, usuario_id)
+);
+CREATE TABLE IF NOT EXISTS mensagens_leituras (
+ mensagem_id TEXT PRIMARY KEY REFERENCES mensagens(id) ON DELETE CASCADE,
+ lida_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TRIGGER IF NOT EXISTS preservar_termos_oportunidade BEFORE UPDATE OF termos_json,versao,candidatura_id,autor_id ON propostas_oportunidade
 BEGIN SELECT RAISE(ABORT,'VERSAO_IMUTAVEL'); END;
 CREATE TRIGGER IF NOT EXISTS validar_acordo_oportunidade BEFORE INSERT ON acordos_oportunidade BEGIN

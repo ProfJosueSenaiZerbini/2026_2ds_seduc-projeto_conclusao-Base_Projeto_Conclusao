@@ -1,8 +1,8 @@
 import { imagemCena } from "./imagensCena.js";
 import { pessoasCena, encontrosCena, projetosCena } from "./cenaConteudo.js";
 export const perfisDemonstrativos = [
-  { slug: "nog.demo", nome: "NOG", funcao: "Rapper", iniciais: "NG", imagem: "Rappers/NOG.jpg", genero: "Rap", cidade: "", bio: "Perfil de exemplo de NOG, artista de HORIZONTAL!." },
-  { slug: "eureka.demo", nome: "Eureka Beats", funcao: "Beatmaker", iniciais: "EB", imagem: "Beatmaker/EUREKA BEATS-PROFILE.jpg", genero: "R&B", cidade: "", bio: "Perfil de exemplo de Eureka Beats. Instrumentais como Vice City." },
+  { slug: "nog.demo", nome: "NOG", funcao: "Rapper", iniciais: "NG", imagem: "Rappers/NOG.jpg", genero: "Rap", cidade: "", bio: "Artista da faixa HORIZONTAL!, com participação de Levinsk." },
+  { slug: "eureka.demo", nome: "Eureka Beats", funcao: "Beatmaker", iniciais: "EB", imagem: "Beatmaker/EUREKA BEATS-PROFILE.jpg", genero: "R&B", cidade: "", bio: "Beatmaker de instrumentais como Vice City." },
   {
     slug: "jotape.demo",
     nome: "Jotapê",
@@ -188,14 +188,14 @@ export const faixasDemonstrativas = [
   },
   {
     id: "demo-obra-horizontal",
-    slug: "levinsk.demo",
+    slug: "nog.demo",
     titulo: "HORIZONTAL!",
     imagem: "Obras/LEVINSK-NOG-HORIZONTAL.jpg",
     genero: "Rap",
     data: "2026-09-18",
     link: "https://open.spotify.com/track/2K6FdNNrVeTIgMQnmCrz4w",
     producao: "Teo Guedx",
-    participacao: "NOG",
+    participacao: "Levinsk",
   },
 ];
 

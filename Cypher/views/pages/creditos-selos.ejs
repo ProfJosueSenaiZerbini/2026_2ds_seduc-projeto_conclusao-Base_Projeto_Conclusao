@@ -1,0 +1,82 @@
+<%- include('../partials/cabecalho',{title,stylesheet}) %>
+<div class="<%= admin ? 'app-shell dc-shell admin-shell' : 'dc-shell sp-shell' %>">
+  <%- include('../partials/barra-lateral',{path}) %>
+  <div class="<%= admin ? 'main-shell' : 'dc-page' %>">
+    <% if(admin){ %><%- include('../partials/barra-superior',{breadcrumb:title}) %><% } %>
+    <main class="sp-page <%= admin ? 'admin-page' : '' %>">
+      <% if(tela==='erro'){ %>
+        <section class="sp-panel"><h1>Não foi possível continuar</h1><p role="alert"><%= erro %></p><a class="sp-button" href="<%= admin?'/admin/moderacao':'/notificacoes' %>">Voltar</a></section>
+      <% } else if(tela==='fila'){ %>
+        <header class="sp-heading"><div><span class="sp-eyebrow">CADASTRO E CURADORIA</span><h1>Créditos em revisão</h1><p>Abra um crédito contestado para analisar o trabalho, a participação e o histórico.</p></div></header>
+        <section class="admin-lane" aria-label="Fila de créditos"><p class="admin-queue-count"><%= itens.length %> <%= itens.length === 1 ? "crédito na fila" : "créditos na fila" %></p>
+        <% if(!itens.length){ %><p class="admin-empty-work">Nenhum crédito aguardando revisão.</p><% } else { const tipos = { obra: "Obra", evento: "Evento", beat: "Beat", projeto: "Projeto" }; %>
+        <ul class="admin-lane-list"><% for(const item of itens){ %><li><a class="admin-lane-card" href="/admin/creditos/<%= encodeURIComponent(item.tipo) %>/<%= encodeURIComponent(item.id) %>"><div><strong>Revisar crédito · <%= tipos[item.tipo] || item.tipo %></strong><small><%= new Date(item.criado_em).toLocaleDateString("pt-BR",{timeZone:"America/Sao_Paulo"}) %></small></div><span class="admin-badge">Contestado</span></a></li><% } %></ul><% } %></section>
+      <% } else if(tela==='gestao'){ %>
+        <a class="sp-back" href="<%= tipo==='obra'?'/espaco-de-trabalho/obra/'+encodeURIComponent(trabalho.id):trabalho.url %>">Voltar à ficha</a>
+        <h1>Créditos de <%= trabalho.titulo %></h1>
+        <ul><% for(const item of creditos){ %><li><a href="/creditos/<%= tipo %>/<%= item.id %>"><%= item.nome %> · <%= item.funcao %></a> · <%= estados[item.estado] %></li><% } %></ul>
+        <% if(tipo==='obra'){ %><a class="sp-button" href="/works/<%= encodeURIComponent(trabalho.id) %>/edit">Editar créditos da obra</a><% } else { %>
+          <form class="sp-panel sp-form" method="post" action="<%= path %>">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label>Identificador profissional<input name="perfil" required maxlength="81" placeholder="@identificador"></label>
+            <% if(tipo==='evento'){ %><label>Tipo de contribuição<select name="categoria"><% for(const [id,nome] of Object.entries(categorias)){ %><option value="<%= id %>"><%= nome %></option><% } %></select></label><% } %>
+            <label>Função no trabalho<input name="funcao" minlength="2" maxlength="80" required></label>
+            <button class="sp-button sp-primary">Solicitar confirmação</button>
+          </form>
+        <% } %>
+      <% } else if(tela==='credito'){ %>
+        <a class="sp-back" href="<%= admin?'/admin/creditos':titular?'/creditos/gerir/'+tipo+'/'+encodeURIComponent(trabalho.id):'/notificacoes' %>">Voltar</a>
+        <section class="sp-panel">
+          <h1><%= trabalho.titulo %></h1>
+          <p><%= trabalho.autor %> · <%= credito.nome %></p>
+          <p><strong><%= [categorias[credito.categoria],credito.funcao,credito.detalhe].filter(Boolean).join(' · ') %></strong></p>
+          <p><%= estados[credito.estado] %></p>
+          <% if(!admin&&trabalho.publicavel){ %><a class="sp-button" href="<%= trabalho.url %>">Abrir ficha</a><% } %>
+          <% if(!admin&&credito.estado==='pendente'&&!titular){ %>
+            <form class="sp-form" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="sp-button sp-primary" name="acao" value="confirmado">Confirmar participação</button><button class="sp-button" name="acao" value="recusado">Recusar crédito</button></form>
+          <% } %>
+          <% if((admin&&credito.estado==='contestado')||(!admin&&(['confirmado','recusado'].includes(credito.estado)||(!titular&&credito.estado==='pendente')))){ %>
+            <form class="sp-form" method="post">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label>Justificativa<textarea name="motivo" required minlength="10" maxlength="1500"></textarea></label>
+              <% if(admin){ %><button class="sp-button sp-primary" name="acao" value="validado">Validar crédito</button><button class="sp-button" name="acao" value="invalidado">Invalidar crédito</button>
+              <% } else { %><button class="sp-button" name="acao" value="contestado">Solicitar revisão</button><% } %>
+            </form>
+          <% } %>
+        </section>
+        <% if(historico.length){ %><section class="sp-panel"><h2>Histórico do crédito</h2><ul><% for(const item of historico){ %><li><strong><%= estados[item.estado] %></strong><% if(item.motivo){ %><p><%= item.motivo %></p><% } %></li><% } %></ul></section><% } %>
+      <% } else if(tela==='selos'){ %>
+        <% if(admin){ %><header class="sp-heading"><div><span class="sp-eyebrow">CADASTRO E CURADORIA</span><h1>Aprovação de selos profissionais</h1><p>Confira a imagem e a autorização de uso antes de registrar a decisão.</p></div></header><p class="admin-queue-count"><%= itens.length %> <%= itens.length === 1 ? "solicitação na fila" : "solicitações na fila" %></p><% } else { %><h1>Solicitações de selo profissional</h1><% } %>
+        <% if(!admin){ %><a class="sp-back" href="/profile?editar=1&amp;secao=atuacao#profile-editor-selo">Voltar ao perfil</a>
+          <% if(!itens.some(i=>i.estado==='pendente')){ %>
+            <form class="sp-panel sp-form" action="/selos/solicitacoes" method="post" data-selo-externo>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label>Imagem da marca<input type="file" accept="image/png,image/jpeg" required></label><small>PNG ou JPEG, até 64 KB.</small>
+              <label>Sobre a marca<textarea name="justificativa" minlength="10" maxlength="1500" required></textarea></label>
+              <label class="sp-check"><input name="direitos" type="checkbox" value="sim" required> Tenho autorização para usar esta marca.</label>
+              <p role="alert" data-selo-erro hidden></p>
+              <button class="sp-button sp-primary">Enviar para análise</button>
+            </form>
+          <% } %>
+        <% } %>
+        <% if(!itens.length){ %><p class="<%= admin ? "admin-empty-work" : "" %>">Nenhuma solicitação registrada.</p><% } %>
+        <% for(const item of itens){ %>
+          <article class="sp-panel">
+            <h2><%= admin ? item.titular : {pendente:'Em análise',aprovado:'Aprovado',recusado:'Recusado'}[item.estado] %></h2>
+            <img src="<%= admin?'/admin':'' %>/selos/imagem/<%= item.id %>" width="96" height="96" class="sp-selo-imagem" alt="Marca solicitada">
+            <p><%= item.justificativa %></p>
+            <% if(item.motivo){ %><p><strong>Decisão:</strong> <%= item.motivo %></p><% } %>
+            <% if(admin){ %><form class="sp-form" method="post" action="/admin/selos/<%= item.id %>">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label>Justificativa da decisão<textarea name="motivo" minlength="10" maxlength="1500" required></textarea></label>
+              <button class="sp-button sp-primary" name="acao" value="aprovado">Aprovar e ativar</button><button class="sp-button" name="acao" value="recusado">Recusar</button>
+            </form><% } %>
+          </article>
+        <% } %>
+      <% } %>
+    </main>
+    <% if(!admin){ %><%- include('../partials/navegacao-mobile',{rotaAtual:path}) %><% } %>
+  </div>
+</div>
+<% if(tela==='selos'&&!admin){ %><script src="/js/selo-externo.js" defer></script><% } %>
+<%- include('../partials/fim-pagina') %>

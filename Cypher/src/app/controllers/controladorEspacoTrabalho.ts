@@ -1,5 +1,13 @@
 import type { Request, Response } from "express";
-import type { UsuarioDaSessao } from "../models/bancoDados.js";
+import path from "node:path";
+import { caminhoBancoCypher, conexaoInternaCypher } from "../models/bancoDados.js";
+import { fichaAcervo, historicoLancamento } from "../models/acervoMusical.js";
+import {
+  conviteCreditoObra,
+  type UsuarioDaSessao,
+} from "../models/bancoDados.js";
+import { consultarCredito, responderCredito } from "../models/creditosPublicacoes.js";
+import { ErroInteracao } from "../models/interacoesConteudo.js";
 import {
   acoesCriacao,
   normalizarBusca,
@@ -168,8 +176,45 @@ export function fichaTrabalho(req: Request, res: Response) {
     item,
     creditos,
     ofertas,
+    musical: item.modalidade === "obra" ? fichaAcervo(conexaoInternaCypher(), path.dirname(caminhoBancoCypher()), item.id, usuario.id) : null,
+    historicoMusical: item.modalidade === "obra" && item.proprio ? historicoLancamento(conexaoInternaCypher(), item.id) : [],
     voltar: rotaEspaco + (lista.size ? "?" + lista : ""),
   });
+}
+
+export function revisarCreditoObra(req: Request, res: Response) {
+  const usuario = profissional(res);
+  if (!usuario) return;
+  const creditoId = req.params.id ?? "";
+  const convite = conviteCreditoObra(creditoId, usuario.id);
+  if (!convite) return res.sendStatus(404);
+  if (convite.verificado)
+    return res.redirect(303, rotaEspaco + "/obra/" + encodeURIComponent(convite.obraId));
+  const { credito } = consultarCredito(usuario.id, "obra", creditoId);
+  if (credito.estado !== "pendente")
+    return res.redirect(303, "/creditos/obra/" + encodeURIComponent(creditoId));
+  return res.render("pages/convite-credito-obra", {
+    title: "Confirmar crédito",
+    stylesheet: "espaco-trabalho",
+    path: rotaEspaco,
+    creditoId,
+    convite,
+  });
+}
+
+export function aceitarCreditoObra(req: Request, res: Response) {
+  const usuario = profissional(res);
+  if (!usuario) return;
+  const id = req.params.id ?? "";
+  const convite = conviteCreditoObra(id, usuario.id);
+  if (!convite) return res.sendStatus(404);
+  try {
+    responderCredito(usuario.id, "obra", id, { acao: "confirmado" });
+  } catch (erro) {
+    if (erro instanceof ErroInteracao) return res.status(erro.status).send(erro.message);
+    throw erro;
+  }
+  return res.redirect(303, rotaEspaco + "/obra/" + encodeURIComponent(convite.obraId));
 }
 
 export function catalogoObras(req: Request, res: Response) {
@@ -197,7 +242,7 @@ export function catalogoObras(req: Request, res: Response) {
   )
     ? texto(req.query.ordem)
     : "recentes";
-  const obras = catalogo.filter(obra => {
+  const selecionadas = catalogo.filter(obra => {
     if (
       (formato && obra.tipo !== formato) ||
       (genero && obra.genero !== genero) ||
@@ -212,7 +257,7 @@ export function catalogoObras(req: Request, res: Response) {
     );
     return termos.every(termo => busca.includes(termo));
   });
-  obras.sort((a, b) => {
+  selecionadas.sort((a, b) => {
     if (ordem === "titulo") return a.titulo.localeCompare(b.titulo, "pt-BR");
     if (ordem === "artista") return a.autor.localeCompare(b.autor, "pt-BR");
     if (!a.data || !b.data) return Number(!a.data) - Number(!b.data);
@@ -220,11 +265,17 @@ export function catalogoObras(req: Request, res: Response) {
       ? a.data.localeCompare(b.data)
       : b.data.localeCompare(a.data);
   });
+  const curtidos = req.query.curtidos === "1";
+  const totalCurtidos = selecionadas.filter(o => o.curtida).length;
+  const resultados = curtidos ? selecionadas.filter(o => o.curtida) : selecionadas;
+  const paginas = Math.max(1, Math.ceil(resultados.length / 24));
+  const pagina = Math.max(1, Math.min(paginas, Number.parseInt(texto(req.query.pagina), 10) || 1));
+  const obras = resultados.slice((pagina - 1) * 24, pagina * 24);
   const grupos = [
     {
       id: "discos",
       titulo: "Projetos para ouvir por inteiro",
-      descricao: "Álbuns e EPs. Cada faixa, parte de uma história.",
+      descricao: "Álbuns, EPs e mixtapes.",
       itens: obras.filter(o => o.colecao),
     },
     {
@@ -253,6 +304,11 @@ export function catalogoObras(req: Request, res: Response) {
     generos,
     obras,
     grupos,
+    totalResultados: resultados.length,
+    totalCurtidos,
+    curtidos,
+    paginas,
+    pagina,
     ano,
     anos,
     ordem,

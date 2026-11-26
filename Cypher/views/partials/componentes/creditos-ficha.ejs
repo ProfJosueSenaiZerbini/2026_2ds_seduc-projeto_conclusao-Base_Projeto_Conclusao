@@ -1,0 +1,10 @@
+<% const { equipe, assinatura } = creditosFicha(tipo,id); %>
+<% if(assinatura){ %><div class="cy-credito-assinatura"><%- include('selo-assinatura',{selo:assinatura.selo,nome:assinatura.nome}) %><span><strong><%= assinatura.nome %></strong><%= assinatura.funcao ? ' · '+assinatura.funcao : '' %></span></div><% } %>
+<% if(equipe.length){ %>
+  <section class="cy-creditos-ficha">
+    <h3>Créditos confirmados</h3>
+    <ul><% for(const item of equipe){ %>
+      <li><%- include('selo-assinatura',{selo:item.selo,nome:item.nome}) %><span><strong><%= item.nome %></strong> · <%= [categoriasCreditoEvento[item.categoria],item.funcao,item.detalhe].filter(Boolean).join(' · ') %></span></li>
+    <% } %></ul>
+  </section>
+<% } %>

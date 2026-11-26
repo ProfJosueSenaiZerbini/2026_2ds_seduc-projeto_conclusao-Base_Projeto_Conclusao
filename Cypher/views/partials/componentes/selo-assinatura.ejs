@@ -1,0 +1,4 @@
+<% if(selo){ const rotulo = 'Selo profissional de ' + nome; %>
+  <% if(selo.imagem){ %><img class="cy-selo-marca" src="<%= selo.imagem %>" width="48" height="48" alt="<%= rotulo %>">
+  <% } else { %><span class="pf-seal cy-selo-monograma" data-forma="<%= selo.forma %>" data-cor="<%= selo.cor %>" role="img" aria-label="<%= rotulo %>" title="<%= rotulo %>"><%= selo.letras %></span><% } %>
+<% } %>

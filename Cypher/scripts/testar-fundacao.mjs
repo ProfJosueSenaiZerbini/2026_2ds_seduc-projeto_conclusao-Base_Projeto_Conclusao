@@ -81,7 +81,6 @@ try {
     );
   }
   for (const categoria of [
-    "Letrista",
     "MC",
     "DJ",
     "Mixador(a)",
@@ -94,7 +93,8 @@ try {
       ),
       false
     );
-  assert.deepEqual(regras.tiposObraPermitidos(["Compositor(a)"]), ["Obra"]);
+  assert.deepEqual(regras.tiposObraPermitidos(["Compositor(a)"]), ["Obra", "Composição"]);
+  assert.deepEqual(regras.tiposObraPermitidos(["Letrista"]), ["Letra"]);
   assert.equal(
     regras.podePublicar(
       { tipoConta: "profissional", categories: ["Letrista", "Beatmaker"] },

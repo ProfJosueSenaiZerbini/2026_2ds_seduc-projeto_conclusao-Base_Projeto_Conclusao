@@ -1,7 +1,11 @@
+import path from "node:path";
+import { fichaAcervo } from "./acervoMusical.js";
 import {
+  caminhoBancoCypher,
   conexaoInternaCypher,
   listarObrasPublicasPerfilCypher,
 } from "./bancoDados.js";
+import { podeIniciarConversa } from "./contatosOportunidades.js";
 import {
   discoDemo,
   idFaixaDemo,
@@ -255,11 +259,12 @@ export function montarApresentacao(
     return { ...i, capa: foto?.url || "" };
   });
   const detalhe =
-    !proprio && nav.obra
+    nav.obra
       ? listarObrasPublicasPerfilCypher(p.handle, visitante.id, nav.obra)[0]
       : null;
   const faixas: Trabalho[] = [];
-  if (detalhe) {
+  const musical = detalhe ? fichaAcervo(db, path.dirname(caminhoBancoCypher()), detalhe.id, visitante.id) : null;
+  if (detalhe && !musical?.lancamento) {
     const ordem: string[] = detalhe.faixasJson
       ? JSON.parse(detalhe.faixasJson)
       : (discoDemo(detalhe.id)?.faixas.map((_, i) =>
@@ -318,8 +323,8 @@ export function montarApresentacao(
   const conversa = contato
     ? (db
         .prepare(
-          `SELECT id FROM conversas WHERE
-    (participante_a=? AND participante_b=?) OR (participante_a=? AND participante_b=?) ORDER BY criada_em DESC LIMIT 1`
+          `SELECT id FROM conversas WHERE contexto='Conversa direta' AND
+    ((participante_a=? AND participante_b=?) OR (participante_a=? AND participante_b=?)) LIMIT 1`
         )
         .get(visitante.id, p.id, p.id, visitante.id) as
         { id: string } | undefined)
@@ -348,6 +353,7 @@ export function montarApresentacao(
       visitante.tipoConta === "profissional" &&
       objetoDisponivel(db, "perfil", visitante.id, p.id),
     conversa: conversa?.id,
+    iniciarConversa: contato && podeIniciarConversa(visitante.id, p.id),
     foto: foto
       ? "/publication-media/" + foto.id
       : fotoCatalogo
@@ -368,6 +374,8 @@ export function montarApresentacao(
       ? {
           ...detalhe,
           faixas,
+          musical,
+          baseMusical: enderecoObra(p.handle, "").split("#")[0],
           plataforma: plataformaDaObra(detalhe.id, detalhe.listenLink),
         }
       : null,

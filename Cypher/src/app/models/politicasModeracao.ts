@@ -1,4 +1,5 @@
 import type Database from "better-sqlite3";
+import { consultaPreparada } from "./consultaPreparada.js";
 import { contaEncerrada, menorProtegido } from "./protecoesConta.js";
 type Banco = Database.Database;
 // Políticas compartilhadas não alteram a visibilidade ou os registros de origem.
@@ -7,13 +8,11 @@ export function situacaoContaModeracao(
   id: string,
   agora = Date.now()
 ) {
-  const antiga = db
-    .prepare(
+  const antiga = consultaPreparada(db,
       "SELECT motivo FROM restricoes_contas WHERE usuario_id=? AND (ate IS NULL OR datetime(ate)>datetime('now'))"
     )
     .get(id) as { motivo: string } | undefined;
-  const medidas = db
-    .prepare(
+  const medidas = consultaPreparada(db,
       "SELECT acao,motivo FROM suporte_medidas WHERE alvo_tipo='perfil' AND alvo_id=? AND revogada_em IS NULL AND (ate IS NULL OR ate>?) ORDER BY criada_em DESC"
     )
     .all(id, agora) as { acao: string; motivo: string }[];
@@ -35,8 +34,7 @@ export function objetoSobMedida(
   agora = Date.now()
 ) {
   return Boolean(
-    db
-      .prepare(
+    consultaPreparada(db,
         "SELECT 1 FROM suporte_medidas WHERE alvo_tipo=? AND alvo_id=? AND acao IN('ocultar','remover') AND revogada_em IS NULL AND (ate IS NULL OR ate>?)"
       )
       .get(tipo, id, agora)
@@ -52,8 +50,7 @@ export function objetoDisponivel(
   if (objetoSobMedida(db, tipo, id, agora)) return false;
   if (
     tipo === "beat" &&
-    db
-      .prepare("SELECT 1 FROM beat_catalogo WHERE beat_id=? AND retirado=1")
+    consultaPreparada(db, "SELECT 1 FROM beat_catalogo WHERE beat_id=? AND retirado=1")
       .get(id)
   )
     return false;
@@ -71,8 +68,7 @@ export function objetoDisponivel(
   if (tipo !== "perfil") {
     const f = Object.hasOwn(fontes,tipo) ? fontes[tipo] : null;
     if (!f) return false;
-    const r = db
-      .prepare(`SELECT ${f[1]} dono FROM ${f[0]} WHERE id=?`)
+    const r = consultaPreparada(db, `SELECT ${f[1]} dono FROM ${f[0]} WHERE id=?`)
       .get(id) as { dono: string } | undefined;
     if (!r) return false;
     dono = r.dono;
@@ -87,21 +83,18 @@ export function objetoDisponivel(
   if (
     visitante &&
     visitante !== dono &&
-    db
-      .prepare(
+    consultaPreparada(db,
         "SELECT 1 FROM bloqueios_usuarios WHERE (autor_id=? AND alvo_id=?) OR (autor_id=? AND alvo_id=?)"
       )
       .get(dono, visitante, visitante, dono)
   )
     return false;
   // A permissão da origem continua obrigatória: a medida não concede acesso a conteúdo privado.
-  const p = db
-    .prepare("SELECT perfil_publico FROM perfis WHERE usuario_id=?")
+  const p = consultaPreparada(db, "SELECT perfil_publico FROM perfis WHERE usuario_id=?")
     .get(dono) as { perfil_publico: number } | undefined;
   const mediada =
     tipo === "oportunidade" &&
-    db
-      .prepare("SELECT 1 FROM administradores WHERE usuario_id=? AND ativo=1")
+    consultaPreparada(db, "SELECT 1 FROM administradores WHERE usuario_id=? AND ativo=1")
       .get(dono);
   if (
     tipo !== "mensagem" &&
@@ -112,8 +105,7 @@ export function objetoDisponivel(
     return false;
   if (tipo === "projeto" && dono !== visitante) {
     if (
-      !db
-        .prepare(
+      !consultaPreparada(db,
           "SELECT 1 FROM projetos_trabalho p LEFT JOIN detalhes_projetos d ON d.projeto_id=p.id WHERE p.id=? AND p.publico=1 AND coalesce(d.retirado,0)=0"
         )
         .get(id)

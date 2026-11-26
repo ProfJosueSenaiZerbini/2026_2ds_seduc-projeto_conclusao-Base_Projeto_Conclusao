@@ -9,6 +9,7 @@ process.env.CYPHER_DB_PATH = path.join(pasta, "teste.sqlite");
 const banco = await import("../dist/src/app/models/bancoDados.js");
 const m = await import("../dist/src/app/models/oportunidades.js");
 const contato = await import("../dist/src/app/models/contatosOportunidades.js");
+const tempoMensagens = await import("../dist/src/app/models/tempoMensagens.js");
 const v = await import("../dist/src/app/validators/validarOportunidade.js");
 const iconesSvg = await import("lucide-static");
 const { iniciarSessao } =
@@ -61,8 +62,68 @@ const dados = (vagas = 2) => ({
 try {
   banco.inicializarBancoCypher();
   let db = banco.conexaoInternaCypher();
+  const agoraChat = new Date("2026-11-26T15:00:00Z");
+  const gruposChat = tempoMensagens.agruparMensagensPorDia([
+    { criada_em: "2025-12-10 15:00:00" },
+    { criada_em: "2026-09-12 15:00:00" },
+    { criada_em: "2026-11-20 15:00:00" },
+    { criada_em: "2026-11-25 15:00:00" },
+    { criada_em: "2026-11-26 01:00:00" },
+    { criada_em: "2026-11-26 14:55:00" },
+  ], agoraChat);
+  ok(() => assert.deepEqual(gruposChat.map(g => g.rotulo), ["10/12/2025", "12/09", "sexta", "Ontem", "Hoje · há 5 min"]));
+  ok(() => assert.deepEqual([
+    "2026-11-26 14:55:00", "2026-11-25 15:00:00", "2026-11-20 15:00:00", "2026-09-12 15:00:00",
+  ].map(valor => tempoMensagens.rotuloDataConversa(valor, agoraChat)), ["há 5 min", "Ontem", "sexta", "12/09"]));
+  ok(() => assert.equal(gruposChat[3].mensagens.length, 2));
+  ok(() => assert.equal(tempoMensagens.horaMensagem("2026-11-26 14:55:00"), "11:55"));
   for (const id of ["autor", "candidato", "terceiro", "extra"]) seed(id);
   seed("ouvinte", "consumidor");
+  seed("novo-contato");
+  seed("2funflow");
+  seed("lezin");
+  ok(() => assert.equal(contato.listarContatosDisponiveis("autor").find(p => p.usuario_id === "2funflow")?.foto, "/img/cena/perfis/2funflow.jpg"));
+  const conversaLezin = contato.iniciarConversa("autor", "lezin");
+  contato.enviarMensagem("autor", conversaLezin, "Conversa com Lezin", "foto-lezin-teste-12345");
+  const textoAnexo = Buffer.from("Arquivo privado de teste.\n", "utf8");
+  const mensagemAnexo = contato.enviarAnexo("autor", conversaLezin, "nota.md", textoAnexo, "Legenda do arquivo", "anexo-texto-teste-12345");
+  const idAnexo = db.prepare("SELECT id FROM mensagens_anexos WHERE mensagem_id=?").get(mensagemAnexo).id;
+  ok(() => assert.equal(contato.enviarAnexo("autor", conversaLezin, "nota.md", textoAnexo, "Legenda do arquivo", "anexo-texto-teste-12345"), mensagemAnexo));
+  ok(() => assert.equal(contato.conversa(conversaLezin, "lezin").mensagens.find(m => m.id === mensagemAnexo)?.anexo?.nome, "nota.md"));
+  ok(() => assert.equal(contato.arquivoAnexo("lezin", idAnexo).mime, "text/markdown"));
+  ok(() => assert.throws(() => contato.arquivoAnexo("terceiro", idAnexo)));
+  ok(() => assert.throws(() => contato.enviarAnexo("autor", conversaLezin, "malware.exe", textoAnexo, "", "anexo-invalido-12345")));
+  ok(() => assert.throws(() => contato.enviarAnexo("autor", conversaLezin, "falso.docx", Buffer.from("PKxx"), "", "anexo-docx-falso-12345")));
+  const fotoMensagem = fs.readFileSync("public/img/cena/perfis/2funflow.jpg");
+  const mensagemImagem = contato.enviarAnexo("autor", conversaLezin, "foto.jpg", fotoMensagem, "", "anexo-imagem-teste-12345");
+  ok(() => assert.equal(contato.conversa(conversaLezin, "autor").mensagens.find(m => m.id === mensagemImagem)?.anexo?.mime, "image/jpeg"));
+  const pdfTeste = Buffer.from("%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF", "ascii");
+  const mensagemPdf = contato.enviarAnexo("autor", conversaLezin, "arquivo.pdf", pdfTeste, "", "anexo-pdf-teste-12345");
+  ok(() => assert.equal(contato.conversa(conversaLezin, "autor").mensagens.find(m => m.id === mensagemPdf)?.anexo?.mime, "application/pdf"));
+  const audioWebm = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.from("webm audio gravado", "ascii")]);
+  const mensagemAudio = contato.enviarAnexo("autor", conversaLezin, "audio.weba", audioWebm, "", "anexo-audio-teste-12345");
+  ok(() => assert.equal(contato.conversa(conversaLezin, "autor").mensagens.find(m => m.id === mensagemAudio)?.anexo?.mime, "audio/webm"));
+  contato.bloquear("lezin", "autor", true);
+  ok(() => assert.equal(contato.arquivoAnexo("lezin", idAnexo).nome, "nota.md"));
+  ok(() => assert.throws(() => contato.enviarAnexo("autor", conversaLezin, "novo.txt", textoAnexo, "", "anexo-bloqueado-12345")));
+  contato.bloquear("lezin", "autor", false);
+  ok(() => assert.equal(contato.listarConversas("autor").find(c => c.id === conversaLezin)?.foto, "/img/Rappers/LEZIN.jpg"));
+  ok(() => assert.equal(contato.conversa(conversaLezin, "autor").foto, "/img/Rappers/LEZIN.jpg"));
+  const fotoContatoId = "foto-novo-contato";
+  const fotoContato = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
+  fs.mkdirSync(path.join(pasta, "midias-publicacoes"), { recursive: true });
+  fs.writeFileSync(path.join(pasta, "midias-publicacoes", fotoContatoId), fotoContato);
+  db.prepare("INSERT INTO midias_publicacoes(id,autor_id,objeto_tipo,objeto_id,finalidade,nome,mime,bytes,criado_em,posicao) VALUES(?,?,'perfil',?,'imagem','foto.png','image/png',?,?,'principal')")
+    .run(fotoContatoId, "novo-contato", "novo-contato", fotoContato.length, Date.now());
+  ok(() => assert.equal(contato.listarContatosDisponiveis("autor").find(p => p.usuario_id === "novo-contato")?.foto, `/publication-media/${fotoContatoId}`));
+  ok(() => assert.ok(contato.listarContatosDisponiveis("autor").some(p => p.usuario_id === "novo-contato")));
+  ok(() => assert.ok(contato.listarContatosDisponiveis("autor", "@novo-contato").some(p => p.usuario_id === "novo-contato")));
+  ok(() => assert.ok(!contato.listarContatosDisponiveis("ouvinte").some(p => p.usuario_id === "novo-contato")));
+  const conversaNova = contato.iniciarConversa("autor", "novo-contato");
+  contato.enviarMensagem("autor", conversaNova, "Primeiro contato", "novo-contato-teste-12345");
+  ok(() => assert.ok(!contato.listarContatosDisponiveis("autor").some(p => p.usuario_id === "novo-contato")));
+  ok(() => assert.ok(contato.listarContatosDisponiveis("autor", "novo-contato").some(p => p.usuario_id === "novo-contato" && !p.novo && p.conversa_id === conversaNova)));
+  ok(() => assert.ok(contato.listarConversas("autor").some(c => c.id === conversaNova && c.ultima_mensagem === "Primeiro contato")));
   seed("incompativel", "profissional", "Fotógrafo(a)");
   seed("legado", "profissional", "Rapper");
   db.prepare("UPDATE profissoes_usuario SET profissao_id='podcaster',valor_original='Podcaster' WHERE usuario_id='legado'").run();
@@ -409,6 +470,7 @@ try {
             check: "Check",
             plus: "Plus",
             search: "Search",
+            send: "Send",
             sliders: "SlidersHorizontal",
             crown: "Crown",
             house: "House",
@@ -450,6 +512,18 @@ try {
       `cypher_csrf=${csrf}; ${u === "admin" || u === "editor" ? "cypher_admin_session" : "cypher_session"}=${iniciarSessao(u)}`,
     ])
   );
+  const uploadHttp = await fetch(host + `/messages/${conversaLezin}/attachments`, {
+    method: "POST", headers: {
+      cookie: cookies.autor, "content-type": "application/octet-stream", "x-csrf-token": csrf,
+      "x-file-name": "nota.txt", "x-message-key": "anexo-http-teste-12345", "x-message-text": "",
+    }, body: Buffer.from("Outro documento privado", "utf8"),
+  });
+  ok(() => assert.equal(uploadHttp.status, 201));
+  const arquivoHttp = await fetch(host + `/messages/attachments/${idAnexo}`, { headers: { cookie: cookies.autor } });
+  ok(() => assert.equal(arquivoHttp.status, 200));
+  ok(() => assert.match(arquivoHttp.headers.get("content-disposition") || "", /attachment/i));
+  const arquivoTerceiro = await fetch(host + `/messages/attachments/${idAnexo}`, { headers: { cookie: cookies.terceiro } });
+  ok(() => assert.equal(arquivoTerceiro.status, 404));
   for (const [u, url] of [
     ["autor", "/opportunities"],
     ["autor", "/opportunities/new"],
@@ -459,6 +533,10 @@ try {
     ["autor", `/opportunities/${retir}/edit`],
     ["candidato", `/opportunities/applications/${c}`],
     ["autor", "/messages"],
+    ["autor", "/messages?q=novo-contato"],
+    ["autor", "/messages?q=2funflow"],
+    ["autor", `/messages/${conversaLezin}`],
+    ["autor", "/p/lezin"],
     ["autor", `/messages/${conv}`],
     ["menor-a", "/messages/conversa-etaria-adulto"],
     ["ouvinte", "/service-requests"],
@@ -479,6 +557,37 @@ try {
     assert.equal(r.status, 200, `${url}: ${html.slice(0, 1500)}`);
     checks++;
     assert.ok(!html.includes("[object Object]"), url);
+    if (url === "/messages?q=novo-contato")
+      ok(() => assert.ok(html.includes(`/publication-media/${fotoContatoId}`)));
+    if (url === "/messages?q=2funflow")
+      ok(() => {
+        assert.ok(html.includes('/img/cena/perfis/2funflow.jpg'));
+        assert.ok(html.includes('href="/p/2funflow"'));
+      });
+    if (url === "/messages")
+      ok(() => {
+        assert.ok(html.includes('class="msg-more-contacts"'));
+        assert.ok(html.includes('data-message-search'));
+        assert.ok(html.includes('/img/Rappers/LEZIN.jpg'));
+        assert.ok(html.includes('href="/p/lezin"'));
+        assert.ok(html.includes('class="msg-settings-form"'));
+      });
+    if (url === `/messages/${conversaLezin}`)
+      ok(() => {
+        assert.ok(html.includes('/img/Rappers/LEZIN.jpg'));
+        assert.ok(html.includes('href="/p/lezin"'));
+        assert.ok(html.includes('class="msg-record-button"'));
+        assert.ok(html.includes('data-attachment="image"'));
+        assert.ok(html.includes('data-attachment="video"'));
+        assert.ok(html.includes('data-attachment="file"'));
+      });
+    if (url === `/messages/${conv}`)
+      ok(() => {
+        assert.ok(html.includes('class="msg-send-button"'));
+        assert.ok(html.includes('class="msg-day-divider"'));
+        assert.ok(!html.includes("Mensagem para "));
+        assert.ok(!html.includes("Enter envia"));
+      });
     const qa = {
       "/opportunities": "lista",
       "/opportunities/new": "formulario",
@@ -497,6 +606,12 @@ try {
       );
     }
   }
+  const fotoResposta = await fetch(host + "/publication-media/" + fotoContatoId, {
+    headers: { cookie: cookies.autor },
+  });
+  ok(() => assert.equal(fotoResposta.status, 200));
+  const fotoCenaResposta = await fetch(host + "/img/cena/perfis/2funflow.jpg");
+  ok(() => assert.equal(fotoCenaResposta.status, 200));
   ok(() =>
     assert.ok(db.prepare("SELECT COUNT(*) n FROM notificacoes").get().n > 0)
   );

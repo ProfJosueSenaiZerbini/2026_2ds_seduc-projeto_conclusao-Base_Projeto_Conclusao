@@ -196,7 +196,7 @@ document.addEventListener("submit", async evento => {
     if (button.disabled) return;
     if (
       form.dataset.ciComment === "excluir" &&
-      !confirm("Excluir seu comentário?")
+      !(await window.cypherConfirmar("Excluir seu comentário?", { destrutiva: true, rotulo: "Excluir comentário" }))
     )
       return;
     const root = form.closest(".ci-conversation");

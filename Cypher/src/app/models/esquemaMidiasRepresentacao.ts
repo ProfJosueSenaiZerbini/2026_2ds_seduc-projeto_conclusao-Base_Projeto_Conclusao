@@ -13,6 +13,31 @@ CREATE TABLE IF NOT EXISTS selos_perfil (
  criado_em INTEGER NOT NULL, retirado_em INTEGER
 );
 CREATE UNIQUE INDEX IF NOT EXISTS selo_perfil_ativo ON selos_perfil(autor_id) WHERE retirado_em IS NULL;
+CREATE TABLE IF NOT EXISTS pedidos_selo_externo (
+ id TEXT PRIMARY KEY, autor_id TEXT NOT NULL REFERENCES usuarios(id),
+ imagem BLOB NOT NULL, mime TEXT NOT NULL CHECK(mime IN('image/png','image/jpeg')),
+ justificativa TEXT NOT NULL, estado TEXT NOT NULL CHECK(estado IN('pendente','aprovado','recusado')),
+ criado_em INTEGER NOT NULL, decidido_em INTEGER, revisor_id TEXT REFERENCES administradores(usuario_id),
+ motivo TEXT, selo_id TEXT UNIQUE REFERENCES selos_perfil(id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS pedido_selo_pendente ON pedidos_selo_externo(autor_id) WHERE estado='pendente';
+CREATE TABLE IF NOT EXISTS creditos_publicacoes (
+ id TEXT PRIMARY KEY, tipo TEXT NOT NULL CHECK(tipo IN('beat','evento')),
+ objeto_id TEXT NOT NULL, usuario_id TEXT NOT NULL REFERENCES usuarios(id),
+ funcao TEXT NOT NULL, categoria TEXT NOT NULL,
+ confirmado INTEGER NOT NULL DEFAULT 0 CHECK(confirmado IN(0,1)),
+ retirado_em INTEGER, criado_em INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS credito_publicacao_ativo
+ ON creditos_publicacoes(tipo,objeto_id,usuario_id,funcao,categoria) WHERE retirado_em IS NULL;
+CREATE TABLE IF NOT EXISTS historico_creditos (
+ id INTEGER PRIMARY KEY, credito_id TEXT NOT NULL,
+ tipo TEXT NOT NULL CHECK(tipo IN('obra','beat','evento')),
+ ator_id TEXT NOT NULL REFERENCES usuarios(id),
+ estado TEXT NOT NULL CHECK(estado IN('confirmado','recusado','contestado','validado','invalidado')),
+ motivo TEXT NOT NULL DEFAULT '', criado_em INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS historico_credito_registro ON historico_creditos(tipo,credito_id,id DESC);
 CREATE TABLE IF NOT EXISTS representacoes_profissionais (
  id TEXT PRIMARY KEY, representante_id TEXT NOT NULL REFERENCES usuarios(id),
  representado_id TEXT NOT NULL REFERENCES usuarios(id), proponente_id TEXT NOT NULL REFERENCES usuarios(id),

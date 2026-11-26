@@ -45,9 +45,9 @@
 }
 .ev-hero h2 {
   font:
-    700 clamp(30px, 4vw, 56px)/1.05 "Space Grotesk",
+    700 clamp(30px, 4vw, 56px)/1.05 "Oswald",
     sans-serif;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
 }
 .ev-date {
   display: grid;

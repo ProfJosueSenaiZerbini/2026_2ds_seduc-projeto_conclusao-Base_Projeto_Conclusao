@@ -50,9 +50,9 @@
 .ob-editorial h2 {
   margin: 20px 0 16px;
   font:
-    700 clamp(38px, 4.1vw, 62px)/1.02 "Space Grotesk",
+    700 clamp(38px, 4.1vw, 62px)/1.02 "Oswald",
     sans-serif;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.02em;
 }
 .ob-editorial h2 em {
   color: var(--dc-accent);
@@ -273,7 +273,7 @@
   background: transparent;
   color: var(--dc-muted);
   font:
-    600 14px "DM Sans",
+    600 14px "Space Grotesk",
     sans-serif;
   cursor: pointer;
 }
@@ -742,7 +742,7 @@
   color: var(--dc-accent);
   background: transparent;
   font:
-    700 14px "DM Sans",
+    700 14px "Space Grotesk",
     sans-serif;
   cursor: pointer;
 }
@@ -1259,4 +1259,16 @@
   .ob-album-heading .ob-track-label { font-size: 10px; }
   .ob-album-player { padding: 12px; }
   .ob-album-tracks button { gap: 8px; padding-inline: 6px; }
+}
+html:not(.dark) .ob-acervo :is(.ob-eyebrow, .ob-heading-actions > a, .ob-shelf-heading p, [data-ob-shelf-count], .ob-catalog-note) {
+  color: #263222;
+}
+
+html:not(.dark) .ob-acervo .ob-catalog-note a {
+  color: #36510e;
+}
+
+.ob-catalog-note a {
+  text-decoration: underline;
+  text-underline-offset: .2em;
 }

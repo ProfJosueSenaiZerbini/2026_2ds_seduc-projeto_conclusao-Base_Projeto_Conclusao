@@ -66,21 +66,6 @@
       <h2 id="work-selected-type-title">
         <%= valores.tipo || 'Obra' %>
       </h2>
-      <p>
-        <%= valores.tipo === 'Instrumental'
-        ? 'Material instrumental sem estrutura de faixa tradicional.'
-        : valores.tipo === 'Música'
-          ? 'Faixa com letra, créditos e dados técnicos.'
-          : valores.tipo === 'Single'
-            ? 'Lançamento individual pronto para organizar.'
-            : valores.tipo === 'EP'
-              ? 'Lançamento curto com organização posterior das faixas.'
-              : valores.tipo === 'Álbum'
-                ? 'Lançamento completo com tracklist posterior.'
-                : valores.tipo === 'Outro'
-                  ? 'Projeto musical ou material relacionado.'
-                  : 'Organize os dados principais do seu registro.' %>
-      </p>
     </div>
     <% if (!editando) { %>
       <a class="button button-outline work-change-type" href="/works/new">
@@ -89,6 +74,7 @@
     <% } %>
   </section>
   <input type="hidden" name="tipo" value="<%= valores.tipo %>" data-work-type-value>
+  <input type="hidden" name="acervo" value="1">
   <section class="form-section">
     <div class="form-section-heading">
       <span class="form-step">
@@ -167,7 +153,7 @@
         <%= valores.descricao %>
       </textarea>
     </label>
-    <label class="field-full" data-work-field="lyrics">
+    <% if (['composicao','letra'].includes(classeAcervo)) { %><label class="field-full">
       Letra
       <span class="optional-mark">
         Opcional
@@ -175,7 +161,7 @@
       <textarea name="letra" rows="5" maxlength="5000" placeholder="Adicione um trecho da letra. Em uma obra pública, ele aparece no perfil.">
         <%= valores.letra %>
       </textarea>
-    </label>
+    </label><% } %>
   </div>
 </section>
 <section class="form-section" data-work-section="credits">
@@ -229,7 +215,7 @@
           Perfis Cypher
         </strong>
         <p>
-          Use o identificador com @. Cada crédito fica associado ao perfil e identificado como não confirmado.
+          Use o identificador com @. Quando a obra estiver visível na Cypher, o colaborador poderá confirmar a participação pela caixa de notificações.
         </p>
       </div>
     </div>
@@ -333,35 +319,25 @@
     </span>
     <div>
       <h2>
-        Identificação e lançamento
+        Identificação e vínculos
       </h2>
-      <p>
-        Inclua códigos existentes ou deixe-os para preencher depois.
-      </p>
     </div>
   </div>
   <div class="form-grid">
-    <label data-work-field="codes">
+    <% if (classeAcervo === 'fonograma') { %><label>
       ISRC
       <span class="optional-mark">
         Opcional
       </span>
       <input name="isrc" maxlength="20" placeholder="Código da gravação" value="<%= valores.isrc %>">
-    </label>
-    <label data-work-field="codes">
+    </label><% } %>
+    <% if (classeAcervo === 'composicao') { %><label>
       ISWC
       <span class="optional-mark">
         Opcional
       </span>
       <input name="iswc" maxlength="20" placeholder="Código da obra" value="<%= valores.iswc %>">
-    </label>
-    <label data-work-field="release-date">
-      Data de lançamento
-      <span class="optional-mark">
-        Opcional
-      </span>
-      <input type="date" name="dataLancamento" value="<%= valores.dataLancamento %>">
-    </label>
+    </label><% } %>
     <label data-work-field="listen-link">
       Link de escuta
       <span class="optional-mark">
@@ -370,6 +346,30 @@
       <input type="url" name="link" maxlength="500" placeholder="https://" value="<%= valores.link %>">
     </label>
   </div>
+  <% if (['fonograma','lancamento'].includes(classeAcervo)) { 
+       const faixa = classeAcervo === 'lancamento';
+       const max = faixa ? (valores.tipo === 'Single' ? 1 : 50) : 20;
+       const opcoes = faixa ? opcoesMusicais.fonogramas : opcoesMusicais.composicoes;
+       const escolhidas = faixa ? valores.faixas ?? [] : valores.composicoes ?? [];
+       const campo = faixa ? 'fonogramaId' : 'composicaoId';
+  %>
+    <fieldset class="form-grid" data-vinculos-musicais data-limite="<%= max %>">
+      <legend><%= faixa ? 'Faixas na ordem de reprodução' : 'Composições da gravação' %></legend>
+      <% if (!opcoes.length) { %><p class="field-full"><a href="/works/new?tipo=<%= faixa ? 'Fonograma' : encodeURIComponent('Composição') %>">Cadastrar <%= faixa ? 'um fonograma' : 'uma composição' %></a></p><% } else { %>
+      <div class="form-grid field-full" data-lista-vinculos>
+        <% for (let i = 0; i < Math.min(max, escolhidas.length + 1); i++) { %>
+          <label><%= faixa ? 'Faixa' : 'Composição' %> <%= i + 1 %>
+            <select name="<%= campo %>"><option value="">Nenhuma</option>
+              <% for (const item of opcoes) { %><option value="<%= item.id %>" <%= escolhidas[i] === item.id ? 'selected' : '' %>><%= item.titulo %></option><% } %>
+              <% if (escolhidas[i] && !opcoes.some(o => o.id === escolhidas[i])) { %><option value="<%= escolhidas[i] %>" selected>Registro indisponível</option><% } %>
+            </select>
+          </label>
+        <% } %>
+      </div>
+      <% if (max > 1) { %><button type="button" class="button button-outline" data-adicionar-vinculo hidden data-rotulo="<%= faixa ? 'Faixa' : 'Composição' %>">Adicionar <%= faixa ? 'faixa' : 'composição' %></button><% } %>
+      <% } %>
+    </fieldset>
+  <% } %>
 </section>
 <div class="work-form-actions">
   <a class="button button-outline" href="/espaco-de-trabalho">
@@ -385,4 +385,5 @@
 </div>
 </main></div>
 </div>
+<script src="/js/acervo-musical.js" defer></script>
 <%- include('../partials/fim-pagina') %>

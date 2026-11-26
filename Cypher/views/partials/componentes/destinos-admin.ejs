@@ -1,0 +1,46 @@
+<%
+  const papel = usuario.papelAdministrativo;
+  const modera = ['super_admin', 'moderador'].includes(papel);
+  const edita = ['super_admin', 'editor'].includes(papel);
+  const rota = String(path || '/admin').split(/[?#]/)[0];
+  const item = (href, titulo, icon, resumo, match) => ({href, titulo, icon, resumo, match});
+  const grupos = [
+    { nome: 'Atendimento', itens: modera ? [
+      item('/admin/moderacao', 'Suporte e moderação', 'shieldCheck', 'Analise denúncias, recursos e demais solicitações.'),
+      item('/admin/reputacao', 'Reputação e colaborações', 'users', 'Revise contestações de avaliações e de colaborações.'),
+      item('/admin/oportunidades', 'Pedidos de serviço', 'briefcase', 'Acompanhe pedidos, candidaturas e decisões.')
+    ] : [] },
+    { nome: 'Cadastro e curadoria', itens: modera ? [
+      item('/admin/revisao/excecoes', 'Exceções profissionais', 'user', 'Revise pedidos de mudança de atuação profissional.', r => r.startsWith('/admin/revisao/excecoes')),
+      ...(papel === 'super_admin' ? [item('/admin/revisao', 'Taxonomia', 'tag', 'Analise propostas de gêneros e profissões.', r => r === '/admin/revisao')] : []),
+      item('/admin/creditos', 'Créditos em revisão', 'fileMusic', 'Revise créditos atribuídos em obras e publicações.'),
+      item('/admin/selos', 'Selos profissionais', 'check', 'Confira as solicitações de selo.'),
+      item('/admin/lancamentos', 'Evidências de lançamento', 'disc', 'Confira a comprovação de lançamentos.')
+    ] : [] },
+    { nome: 'Cypher Central', itens: edita ? [
+      item('/admin/central', 'Conteúdos da Central', 'lightbulb', 'Crie, edite e publique orientações.', r => r === '/admin/central' || /^\/admin\/central\/(?:new|[^/]+\/(?:edit|preview))$/.test(r)),
+      item('/admin/central/reviews', 'Revisões da Central', 'listChecks', 'Veja os guias na fila editorial.'),
+      item('/admin/central/quality', 'Qualidade da Central', 'chart', 'Acompanhe alcance, utilidade e pontos de melhoria.'),
+      item('/admin/central/searches', 'Pesquisas da Central', 'search', 'Veja que dúvidas ainda não encontram resposta.')
+    ] : [] }
+  ];
+  const ativo = link => link.match ? link.match(rota) : rota === link.href || rota.startsWith(link.href + '/');
+%>
+<% if (modo === 'menu') { %>
+  <a class="side-link<%= rota === '/admin' ? ' active' : '' %>" href="/admin" aria-label="Painel inicial"<% if (rota === '/admin') { %> aria-current="page"<% } %>><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.house %></span><span class="side-link-label">Painel inicial</span></a>
+<% } %>
+<% grupos.filter(grupo => grupo.itens.length).forEach(grupo => { %>
+  <% if (modo === 'menu') { %>
+    <div class="admin-nav-group" role="group" aria-label="<%= grupo.nome %>">
+     <div class="nav-label" aria-hidden="true"><%= grupo.nome %></div>
+     <% grupo.itens.forEach(link => { %><a class="side-link<%= ativo(link) ? ' active' : '' %>" href="<%= link.href %>" aria-label="<%= link.titulo %>" title="<%= link.titulo %>"<% if (ativo(link)) { %> aria-current="page"<% } %>><span class="side-icon lucide-icon" aria-hidden="true"><%- icones[link.icon] %></span><span class="side-link-label"><%= link.titulo %></span></a><% }) %>
+    </div>
+  <% } else { %>
+    <section class="admin-station">
+      <header class="admin-group-heading"><h2><%= grupo.nome %></h2></header>
+      <div class="admin-quick-grid">
+       <% grupo.itens.forEach(link => { %><a href="<%= link.href %>"><span class="admin-tile-icon lucide-icon" aria-hidden="true"><%- icones[link.icon] %></span><strong><%= link.titulo %> <span aria-hidden="true">↗</span></strong><small><%= link.resumo %></small></a><% }) %>
+      </div>
+    </section>
+  <% } %>
+<% }) %>

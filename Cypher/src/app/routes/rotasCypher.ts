@@ -1,4 +1,5 @@
 import rotasSuporte from "./rotasSuporte.js";
+import rotasCreditosSelos from "./rotasCreditosSelos.js";
 import rotasMidiasRepresentacao from "./rotasMidiasRepresentacao.js";
 import rotasInteracoes from "./rotasInteracoes.js";
 import rotasLicenciamentoBeats from "./rotasLicenciamentoBeats.js";
@@ -24,11 +25,17 @@ import { buscaGlobal, sugestoesBusca } from "../controllers/controladorBusca.js"
 import * as notificacoes from "../controllers/controladorNotificacoes.js";
 import { middlewareAutorizacao } from "../controllers/controladorCompartilhado.js";
 
-import { espacoTrabalho, fichaTrabalho } from "../controllers/controladorEspacoTrabalho.js";
+import {
+  aceitarCreditoObra,
+  espacoTrabalho,
+  fichaTrabalho,
+  revisarCreditoObra,
+} from "../controllers/controladorEspacoTrabalho.js";
 
 const router = Router();
 
 router.use(middlewareAutorizacao);
+router.use(rotasCreditosSelos);
 router.use(rotasMidiasRepresentacao);
 router.use(rotasInteracoes);
 router.use(rotasSuporte);
@@ -87,6 +94,8 @@ router.get("/events/:id/edit", eventos.editarEvento);
 router.post("/events/:id/edit", eventos.atualizarEvento);
 router.post("/events/:id/delete", eventos.excluirEvento);
 router.get("/espaco-de-trabalho", espacoTrabalho);
+router.get("/espaco-de-trabalho/creditos/:id", revisarCreditoObra);
+router.post("/espaco-de-trabalho/creditos/:id", aceitarCreditoObra);
 router.get("/espaco-de-trabalho/:modalidade/:id", fichaTrabalho);
 router.get("/works", obras.obras);
 router.post("/works/:id/like", obras.curtirObra);
@@ -95,6 +104,9 @@ router.post("/works/new", obras.criarObra);
 router.get("/works/:id/edit", obras.editarObra);
 router.post("/works/:id/edit", obras.atualizarObra);
 router.post("/works/:id/delete", obras.excluirObra);
+router.post("/works/:id/evidencia", obras.comprovarLancamento);
+router.get("/admin/lancamentos", obras.evidenciasLancamentos);
+router.post("/admin/lancamentos/:id", obras.decidirEvidencia);
 router.get("/beats", beats.bancoBeats);
 router.get("/beats/new", beats.novoBeat);
 router.post("/beats/new", beats.criarBeat);

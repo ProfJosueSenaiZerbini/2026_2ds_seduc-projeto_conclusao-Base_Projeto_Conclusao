@@ -5,6 +5,11 @@
       <meta name="cypher-theme" content="<%= typeof temaPreferido !== 'undefined' ? temaPreferido : '' %>">
       <script>
         (() => {
+          const acessoAdmin = <%- JSON.stringify((typeof temaFixoAdmin !== 'undefined' && temaFixoAdmin) || (typeof usuario !== 'undefined' && usuario && usuario.tipoConta === 'administrativo')) %>;
+          if (acessoAdmin) {
+            document.documentElement.classList.add("dark");
+            return;
+          }
           const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
           let tema = temaConta === "light" ? "light" : "dark";
           try {
@@ -41,7 +46,7 @@
       </title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/css/estilos.css">
       <link rel="stylesheet" href="/css/tema-cypher-claro.css">
       <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
@@ -53,9 +58,11 @@
       <link rel="stylesheet" href="/css/responsivo.css">
       <link rel="stylesheet" href="/css/formularios.css">
       <link rel="stylesheet" href="/css/busca-global.css">
+      <link rel="stylesheet" href="/css/cards-obras.css">
       <% if(typeof midiasUsuario==='function'){ %><link rel="stylesheet" href="/css/midias-publicacoes.css"><% } %>
       <% if (typeof interacao === 'function' || stylesheet === 'catalogo-obras' || stylesheet === 'cena-perfil') { %><link rel="stylesheet" href="/css/interacoes-conteudo.css"><% } %>
       <% if (typeof usuario !== "undefined" && usuario && usuario.tipoConta === "administrativo") { %><link rel="stylesheet" href="/css/admin.css"><% } %>
       <link rel="stylesheet" href="/css/botao-salvar.css">
+      <link rel="stylesheet" href="/css/navegacao.css">
     </head>
     <body<% if (typeof usuario !== "undefined" && usuario && usuario.tipoConta === "administrativo") { %> class="admin-context"<% } %>>

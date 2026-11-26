@@ -1,0 +1,133 @@
+
+/* Shared refinements for the account, profile and work flows. */
+.account-settings-shell .cy-settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2.5vw, 28px);
+}
+.account-settings-shell .cy-settings-layout .settings-index {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--dc-line);
+  border-radius: 8px 18px 8px 8px;
+}
+.cy-settings-layout .settings-index-link {
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+.cy-settings-layout .settings-content { display: grid; gap: clamp(16px, 2vw, 24px); min-width: 0; }
+.account-settings-shell .settings-page .settings-section,
+.cy-activation .profile-edit-panel,
+.cy-work-flow .et-sheet,
+.cy-work-flow .sp-panel,
+.cy-work-flow .pt-feedback,
+.cy-error-card {
+  background: var(--dc-panel);
+  color: var(--dc-ink);
+  border: 1px solid var(--dc-line);
+  border-radius: 8px 22px 8px 8px;
+  box-shadow: var(--dc-shadow);
+  min-width: 0;
+}
+.account-settings-shell .settings-section { scroll-margin-block-start: 24px; }
+.account-settings-shell .settings-section > h2,
+.cy-activation .page-header h2,
+.cy-work-flow .et-page .cy-work-heading,
+.cy-error-card h1 {
+  font: 700 clamp(29px, 4vw, 46px)/1.1 "Oswald", sans-serif;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+}
+.account-settings-shell .settings-section > h2,
+.cy-activation .page-header h2 { border-inline-start: 4px solid var(--dc-olive); padding-inline-start: 12px; }
+.account-settings-shell .settings-data strong { overflow-wrap: anywhere; }
+.account-settings-shell .cy-security-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 14px;
+}
+.account-settings-shell .cy-security-grid .profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin: 0;
+  padding: clamp(14px,2.2vw,24px);
+  border: 1px solid var(--dc-line);
+  border-radius: 8px;
+  background: var(--dc-field);
+}
+.account-settings-shell .cy-security-grid .profile-edit-form :is(h3,p) { margin: 0; }
+.account-settings-shell .cy-security-grid .profile-edit-form .button {
+  align-self: start;
+  margin-block-start: auto;
+}
+.account-settings-shell .settings-page :is(input:not([type=checkbox]):not([type=hidden]),select) {
+  font: 500 1rem/1.4 "Space Grotesk", sans-serif;
+}
+.account-settings-shell .settings-password-grid { gap: 12px; }
+.cy-account-exit { display: grid; gap: 12px; margin-block-start: 24px; padding-block-start: 18px; border-top: 1px solid var(--dc-line); }
+.cy-account-exit .account-delete-panel { margin-top: 0; }
+.dc-shell .cy-danger,
+.cy-confirm .cy-danger {
+  background: #fbd5cb;
+  border: 1px solid #b84e3e;
+  color: #601d15;
+  font-weight: 700;
+}
+.dark :is(.dc-shell,.cy-confirm) .cy-danger { background: #3b201b; color: #ffd6cb; border-color: #d38372; }
+.dc-shell .cy-danger:hover, .cy-confirm .cy-danger:hover { background: #f8b9a7; color: #421610; }
+.cy-activation .button-lime,
+.cy-error-card .button-lime { background: var(--dc-button); color: var(--dc-button-ink); }
+.cy-activation .cy-activation-content,
+.cy-work-flow .et-page { max-width: 1260px; width: 100%; margin-inline: auto; padding: clamp(18px, 3vw, 36px) clamp(16px, 3vw, 40px) 110px; }
+.cy-activation .profile-edit-panel { padding: clamp(16px,3vw,32px); }
+.cy-work-flow .et-page {
+  --et-ink: var(--dc-ink);
+  --et-muted: var(--dc-muted);
+  --et-gold: var(--dc-olive);
+  --et-line: var(--dc-line);
+  color-scheme: light;
+  background: none;
+}
+.dark .cy-work-flow .et-page { color-scheme: dark; }
+.cy-work-flow .et-sheet,
+.cy-work-flow .sp-panel,
+.cy-work-flow .pt-feedback { padding: clamp(16px, 3vw, 32px); }
+.cy-work-flow :is(.et-sheet,.sp-panel,.pt-feedback) :is(input,select,textarea) { max-width: 100%; }
+.cy-work-flow .et-formats a { background: var(--dc-panel); color: var(--dc-ink); border-color: var(--dc-line); }
+.cy-work-flow .et-formats a:hover { background: var(--dc-hover); }
+.cy-work-flow .et-back { color: var(--dc-ink); }
+.cy-error-content { width: min(100%, 760px); margin: auto; padding: clamp(24px, 8vw, 100px) 20px; }
+.cy-error-content > .cypher-logo { display: inline-grid; margin-block-end: 25px; }
+.cy-error-card { padding: clamp(22px,5vw,48px); }
+.cy-error-card h1 { margin-block: 16px 8px; }
+.cy-error-card p { color: var(--dc-muted); margin-block-end: 24px; }
+.cy-settings-layout a:focus-visible, .cy-work-flow a:focus-visible, .cy-activation :is(a,button,input):focus-visible {
+  outline: 2px solid var(--dc-ink);
+  outline-offset: 3px;
+}
+@media(max-width:900px) {
+  .account-settings-shell .settings-page { padding-bottom: 110px; }
+}
+@media(max-width:750px) {
+  .account-settings-shell .cy-security-grid { grid-template-columns: minmax(0,1fr); }
+  .account-settings-shell .cy-settings-layout .settings-index { flex-wrap: nowrap; overflow: auto; }
+  .cy-settings-layout .settings-index-link { flex-shrink: 0; white-space: nowrap; }
+}
+
+.account-settings-shell .settings-page label.floating-field { padding-top: 0; }
+.account-settings-shell .settings-page .floating-field .field-caption { position: static; transform: none; }
+.account-settings-shell .settings-page .floating-field:focus-within .field-caption { color: var(--dc-olive); }
+.account-settings-shell .settings-page .floating-field > :is(input,select,textarea):focus-visible { outline: 2px solid var(--dc-olive); outline-offset: 2px; }
+.account-settings-shell .cy-security-grid .button-lime:hover { filter: brightness(1.1); }
+@media (max-width: 370px) {
+  .cy-work-flow .et-formats { grid-template-columns: minmax(0, 1fr); }
+}

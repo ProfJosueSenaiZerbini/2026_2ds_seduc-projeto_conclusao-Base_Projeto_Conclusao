@@ -1,8 +1,10 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
 <%
-  function urlFormato(valor) {
+  function urlFormato(valor, pagina = 1, favor = curtidos) {
     const params = new URLSearchParams();
     for (const [chave, dado] of Object.entries({q, genero, ano, ordem, formato: valor})) if (dado && !(chave === 'ordem' && dado === 'recentes')) params.set(chave, dado);
+    if (pagina > 1) params.set('pagina', pagina);
+    if (favor) params.set('curtidos', '1');
     return '/works' + (params.size ? '?' + params : '');
   }
 %>
@@ -41,16 +43,17 @@
       <section class="ob-catalog" id="catalogo-obras" aria-labelledby="ob-catalogo-titulo">
         <header class="dc-heading ob-catalog-heading">
           <div><span class="ob-eyebrow">Encontre seu próximo favorito</span><h2 id="ob-catalogo-titulo"><%= q ? 'Resultados para “' + q + '”' : 'Explore o acervo' %></h2></div>
-          <div class="ob-heading-actions"><span class="cy-count-sticker" data-ob-total><%= obras.length %> <%= obras.length === 1 ? 'obra' : 'obras' %></span><% if (usuario.tipoConta === 'profissional' && !usuario.demonstracao) { %><a href="/espaco-de-trabalho">Minhas obras</a><% } %></div>
+          <div class="ob-heading-actions"><span class="cy-count-sticker"><%= totalResultados %> <%= totalResultados === 1 ? 'obra' : 'obras' %></span><% if (usuario.tipoConta === 'profissional' && !usuario.demonstracao) { %><a href="/espaco-de-trabalho">Minhas obras</a><% } %></div>
         </header>
         <div class="dc-controls ob-controls">
           <nav class="dc-tabs ob-format-tabs" aria-label="Filtrar obras por formato">
             <a href="<%= urlFormato('') %>"<%= !formato ? ' aria-current=page' : '' %>><span aria-hidden="true"><%- icones.disc %></span> Todo o acervo</a>
             <% formatos.forEach(opcao => { %><a href="<%= urlFormato(opcao) %>"<%= formato === opcao ? ' aria-current=page' : '' %>><%= ({'Faixa':'Faixas','Single':'Singles','EP':'EPs','Álbum':'Álbuns'})[opcao] || opcao %></a><% }) %>
           </nav>
-            <button class="ob-collection-button" type="button" data-ob-collection aria-pressed="false" hidden><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %> Curtidos <span data-ob-favorite-count>0</span></button>
+            <a class="ob-collection-button" data-ob-collection href="<%= urlFormato(formato, 1, !curtidos) %>"><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %> <%= curtidos ? 'Ver todas as obras' : 'Ver curtidas' %><% if (!curtidos) { %> <span data-ob-favorite-count><%= totalCurtidos %></span><% } %></a>
           <details class="dc-filter ob-filter"><summary><span aria-hidden="true"><%- icones.sliders %></span> Refinar<%= genero || ano ? ' •' : '' %></summary>
             <form action="/works">
+              <% if (curtidos) { %><input type="hidden" name="curtidos" value="1"><% } %>
               <% for (const [chave, dado] of Object.entries({q, formato})) { if (dado) { %><input type="hidden" name="<%= chave %>" value="<%= dado %>"><% }} %>
               <label>Gênero musical<select name="genero"><option value="">Todos os gêneros</option><% generos.forEach(g => { %><option value="<%= g %>"<%= g === genero ? ' selected' : '' %>><%= g %></option><% }) %></select></label>
               <label>Ano de lançamento<select name="ano"><option value="">Todos os anos</option><% anos.forEach(a => { %><option value="<%= a %>"<%= a === ano ? ' selected' : '' %>><%= a %></option><% }) %></select></label>
@@ -69,11 +72,15 @@
               </div>
             </section>
           <% }) %>
-          <div class="dc-empty ob-empty" data-ob-collection-empty hidden><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %><div><h3>Sua coleção começa com uma descoberta.</h3><p>Curta uma obra pela coroa. Suas curtidas desta seleção aparecem aqui.</p><button class="ob-text-button" type="button" data-ob-show-all>Voltar ao acervo</button></div></div>
+          <div class="dc-empty ob-empty" data-ob-collection-empty hidden><%- include('../partials/componentes/icone-beat', { tipo: 'crown' }) %><div><h3>Nenhuma obra curtida nesta página.</h3><a class="ob-text-button" href="<%= urlFormato(formato, 1) %>">Atualizar curtidas</a></div></div>
         <% } else { %>
-          <div class="dc-empty ob-empty"><%- icones.search %><div><h3><%= filtrado ? 'Esse som ainda não apareceu por aqui.' : 'O acervo está esperando novas histórias.' %></h3><p><%= filtrado ? 'Tente outro artista, título ou combinação de filtros.' : 'As obras públicas da comunidade vão encontrar seu lugar aqui.' %></p><% if (filtrado) { %><a class="ob-text-button" href="/works">Explorar todo o acervo</a><% } %></div></div>
+          <div class="dc-empty ob-empty"><%- icones.search %><div><h3><%= curtidos ? 'Nenhuma obra curtida nesta seleção.' : filtrado ? 'Nenhuma obra encontrada.' : 'Nenhuma obra disponível.' %></h3><a class="ob-text-button" href="/works">Explorar todo o acervo</a></div></div>
         <% } %>
-        <footer class="ob-catalog-note"><span aria-hidden="true"><%- icones.headphones %></span> Cada obra tem uma voz. Encontre as que conversam com você.</footer>
+        <% if (paginas > 1) { %><nav class="ob-catalog-note" aria-label="Páginas de obras">
+          <% if (pagina > 1) { %><a href="<%= urlFormato(formato, pagina - 1) %>">Página anterior</a><% } %>
+          <span>Página <%= pagina %> de <%= paginas %></span>
+          <% if (pagina < paginas) { %><a href="<%= urlFormato(formato, pagina + 1) %>">Próxima página</a><% } %>
+        </nav><% } %>
       </section>
       <p class="sr-only" role="status" aria-live="polite" data-ob-status></p>
     </main>

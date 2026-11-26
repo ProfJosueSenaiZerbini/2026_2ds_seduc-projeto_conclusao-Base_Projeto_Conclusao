@@ -1,4 +1,5 @@
 @import "./descoberta.css";
+@import "./mensagens.css";
 .op-shell {
   font-size: 16px;
 }
@@ -51,9 +52,9 @@
 .op-detail-heading h2,
 .op-section-heading h2 {
   font:
-    700 clamp(27px, 3vw, 43px)/1.12 "Space Grotesk",
+    700 clamp(27px, 3vw, 43px)/1.12 "Oswald",
     sans-serif;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   max-width: 760px;
   margin: 12px 0 15px;
 }
@@ -99,7 +100,7 @@
   border-radius: 3px;
   color: var(--dc-ink);
   font:
-    700 14px/1.4 "DM Sans",
+    700 14px/1.4 "Space Grotesk",
     sans-serif;
   cursor: pointer;
   text-align: center;
@@ -149,7 +150,7 @@
   background: var(--dc-card);
   color: var(--dc-ink);
   font:
-    400 16px/1.5 "DM Sans",
+    400 16px/1.5 "Space Grotesk",
     sans-serif;
   box-sizing: border-box;
 }

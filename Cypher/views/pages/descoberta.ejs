@@ -61,19 +61,33 @@
                 <% if (slide.foto) { %><picture>
                   <img src="/img/<%= slide.foto %>" alt="" decoding="async" loading="<%= i ? 'lazy' : 'eager' %>">
                 </picture><% } %>
-                <span class="dc-slide-copy"><span class="dc-stamp">Em destaque</span><strong><%= slide.titulo %></strong><span><%= slide.texto %></span><b><%= slide.acao %> <%- icones.arrowRight %></b></span>
+                <span class="dc-slide-copy">
+                  <span class="dc-stamp">Em destaque</span>
+                  <strong><%= slide.titulo %></strong>
+                  <% if (slide.texto) { %><span class="dc-slide-meta"><%= slide.texto %></span><% } %>
+                  <span class="dc-slide-action"><%= slide.acao %><span aria-hidden="true"><%- icones.arrowUpRight %></span></span>
+                </span>
               </a><% }) %>
               </div>
               <div class="dc-feature-nav" role="group" aria-label="Navegar pelos destaques" hidden>
-                <div class="dc-feature-toolbar"><div><span class="dc-feature-caption">SEU PRÓXIMO ENCONTRO</span><span class="dc-feature-counter" aria-hidden="true">01 / <%= String(destaques.length).padStart(2,'0') %></span></div><div class="dc-feature-controls"><button class="dc-feature-arrow dc-feature-prev" type="button" aria-label="Destaque anterior" aria-controls="destaques-conteudo"><%- icones.arrowLeft %></button><button class="dc-feature-arrow dc-feature-next" type="button" aria-label="Próximo destaque" aria-controls="destaques-conteudo"><%- icones.arrowRight %></button></div></div>
+                <span class="dc-feature-counter" aria-hidden="true">01 / <%= String(destaques.length).padStart(2,'0') %></span>
                 <div class="dc-feature-choices" role="radiogroup" aria-label="Escolher destaque">
-                  <% destaques.forEach((slide,i) => { %><label class="dc-feature-choice"><input type="radio" name="destaque" aria-label="Destaque <%= i + 1 %> de <%= destaques.length %>: <%= slide.titulo %>" aria-controls="destaques-conteudo"<% if(i===0){ %> checked<% } %>><% if(slide.foto){ %><img src="/img/<%= slide.foto %>" alt="" loading="lazy"><% } %><span><small><%= slide.acao.replace(/^Ver /,'') %></small><strong><%= slide.titulo %></strong></span></label><% }) %>
-                </div><span class="dc-feature-status" role="status" aria-live="polite" aria-atomic="true"></span>
+                  <% destaques.forEach((slide,i) => { %>
+                    <label class="dc-feature-choice" title="<%= slide.titulo %>">
+                      <input type="radio" name="destaque" aria-label="Destaque <%= i + 1 %> de <%= destaques.length %>: <%= slide.titulo %>" aria-controls="destaques-conteudo"<% if(i===0){ %> checked<% } %>>
+                    </label>
+                  <% }) %>
+                </div>
+                <div class="dc-feature-controls">
+                  <button class="dc-feature-arrow dc-feature-prev" type="button" aria-label="Destaque anterior" aria-controls="destaques-conteudo"><%- icones.arrowLeft %></button>
+                  <button class="dc-feature-arrow dc-feature-next" type="button" aria-label="Próximo destaque" aria-controls="destaques-conteudo"><%- icones.arrowRight %></button>
+                </div>
+                <span class="dc-feature-status" role="status" aria-live="polite" aria-atomic="true"></span>
               </div>
             </section>
             <% } %>
-            <section><% cabecao(musica.length ? 'Lançamentos na cena' : 'Explore por categoria', musica.length ? '/works' : ''); %>
-              <div class="dc-tiles" role="region" aria-label="<%= musica.length ? 'Lançamentos na cena' : 'Explore por categoria' %> — rolagem horizontal" tabindex="0">
+            <section><% cabecao(musica.length ? 'Lançamentos na cena' : 'Explore por categoria', musica.length ? urlFiltro('musica') : ''); %>
+              <div class="dc-tiles<%= musica.length ? ' dc-release-tiles' : '' %>" role="region" aria-label="<%= musica.length ? 'Lançamentos na cena' : 'Explore por categoria' %> — rolagem horizontal" tabindex="0">
                 <% if (musica.length) { musica.forEach(item => { %><%- include('../partials/componentes/item-descoberta', { item }) %><% }); } else { categorias.slice(1).forEach(cat => { %>
                   <a class="dc-category dc-cat-<%= cat.id %>" href="<%= urlFiltro(cat.id) %>">
                     <span class="dc-category-art"><img src="/img/<%= cat.foto %>" alt="" loading="lazy" decoding="async"><i aria-hidden="true"><%- icones[cat.icone] %></i></span>

@@ -1,0 +1,16 @@
+<form class="work-form" method="post" action="/works/<%= encodeURIComponent(id) %>/evidencia">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="form-grid">
+    <label>Tipo de evidência
+      <select name="tipo" required>
+        <option value="audio" <%= valores.tipo === 'audio' ? 'selected' : '' %>>Áudio autorizado na Cypher</option>
+        <option value="externa" <%= valores.tipo === 'externa' ? 'selected' : '' %>>Publicação externa para análise</option>
+      </select>
+    </label>
+    <label>Data da disponibilização <input type="date" name="data" value="<%= valores.data %>" required></label>
+    <label class="field-full">Link da publicação externa <input type="url" name="url" value="<%= valores.url %>" maxlength="500"></label>
+  </div>
+  <p>Para comprovar pela Cypher, publique o lançamento e envie o áudio de cada fonograma na área de mídias.</p>
+  <p><label><input type="checkbox" name="autorizado" value="sim" <%= valores.autorizado ? 'checked' : '' %> required> Tenho autorização para divulgar o lançamento e as faixas.</label></p>
+  <button class="button button-lime" type="submit">Enviar evidência</button>
+</form>

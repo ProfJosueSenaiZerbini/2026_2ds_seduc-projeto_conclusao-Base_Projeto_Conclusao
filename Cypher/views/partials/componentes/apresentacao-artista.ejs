@@ -19,7 +19,7 @@
         <% if (a.proprio && pessoa.namePublic === false) { %><span class="pf-handle">Nome completo privado</span><% } %>
         <% if (pessoa.categories.length) { %><p class="pf-roles"><%= pessoa.categories.map(c => pessoa.rotulosCategorias[c] || c).join(' · ') %></p><% } %>
       </div>
-      <% if (a.selo) { %><span class="pf-seal" data-forma="<%= a.selo.forma %>" data-cor="<%= a.selo.cor %>" role="img" aria-label="Selo profissional de <%= nome %>" title="Selo profissional de <%= nome %>"><%= a.selo.letras %></span><% } %>
+      <%- include('selo-assinatura',{selo:a.selo,nome}) %>
     </div>
     <% if (a.destaque) { %><a class="pf-cover-credit" href="<%= a.destaque.url %>"><%- icones.disc %><span><small>Do acervo</small><strong><%= a.destaque.titulo %></strong></span></a><% } %>
   </div>
@@ -38,7 +38,8 @@
     <div class="pf-actions">
       <% if (a.editavel) { %><a class="pf-button primary" href="/profile?editar=1#editar-perfil"><%- icones.pen %>Editar perfil</a><% } %>
       <% if (a.outraPessoa) { %><%- include('acoes-conteudo',{tipo:'perfil',id:pessoa.id}) %><% } %>
-      <% if (a.conversa) { %><a class="pf-button" href="/messages/<%= encodeURIComponent(a.conversa) %>">Mensagem</a>
+      <% if (a.conversa) { %><a class="pf-button" href="/messages/<%= encodeURIComponent(a.conversa) %>"><%- icones.messageCircle %> Mandar mensagem</a>
+      <% } else if (a.iniciarConversa) { %><form method="post" action="/messages/start"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="alvo_id" value="<%= pessoa.id %>"><button class="pf-button" type="submit"><%- icones.messageCircle %> Mandar mensagem</button></form>
       <% } else if (a.outraPessoa && pessoa.contact) { %><a class="pf-button" href="<%= a.url('sobre').split('#')[0] %>#contato">Contato</a><% } %>
       <% if (a.editavel || a.outraPessoa || temPublico) { %>
         <details class="pf-menu"><summary class="pf-button" aria-label="Mais ações do perfil"><%- icones.more %></summary>

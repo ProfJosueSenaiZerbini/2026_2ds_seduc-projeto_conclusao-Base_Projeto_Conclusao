@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { Request, Response, NextFunction } from "express";
 import * as m from "../models/oportunidades.js";
 import * as contato from "../models/contatosOportunidades.js";
+import { agruparMensagensPorDia, horaMensagem, rotuloDataConversa } from "../models/tempoMensagens.js";
 import { conexaoInternaCypher } from "../models/bancoDados.js";
 import {
   objetoDisponivel,
@@ -34,9 +35,9 @@ function render(
   dados: m.Linha = {}
 ) {
   return res.render("pages/chamadas", {
-    title: "Oportunidades",
+    title: tela === "mensagens" ? "Mensagens" : "Oportunidades",
     stylesheet: "chamadas",
-    path: req.path.startsWith("/admin/") ? req.path : "/opportunities",
+    path: req.path.startsWith("/admin/") ? req.path : tela === "mensagens" ? "/messages" : "/opportunities",
     authenticated: true,
     tela,
     profissional: res.locals.usuario.tipoConta === "profissional",
@@ -71,6 +72,8 @@ function render(
                 : v
           ).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })
         : "Sem prazo definido",
+    hora: horaMensagem,
+    dataConversa: rotuloDataConversa,
     ...dados,
   });
 }
@@ -80,6 +83,8 @@ export function seguro(fn: Handler) {
       m.conta(uid(res));
       return fn(req, res);
     } catch (e) {
+      if (e instanceof ErroOportunidade)
+        if (req.path.includes("/attachments")) return res.status(e.status).json({ erro: e.message });
       if (e instanceof ErroOportunidade)
         return res.status(e.status).render("pages/chamadas", {
           ...res.locals,
@@ -231,9 +236,11 @@ export const aplicar: Handler = (req, res) => {
 };
 export const negociacao: Handler = (req, res) => {
   const c = m.candidatura(req.params.id!, uid(res));
+  const conversa = c.conversa ? contato.conversa(c.conversa.id, uid(res)) : null;
+  if (conversa) contato.registrarLeitura(conversa, uid(res));
   return render(req, res, "negociacao", {
     c,
-    conversa: c.conversa ? contato.conversa(c.conversa.id, uid(res)) : null,
+    conversa,
     negBase: req.path.startsWith("/admin/")
       ? "/admin/oportunidades/candidaturas"
       : "/opportunities/applications",
@@ -314,14 +321,16 @@ export const esclarecer: Handler = (req, res) => {
   contato.responderPedido(uid(res), req.params.id!, req.body.mensagem);
   res.redirect(303, `/service-requests/${req.params.id}?ok=1`);
 };
-export const mensagens: Handler = (req, res) =>
-  render(req, res, "mensagens", {
+export const mensagens: Handler = (req, res) => {
+  const busca = String(req.query.q ?? "").trim().slice(0, 100);
+  res.set("Cache-Control", "private, no-store");
+  return render(req, res, "mensagens", {
     conversa: null,
-    conversas: m.todos(
-      "SELECT * FROM conversas WHERE participante_a=? OR participante_b=? ORDER BY criada_em DESC",
-      uid(res),
-      uid(res)
-    ),
+    conversas: contato.listarConversas(uid(res)).filter(c =>
+      (c.ultima_mensagem || c.contexto !== "Conversa direta") &&
+      (!busca || `${c.interlocutor} ${c.identificador ?? ""}`.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR")))),
+    contatos: contato.listarContatosDisponiveis(uid(res), busca),
+    busca,
     preferencias: m.um(
       "SELECT * FROM preferencias_contato WHERE usuario_id=?",
       uid(res)
@@ -331,13 +340,36 @@ export const mensagens: Handler = (req, res) =>
       uid(res)
     ),
   });
-export const mensagem: Handler = (req, res) =>
-  render(req, res, "mensagens", {
-    conversa: contato.conversa(req.params.id!, uid(res)),
-    conversas: [],
-    preferencias: null,
-    bloqueados: [],
+};
+export const mensagem: Handler = (req, res) => {
+  const conversa = contato.conversa(req.params.id!, uid(res));
+  contato.registrarLeitura(conversa, uid(res));
+  res.set("Cache-Control", "private, no-store");
+  return render(req, res, "mensagens", {
+    conversa,
+    gruposMensagens: agruparMensagensPorDia(conversa.mensagens),
+    conversas: contato.listarConversas(uid(res)).filter(c =>
+      c.ultima_mensagem || c.contexto !== "Conversa direta"),
+    contatos: contato.listarContatosDisponiveis(uid(res)),
+    busca: "",
+    preferencias: m.um(
+      "SELECT * FROM preferencias_contato WHERE usuario_id=?",
+      uid(res)
+    ) ?? { profissionais: 1, consumidores: 0 },
+    bloqueados: m.todos(
+      "SELECT b.alvo_id,p.nome FROM bloqueios_usuarios b LEFT JOIN perfis p ON p.usuario_id=b.alvo_id WHERE b.autor_id=?",
+      uid(res)
+    ),
   });
+};
+export const iniciarMensagem: Handler = (req, res) => {
+  const id = contato.iniciarConversa(uid(res), String(req.body.alvo_id ?? ""));
+  return res.redirect(303, "/messages/" + encodeURIComponent(id));
+};
+export const ocultarMensagem: Handler = (req, res) => {
+  contato.ocultarConversa(uid(res), req.params.id!);
+  return res.redirect(303, "/messages?ok=1");
+};
 export const enviar: Handler = (req, res) => {
   contato.enviarMensagem(
     uid(res),
@@ -346,6 +378,24 @@ export const enviar: Handler = (req, res) => {
     req.body.chave
   );
   res.redirect(303, req.path + "?ok=1");
+};
+export const anexarMensagem: Handler = (req, res) => {
+  let nome = "";
+  let legenda = "";
+  try {
+    nome = decodeURIComponent(req.get("x-file-name") ?? "");
+    legenda = decodeURIComponent(req.get("x-message-text") ?? "");
+  } catch { throw new ErroOportunidade("Nome ou legenda inválidos."); }
+  contato.enviarAnexo(uid(res), req.params.id!, nome, req.body,
+    legenda, req.get("x-message-key"));
+  return res.status(201).json({ ok: true });
+};
+export const baixarAnexo: Handler = (req, res) => {
+  const anexo = contato.arquivoAnexo(uid(res), req.params.attachmentId!);
+  res.set({ "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" });
+  if (!/^(image|audio|video)\//.test(anexo.mime)) res.attachment(anexo.nome);
+  res.type(anexo.mime);
+  return res.sendFile(anexo.caminho);
 };
 export const preferencias: Handler = (req, res) => {
   contato.preferenciasContato(uid(res), req.body);

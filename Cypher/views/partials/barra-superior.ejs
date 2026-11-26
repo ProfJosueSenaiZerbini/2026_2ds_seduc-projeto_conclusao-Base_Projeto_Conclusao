@@ -1,8 +1,8 @@
 <% if (usuario.tipoConta === 'administrativo') { %>
 <header class="dc-header admin-header">
   <button class="dc-menu" type="button" data-sidebar-open aria-label="Abrir navegação administrativa" aria-controls="navegacao-principal" aria-expanded="false"><%- icones.menu %></button>
-  <a class="dc-brand" href="/admin" aria-label="Cypher — administração">CYPHER</a>
-  <div class="dc-title"><span class="admin-header-label">ÁREA DA EQUIPE</span><h1><%= breadcrumb %></h1></div>
+  <a class="dc-brand cypher-logo" href="/admin" aria-label="Cypher: painel da equipe"><span aria-hidden="true">CYPHER</span></a>
+  <div class="dc-title admin-location"><span class="admin-header-label">BASTIDORES / EQUIPE</span><span class="admin-location-name"><%= breadcrumb %></span></div>
   <div class="admin-header-account"><span class="lucide-icon" aria-hidden="true"><%- icones.shieldCheck %></span><span><%= {super_admin:'Administrador Geral',moderador:'Moderador',editor:'Editor'}[usuario.papelAdministrativo] %></span></div>
 </header>
 <% } else { %>

@@ -117,9 +117,9 @@
 .pf-names h2 {
   margin: 0.06em 0 0.08em;
   font:
-    700 clamp(2rem, 4.1vw, 4.7rem)/1.03 "Space Grotesk",
+    700 clamp(2rem, 4.1vw, 4.7rem)/1.03 "Oswald",
     sans-serif;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.02em;
   color: #fffdf2;
 }
 .pf-fullname,
@@ -237,7 +237,7 @@
   color: var(--dc-ink);
   cursor: pointer;
   font:
-    700 0.88rem/1.25 "DM Sans",
+    700 0.88rem/1.25 "Space Grotesk",
     sans-serif;
 }
 .pf-button.primary {
@@ -351,7 +351,7 @@
   color: var(--dc-ink);
   padding: 8px 29px 8px 35px;
   font:
-    600 0.875rem/1.4 "DM Sans",
+    600 0.875rem/1.4 "Space Grotesk",
     sans-serif;
   cursor: pointer;
 }
@@ -592,37 +592,6 @@
   color: var(--dc-ink);
   background: var(--dc-surface);
   border-left: 3px solid var(--dc-olive);
-}
-.pf-seal {
-  display: inline-grid;
-  place-items: center;
-  flex: none;
-  width: 3rem;
-  aspect-ratio: 1;
-  padding: 2px;
-  border: 4px double currentColor;
-  border-radius: 50%;
-  background: #d0df99;
-  color: #202519;
-  font:
-    700 1.12rem/1 "Space Grotesk",
-    sans-serif;
-  letter-spacing: -0.08em;
-}
-.pf-seal[data-cor="areia"] {
-  background: #efdaad;
-}
-.pf-seal[data-cor="lilas"] {
-  background: #ded0ed;
-}
-.pf-seal[data-cor="cobre"] {
-  background: #edb397;
-}
-.pf-seal[data-forma="placa"] {
-  border-radius: 1px 12px;
-}
-.pf-seal[data-forma="quadro"] {
-  border-radius: 2px;
 }
 .pf-seal-editor {
   margin-block: 20px;

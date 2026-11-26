@@ -1,0 +1,8 @@
+<a class="side-link<%= ativo ? ' active' : '' %>" href="<%= link.href %>" aria-label="<%= link.label %><%= link.count > 0 ? ', ' + link.count + ' não lidas' : '' %>" title="<%= link.label %>" <%- ativo ? 'aria-current="page"' : '' %>>
+  <span class="side-icon lucide-icon<%= link.avatar ? ' sidebar-avatar avatar' : '' %>" aria-hidden="true">
+    <% if (link.avatar) { %><%- include('avatar-usuario') %><% } else { %><%- icones[link.icon] %><% } %>
+    <% if (link.count > 0) { %><span class="sidebar-unread-dot"></span><% } %>
+  </span>
+  <span class="side-link-label"><%= link.label %></span>
+  <% if (link.count > 0) { %><b class="sidebar-unread-count" aria-hidden="true"><%= link.count > 99 ? '99+' : link.count %></b><% } %>
+</a>

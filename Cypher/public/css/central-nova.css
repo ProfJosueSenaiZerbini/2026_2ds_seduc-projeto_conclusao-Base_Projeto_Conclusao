@@ -36,6 +36,7 @@
 }
 .cn-hero h2,
 .cn-article-header h2 {
+  font-family: "Oswald", sans-serif;
   max-width: 900px;
   margin: 12px 0 18px;
   font-size: clamp(32px, 4.5vw, 58px);
@@ -150,7 +151,7 @@
   background: var(--dc-field);
   color: var(--dc-ink);
   font:
-    400 14px/1.5 "DM Sans",
+    400 14px/1.5 "Space Grotesk",
     sans-serif;
 }
 .cn-controls input::placeholder,
@@ -171,7 +172,7 @@
   background: var(--dc-surface);
   color: var(--dc-ink);
   font:
-    700 13px "DM Sans",
+    700 13px "Space Grotesk",
     sans-serif;
   cursor: pointer;
 }
@@ -892,7 +893,7 @@
   border: 0;
   background: transparent;
   font:
-    700 12px "DM Sans",
+    700 12px "Space Grotesk",
     sans-serif;
   text-decoration: underline;
   text-underline-offset: 4px;

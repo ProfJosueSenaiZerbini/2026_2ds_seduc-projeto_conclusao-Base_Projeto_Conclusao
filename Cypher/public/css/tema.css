@@ -1460,27 +1460,7 @@ body,
 }
 
 /* Switch de tema compartilhado — Claro/Escuro, sem modificar as paletas. */
-.sidebar-theme {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  margin-left: auto;
-  padding-left: 8px;
-}
-.sidebar-theme .entry-theme {
-  flex-shrink: 0;
-  margin: 0;
-}
-.sidebar-theme .entry-theme .theme-switch {
-  width: 46px;
-  height: 36px;
-  font-size: 13px;
-}
-@media (min-width: 901px) {
-  .dc-shell .sidebar:not(:hover):not(:has(:focus-visible)) .sidebar-theme {
-    display: none;
-  }
-}
+
 .entry-theme {
   display: flex;
   justify-self: center;
@@ -1503,7 +1483,7 @@ body,
   margin: 0;
   padding: 0;
   border: 0;
-  font: 400 17px/1 "DM Sans", sans-serif;
+  font: 400 17px/1 "Space Grotesk", sans-serif;
   cursor: pointer;
 }
 .dark .entry-theme .theme-switch {

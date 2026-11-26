@@ -1,4 +1,5 @@
 import { audioCatalogoLocal, duracaoAudioLocal } from "./audioCatalogoLocal.js";
+import type Database from "better-sqlite3";
 import { enderecoObra, perfilUrl } from "./enderecosPerfil.js";
 import { conexaoInternaCypher } from "./bancoDados.js";
 import { publicacoesDescoberta } from "./modeloDescoberta.js";
@@ -10,7 +11,7 @@ const linksSpotify = new Map(
     .map(obra => [obra.id, obra.link])
 );
 
-function duracaoDaFaixa(id: string, valor: unknown) {
+export function duracaoDaFaixa(id: string, valor?: unknown) {
   const segundos = duracaoAudioLocal[id];
   if (segundos) return `${Math.floor(segundos / 60)}:${String(segundos % 60).padStart(2, "0")}`;
   return typeof valor === "string" && /^\d{1,3}:[0-5]\d$/.test(valor) && !/^0+:00$/.test(valor) ? valor : "";
@@ -45,10 +46,27 @@ type Complemento = {
 
 // A seleção pública continua sob as mesmas regras de visibilidade da Descoberta.
 export function obrasDoCatalogo(usuarioId = "") {
-  const publicas = publicacoesDescoberta("obras", "", false, usuarioId);
-  if (!publicas.length) return [];
+  const db: Database.Database = conexaoInternaCypher();
+  return db.transaction(() => catalogoEmLeitura(db, usuarioId))();
+}
+
+function catalogoEmLeitura(db: Database.Database, usuarioId: string) {
   const comFaixas = publicacoesDescoberta("obras", "", true, usuarioId);
-  const complementos = conexaoInternaCypher()
+  const publicas = comFaixas.filter(o => !o.id.includes("-faixa-"));
+  if (!publicas.length) return [];
+  const lancamentos = new Map<string, string[]>();
+  const faixasOrdenadas = db.prepare(`
+    SELECT l.id, g.obra_id AS faixa FROM lancamentos l
+    LEFT JOIN faixas_lancamento f ON f.lancamento_id=l.id
+    LEFT JOIN fonogramas g ON g.id=f.fonograma_id
+    WHERE l.id IN (SELECT value FROM json_each(?)) ORDER BY l.id,f.ordem
+  `).all(JSON.stringify(publicas.map(o => o.id))) as { id: string; faixa: string | null }[];
+  for (const { id, faixa } of faixasOrdenadas) {
+    let lista = lancamentos.get(id);
+    if (!lista) lancamentos.set(id, lista = []);
+    if (faixa) lista.push(faixa);
+  }
+  const complementos = db
     .prepare(
       `
     SELECT o.id, o.link_escuta AS link, o.metadados,
@@ -60,7 +78,7 @@ export function obrasDoCatalogo(usuarioId = "") {
   `
     )
     .all(JSON.stringify(comFaixas.map(o => o.id))) as Complemento[];
-  const curtidas = conexaoInternaCypher().prepare(`
+  const curtidas = db.prepare(`
     SELECT obra_id, COUNT(*) AS total, MAX(usuario_id = ?) AS curtida
     FROM curtidas_obras GROUP BY obra_id
   `).all(usuarioId) as { obra_id: string; total: number; curtida: number }[];
@@ -79,8 +97,8 @@ export function obrasDoCatalogo(usuarioId = "") {
     } catch {
       /* Metadados legados também podem ser texto livre. */
     }
-    const colecao = obra.tipo === "EP" || obra.tipo === "Álbum";
-    const tipo = obra.tipo === "Música" ? "Faixa" : obra.tipo;
+    const colecao = ["EP", "Álbum", "Mixtape"].includes(obra.tipo);
+    const tipo = ["Música", "Fonograma"].includes(obra.tipo) ? "Faixa" : obra.tipo;
     const artistas = [
       ...new Set([
         obra.autor,
@@ -92,8 +110,9 @@ export function obrasDoCatalogo(usuarioId = "") {
     const quantidade = obra.demonstracao
       ? discoDemo(obra.id)?.faixas.length
       : undefined;
-    const faixas =
-      quantidade ?? (Array.isArray(meta.faixas) ? meta.faixas.length : null);
+    const idsFaixas = lancamentos.get(obra.id) ?? (Array.isArray(meta.faixas) ? meta.faixas : []);
+    const faixas = quantidade ?? (lancamentos.has(obra.id) || Array.isArray(meta.faixas)
+      ? idsFaixas.filter(id => publicaPorId.has(String(id))).length : null);
     const duracao = duracaoDaFaixa(obra.id, meta.duracao);
     return {
       ...obra,
@@ -109,10 +128,10 @@ export function obrasDoCatalogo(usuarioId = "") {
       ano: /^\d{4}-\d{2}-\d{2}$/.test(obra.data) ? obra.data.slice(0, 4) : "",
       faixas,
       listaFaixas: obra.demonstracao ? (discoDemo(obra.id)?.faixas ?? []) :
-        (Array.isArray(meta.faixas) ? meta.faixas.map(id => publicaPorId.get(String(id))?.titulo).filter(Boolean) : []),
+        idsFaixas.map(id => publicaPorId.get(String(id))?.titulo).filter(Boolean),
       faixasDetalhadas: (obra.demonstracao && discoDemo(obra.id)
         ? discoDemo(obra.id)!.faixas.map((_, i) => idFaixaDemo(obra.id, i))
-        : Array.isArray(meta.faixas) ? meta.faixas : []).flatMap(id => {
+        : idsFaixas).flatMap(id => {
         const faixa = publicaPorId.get(String(id));
         if (!faixa) {
           if (!obra.demonstracao) return [];

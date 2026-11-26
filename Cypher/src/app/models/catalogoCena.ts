@@ -4,6 +4,7 @@ import { imagemCena } from "./imagensCena.js";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { conexaoInternaCypher } from "./bancoDados.js";
+import { migrarAcervoMusical } from "./acervoMusical.js";
 import {
   perfisDemonstrativos,
   faixasDemonstrativas,
@@ -226,6 +227,7 @@ export function semearCatalogoCena(
           funcao
         );
       }
+      const obrasDaCarga: string[] = [];
       function obra(
         item: Linha,
         tipo: string,
@@ -238,8 +240,14 @@ export function semearCatalogoCena(
             "SELECT proprietario_id,demonstracao FROM obras WHERE id=?",
             item.id
           );
+        // Corrige a titularidade invertida do registro original de HORIZONTAL!.
+        if (item.id === "demo-obra-horizontal" && existente?.proprietario_id === idPessoaCena("levinsk") && autor === idPessoaCena("nog")) {
+          run("UPDATE obras SET proprietario_id=?,funcao_principal='Artista principal' WHERE id=?", autor, item.id);
+          existente.proprietario_id = autor;
+        }
         if (existente && existente.proprietario_id !== autor)
           throw new Error("Obra do catálogo em conflito: " + item.id);
+        if (!existente) obrasDaCarga.push(item.id);
         run(
           `INSERT INTO obras(id,proprietario_id,titulo,tipo,situacao,metadados,funcao_principal,genero,data_lancamento,link_escuta,publicada,demonstracao,descricao,quantidade_creditos,criado_em) VALUES(?,?,?,?,'Lançado',?,'Artista principal',?,?,?,1,0,?,?,?) ON CONFLICT(id) DO UPDATE SET demonstracao=0,descricao=excluded.descricao,quantidade_creditos=excluded.quantidade_creditos,metadados=excluded.metadados`,
           item.id,
@@ -264,6 +272,9 @@ export function semearCatalogoCena(
         run("UPDATE creditos SET demonstracao=0 WHERE obra_id=?", item.id);
         // Substitui apenas menções textuais antigas do catálogo, nunca créditos de outros registros.
         for (const [i, [p, f]] of equipe.entries()) credito(item.id, p, f, i);
+        if (item.id === "demo-obra-horizontal") {
+          run("UPDATE creditos SET funcao='Artista principal',participacao='Feat' WHERE id=?", "cena-credito-demo-obra-horizontal-2");
+        }
         run(
           "INSERT OR IGNORE INTO atuacoes_obra(obra_id,profissao_id) VALUES(?,?)",
           item.id,
@@ -338,6 +349,12 @@ export function semearCatalogoCena(
           { capa: "/img/cena/obras/" + e.id + ".svg" },
           true
         );
+      if (obrasDaCarga.length) {
+        migrarAcervoMusical(db(), [
+          ...obrasDaCarga,
+          ...discosDemonstrativos.flatMap(d => d.faixas.map((_, i) => idFaixaDemo(d.id, i))),
+        ]);
+      }
       for (const p of projetosCena) {
         const autor = idPessoaCena(p.autor),
           equipe = p.equipe
@@ -390,16 +407,6 @@ export function semearCatalogoCena(
       const duplas: [string, string, string, string][] = [
         ["lezin", "papatinho", "cena-obra-sem-atalho", "concluida"],
         ["jotape", "lezin", "cena-obra-sem-atalho", "concluida"],
-        ["duzz", "ecologyk", "cena-obra-asfalto-em-orbita", "concluida"],
-        ["drizzy", "pecaos", "cena-obra-asfalto-em-orbita", "em_andamento"],
-        ["nog", "teoguedx", "cena-obra-lado-b-da-vila", "concluida"],
-        ["levinsk", "yanbello", "cena-obra-lado-b-da-vila", "concluida"],
-        ["rincon", "gabb", "cena-obra-corpo-palavra", "em_andamento"],
-        ["gabb", "maricarvalho", "cena-obra-corpo-palavra", "concluida"],
-        ["emicida", "rincon", "cena-obra-corpo-palavra", "concluida"],
-        ["cassol", "hxtel", "cena-obra-entre-linhas", "em_andamento"],
-        ["binho", "speto", "", "em_andamento"],
-        ["aquiles", "andrefelipe", "", "em_andamento"],
       ];
       for (const [a, b, origem, estado] of duplas) {
         const aid = idPessoaCena(a),
@@ -488,6 +495,17 @@ export function semearCatalogoCena(
         ["demo-workshop-slam-poesia", "jay"],
         ["demo-workshop-beatbox", "caroljafet"],
       ];
+      const nomesEventosRap: Record<string, string> = {
+        "demo-evento-batalha": "Batalha da Aldeia",
+        "demo-evento-cypher": "Batalha do Santa Cruz",
+        "demo-evento-show": "Rap in Cena Festival",
+        "demo-destaque-mulheres-no-mic": "Batalha das Gurias",
+        "demo-destaque-roda-da-madrugada": "Duelo de MCs Nacional",
+        "demo-destaque-voz-da-praca": "Red Bull FrancaMente",
+        "demo-workshop-dj-producao": "A Arte do DJ",
+        "demo-workshop-slam-poesia": "Slam da Guilhermina",
+        "demo-workshop-beatbox": "Campeonato Nacional de Beatbox",
+      };
       for (const [id, slug] of eventosAnteriores) {
         const anterior = um(
           "SELECT * FROM eventos WHERE id=? AND demonstracao=1",
@@ -504,8 +522,9 @@ export function semearCatalogoCena(
         )
           continue;
         run(
-          "UPDATE eventos SET proprietario_id=?,demonstracao=0 WHERE id=?",
+          "UPDATE eventos SET proprietario_id=?,demonstracao=0,titulo=? WHERE id=?",
           idPessoaCena(slug),
+          nomesEventosRap[id],
           id
         );
         const inicio = Date.parse(
@@ -526,38 +545,15 @@ export function semearCatalogoCena(
           localizacao_confirmada: false,
         });
       }
-      const eventos = [
-        {
-          id: "cena-evento-verso",
-          autor: "jay",
-          titulo: "Verso em Construção · Encontro da Papatunes",
-          local: "Rio de Janeiro, RJ · local comunicado aos inscritos",
-          descricao:
-            "Lezin, Jotapê e Papatinho abrem uma conversa sobre escrita e criação coletiva. A equipe de produção compartilha o caminho entre a primeira ideia e a faixa.",
-          dias: 12,
-          vagas: 60,
-        },
-        {
-          id: "cena-evento-corpo",
-          autor: "caroljafet",
-          titulo: "Corpo e Palavra · Laboratório Aberto",
-          local: "São Paulo, SP · espaço informado aos participantes",
-          descricao:
-            "Rincon Sapiência, Gabb Cabo Verde e Mari Carvalho aproximam verso e movimento, com uma roda de pesquisa e criação de dança.",
-          dias: 19,
-          vagas: 30,
-        },
-        {
-          id: "cena-evento-muros",
-          autor: "fioti",
-          titulo: "Muros que Rimam · Arte em Encontro",
-          local: "São Paulo, SP · endereço confirmado com a organização",
-          descricao:
-            "Binho Ribeiro e Speto conversam com a equipe visual sobre mural, capa e cidade. Um encontro para quem desenha, produz e faz a cultura circular.",
-          dias: 26,
-          vagas: 45,
-        },
-      ];
+      const eventos: {
+        id: string;
+        autor: string;
+        titulo: string;
+        local: string;
+        descricao: string;
+        dias: number;
+        vagas: number;
+      }[] = [];
       for (const [i, e] of eventos.entries()) {
         const data = new Date(agora + e.dias * 86400000)
             .toISOString()
@@ -689,15 +685,7 @@ export function semearCatalogoCena(
   for (const b of beatsDemonstrativos) {
     const autor = idPessoaCena(b.slug.replace(".demo", "")),
       dados = ofertasCena[b.id];
-    let audio = audioCatalogoLocal[b.id];
-    if (!audio && b.id === "demo-beat-spider-man")
-      audio =
-        "/audio/beats/" +
-        encodeURIComponent(
-          fs
-            .readdirSync(path.resolve("public/audio/beats"))
-            .find(n => n.includes("Spider-Man")) || ""
-        );
+    const audio = audioCatalogoLocal[b.id];
     if (!audio && !opcoes.audioSintetico)
       throw new Error("Áudio não encontrado para " + b.titulo);
     const arquivo = opcoes.audioSintetico

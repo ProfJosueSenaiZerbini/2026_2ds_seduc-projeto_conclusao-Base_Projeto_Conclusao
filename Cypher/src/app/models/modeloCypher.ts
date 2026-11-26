@@ -40,6 +40,9 @@ import {
 } from "./bancoDados.js";
 
 export const tiposObra = [
+  "Composição",
+  "Letra",
+  "Fonograma",
   "Obra",
   "Instrumental",
   "Música",
@@ -55,6 +58,7 @@ export const statusObra = ["Em produção", "Rascunho", "Lançado"];
 export const papeisObra = [
   "Artista principal",
   "Composição",
+  "Letra",
   "Produção musical",
   "Instrumentação",
   "Participação como feat",

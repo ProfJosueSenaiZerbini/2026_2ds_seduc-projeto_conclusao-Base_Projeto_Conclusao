@@ -100,10 +100,10 @@
 
 .auth-quote h1 {
   margin: 22px 0 0;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Oswald", sans-serif;
   font-size: clamp(45px, 5.5vw, 79px);
   line-height: 0.9;
-  letter-spacing: -0.09em;
+  letter-spacing: -0.02em;
 }
 
 .auth-quote h1 em {

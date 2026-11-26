@@ -1,5 +1,6 @@
-</div>
-  </main>
+    </main>
+  </div>
+<% if (typeof usuario !== 'undefined' && usuario && usuario.tipoConta !== 'administrativo') { %><%- include('navegacao-mobile', {rotaAtual: path}) %><% } %>
 </div>
 <script src="/js/espaco-trabalho.js" defer></script>
 <%- include('fim-pagina') %>

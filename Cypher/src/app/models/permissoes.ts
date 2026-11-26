@@ -11,6 +11,7 @@ export type ContextoConta = {
 // Ausência de publicação musical não impede crédito, atuação ou futuro portfólio.
 const lancamentos = [
   "Obra",
+  "Letra",
   "Música",
   "Single",
   "EP",
@@ -49,11 +50,11 @@ export const matrizProfissional: Readonly<
     contexto: "Composição autoral; não concede publicação de fonograma ou beat",
   },
   Letrista: {
-    obras: [],
+    obras: ["Letra"],
     beat: false,
     evento: false,
     contexto:
-      "Letras e créditos de escrita; publicação de letras terá modalidade própria",
+      "Letras independentes e créditos de escrita",
   },
   Beatmaker: {
     obras: ["Instrumental"],
@@ -190,12 +191,17 @@ export const matrizProfissional: Readonly<
 };
 
 export function tiposObraPermitidos(categorias: readonly string[]): string[] {
-  return [
+  const tipos = [
     ...new Set(
       categorias.flatMap(
         categoria => matrizProfissional[categoria]?.obras ?? []
       )
     ),
+  ];
+  return [
+    ...tipos,
+    ...(tipos.includes("Obra") ? ["Composição"] : []),
+    ...(tipos.includes("Música") ? ["Fonograma"] : []),
   ];
 }
 

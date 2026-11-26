@@ -83,7 +83,7 @@ function editorial(
   return res.render("pages/central-editorial", {
     title: "Central / Editorial",
     stylesheet: "central-nova",
-    path: "/admin/central",
+    path: req.method === "GET" ? req.path : "/admin/central",
     tela,
     ...comuns,
     erro: "",

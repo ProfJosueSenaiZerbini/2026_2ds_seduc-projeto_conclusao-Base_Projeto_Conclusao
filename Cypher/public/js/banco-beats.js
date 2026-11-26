@@ -6,8 +6,16 @@
   const anunciar = mensagem => {
     if (status) status.textContent = mensagem;
   };
-  const catalogo = pagina.querySelector(".beats-catalog");
-  const cards = [...pagina.querySelectorAll("[data-beat-card]")];
+  const destino = new URL(location.href);
+  const ancora = destino.hash.slice(1);
+  if (ancora.startsWith("beat-") && !destino.searchParams.has("beat")) {
+    let id = "";
+    try { id = decodeURIComponent(ancora); } catch {}
+    if (id && !document.getElementById(id)) {
+      destino.searchParams.set("beat", id.slice(5));
+      location.replace(destino);
+    }
+  }
   const importar = pagina.querySelector("[data-importar-favoritos]");
   const chave = pagina.dataset.favoritesKey;
   let favoritosLocais = [];
@@ -50,30 +58,6 @@
       }
     });
   }
-
-  pagina
-    .querySelector("[data-beats-sort]")
-    ?.addEventListener("change", evento => {
-      const ordem = evento.target.value;
-      const valor = (card, campo) =>
-        card.dataset[campo] === "" ||
-        (Number(card.dataset[campo]) <= 0 && campo === "bpm")
-          ? Infinity
-          : Number(card.dataset[campo]);
-      const ordenados = [...cards];
-      if (ordem === "title")
-        ordenados.sort((a, b) =>
-          a.dataset.title.localeCompare(b.dataset.title, "pt-BR")
-        );
-      if (ordem === "price" || ordem === "bpm")
-        ordenados.sort((a, b) => valor(a, ordem) - valor(b, ordem));
-      for (const card of ordenados) catalogo.append(card);
-      anunciar(
-        `Beats ordenados por ${evento.target.selectedOptions[0].textContent}.`
-      );
-    });
-  const barra = pagina.querySelector("[data-beats-toolbar]");
-  if (barra) barra.hidden = false;
 
   // Uma única fonte de áudio mantém as prévias do destaque e do catálogo sincronizadas.
   const previas = [...pagina.querySelectorAll("[data-beat-preview]")];

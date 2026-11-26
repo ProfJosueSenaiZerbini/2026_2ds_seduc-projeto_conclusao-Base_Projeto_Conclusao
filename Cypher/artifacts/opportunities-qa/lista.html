@@ -5,6 +5,11 @@
       <meta name="cypher-theme" content="light">
       <script>
         (() => {
+          const acessoAdmin = false;
+          if (acessoAdmin) {
+            document.documentElement.classList.add("dark");
+            return;
+          }
           localStorage.setItem("cypher-tema","dark"); const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
           let tema = temaConta === "light" ? "light" : "dark";
           try {
@@ -41,11 +46,12 @@
       </title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/css/estilos.css">
       <link rel="stylesheet" href="/css/tema-cypher-claro.css">
       <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
       
+        
         <link rel="stylesheet" href="/css/chamadas.css">
       
       <link rel="stylesheet" href="/css/tema.css">
@@ -93,9 +99,7 @@
             <span>
             </span>
           </span>
-          <span class="logo-word">
-            CYPHER
-          </span>
+          <span class="logo-word">CYPHER</span>
         </a>
         <div class="sidebar-theme">
           <nav class="entry-theme" aria-label="Aparência da página">
@@ -377,6 +381,32 @@
         </a>
       
         
+        <a class="side-link" aria-label="Mensagens" href="/messages" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Mensagens
+          </span>
+          
+        </a>
+      
+        
         <a class="side-link" aria-label="Colaborações" href="/colaboracoes" >
           <span class="side-icon lucide-icon" aria-hidden="true">
             
@@ -562,7 +592,7 @@
         
       </div>
 
-      <a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
+      <a class="reputation-mini reputation-link" href="/colaboracoes">
         <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true">
 <svg
   class="lucide lucide-circle"
@@ -582,8 +612,8 @@
         <div class="rep-number">—</div><p>Ainda sem avaliações</p>
       </a>
       <div class="sidebar-account-row">
-      <a class="user-mini" href="/profile" aria-label="Abrir perfil deautor">
-        <div class="avatar avatar-yellow">
+      <a class="user-mini" href="/profile" aria-label="AA · @autor · Rapper">
+        <div class="avatar avatar-yellow" aria-hidden="true">
           
 
   AA
@@ -592,7 +622,7 @@
         </div>
         <div>
           <strong>
-            autor
+            @autor
           </strong>
           <span>
             Rapper
@@ -638,27 +668,10 @@
   <div class="dc-title"><h1 id="op-titulo">Oportunidades</h1><p>Encontros profissionais que fazem a cena acontecer.</p></div>
   <div class="dc-account">
     <form class="global-search dc-search" action="/search" method="get" role="search" aria-label="Busca global" data-global-search>
-  <button class="global-search-toggle" type="button" aria-label="Abrir busca" aria-expanded="false" aria-controls="cypher-search-field" hidden>
-<svg
-  class="lucide lucide-search"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m21 21-4.34-4.34" />
-  <circle cx="11" cy="11" r="8" />
-</svg>
-</button>
-  <div class="global-search-field" id="cypher-search-field">
+  <div class="global-search-field">
     <label class="sr-only" for="cypher-global-search">Buscar na Cypher</label>
     <input id="cypher-global-search" name="q" type="search" value="" maxlength="100" placeholder="Buscar na Cypher" autocomplete="off" spellcheck="false" aria-controls="cypher-search-suggestions" aria-expanded="false">
-    <button type="submit" aria-label="Pesquisar na Cypher">
+    <button class="global-search-button" type="submit" aria-label="Pesquisar na Cypher">
 <svg
   class="lucide lucide-search"
   xmlns="http://www.w3.org/2000/svg"
@@ -684,7 +697,7 @@
 </form>
 
         <div class="notification-center" data-notification-center>
-      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações, 23 não lida(s)" aria-expanded="false" aria-controls="painel-notificacoes">
         <span class="lucide-icon" aria-hidden="true">
           
 <svg
@@ -705,7 +718,7 @@
 
         </span>
         
-          <span class="notification-count" aria-label="23 não lida(s)">
+          <span class="notification-count" aria-hidden="true">
             23
           </span>
         
@@ -723,64 +736,7 @@
           <div class="notification-list">
             
               <article class="notification-item notification-item-unread">
-                <a href="/messages/72b7c18b-c688-4a50-af04-6d29660dbd6a">
-                  <strong>
-                    Nova mensagem
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/ce415700-c967-48b7-80cb-7fc0589e85f4/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
-                  <strong>
-                    Proposta recebida · versão 2
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/c7b2fecd-ed77-47cd-8e90-faf97e01e763/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/8e2422e2-265e-4212-b3fd-f70f740b824c">
-                  <strong>
-                    Situação da oportunidade: cancelada
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/c79c78b3-74c7-4238-abf5-a1937aa1c478/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
+                <a href="/opportunities/applications/1a2cb7b1-09fe-4712-a552-ff27cf222d95">
                   <strong>
                     Acordo confirmado pelas duas partes
                   </strong>
@@ -789,7 +745,7 @@
                   </span>
                 </a>
                 
-                  <form method="post" action="/notificacoes/c2f33663-0f80-488c-b0bb-e9829db69a15/lida">
+                  <form method="post" action="/notificacoes/f1db3d69-d6a6-47c9-a551-09cc37e9cfe6/lida">
                     <button type="submit" aria-label="Marcar como lida">
                       Lida
                     </button>
@@ -799,7 +755,45 @@
               </article>
             
               <article class="notification-item notification-item-unread">
-                <a href="/opportunities/1bcd08c2-ab8a-491f-a5ae-6170ff1e1916">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Situação da oportunidade: aberta
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/da7de524-e45b-4a3f-99a3-47ad97234c99/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Condições da oportunidade atualizadas
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/c932e97b-795f-419e-9789-d0961f150941/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
                   <strong>
                     Nova candidatura recebida
                   </strong>
@@ -808,7 +802,26 @@
                   </span>
                 </a>
                 
-                  <form method="post" action="/notificacoes/a95a8dbc-e1ee-40c8-8579-eecc5a884345/lida">
+                  <form method="post" action="/notificacoes/bb8d774e-4cb6-4de4-b81c-179d7289eee8/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Situação da oportunidade: pausada
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/af94857d-1d7f-4c49-893e-c7272d16a160/lida">
                     <button type="submit" aria-label="Marcar como lida">
                       Lida
                     </button>
@@ -821,7 +834,7 @@
         
       </section>
     </div>
-    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de autor" title="Perfil de autor">
+    <a class="topbar-avatar" href="/profile" aria-label="AA · Perfil de @autor" title="Perfil de @autor">
       
 
   AA
@@ -940,13 +953,13 @@
 <div class="op-chips"></div>
 <div class="op-grid"><article class="op-card">
  <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
- <h3><a href="/opportunities/37ea2920-62a9-4d4e-bc76-d42272d52616">Produção de um lançamento</a></h3>
+ <h3><a href="/opportunities/27d5d97d-15b3-4a7f-abec-d666294df6cb">Produção de um lançamento</a></h3>
  <p class="op-roles">Rapper</p>
  <p class="op-summary">Procuro profissional para um projeto autoral.</p>
- <div class="op-author"><span class="op-avatar">AU</span><div><strong>autor</strong><small>Rapper</small></div></div>
+ <div class="op-author"><span class="op-avatar">@A</span><div><strong>@autor</strong><small>Rapper</small></div></div>
  <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
  
- <footer><span>Publicada 24/11/2026</span><a href="/opportunities/37ea2920-62a9-4d4e-bc76-d42272d52616">Ver chamada 
+ <footer><span>Publicada 26/11/2026</span><a href="/opportunities/27d5d97d-15b3-4a7f-abec-d666294df6cb">Ver chamada 
 <svg
   class="lucide lucide-plus"
   xmlns="http://www.w3.org/2000/svg"
@@ -965,63 +978,13 @@
 </a></footer>
  </article><article class="op-card">
  <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
- <h3><a href="/opportunities/52312ac7-c7da-41fc-b204-8ae744d160d6">Produção de um lançamento</a></h3>
- <p class="op-roles">Rapper</p>
- <p class="op-summary">Procuro profissional para um projeto autoral.</p>
- <div class="op-author"><span class="op-avatar">AU</span><div><strong>autor</strong><small>Rapper</small></div></div>
- <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
- 
- <footer><span>Publicada 24/11/2026</span><a href="/opportunities/52312ac7-c7da-41fc-b204-8ae744d160d6">Ver chamada 
-<svg
-  class="lucide lucide-plus"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M5 12h14" />
-  <path d="M12 5v14" />
-</svg>
-</a></footer>
- </article><article class="op-card">
- <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
- <h3><a href="/opportunities/7e95e048-5a64-42ff-b248-6ea8856fff7d">Produção de um lançamento</a></h3>
- <p class="op-roles">Rapper</p>
- <p class="op-summary">Procuro profissional para um projeto autoral.</p>
- <div class="op-author"><span class="op-avatar">AU</span><div><strong>autor</strong><small>Rapper</small></div></div>
- <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
- 
- <footer><span>Publicada 24/11/2026</span><a href="/opportunities/7e95e048-5a64-42ff-b248-6ea8856fff7d">Ver chamada 
-<svg
-  class="lucide lucide-plus"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M5 12h14" />
-  <path d="M12 5v14" />
-</svg>
-</a></footer>
- </article><article class="op-card">
- <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
- <h3><a href="/opportunities/c46cc92d-6b0a-4f24-bf44-2834864e5975">Produção de um lançamento</a></h3>
+ <h3><a href="/opportunities/44da9325-64c3-4fad-9c13-1a2a6c1c8094">Produção de um lançamento</a></h3>
  <p class="op-roles">Rapper</p>
  <p class="op-summary">Procuro profissional para um projeto autoral.</p>
  <div class="op-author"><span class="op-avatar">AD</span><div><strong>admin</strong><small>Pedido excepcional · gestão autorizada</small></div></div>
  <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>1 disponíveis / 1</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
  
- <footer><span>Publicada 24/11/2026</span><a href="/opportunities/c46cc92d-6b0a-4f24-bf44-2834864e5975">Ver chamada 
+ <footer><span>Publicada 26/11/2026</span><a href="/opportunities/44da9325-64c3-4fad-9c13-1a2a6c1c8094">Ver chamada 
 <svg
   class="lucide lucide-plus"
   xmlns="http://www.w3.org/2000/svg"
@@ -1040,13 +1003,63 @@
 </a></footer>
  </article><article class="op-card">
  <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
- <h3><a href="/opportunities/d96927af-8638-45c3-9fdb-1d1a1b7cc815">Produção de um lançamento</a></h3>
+ <h3><a href="/opportunities/a0ec8180-7a5a-4cf7-bff4-e24fb75af6c0">Produção de um lançamento</a></h3>
  <p class="op-roles">Rapper</p>
  <p class="op-summary">Procuro profissional para um projeto autoral.</p>
- <div class="op-author"><span class="op-avatar">AU</span><div><strong>autor</strong><small>Rapper</small></div></div>
+ <div class="op-author"><span class="op-avatar">@A</span><div><strong>@autor</strong><small>Rapper</small></div></div>
  <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
  
- <footer><span>Publicada 24/11/2026</span><a href="/opportunities/d96927af-8638-45c3-9fdb-1d1a1b7cc815">Ver chamada 
+ <footer><span>Publicada 26/11/2026</span><a href="/opportunities/a0ec8180-7a5a-4cf7-bff4-e24fb75af6c0">Ver chamada 
+<svg
+  class="lucide lucide-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="M12 5v14" />
+</svg>
+</a></footer>
+ </article><article class="op-card">
+ <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
+ <h3><a href="/opportunities/e30b1c3f-3775-4be1-b75e-dd6884b7ed12">Produção de um lançamento</a></h3>
+ <p class="op-roles">Rapper</p>
+ <p class="op-summary">Procuro profissional para um projeto autoral.</p>
+ <div class="op-author"><span class="op-avatar">@A</span><div><strong>@autor</strong><small>Rapper</small></div></div>
+ <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
+ 
+ <footer><span>Publicada 26/11/2026</span><a href="/opportunities/e30b1c3f-3775-4be1-b75e-dd6884b7ed12">Ver chamada 
+<svg
+  class="lucide lucide-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="M12 5v14" />
+</svg>
+</a></footer>
+ </article><article class="op-card">
+ <div class="op-card-top"><span class="op-eyebrow">Prestação de serviço</span><span class="op-state" data-state="aberta">Aberta</span></div>
+ <h3><a href="/opportunities/e3b60059-a722-4196-91a3-d5d16ebd16be">Produção de um lançamento</a></h3>
+ <p class="op-roles">Rapper</p>
+ <p class="op-summary">Procuro profissional para um projeto autoral.</p>
+ <div class="op-author"><span class="op-avatar">@A</span><div><strong>@autor</strong><small>Rapper</small></div></div>
+ <dl class="op-facts"><div><dt>Trabalho</dt><dd>Remoto</dd></div><div><dt>Condições</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>2 disponíveis / 2</dd></div><div><dt>Candidaturas até</dt><dd>Sem prazo definido</dd></div></dl>
+ 
+ <footer><span>Publicada 26/11/2026</span><a href="/opportunities/e3b60059-a722-4196-91a3-d5d16ebd16be">Ver chamada 
 <svg
   class="lucide lucide-plus"
   xmlns="http://www.w3.org/2000/svg"
@@ -1193,6 +1206,16 @@
 
 </div>
 <script src="/js/chamadas.js" defer></script>
+<link rel="stylesheet" href="/css/confirmacao-cypher.css">
+<dialog class="cy-confirm" id="cy-confirm" aria-labelledby="cy-confirm-title" aria-describedby="cy-confirm-message">
+  <form method="dialog">
+    <p class="cy-confirm-kicker" aria-hidden="true">CYPHER / CONFIRMAÇÃO</p>
+    <h2 id="cy-confirm-title">Confirmar ação</h2>
+    <p id="cy-confirm-message"></p>
+    <div class="cy-confirm-actions"><button value="cancelar" autofocus>Cancelar</button><button value="confirmar" class="cy-confirm-submit">Confirmar</button></div>
+  </form>
+</dialog>
+<script src="/js/confirmacao-cypher.js" defer></script>
 <button class="mobile-overlay" type="button" data-sidebar-close aria-label="Fechar menu de navegação" hidden>
 </button>
 <script src="/js/interacoes.js" defer>

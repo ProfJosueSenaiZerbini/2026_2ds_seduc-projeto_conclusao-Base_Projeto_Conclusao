@@ -48,11 +48,15 @@ Ainda há pendências em obras e créditos, Selos Profissionais e interações g
 
 Veja o [alinhamento atual e as pendências por requisito](../planoEvolucao/00-planejamento/alinhamento-atual.md).
 
+O [guia de acervo musical e homologação](../planoEvolucao/04-implementacao/acervo-musical-e-homologacao.md) descreve a comprovação de lançamentos, a migração, a restauração e os testes reproduzíveis.
+
 Contas incluem recuperação de senha, encerramento e proteção para usuários de 16 e 17 anos. Consulte [acesso e proteção](../planoEvolucao/04-implementacao/contas-acesso-e-protecao.md).
 
 Beats possuem prévias, ofertas versionadas, aceite e entrega privada em `/purchases`. Consulte [licenciamento e configuração de teste](../planoEvolucao/04-implementacao/modulo-7-beats-e-licenciamento.md).
 
 Eventos possuem inscrições, vagas, presença, avisos, mapa e avaliação elegível. Consulte [participação e limites da entrega](../planoEvolucao/04-implementacao/modulo-8-eventos-e-participacao.md).
+
+Mensagens privadas aceitam imagens, áudio, vídeo e documentos com acesso restrito aos participantes. Consulte [formatos e limites dos anexos](docs/anexos-mensagens.md).
 
 Projetos e galerias ficam em `/work-projects`, integrados ao Espaço de Trabalho. Consulte [formatos, limites e regras do acervo](../planoEvolucao/04-implementacao/modulo-5-projetos-galerias-e-acervo.md).
 

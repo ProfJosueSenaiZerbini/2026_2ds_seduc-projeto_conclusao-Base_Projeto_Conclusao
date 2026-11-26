@@ -1,8 +1,9 @@
 import { perfilUrl, enderecoObra } from "../models/enderecosPerfil.js";
+import { rotulosPessoa } from "../models/buscaGlobal.js";
 import { artigosPublicados } from "../models/central.js";
 import { randomInt } from "node:crypto";
 import type { Request, Response } from "express";
-import type { UsuarioDaSessao } from "../models/bancoDados.js";
+import { conexaoInternaCypher, type UsuarioDaSessao } from "../models/bancoDados.js";
 import { CypherModel } from "../models/modeloCypher.js";
 import {
   fotoEventoDemonstrativo,
@@ -18,6 +19,10 @@ import {
 } from "../models/catalogoDemonstrativo.js";
 import { dataAtualCadastro } from "../validators/validarIdentidade.js";
 import { resolverTemaEvento } from "../models/temasEvento.js";
+import {
+  formatoLancamentoCena,
+  lancamentoCena,
+} from "../models/lancamentosCena.js";
 
 const albumAteAUltimaRima = "demo-obra-ate-a-ultima-rima";
 const faixaAlice = idFaixaDemo(albumAteAUltimaRima, 7);
@@ -88,6 +93,7 @@ function ficha(item: PublicacaoDescoberta) {
 
 export function descoberta(req: Request, res: Response) {
   const usuario = res.locals.usuario as UsuarioDaSessao;
+  const db = conexaoInternaCypher();
   const categoria =
     req.query.tipo === "musica"
       ? "musica"
@@ -98,7 +104,11 @@ export function descoberta(req: Request, res: Response) {
   const preferencias = obterPreferenciasUsuario(usuario.id, "");
   const generos = new Set(preferencias.generos.map(normalizar));
   const regiao = normalizar(preferencias.regiao);
-  const afinidade = (local: string, estilos: string[]) =>
+  const seguidos = new Set(db.prepare(
+    "SELECT profissional_id AS id FROM profissionais_seguidos WHERE seguidor_id=?"
+  ).pluck().all(usuario.id));
+  const afinidade = (local: string, estilos: string[], autorId: string) =>
+    Number(!termos.length && seguidos.has(autorId)) +
     Number(Boolean(regiao && normalizar(local).includes(regiao))) +
     Number(estilos.some(estilo => generos.has(normalizar(estilo))));
   // Sugestões profissionais usam somente atuações visíveis e a função da própria conta.
@@ -130,25 +140,28 @@ export function descoberta(req: Request, res: Response) {
     url: perfilUrl(p.handle),
     iniciais: p.initials,
     categorias: p.categories,
+    profissoes: rotulosPessoa(p),
     estilos: p.genres,
-    afinidade: afinidade(p.city, p.genres),
+    afinidade: afinidade(p.city, p.genres, p.userId),
     complementar: p.categories.some(c => complementares.has(c)),
   });
   const filtrosPessoas = { q, categoria: "", genero: "", localizacao: "" };
-  const pessoas = CypherModel.buscarPessoasPublicas(filtrosPessoas, usuario.id)
-    .pessoas.map(cartaoPerfil)
-    .sort(
-      (a, b) =>
+  const pessoas = categoria === "tudo" || categoria === "profissionais"
+    ? CypherModel.buscarPessoasPublicas(filtrosPessoas, usuario.id).pessoas.map(cartaoPerfil)
+      .sort((a, b) =>
+        (termos.length ? 0 : Number(seguidos.has(b.userId)) - Number(seguidos.has(a.userId))) ||
         Number(b.complementar) - Number(a.complementar) ||
         b.afinidade - a.afinidade
-    );
+      )
+    : [];
   const filtrado = Boolean(q || detalhe || categoria !== "tudo");
-  const publicacoesComDestaques = publicacoesDescoberta(
-    "",
+  const grupo = categoria === "obras" || categoria === "beats" || categoria === "eventos" ? categoria : "";
+  const publicacoesComDestaques = (categoria === "profissionais" ? [] : publicacoesDescoberta(
+    grupo,
     filtrado ? "" : faixaAlice,
     false,
     usuario.id
-  )
+  ))
     .filter(item => {
       const campos = normalizar(
         [
@@ -156,6 +169,7 @@ export function descoberta(req: Request, res: Response) {
           item.autor,
           item.handle,
           item.tipo,
+          item.grupo === "eventos" ? "" : formatoLancamentoCena(item).rotulo,
           item.categoria,
           item.genero,
           item.local,
@@ -185,7 +199,7 @@ export function descoberta(req: Request, res: Response) {
         mes: partes
           .find(parte => parte.type === "month")
           ?.value.replace(/\.$/, ""),
-        afinidade: afinidade(item.local, [item.genero]),
+        afinidade: afinidade(item.local, [item.genero], item.autorId),
       };
     })
     .sort((a, b) => b.afinidade - a.afinidade);
@@ -235,7 +249,22 @@ export function descoberta(req: Request, res: Response) {
   const publicacoes = publicacoesComDestaques.filter(
     item => item.id !== faixaAlice
   );
-  const musica = publicacoes.filter(item => item.grupo !== "eventos");
+  const vitrine: typeof publicacoes = [];
+  if (!filtrado) {
+    const musica = publicacoes.filter(item => item.grupo !== "eventos");
+    const formatos = new Set<string>();
+    for (const item of musica) {
+      const formato = formatoLancamentoCena(item).estilo;
+      if (formatos.has(formato)) continue;
+      formatos.add(formato);
+      vitrine.push(item);
+      if (vitrine.length === 4) break;
+    }
+    if (vitrine.length < 4)
+      vitrine.push(
+        ...musica.filter(item => !vitrine.includes(item)).slice(0, 4 - vitrine.length)
+      );
+  }
   const hoje = dataAtualCadastro();
   const agenda = publicacoes
     .filter(
@@ -267,7 +296,7 @@ export function descoberta(req: Request, res: Response) {
     "categorias" in item
       ? [...item.categorias, ...item.estilos, item.local].filter(Boolean)
       : [
-          item.tipo,
+          item.grupo === "eventos" ? item.tipo : formatoLancamentoCena(item).rotulo,
           item.categoria,
           item.genero,
           item.local,
@@ -281,13 +310,24 @@ export function descoberta(req: Request, res: Response) {
     a.localeCompare(b, "pt-BR")
   );
   const resultados = candidatos.filter(
-    item => !detalhe || facetas(item).includes(detalhe)
+    item =>
+      !detalhe ||
+      facetas(item).includes(detalhe) ||
+      ("id" in item && item.grupo !== "eventos" && item.tipo === detalhe)
   );
   const paginas = Math.max(1, Math.ceil(resultados.length / 24));
   const pagina = Math.max(
     1,
     Math.min(paginas, Number.parseInt(texto(req.query.pagina), 10) || 1)
   );
+  const comLancamento = (item: (typeof candidatos)[number]) =>
+    "id" in item && item.grupo !== "eventos"
+      ? { ...item, lancamento: lancamentoCena(item, usuario.id) }
+      : item;
+  const cards = db.transaction(() => filtrado
+    ? { resultados: resultados.slice((pagina - 1) * 24, pagina * 24).map(comLancamento), musica: [] }
+    : { resultados: [], musica: vitrine.map(comLancamento) }
+  )();
   return res.render("pages/descoberta", {
     title: "Descoberta",
     stylesheet: "descoberta",
@@ -302,11 +342,11 @@ export function descoberta(req: Request, res: Response) {
     opcoes,
     filtrado,
     destaques,
-    resultados: resultados.slice((pagina - 1) * 24, pagina * 24),
+    resultados: cards.resultados,
     total: resultados.length,
     paginas,
     pagina,
-    musica: musica.slice(0, 4),
+    musica: cards.musica,
     pessoas: pessoas.slice(0, 6),
     populares,
     agenda: agenda.slice(0, 4),

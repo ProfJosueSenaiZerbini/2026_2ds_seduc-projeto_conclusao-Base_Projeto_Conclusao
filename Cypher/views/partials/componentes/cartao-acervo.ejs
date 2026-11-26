@@ -2,7 +2,7 @@
 <article class="ob-card<%= o.colecao ? ' ob-card-record' : '' %><%= o.tipo === 'Single' ? ' ob-card-single' : '' %>" data-ob-card data-ob-id="<%= o.id %>" data-ob-liked="<%= o.curtida %>" data-ob-likes="<%= o.curtidas %>" data-ob-title="<%= o.titulo %>" aria-labelledby="acervo-titulo-<%= o.id %>">
   <div class="ob-artwork">
     <a class="ob-cover" href="<%= o.url %>" aria-label="Abrir <%= o.titulo %>">
-      <% const capaEnviada=typeof capaUsuario==='function'?capaUsuario('obra',o.id):''; %><% if(capaEnviada){ %><img src="<%= capaEnviada %>" alt="Capa de <%= o.titulo %>"><% }else if (o.capa) { %><img src="/img/<%= o.capa %>" alt="Capa de <%= o.titulo %>" loading="lazy" decoding="async"><% } else { %><span class="ob-cover-fallback" aria-hidden="true"><small>CYPHER / ORIGINAL</small><%- icones.music2 %><strong><%= o.titulo %></strong></span><% } %>
+      <% const capaEnviada=typeof capaUsuario==='function'?capaUsuario('obra',o.id):''; %><% if(capaEnviada){ %><img src="<%= capaEnviada %>" alt=""><% }else if (o.capa) { %><img src="/img/<%= o.capa %>" alt="" loading="lazy" decoding="async"><% } else { %><span class="ob-cover-fallback"><span class="lucide-icon" aria-hidden="true"><%- icones.music2 %></span><strong><%= o.titulo %></strong></span><% } %>
       <span class="ob-cover-gloss" aria-hidden="true"></span>
     </a>
     <span class="ob-format"><%= o.tipo %></span>

@@ -2,18 +2,16 @@
 <div class="app-shell dc-shell admin-shell">
 <%- include('../partials/barra-lateral', { path }) %>
 <main class="main-shell">
-<%- include('../partials/barra-superior', { breadcrumb: 'Administrador' }) %>
+<%- include('../partials/barra-superior', { breadcrumb: secaoAdmin === 'excecoes' ? 'Exceções profissionais' : 'Taxonomia' }) %>
 <div class="page-content admin-page">
 <header class="admin-hero">
   <div class="admin-hero-copy">
     <span class="eyebrow">
-      FERRAMENTAS EXCLUSIVAS DA EQUIPE
+      CADASTRO E CURADORIA
     </span>
-    <h1>
-      Administrador
-    </h1>
+    <h1><%= secaoAdmin === "excecoes" ? "Exceções profissionais" : "Taxonomia" %></h1>
     <p>
-      Moderação transparente e decisões de acesso registradas em um só lugar.
+      <%= secaoAdmin === "excecoes" ? "Acompanhe pedidos de mudança profissional e consulte as decisões anteriores." : "Revise propostas de gêneros e profissões antes de incluí-las no catálogo." %>
     </p>
   </div>
   <div class="admin-hero-mark" aria-hidden="true">

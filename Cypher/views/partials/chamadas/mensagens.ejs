@@ -1,2 +1,118 @@
-<header class="op-section-heading"><span class="op-eyebrow">Contato e negociação</span><h2><%= conversa?conversa.contexto:'Suas conversas' %></h2><p>Mensagens privadas, propostas e encontros profissionais.</p></header>
-<% if(conversa){ %><%- include('conversa') %><% }else{ %><div class="op-detail-grid"><section class="op-panel op-rows"><% if(!conversas.length){ %><p>Sua caixa está vazia. As conversas de negociação e os pedidos de mediação aparecerão aqui.</p><% } %><% conversas.forEach(c=>{ %><a href="/messages/<%= c.id %>"><strong><%= c.contexto %></strong><span>Abrir conversa</span></a><% }) %></section><aside class="op-stack"><form class="op-panel" action="/messages/preferences" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><h3>Quem pode entrar em contato</h3><label class="op-check"><input type="checkbox" name="profissionais" value="sim" <%= preferencias.profissionais?'checked':'' %>> Permitir mensagens profissionais</label><label class="op-check"><input type="checkbox" name="consumidores" value="sim" <%= preferencias.consumidores?'checked':'' %>> Receber pedidos de consumidores</label><button class="op-button">Salvar preferências</button></form><section class="op-panel"><h3>Contatos bloqueados</h3><% if(!bloqueados.length){ %><p>Nenhum contato bloqueado.</p><% } %><% bloqueados.forEach(b=>{ %><form method="post" action="/messages/block"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="alvo_id" value="<%= b.alvo_id %>"><span><%= b.nome||'Conta' %></span><button class="op-text-link" name="acao" value="desbloquear">Desbloquear</button></form><% }) %></section></aside></div><% } %>
+<% if (administrativo) { %>
+  <header class="op-section-heading"><h2><%= conversa ? conversa.interlocutor : 'Mensagens' %></h2></header>
+  <% if (conversa) { %><%- include('conversa') %><% } %>
+<% } else { %>
+  <section class="msg-layout<%= conversa ? ' has-conversation' : '' %>" aria-label="Mensagens privadas">
+    <aside class="msg-sidebar" aria-label="Pessoas e conversas">
+      <div class="msg-sidebar-head">
+        <h2>Conversas</h2>
+        <form class="msg-search" role="search" action="/messages" method="get" data-message-search>
+          <label class="sr-only" for="msg-person-search">Buscar pessoas</label>
+          <div class="msg-search-field"><input id="msg-person-search" name="q" type="search" value="<%= busca %>" maxlength="100" placeholder="Nome ou @" autocomplete="off"><button type="submit" aria-label="Buscar pessoas"><%- icones.search %></button></div>
+        </form>
+        <details class="msg-settings">
+          <summary title="Preferências de mensagens" aria-label="Preferências de mensagens"><%- icones.settings %></summary>
+          <div class="msg-settings-panel">
+            <h3>Preferências de mensagens</h3>
+            <form class="msg-settings-form" action="/messages/preferences" method="post">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <fieldset class="msg-settings-group"><legend>Receber de</legend>
+                <label class="msg-settings-option"><span>Profissionais</span><input type="checkbox" name="profissionais" value="sim" <%= preferencias.profissionais ? 'checked' : '' %>></label>
+                <label class="msg-settings-option"><span>Consumidores</span><input type="checkbox" name="consumidores" value="sim" <%= preferencias.consumidores ? 'checked' : '' %>></label>
+              </fieldset>
+              <button class="op-button op-primary msg-settings-save" type="submit">Salvar</button>
+            </form>
+            <% if (bloqueados.length) { %>
+              <div class="msg-settings-blocked"><h4>Bloqueados <span><%= bloqueados.length %></span></h4>
+              <% bloqueados.forEach(b => { %>
+                <form method="post" action="/messages/block" class="msg-unblock">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="alvo_id" value="<%= b.alvo_id %>">
+                  <span><%= b.nome || 'Conta' %></span>
+                  <button name="acao" value="desbloquear" type="submit">Desbloquear</button>
+                </form>
+              <% }) %>
+              </div>
+            <% } %>
+          </div>
+        </details>
+      </div>
+      <% if (busca) { %><p class="msg-search-result">Resultados para “<%= busca %>” <a href="/messages">Limpar</a></p><% } %>
+
+      <div class="msg-sidebar-scroll">
+        <% if (conversas.length) { %>
+          <section class="msg-list-section" aria-labelledby="msg-conversations-title">
+            <h3 id="msg-conversations-title">Conversas <span><%= conversas.length %></span></h3>
+            <% conversas.forEach(c => { %>
+              <div class="msg-person msg-conversation-item<%= conversa && conversa.id === c.id ? ' is-active' : '' %>">
+                <a class="msg-conversation-hit" href="/messages/<%= encodeURIComponent(c.id) %>" aria-label="Abrir conversa com <%= c.interlocutor %>"<% if (conversa && conversa.id === c.id) { %> aria-current="page"<% } %>></a>
+                <% if (c.identificador) { %><a class="msg-avatar msg-avatar-link" href="/p/<%= encodeURIComponent(c.identificador.replace(/^@/, '')) %>" aria-label="Ver perfil de <%= c.interlocutor %>"><% } else { %><span class="msg-avatar" aria-hidden="true"><% } %>
+                  <% if (c.foto) { %><img src="<%= c.foto %>" alt="" loading="lazy"><% } else { %><%= c.iniciais || c.interlocutor.slice(0, 2).toUpperCase() %><% } %>
+                <% if (c.identificador) { %></a><% } else { %></span><% } %>
+                <span class="msg-person-info"><span class="msg-person-top"><% if (c.identificador) { %><a class="msg-person-name" href="/p/<%= encodeURIComponent(c.identificador.replace(/^@/, '')) %>"><%= c.interlocutor %></a><% } else { %><strong><%= c.interlocutor %></strong><% } %><% if (c.ultima_data) { %><time title="<%= data(c.ultima_data) %>"><%= dataConversa(c.ultima_data) %></time><% } %></span><span class="msg-person-bottom"><span><%= c.ultima_mensagem || c.contexto %></span><% if (c.nao_lidas) { %><b class="msg-unread" aria-label="<%= c.nao_lidas %> mensagens não lidas"><%= c.nao_lidas %></b><% } %></span></span>
+              </div>
+            <% }) %>
+          </section>
+        <% } %>
+
+        <section class="msg-list-section" aria-labelledby="msg-new-title">
+          <h3 id="msg-new-title"><%= busca ? 'Pessoas' : 'Novos contatos' %> <span><%= contatos.length %></span></h3>
+          <% if (contatos.length) { %>
+            <% contatos.slice(0, busca ? contatos.length : 3).forEach(p => { %><%- include('contato-mensagem', { p }) %><% }) %>
+            <% if (!busca && contatos.length > 3) { %>
+              <details class="msg-more-contacts"><summary><span class="msg-more-closed">Ver mais <small>(<%= contatos.length - 3 %>)</small></span><span class="msg-more-open">Ver menos</span><%- icones.chevronDown %></summary>
+                <% contatos.slice(3).forEach(p => { %><%- include('contato-mensagem', { p }) %><% }) %>
+              </details>
+            <% } %>
+          <% } else { %>
+            <p class="msg-empty-list"><%= busca ? 'Nenhuma pessoa disponível com esse nome.' : 'Nenhum novo contato disponível agora.' %></p>
+          <% } %>
+        </section>
+      </div>
+    </aside>
+
+    <div class="msg-main<%= conversa ? ' msg-main-active' : '' %>">
+      <% if (conversa) { %>
+        <header class="msg-chat-head">
+          <a class="msg-mobile-back" href="/messages" aria-label="Voltar às conversas"><%- icones.arrowLeft %></a>
+          <% if (conversa.identificador) { %><a class="msg-avatar msg-avatar-large msg-avatar-link" href="/p/<%= encodeURIComponent(conversa.identificador.replace(/^@/, '')) %>" aria-label="Ver perfil de <%= conversa.interlocutor %>"><% } else { %><span class="msg-avatar msg-avatar-large" aria-hidden="true"><% } %>
+            <% if (conversa.foto) { %><img src="<%= conversa.foto %>" alt=""><% } else { %><%= conversa.interlocutor.slice(0, 2).toUpperCase() %><% } %>
+          <% if (conversa.identificador) { %></a><% } else { %></span><% } %>
+          <div class="msg-chat-person"><h2><% if (conversa.identificador) { %><a href="/p/<%= encodeURIComponent(conversa.identificador.replace(/^@/, '')) %>"><%= conversa.interlocutor %></a><% } else { %><%= conversa.interlocutor %><% } %></h2><span><%= conversa.contexto %></span></div>
+          <details class="msg-chat-actions"><summary title="Opções da conversa" aria-label="Opções da conversa">•••</summary><div>
+            <form method="post" action="/messages/<%= encodeURIComponent(conversa.id) %>/hide"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">Ocultar da minha caixa</button></form>
+            <form method="post" action="/messages/block" data-confirm="Bloquear novos contatos desta pessoa? O histórico da conversa será preservado."><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="alvo_id" value="<%= conversa.outro %>"><button type="submit" name="acao" value="bloquear">Bloquear contato</button></form>
+          </div></details>
+        </header>
+        <% const fotoRemetente = typeof capaUsuario === 'function' ? capaUsuario('perfil', usuario.id) : ''; %>
+        <div class="msg-history-frame">
+          <div class="msg-wallpaper" aria-hidden="true">
+            <% if (conversa.foto) { %><img class="msg-wallpaper-photo msg-wallpaper-recipient" src="<%= conversa.foto %>" alt=""><% } %>
+            <% if (fotoRemetente) { %><img class="msg-wallpaper-photo msg-wallpaper-sender" src="<%= fotoRemetente %>" alt=""><% } %>
+            <span class="msg-wallpaper-spray msg-wallpaper-spray-left"></span><span class="msg-wallpaper-spray msg-wallpaper-spray-right"></span>
+          </div>
+          <div class="msg-history" aria-label="Histórico de mensagens">
+          <% if (!conversa.mensagens.length) { %><div class="msg-first-message"><span aria-hidden="true"><%- icones.messageCircle %></span><h3>Comece a conversa</h3><p>Escreva uma mensagem para <%= conversa.interlocutor %>.</p></div><% } %>
+          <% gruposMensagens.forEach(grupo => { %>
+            <div class="msg-day-divider"><time datetime="<%= grupo.dia %>"><%= grupo.rotulo %></time></div>
+            <% grupo.mensagens.forEach(m => { const propria = m.autor_id === usuario.id; %>
+              <article class="msg-bubble-row<%= propria ? ' is-own' : '' %>">
+                <div class="msg-bubble"><% if (m.texto) { %><p><%= m.texto %></p><% } %><%- include('anexo-mensagem', { m }) %><footer>
+                  <% if (!propria) { %><details class="msg-bubble-actions"><summary aria-label="Opções da mensagem" title="Opções da mensagem">•••</summary><a href="/suporte/new?objeto_tipo=mensagem&amp;objeto_id=<%= encodeURIComponent(m.id) %>">Denunciar mensagem</a></details><% } %>
+                  <time><%= hora(m.criada_em) %></time>
+                  <% if (propria) { %><span class="msg-delivery<%= m.lida_em ? ' is-read' : '' %>" aria-label="<%= m.lida_em ? 'Lida' : 'Enviada' %>" title="<%= m.lida_em ? 'Lida' : 'Enviada' %>"><%= m.lida_em ? '✓✓' : '✓' %></span><% } %>
+                </footer></div>
+              </article>
+            <% }) %>
+          <% }) %>
+          </div>
+        </div>
+        <% if (conversa.envioPermitido) { %>
+          <%- include('compositor-mensagem', { action: '/messages/' + encodeURIComponent(conversa.id) }) %>
+        <% } else { %><p class="msg-send-disabled" role="status"><%= conversa.motivoEnvio %> O histórico permanece disponível.</p><% } %>
+      <% } else { %>
+        <div class="msg-welcome"><span class="msg-welcome-icon" aria-hidden="true"><%- icones.messageCircle %></span><span class="op-eyebrow">Sua caixa de mensagens</span><h2>Uma conversa começa aqui.</h2><p>Escolha uma conversa ou encontre uma pessoa disponível na lista ao lado.</p></div>
+      <% } %>
+    </div>
+  </section>
+<% } %>

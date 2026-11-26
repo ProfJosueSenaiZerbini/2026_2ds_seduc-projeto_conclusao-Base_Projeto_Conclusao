@@ -374,274 +374,33 @@ export const encontrosCena = [
       "Lezin e Jotapê cruzam duas formas de escrever sobre a caminhada. A produção de Papatinho costura o encontro entre Bahia, Guarulhos e Rio.",
     capa: "papatunes",
   },
-  {
-    id: "cena-obra-asfalto-em-orbita",
-    titulo: "Asfalto em Órbita",
-    autor: "duzz",
-    genero: "Boom Bap",
-    equipe: [
-      ["drizzy", "Participação como feat"],
-      ["pecaos", "Participação como feat"],
-      ["ecologyk", "Produção musical"],
-      ["tpires", "Direção audiovisual"],
-    ],
-    descricao:
-      "Três canetas, uma madrugada de estúdio. Duzz, Drizzy e Pecaos transformam os intervalos da cidade em versos sobre tempo, trabalho e amizade.",
-    capa: "ucla",
-  },
-  {
-    id: "cena-obra-lado-b-da-vila",
-    titulo: "Lado B da Vila",
-    autor: "nog",
-    genero: "Rap",
-    equipe: [
-      ["levinsk", "Participação como feat"],
-      ["gnao", "Participação como feat"],
-      ["teoguedx", "Produção musical"],
-      ["thiagoveiga", "Direção audiovisual"],
-      ["yanbello", "Fotografia"],
-    ],
-    descricao:
-      "A conversa de NOG e Levinsk ganha a perspectiva de GNÃO. Bateria crua, refrão de roda e imagens pensadas a partir de retratos do bairro.",
-    capa: "yalla",
-  },
-  {
-    id: "cena-obra-entre-linhas",
-    titulo: "Entre Linhas e Becos",
-    autor: "cassol",
-    genero: "Boom Bap",
-    equipe: [
-      ["pecaos", "Participação como feat"],
-      ["drizzy", "Participação como feat"],
-      ["hxtel", "Beat"],
-    ],
-    descricao:
-      "Cassol, Pecaos e Drizzy dividem o mesmo compasso. Um encontro sem pressa sobre as pequenas escolhas que desenham uma trajetória.",
-    capa: "rua",
-  },
-  {
-    id: "cena-obra-corpo-palavra",
-    titulo: "Corpo e Palavra",
-    autor: "rincon",
-    genero: "Rap",
-    equipe: [
-      ["emicida", "Participação como feat"],
-      ["gabb", "Coreografia"],
-      ["maricarvalho", "Coreografia"],
-      ["jessoalves", "Ilustração"],
-      ["millacarol", "Design gráfico"],
-    ],
-    descricao:
-      "A palavra encontra o corpo: rap, dança e identidade visual construídos como uma só apresentação. A equipe trabalha o mesmo pulso em cada linguagem.",
-    capa: "corpo",
-  },
-  {
-    id: "cena-obra-antes-do-primeiro-trem",
-    titulo: "Antes do Primeiro Trem",
-    autor: "levinsk",
-    genero: "R&B",
-    equipe: [
-      ["lezin", "Participação como feat"],
-      ["eureka", "Beat"],
-      ["torvic", "Fotografia"],
-    ],
-    descricao:
-      "Levinsk e Lezin dividem uma composição de madrugada sobre partir, ficar e encontrar o próprio ritmo. O instrumental de Eureka deixa os silêncios aparecerem.",
-    capa: "noite",
-  },
-  {
-    id: "cena-obra-norte-em-cena",
-    titulo: "Norte em Cena",
-    autor: "duzz",
-    genero: "Detroit",
-    equipe: [
-      ["sobs", "Participação como feat"],
-      ["wkilla", "Beat"],
-      ["ecologyk", "Mixagem"],
-    ],
-    descricao:
-      "Um instrumental de Manaus recebe os versos de Duzz e Sobs. Recortes digitais, bateria deslocada e uma conversa entre diferentes pontos do mapa.",
-    capa: "norte",
-  },
-  {
-    id: "cena-obra-mesmo-quarteirao",
-    titulo: "Mesmo Quarteirão",
-    autor: "jotape",
-    genero: "Rap",
-    equipe: [
-      ["nog", "Participação como feat"],
-      ["gnao", "Participação como feat"],
-      ["peunubeat", "Beat"],
-    ],
-    descricao:
-      "Jotapê, NOG e GNÃO fazem uma roda de histórias: as referências mudam, mas o encontro continua sendo a matéria-prima do rap.",
-    capa: "yalla",
-  },
 ];
 
-export const projetosCena = [
-  {
-    id: "cena-projeto-sessao-papatunes",
-    titulo: "Sessões da Papatunes · Verso em Construção",
-    autor: "papatinho",
-    modalidade: "projeto",
-    profissoes: ["produtor", "beatmaker"],
-    equipe: ["lezin", "jotape", "lwally", "2funflow", "jay"],
-    descricao:
-      "Encontros de escrita, produção e finalização. Da primeira ideia ao arranjo, cada sessão aproxima vozes e profissionais do mesmo núcleo.",
-    papel: "Direção musical e produção",
-    entregas: "Duas faixas, retratos de estúdio e caderno de processo.",
-    capa: "papatunes",
-  },
-  {
-    id: "cena-projeto-asfalto",
-    titulo: "Asfalto em Órbita · Filme de uma Sessão",
-    autor: "thiagoveiga",
-    modalidade: "audiovisual",
-    profissoes: ["videomaker", "editor-video"],
-    equipe: [
-      "duzz",
-      "drizzy",
-      "pecaos",
-      "ecologyk",
-      "torvic",
-      "fernandaferreira",
-    ],
-    descricao:
-      "Um filme curto acompanha a construção de Asfalto em Órbita. Câmera próxima, luz do estúdio e montagem guiada pelo ritmo dos versos.",
-    papel: "Direção e montagem",
-    entregas: "Filme de sessão, teaser vertical e seleção de stills.",
-    capa: "ucla",
-  },
-  {
-    id: "cena-projeto-corpo",
-    titulo: "Corpo e Palavra · Laboratório de Movimento",
-    autor: "gabb",
-    modalidade: "danca",
-    profissoes: ["dancarino", "coreografo"],
-    equipe: [
-      "rincon",
-      "emicida",
-      "maricarvalho",
-      "neguin",
-      "pelezinho",
-      "caroljafet",
-    ],
-    descricao:
-      "Rap e dança desenvolvidos em conjunto. A pesquisa parte do pulso da faixa e encontra momentos de improviso, chão e presença coletiva.",
-    papel: "Criação coreográfica",
-    entregas: "Apresentação de palco e registro da pesquisa corporal.",
-    capa: "corpo",
-  },
-  {
-    id: "cena-projeto-retratos",
-    titulo: "Entre um Verso e Outro · Retratos de Set",
-    autor: "yanbello",
-    modalidade: "fotografia",
-    profissoes: ["fotografo"],
-    equipe: ["nog", "levinsk", "jotape", "torvic"],
-    descricao:
-      "Fotografias dos encontros entre preparação, gravação e intervalo. A série procura as pessoas antes da pose e depois do último take.",
-    papel: "Fotografia e edição de imagem",
-    entregas: "Série de retratos e seleção para materiais de circulação.",
-    capa: "yalla",
-  },
-  {
-    id: "cena-projeto-muros",
-    titulo: "Muros que Rimam · Cidade em Camadas",
-    autor: "binho",
-    modalidade: "galeria",
-    profissoes: ["grafiteiro", "ilustrador"],
-    equipe: ["speto", "jessoalves", "millacarol", "rincon", "fioti"],
-    descricao:
-      "Uma conversa entre mural, capa e cenário de palco. Grafite, ilustração e design partem das mesmas palavras para construir imagens diferentes.",
-    papel: "Criação visual e articulação cultural",
-    entregas: "Painéis, estudos de capa e identidade do encontro.",
-    capa: "artes",
-  },
-  {
-    id: "cena-projeto-vozes",
-    titulo: "Vozes da Cena · Quem Faz o Som Acontecer",
-    autor: "aquiles",
-    modalidade: "texto",
-    profissoes: ["jornalista-cultural", "criador-conteudo"],
-    equipe: ["andrefelipe", "lezin", "papatinho", "duzz", "caroljafet"],
-    descricao:
-      "Conversas sobre a cadeia criativa: quem escreve, produz, registra e faz circular. A série aproxima os artistas das equipes por trás das obras.",
-    papel: "Pesquisa e entrevistas",
-    entregas: "Série editorial, entrevistas e recortes para leitura rápida.",
-    capa: "noite",
-  },
-];
+type ProjetoCena = {
+  id: string;
+  titulo: string;
+  autor: string;
+  modalidade: string;
+  profissoes: string[];
+  equipe: string[];
+  descricao: string;
+  papel: string;
+  entregas: string;
+  capa: string;
+};
+export const projetosCena: ProjetoCena[] = [];
 
-export const oportunidadesCena = [
-  {
-    id: "cena-op-capa",
-    autor: "jay",
-    titulo: "Identidade visual para a próxima sessão da Papatunes",
-    profissao: "designer-grafico",
-    valor: 180000,
-    descricao:
-      "Buscamos uma identidade que una capa, peças verticais e material de lançamento para o encontro de Lezin e Jotapê. O projeto já tem direção musical e precisa de uma leitura visual própria.",
-    vagas: 1,
-    projeto: "cena-projeto-sessao-papatunes",
-  },
-  {
-    id: "cena-op-stills",
-    autor: "fernandaferreira",
-    titulo: "Fotografia de bastidores · Asfalto em Órbita",
-    profissao: "fotografo",
-    valor: 95000,
-    descricao:
-      "Uma diária para acompanhar a gravação de Duzz, Drizzy e Pecaos. Precisamos de retratos, atmosfera do estúdio e material de divulgação em formatos horizontal e vertical.",
-    vagas: 2,
-    projeto: "cena-projeto-asfalto",
-  },
-  {
-    id: "cena-op-movimento",
-    autor: "caroljafet",
-    titulo: "Corpo e Palavra procura intérpretes de dança",
-    profissao: "dancarino",
-    valor: 140000,
-    descricao:
-      "A equipe de Gabb Cabo Verde e Mari Carvalho prepara uma criação com Rincon e Emicida. A seleção procura intérpretes com pesquisa própria e disponibilidade para ensaios presenciais.",
-    vagas: 3,
-    projeto: "cena-projeto-corpo",
-  },
-  {
-    id: "cena-op-master",
-    autor: "papatinho",
-    titulo: "Finalização de áudio para uma sessão de duas vozes",
-    profissao: "masterizador",
-    valor: 80000,
-    descricao:
-      "Duas faixas do núcleo de estúdio precisam de masterização com foco em dinâmica, inteligibilidade e tradução para streaming. Envio de referência e conversa técnica antes do fechamento.",
-    vagas: 1,
-    projeto: "cena-projeto-sessao-papatunes",
-  },
-  {
-    id: "cena-op-texto",
-    autor: "aquiles",
-    titulo: "Reportagem visual · os bastidores que não aparecem no refrão",
-    profissao: "jornalista-cultural",
-    valor: 120000,
-    descricao:
-      "Vozes da Cena abre uma pauta sobre profissionais técnicos, equipes visuais e circulação cultural. Procuramos uma abordagem de entrevista que una contexto e escuta.",
-    vagas: 1,
-    projeto: "cena-projeto-vozes",
-  },
-  {
-    id: "cena-op-mural",
-    autor: "fioti",
-    titulo: "Mural coletivo para o encontro Muros que Rimam",
-    profissao: "grafiteiro",
-    valor: 240000,
-    descricao:
-      "O encontro aproxima arte urbana e música. Precisamos de propostas autorais para um painel coletivo, em diálogo com a identidade desenvolvida por Binho, Speto e a equipe visual.",
-    vagas: 2,
-    projeto: "cena-projeto-muros",
-  },
-];
+type OportunidadeCena = {
+  id: string;
+  autor: string;
+  titulo: string;
+  profissao: string;
+  valor: number;
+  descricao: string;
+  vagas: number;
+  projeto: string;
+};
+export const oportunidadesCena: OportunidadeCena[] = [];
 
 export const ofertasCena: Record<
   string,
@@ -696,105 +455,12 @@ export const ofertasCena: Record<
   },
 };
 
-export const conversasCena: Record<string, { autor: string; texto: string }[]> =
-  {
-    "cena-obra-sem-atalho": [
-      {
-        autor: "lezin",
-        texto:
-          "Essa começou com uma guia de voz e terminou com cada um encontrando seu espaço. O encontro com Jotapê mudou o refrão.",
-      },
-      {
-        autor: "papatinho",
-        texto:
-          "Deixei a bateria respirar para a troca de versos aparecer. Agora quero ouvir essa no palco.",
-      },
-    ],
-    "cena-obra-asfalto-em-orbita": [
-      {
-        autor: "drizzy",
-        texto:
-          "Três canetas, três caminhos para o mesmo instrumental. A virada depois do segundo verso foi a chave.",
-      },
-      {
-        autor: "ecologyk",
-        texto:
-          "A textura veio antes da bateria. Duzz e Pecaos trouxeram outra intenção para o arranjo.",
-      },
-    ],
-    "cena-obra-lado-b-da-vila": [
-      {
-        autor: "levinsk",
-        texto:
-          "Queria manter a energia da roda sem perder os detalhes da escrita. Essa troca com NOG e GNÃO encaixou demais.",
-      },
-      {
-        autor: "yanbello",
-        texto:
-          "Na imagem, fui atrás da mesma luz de fim de tarde que atravessa os versos. O ensaio faz parte do projeto Retratos da Cena.",
-      },
-    ],
-    "cena-obra-entre-linhas": [
-      {
-        autor: "pecaos",
-        texto:
-          "Cada verso deixou uma deixa para o próximo. Cassol puxou a primeira ideia e o resto virou conversa.",
-      },
-      {
-        autor: "hxtel",
-        texto:
-          "Caixa seca e espaço para a voz. Fiz o instrumental pensando justamente nessa troca entre as três escritas.",
-      },
-    ],
-    "cena-obra-corpo-palavra": [
-      {
-        autor: "gabb",
-        texto:
-          "O movimento nasceu junto com a música. Mari e eu estamos levando essa pesquisa para o laboratório aberto.",
-      },
-      {
-        autor: "rincon",
-        texto:
-          "Quando a dança entra desde o começo, a interpretação muda. O projeto reúne essa construção inteira, da palavra ao corpo.",
-      },
-    ],
-    "cena-obra-antes-do-primeiro-trem": [
-      {
-        autor: "eureka",
-        texto:
-          "Esse piano ficou guardado até encontrar essas vozes. A levada pede escuta de madrugada.",
-      },
-      {
-        autor: "lezin",
-        texto:
-          "A escrita da Levinsk trouxe um contraste bonito para a minha parte. Tem silêncio que também conta a história.",
-      },
-    ],
-    "cena-obra-norte-em-cena": [
-      {
-        autor: "wkilla",
-        texto:
-          "A ideia era deixar o grave conversar com o recorte eletrônico sem cobrir as vozes. Norte presente na troca.",
-      },
-      {
-        autor: "sobs",
-        texto:
-          "O refrão ganhou outro caminho depois da sessão com Duzz. Estamos organizando as referências visuais para o próximo passo.",
-      },
-    ],
-    "cena-obra-mesmo-quarteirao": [
-      {
-        autor: "jotape",
-        texto:
-          "Encontro de quem já se cruzou em tanta roda. Aqui a gente teve tempo de construir cada entrada junto.",
-      },
-      {
-        autor: "peunubeat",
-        texto:
-          "O instrumental acompanha a passagem de um verso para o outro. Tem detalhe de percussão que só aparece na segunda escuta.",
-      },
-    ],
-  };
+export const conversasCena: Record<string, { autor: string; texto: string }[]> = {
+  "cena-obra-sem-atalho": [
+    { autor: "lezin", texto: "Essa começou com uma guia de voz e terminou com cada um encontrando seu espaço. O encontro com Jotapê mudou o refrão." },
+    { autor: "papatinho", texto: "Deixei a bateria respirar para a troca de versos aparecer. Agora quero ouvir essa no palco." },
+  ],
+};
 
 export const fontesCena = [
   {

@@ -1,7 +1,7 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
 <%
-  function urlGenero(valor) {
-    const parametros = new URLSearchParams(Object.entries({ ...filtros, genero: valor }).filter(([, valor]) => valor));
+  function urlGenero(valor, pag = 1) {
+    const parametros = new URLSearchParams(Object.entries({ ...filtros, genero: valor, ordem: ordem === 'original' ? '' : ordem, pagina: pag > 1 ? pag : '' }).filter(([, valor]) => valor));
     return '/beats' + (parametros.size ? '?' + parametros : '');
   }
 
@@ -44,7 +44,7 @@
                 <img src="/img/<%= imagemPublicacaoDemo(destaque.id) %>" alt="Capa de <%= destaque.title %>" decoding="async" fetchpriority="high">
                 <span class="beats-spotlight-sticker" aria-hidden="true">FEITO<br>PRA RIMAR.</span>
               </div>
-              <div class="beats-spotlight-info"><div><h3><%= destaque.title %></h3><p><%= destaque.producer %> · <%= destaque.genre %> · <%= destaque.bpm %> BPM</p></div><a href="#beat-<%= destaque.id %>" aria-label="Ver detalhes de <%= destaque.title %>"><%- icones.arrowUpRight %></a></div>
+              <div class="beats-spotlight-info"><div><h3><%= destaque.title %></h3><p><%= destaque.producer %> · <%= destaque.genre %> · <%= destaque.bpm %> BPM</p></div><a href="/beats?beat=<%= encodeURIComponent(destaque.id) %>#beat-<%= encodeURIComponent(destaque.id) %>" aria-label="Ver detalhes de <%= destaque.title %>"><%- icones.arrowUpRight %></a></div>
               <%- include('../partials/componentes/player-previa-beat', { beat: destaque }) %>
             </div>
           <% } else { %>
@@ -57,7 +57,7 @@
         <header class="dc-heading beats-heading">
           <div><span class="beats-eyebrow">Escolha a sua frequência</span><h2 id="titulo-catalogo-beats"><%= q ? 'Resultados para “' + q + '”' : 'Dê play na sua próxima ideia' %></h2></div>
           <div class="beats-heading-actions">
-            <span class="cy-count-sticker" data-beats-count><%= beats.length %> <%= beats.length === 1 ? 'beat' : 'beats' %></span>
+            <span class="cy-count-sticker" data-beats-count><%= total %> <%= total === 1 ? 'beat' : 'beats' %></span>
             <% if (filtrado) { %><a href="/beats">Limpar filtros <span aria-hidden="true"><%- icones.x %></span></a><% } %>
           </div>
         </header>
@@ -76,6 +76,7 @@
           <% } %>
         </div>
         <form class="beats-search-filters" action="/beats#catalogo-beats" method="get" aria-label="Buscar e filtrar beats">
+          <% if (ordem !== 'original') { %><input type="hidden" name="ordem" value="<%= ordem %>"><% } %>
           <% if (genero) { %><input type="hidden" name="genero" value="<%= genero %>"><% } %>
           <div class="beats-search-row">
             <label for="beats-query">Título ou produtor</label>
@@ -113,16 +114,25 @@
         </form>
 
         <% if (beats.length) { %>
-          <div class="beats-toolbar" data-beats-toolbar hidden>
+          <div class="beats-toolbar">
             <div class="ci-actions">
               <a class="ci-button" href="/colecoes">Minha coleção</a>
               <button type="button" class="ci-button" data-importar-favoritos hidden>Importar favoritos deste navegador</button>
             </div>
-            <label class="beats-sort">Ordenar por <select data-beats-sort aria-label="Ordenar beats"><option value="original">Seleção Cypher</option><option value="price">Menor preço</option><option value="bpm">BPM crescente</option><option value="title">Título A–Z</option></select><span aria-hidden="true"><%- icones.chevronDown %></span></label>
+            <form action="/beats#catalogo-beats" method="get" class="ci-actions">
+              <% for (const [campo, valor] of Object.entries(filtros)) { if (valor) { %><input type="hidden" name="<%= campo %>" value="<%= valor %>"><% } } %>
+              <label class="beats-sort">Ordenar por <select name="ordem"><% for (const [valor, rotulo] of [['original','Seleção Cypher'],['price','Menor preço'],['bpm','BPM crescente'],['title','Título A–Z']]) { %><option value="<%= valor %>" <%= ordem === valor ? 'selected' : '' %>><%= rotulo %></option><% } %></select></label>
+              <button class="ci-button" type="submit">Ordenar</button>
+            </form>
           </div>
           <div class="beats-catalog">
-            <% beats.forEach((beat, indice) => { %><%- include('../partials/componentes/cartao-beat', { beat, indice, disponibilidades }) %><% }) %>
+            <% beats.forEach((beat, indice) => { %><%- include('../partials/componentes/cartao-beat', { beat, indice: inicioPagina + indice, disponibilidades }) %><% }) %>
           </div>
+          <% if (paginas > 1) { %><nav class="beats-toolbar" aria-label="Páginas de beats">
+            <% if (pagina > 1) { %><a class="ci-button" href="<%= urlGenero(genero, pagina - 1) %>#catalogo-beats">Página anterior</a><% } %>
+            <span>Página <%= pagina %> de <%= paginas %></span>
+            <% if (pagina < paginas) { %><a class="ci-button" href="<%= urlGenero(genero, pagina + 1) %>#catalogo-beats">Próxima página</a><% } %>
+          </nav><% } %>
         <% } else { %>
           <div class="dc-empty">
             <%- filtrado ? icones.search : icones.headphones %>

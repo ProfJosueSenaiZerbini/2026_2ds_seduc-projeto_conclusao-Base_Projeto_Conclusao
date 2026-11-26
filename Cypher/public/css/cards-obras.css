@@ -1,0 +1,96 @@
+/* Objetos musicais: a silhueta identifica o formato mesmo sem capa. */
+.cy-work-card {
+  --work-accent: #dec969;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--dc-line, #69744e);
+  border-radius: 5px 18px 5px 5px;
+  background: var(--dc-panel, #171e15);
+  color: var(--dc-text, #f4f3e8);
+  text-decoration: none;
+  box-shadow: 3px 4px 0 #0003;
+  transition: transform .18s ease, border-color .18s ease;
+}
+.cy-work-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 190px;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 80%, #ffffff18, transparent 70%), #111710;
+  border-bottom: 1px solid var(--dc-line, #69744e);
+}
+.cy-work-cover {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 126px;
+  height: 126px;
+  color: var(--work-accent);
+  background: #263123;
+  border: 1px solid #ffffff45;
+  box-shadow: 0 10px 18px #0007;
+  transform: rotate(-4deg);
+}
+.cy-work-cover img { width: 100%; height: 100%; object-fit: cover; }
+.cy-work-cover svg { width: 42px; height: 42px; }
+.cy-work-format {
+  position: absolute;
+  z-index: 3;
+  left: 12px;
+  top: 12px;
+  padding: 4px 9px;
+  border-radius: 2px;
+  background: var(--work-accent);
+  color: #142016;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.cy-work-copy { display: grid; gap: 5px; padding: 16px 18px; }
+.cy-work-copy strong { font-size: 1.15rem; line-height: 1.25; overflow-wrap: anywhere; }
+.cy-work-author { font-size: .875rem; overflow-wrap: anywhere; }
+.cy-work-genre { color: var(--dc-muted, #bdc7b0); font-size: .8125rem; }
+.cy-work-object { position: absolute; width: 126px; height: 126px; }
+.cy-work-card--album .cy-work-cover { transform: translateX(-25px) rotate(-5deg); }
+.cy-work-card--album .cy-work-object,
+.cy-work-card--single .cy-work-object,
+.cy-work-card--fonograma .cy-work-object {
+  border-radius: 50%;
+  transform: translateX(38px);
+  background: radial-gradient(circle, #121712 0 4%, var(--work-accent) 5% 22%, #161916 23% 28%, transparent 29%), repeating-radial-gradient(circle, #333830 0 1px, #101510 2px 4px);
+  border: 1px solid #73786b;
+  box-shadow: 0 8px 15px #0008;
+}
+.cy-work-card--ep { --work-accent: #b6ca87; }
+.cy-work-card--ep .cy-work-object { background: #75885c; transform: translate(12px,-4px) rotate(7deg); box-shadow: 7px -5px 0 #3b4932; border: 1px solid #b6ca87; }
+.cy-work-card--single { --work-accent: #e3ae76; }
+.cy-work-card--single .cy-work-cover { width: 98px; height: 98px; transform: translateX(-27px) rotate(-8deg); }
+.cy-work-card--mixtape { --work-accent: #dbac81; }
+.cy-work-card--mixtape .cy-work-cover { width: 180px; height: 112px; border: 9px solid #434337; border-radius: 10px; transform: rotate(-5deg); }
+.cy-work-card--mixtape .cy-work-object { z-index: 2; width: 110px; height: 32px; border: 4px solid #a5a494; border-radius: 20px; background: radial-gradient(circle at 15% 50%, #c5c2ac 0 8px, transparent 9px), radial-gradient(circle at 85% 50%, #c5c2ac 0 8px, transparent 9px), #171b16; transform: rotate(-5deg); }
+.cy-work-card--fonograma { --work-accent: #adc9c5; }
+.cy-work-card--fonograma .cy-work-cover { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; transform: translateX(-28px); }
+.cy-work-card--beat { --work-accent: #c1a9dc; }
+.cy-work-card--instrumental { --work-accent: #99c5b6; }
+.cy-work-pattern { display: none; }
+:is(.cy-work-card--musica, .cy-work-card--beat, .cy-work-card--instrumental) .cy-work-pattern { position: absolute; inset: auto 12px 16px; display: flex; align-items: center; justify-content: space-between; height: 26px; opacity: .7; }
+.cy-work-pattern i { width: 4%; height: 30%; background: var(--work-accent); }
+.cy-work-pattern i:nth-child(3n) { height: 100%; }
+.cy-work-pattern i:nth-child(3n + 1) { height: 60%; }
+.cy-work-card--beat .cy-work-cover { transform: translateY(-7px) rotate(3deg); border-radius: 8px; border: 5px solid #424035; }
+.cy-work-card--instrumental .cy-work-pattern i { height: 100%; border-bottom: 7px solid #101510; }
+.cy-work-card--letra { --work-accent: #e4d8a6; }
+.cy-work-card--composicao { --work-accent: #bad0a1; }
+:is(.cy-work-card--letra, .cy-work-card--composicao) .cy-work-cover { width: 98px; height: 128px; background: repeating-linear-gradient(#e8e1bd 0 15px, #a7aa8a 16px 17px); color: #28382a; box-shadow: 5px 5px 0 #777e61, 9px 9px 0 #3b4932; }
+.cy-work-card--composicao .cy-work-cover { transform: rotate(5deg); border-left: 10px solid #364932; }
+.cy-work-card--obra .cy-work-cover { border: 6px double #c7c694; }
+.cy-work-card--outro .cy-work-cover { transform: rotate(5deg); border-radius: 18px 2px 18px 2px; }
+.cy-work-card:focus-visible { outline: 3px solid var(--work-accent); outline-offset: 4px; }
+@media (hover: hover) { .cy-work-card:hover { transform: translateY(-3px); border-color: var(--work-accent); } }
+@media (prefers-reduced-motion: reduce) { .cy-work-card { transition: none; } }
+@media (max-width: 480px) { .cy-work-visual { height: 175px; } }

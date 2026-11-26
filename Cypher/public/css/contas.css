@@ -10,9 +10,9 @@
 }
 .account-policy h1 {
   font:
-    700 clamp(34px, 6vw, 64px)/1.02 "Space Grotesk",
+    700 clamp(34px, 6vw, 64px)/1.02 "Oswald",
     sans-serif;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.02em;
   margin: 14px 0;
 }
 .account-policy header p,

@@ -6,7 +6,7 @@
 <header class="tag-intro"><h1>Boas-vindas à Cypher!</h1><p>Como você participa da cena?</p></header>
 <nav class="tag-stack" aria-label="Tipo de conta">
 <% for (const [tipo,nome,descricao] of [['consumidor','Público','Descubra e acompanhe a cena.'],['profissional','Profissional','Mostre a todos sua arte!']]) { %>
-<a href="<%= (erro || tipoInicial) && dados.tipoConta === tipo ? '/register' : '/register?tipo='+tipo %>" aria-label="<%= (erro || tipoInicial) && dados.tipoConta === tipo ? nome+' selecionado. Trocar tipo de conta' : 'Selecionar '+nome+'. '+descricao %>" class="tag-sticker" data-sticker="<%= tipo %>" aria-controls="cadastro-dados"><span class="sticker-paper"><span class="tag-band">CYPHER</span><strong><%= nome %></strong><small><%= descricao %></small></span></a>
+<a href="<%= (erro || tipoInicial) && dados.tipoConta === tipo ? '/register' : '/register?tipo='+tipo %>" class="tag-sticker" data-sticker="<%= tipo %>" aria-controls="cadastro-dados"><span class="sticker-paper"><span class="tag-band" aria-hidden="true">CYPHER</span><strong><%= nome %></strong><small><%= descricao %></small><% if ((erro || tipoInicial) && dados.tipoConta === tipo) { %><span class="sr-only">Conta selecionada. Trocar tipo de conta.</span><% } %></span></a>
 <% } %></nav>
 <section class="auth-panel tag-panel" id="cadastro-dados">
 <h2 data-register-title tabindex="-1">Crie sua conta</h2><p data-register-description>Preencha seus dados para continuar.</p>

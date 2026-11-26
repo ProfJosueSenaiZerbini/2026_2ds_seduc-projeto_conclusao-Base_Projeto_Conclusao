@@ -1,0 +1,12 @@
+<% if (m.anexo) { const anexo = m.anexo; const urlAnexo = (administrativo ? '/admin/oportunidades/mensagens' : '/messages') + '/attachments/' + encodeURIComponent(anexo.id); %>
+  <div class="msg-attachment" data-type="<%= anexo.mime.startsWith('image/') ? 'imagem' : anexo.mime.startsWith('video/') ? 'vídeo' : anexo.mime.startsWith('audio/') ? 'áudio' : 'documento' %>">
+    <% if (anexo.mime.startsWith('image/')) { %>
+      <a href="<%= urlAnexo %>" target="_blank" rel="noopener" aria-label="Abrir imagem <%= anexo.nome %>"><img src="<%= urlAnexo %>" alt="<%= anexo.nome %>" loading="lazy"></a>
+    <% } else if (anexo.mime.startsWith('video/')) { %>
+      <video controls preload="metadata" src="<%= urlAnexo %>" aria-label="<%= anexo.nome %>"></video>
+    <% } else if (anexo.mime.startsWith('audio/')) { %>
+      <audio controls preload="metadata" src="<%= urlAnexo %>" aria-label="<%= anexo.nome %>"></audio>
+    <% } %>
+    <% if (!anexo.mime.startsWith('image/') && !anexo.mime.startsWith('video/')) { %><a class="msg-attachment-download" href="<%= urlAnexo %>" download="<%= anexo.nome %>"><span class="msg-attachment-icon" aria-hidden="true"><%= anexo.mime.startsWith('audio/') ? '♫' : anexo.nome.split('.').pop().toUpperCase() %></span><span class="msg-attachment-meta"><strong><%= anexo.nome %></strong><small><%= anexo.mime.startsWith('audio/') ? 'Arquivo de áudio' : 'Toque para baixar' %></small></span><span class="msg-attachment-download-icon" aria-hidden="true">↓</span></a><% } else { %><a class="msg-attachment-download msg-attachment-caption" href="<%= urlAnexo %>" download="<%= anexo.nome %>"><%= anexo.nome %> · Baixar</a><% } %>
+  </div>
+<% } %>

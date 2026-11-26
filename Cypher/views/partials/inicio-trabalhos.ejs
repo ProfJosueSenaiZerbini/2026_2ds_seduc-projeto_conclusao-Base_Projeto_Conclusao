@@ -1,6 +1,10 @@
 <%- include('cabecalho', { title, stylesheet }) %>
-<div class="app-shell">
+<link rel="stylesheet" href="/css/descoberta.css"><link rel="stylesheet" href="/css/refino-cypher.css">
+<% const trabalhoAdmin = typeof usuario !== "undefined" && usuario?.tipoConta === "administrativo"; %>
+<div class="dc-shell cy-work-flow<%= trabalhoAdmin ? ' admin-shell' : '' %>">
   <%- include('barra-lateral', { path }) %>
-  <main class="main-shell">
-    <%- include('barra-superior', { breadcrumb }) %>
-    <div class="et-page">
+  <div class="dc-page">
+    <% if (trabalhoAdmin) { %><%- include('barra-superior', { breadcrumb }) %><% } else { %>
+      <%- include('componentes/cabecalho-descoberta', { titulo: breadcrumb, tituloId: 'cy-work-title', descricao: 'Criações, créditos e registros da cena.' }) %>
+    <% } %>
+    <main class="dc-content et-page cy-work-content<%= trabalhoAdmin ? ' admin-page' : '' %>"<% if (!trabalhoAdmin) { %> aria-labelledby="cy-work-title"<% } %>>

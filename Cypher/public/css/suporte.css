@@ -11,6 +11,7 @@
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
 }
+.sp-page h1 { font-family: "Oswald", sans-serif; }
 .sp-page :is(a, button, input, select, textarea, summary):focus-visible {
   outline: 2px solid var(--dc-accent);
   outline-offset: 4px;
@@ -61,7 +62,7 @@
   color: var(--dc-ink);
   background: var(--dc-surface);
   font:
-    700 13px "DM Sans",
+    700 13px "Space Grotesk",
     sans-serif;
   cursor: pointer;
 }
@@ -191,7 +192,7 @@
   color: var(--dc-ink);
   background: var(--dc-field);
   font:
-    400 14px/1.5 "DM Sans",
+    400 14px/1.5 "Space Grotesk",
     sans-serif;
 }
 .sp-form input::placeholder,
@@ -413,7 +414,7 @@
   overflow-wrap: anywhere;
   margin: 16px 0;
   font:
-    400 13px/1.8 "DM Sans",
+    400 13px/1.8 "Space Grotesk",
     sans-serif;
 }
 .sp-measure {
@@ -454,7 +455,7 @@
   background: var(--dc-field);
   color: var(--dc-ink);
   font:
-    400 14px "DM Sans",
+    400 14px "Space Grotesk",
     sans-serif;
 }
 .sp-filters > .sp-button {

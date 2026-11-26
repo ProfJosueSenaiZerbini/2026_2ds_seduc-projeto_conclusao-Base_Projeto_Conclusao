@@ -1,0 +1,28 @@
+<%
+  const formatos = {
+    'Álbum': ['album', 'disc'], 'EP': ['ep', 'disc'],
+    'Mixtape': ['mixtape', 'music2'], 'Single': ['single', 'music2'],
+    'Música': ['musica', 'music2'], 'Fonograma': ['fonograma', 'disc'],
+    'Instrumental': ['instrumental', 'headphones'], 'Beat': ['beat', 'headphones'],
+    'Letra': ['letra', 'music2'], 'Composição': ['composicao', 'music2'],
+    'Obra': ['obra', 'disc'], 'Outro': ['outro', 'disc'],
+  };
+  const tipo = item.grupo === 'beats' ? 'Beat' : (item.tipo || 'Obra');
+  const [formato, icone] = formatos[tipo] || formatos.Outro;
+  const demo = imagemPublicacaoDemo(item.id);
+  const enviada = typeof capaUsuario === 'function' ? capaUsuario(item.grupo === 'beats' ? 'beat' : 'obra', item.id) : '';
+  const capa = enviada || (demo ? '/img/' + demo : '');
+%>
+<a class="cy-work-card cy-work-card--<%= formato %>" href="<%= item.url %>">
+  <span class="cy-work-visual" aria-hidden="true">
+    <span class="cy-work-object"></span>
+    <span class="cy-work-cover"><% if (capa) { %><img src="<%= capa %>" alt="" loading="lazy" decoding="async"><% } else { %><%- icones[icone] %><% } %></span>
+    <span class="cy-work-pattern"><% for (let i = 0; i < 15; i++) { %><i></i><% } %></span>
+    <span class="cy-work-format"><%= tipo %></span>
+  </span>
+  <span class="cy-work-copy">
+    <strong><%= item.titulo %></strong>
+    <span class="cy-work-author"><%= item.autor %></span>
+    <% if (item.genero) { %><span class="cy-work-genre"><%= item.genero %></span><% } %>
+  </span>
+</a>

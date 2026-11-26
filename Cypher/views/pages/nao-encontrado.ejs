@@ -1,20 +1,7 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<main class="page-content">
-<div class="page-header">
-  <div>
-    <div class="eyebrow">
-      CYPHER
-    </div>
-    <h1>
-      Página não encontrada.
-    </h1>
-    <p>
-      O caminho que você procurou não existe.
-    </p>
-    <a class="button button-lime" href="/dashboard">
-      Voltar ao início
-    </a>
-  </div>
-</div>
-</main>
+<link rel="stylesheet" href="/css/descoberta.css"><link rel="stylesheet" href="/css/refino-cypher.css">
+<div class="dc-shell cy-error-shell"><main class="dc-content cy-error-content">
+<a class="cypher-logo" href="/dashboard" aria-label="Cypher: início"><span class="cypher-logo__base" aria-hidden="true">CYPHER</span><span class="cypher-logo__paint" aria-hidden="true">CYPHER</span></a>
+<section class="cy-error-card" aria-labelledby="cy-error-title"><span class="dc-stamp">CYPHER / 404</span><h1 id="cy-error-title">Página não encontrada</h1><p>O caminho que você procurou não existe.</p><a class="button button-lime" href="/dashboard">Voltar ao início</a></section>
+</main></div>
 <%- include('../partials/fim-pagina') %>

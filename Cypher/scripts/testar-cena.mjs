@@ -360,6 +360,8 @@ try {
   );
   const pages = [
     ["descoberta", "/"],
+    ["lancamentos", "/dashboard?tipo=musica&q=profetiza"],
+    ["lancamento-beat", "/dashboard?tipo=musica&q=vice%20city"],
     ["beats", "/beats"],
     ["beat", "/beats/demo-beat-parece-sorte"],
     ["vendido", "/beats/demo-beat-visao-de-rua"],
@@ -415,6 +417,10 @@ try {
     if (nome === "conversa")
       ok(() => assert.match(visivel, /Essa começou com uma guia de voz/));
     if (nome === "descoberta") {
+      ok(() => assert.match(principal, /href="\/dashboard\?tipo=musica"[^>]*>Ver mais/));
+      const formatos = [...principal.matchAll(/data-release-format="([^"]+)"/g)].map(m => m[1]).sort();
+      ok(() => assert.deepEqual(formatos, ["album", "beat", "ep", "faixa"]));
+      ok(() => assert.doesNotMatch(principal, /class="dc-release-action"/));
       const slides = [...html.matchAll(/class="dc-slide"[\s\S]*?<\/a>/g)].map(
         m => m[0]
       );
@@ -438,6 +444,16 @@ try {
         );
       }
     }
+    if (nome === "lancamentos") {
+      ok(() => assert.match(principal, /data-release-format="album"[\s\S]*?14 faixas/));
+      ok(() => assert.match(principal, /data-release-open aria-label="Abrir faixa Profetiza"/));
+      ok(() => assert.match(principal, /data-release-track="\/audio\/Profetiza\/1\./));
+      ok(() => assert.match(principal, /src="\/audio\/Profetiza_MP3_256kbps\.mp3"/));
+    }
+    if (nome === "lancamento-beat") {
+      ok(() => assert.match(principal, /data-release-format="beat"/));
+      ok(() => assert.match(principal, /src="\/audio\/beats\/[^"]*VICE_CITY/));
+    }
     ok(() =>
       assert.doesNotMatch(
         visivel,
@@ -451,6 +467,11 @@ try {
       fs.writeFileSync(path.join(out, nome + ".html"), html);
     }
   }
+  db.prepare("UPDATE obras SET publicada=0 WHERE id=?").run("demo-album-profetiza-faixa-1");
+  const semFaixa = await (await req("/dashboard?tipo=musica&q=profetiza")).text();
+  ok(() => assert.match(semFaixa, /13 faixas/));
+  ok(() => assert.doesNotMatch(semFaixa, /data-release-track="\/audio\/Profetiza\/1\./));
+  db.prepare("UPDATE obras SET publicada=1 WHERE id=?").run("demo-album-profetiza-faixa-1");
   const credito = db.prepare("SELECT id FROM creditos WHERE obra_id='cena-obra-sem-atalho' AND usuario_creditado_id=? AND verificado=1").get(pap);
   db.prepare("UPDATE creditos SET verificado=0 WHERE id=?").run(credito.id);
   const semCredito = await (await req("/p/papatinho.cena?aba=creditos&atuacao=Produtor%28a%29")).text();
@@ -536,6 +557,11 @@ try {
   ok(() =>
     assert.doesNotMatch(excluidoJson.html, /Comentário atualizado no painel/)
   );
+  const revisaoLicenca = await req("/purchases/" + novoPedido + "/checkout");
+  const htmlLicenca = await revisaoLicenca.text();
+  ok(() => assert.equal(revisaoLicenca.status, 200));
+  ok(() => assert.match(htmlLicenca, /Sem cobrança/));
+  ok(() => assert.match(htmlLicenca, /Confirmar licença/));
   const semCsrf = await req("/purchases/" + novoPedido + "/confirm", {
     method: "POST",
     headers: { "content-type": "application/json" },

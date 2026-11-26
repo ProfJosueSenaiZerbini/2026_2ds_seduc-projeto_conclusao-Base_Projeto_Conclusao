@@ -1,0 +1,170 @@
+/* A entrada da equipe usa a estrutura da entrada pública com a paleta administrativa. */
+:root .entrada-cypher.admin-access {
+  --dc-ink: #f7f1da;
+  --dc-muted: #cfc3a3;
+  --dc-line: #a48b53;
+  --dc-accent: #efd367;
+  --dc-olive: #d0b654;
+  --dc-surface: #1a1b13;
+  --dc-panel: linear-gradient(135deg, #242317ee, #171912f2 60%, #242012ed);
+  --dc-card: #292717;
+  --dc-field: #11140e;
+  --dc-button: linear-gradient(112deg, #f0d76f, #dfc150 68%, #c9ae42);
+  --dc-button-ink: #211b0d;
+  --dc-shadow: 3px 5px 0 #080a07c9, 0 18px 42px #0009;
+  color-scheme: dark;
+  isolation: isolate;
+}
+
+.admin-access::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 52%, #cfac3d2e, transparent 58%);
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-brand {
+  color: var(--dc-accent);
+  text-shadow: none;
+}
+
+.admin-access .tag-brand span {
+  font:
+    700 clamp(13px, 1.8vw, 19px)/1 "Space Grotesk",
+    sans-serif;
+  letter-spacing: 0.13em;
+  vertical-align: middle;
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel {
+  --text-primary: var(--dc-ink);
+  --text-secondary: var(--dc-muted);
+  --bg-surface: var(--dc-surface);
+  --border-color: var(--dc-line);
+  --field-focus: var(--dc-accent);
+  color: var(--dc-ink);
+  border-color: var(--dc-line);
+  background: var(--dc-panel);
+  box-shadow: var(--dc-shadow);
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel::before {
+  background:
+    url("desgaste-sticker.svg") 0 0 / 180px 96px,
+    var(--dc-accent);
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel h1 {
+  color: var(--dc-ink);
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel .admin-access-badge {
+  width: fit-content;
+  margin: 0 auto 20px;
+  padding: 7px 11px;
+  border: 1px solid var(--dc-olive);
+  border-radius: 2px 5px 1px 4px;
+  color: var(--dc-button-ink);
+  background: var(--dc-button);
+  font:
+    800 11px/1.3 "Space Grotesk",
+    sans-serif;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  .admin-access-description {
+  max-width: 42ch;
+  margin: 10px auto 0;
+  color: var(--dc-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel .login-cena {
+  color: var(--dc-accent);
+  background-image: linear-gradient(
+    110deg,
+    var(--dc-accent) 26%,
+    var(--dc-olive) 48%,
+    var(--dc-accent) 66%
+  );
+}
+
+:root .tag-page.entrada-cypher.admin-access .tag-panel .button-lime {
+  color: var(--dc-button-ink);
+  border-color: var(--dc-olive);
+  background: var(--dc-button);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  form
+  .floating-field
+  > input {
+  color: var(--dc-ink);
+  caret-color: var(--dc-accent);
+  border-color: var(--dc-line);
+  background-color: var(--dc-field);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  form
+  .floating-field
+  > input:focus {
+  border-color: var(--dc-accent);
+  box-shadow: 0 0 0 1px var(--dc-accent);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  form
+  .floating-field
+  > input:autofill {
+  -webkit-text-fill-color: var(--dc-ink);
+  box-shadow: inset 0 0 0 100px var(--dc-field);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  :is(.floating-field .field-caption, input::placeholder, .password-toggle) {
+  color: var(--dc-muted);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  .tag-panel
+  .floating-field:focus-within
+  .field-caption,
+:root .tag-page.entrada-cypher.admin-access .join-cypher a {
+  color: var(--dc-accent);
+}
+
+:root
+  .tag-page.entrada-cypher.admin-access
+  :is(a, button, input):focus-visible {
+  outline-color: var(--dc-accent);
+}
+
+@media (max-width: 600px) {
+  :root .tag-page.entrada-cypher.admin-access .tag-panel .admin-access-badge {
+    margin-bottom: 15px;
+  }
+  :root
+    .tag-page.entrada-cypher.admin-access
+    .tag-panel
+    .admin-access-description {
+    font-size: 13px;
+  }
+}

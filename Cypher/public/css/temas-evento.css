@@ -1,7 +1,39 @@
+.dc-event-frame {
+  container-type: inline-size;
+}
+
+.dc-event-poster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  isolation: isolate;
+}
+
 .dc-shell .dc-event-card[data-event-theme="classico"] {
   --dc-event-copy-bg: rgb(0 0 0 / 30%);
   --dc-event-text-halo: transparent;
   --dc-event-copy-color: #fff;
+  padding-top: 0;
+  overflow: hidden;
+  background-color: var(--dc-event-dark);
+  background-image: none;
+}
+
+.dc-event-card[data-event-theme="classico"] .dc-event-poster {
+  min-height: clamp(220px, 72cqi, 330px);
+  padding-top: clamp(88px, 32cqi, 160px);
+}
+
+.dc-event-card[data-event-theme="classico"] .dc-event-poster::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--dc-event-dark) var(--dc-event-photo) center 32% / cover
+    no-repeat;
+  pointer-events: none;
 }
 
 .dark .dc-shell .dc-event-card[data-event-theme="classico"] {
@@ -15,10 +47,17 @@
 }
 
 .dc-shell .dc-event-card[data-event-theme="classico"] .dc-event-body {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
   gap: 0;
-  padding: 0;
+  padding: 8px 0 0;
   border-top: 0;
   background: transparent;
+}
+
+.dc-shell .dc-event-card[data-event-theme="classico"] .dc-event-date {
+  z-index: 3;
 }
 
 .dc-event-card[data-event-theme="classico"] .dc-event-copy {
@@ -28,12 +67,25 @@
   align-items: flex-start;
   align-self: stretch;
   gap: 8px;
-  margin-top: auto;
-  padding: 16px clamp(14px, 2vw, 24px) 18px;
-  border-top: 1px solid var(--dc-line);
+  margin-top: 0;
+  padding: 0 clamp(14px, 2vw, 24px) 18px;
+  border-top: 0;
   border-radius: inherit;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.dc-event-card[data-event-theme="classico"] .dc-event-heading {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  min-width: 0;
+  padding: 11px clamp(14px, 2vw, 24px) 12px;
+  border-top: 1px solid var(--dc-line);
   background: var(--dc-event-copy-bg);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 
 .dc-event-card[data-event-theme="classico"] .dc-event-copy .dc-event-action {
@@ -54,7 +106,7 @@
     0 0 5px var(--dc-event-text-halo);
 }
 
-.dc-event-card[data-event-theme="classico"] .dc-event-copy::before {
+.dc-event-card[data-event-theme="classico"] .dc-event-heading::before {
   content: "";
   position: absolute;
   z-index: 2;
@@ -89,19 +141,18 @@
     :focus-visible,
     :focus-within
   )
-  .dc-event-copy::before {
+  .dc-event-heading::before {
   transform: scaleX(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dc-event-card[data-event-theme="classico"] .dc-event-copy::before {
+  .dc-event-card[data-event-theme="classico"] .dc-event-heading::before {
     transition: none;
   }
 }
 
 .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] {
   --cartaz-margem: clamp(10px, 2vw, 16px);
-  --cartaz-altura: clamp(198px, 27vw, 292px);
   --cartaz-tinta: #f8e9ba;
   --cartaz-texto: #100f0a;
   --cartaz-acao: #19230f;
@@ -118,7 +169,7 @@
   --cartaz-selo-contagem: #c6d68b;
   --cartaz-selo-categoria: #c8d68b;
   min-width: 0;
-  padding-top: calc(var(--cartaz-altura) + var(--cartaz-margem));
+  padding-top: 0;
   border-color: var(--cartaz-borda);
   border-radius: 2px 5px 2px 7px;
   color: var(--cartaz-texto);
@@ -163,12 +214,17 @@
   border-color: var(--dc-olive);
 }
 
-.dc-event-card[data-event-theme="cartaz-de-rua"]::before {
+.dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-poster {
+  min-height: clamp(230px, 78cqi, 340px);
+  margin: var(--cartaz-margem) var(--cartaz-margem) 0;
+  padding-top: clamp(94px, 32cqi, 166px);
+}
+
+.dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-poster::before {
   content: "";
   position: absolute;
-  inset: var(--cartaz-margem) var(--cartaz-margem) auto;
+  inset: 0;
   box-sizing: border-box;
-  height: var(--cartaz-altura);
   border: 2px solid var(--cartaz-papel);
   background:
     url("marcas-acrilico.svg") center / 208px 60px repeat,
@@ -266,22 +322,23 @@
 }
 
 .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-heading {
-  position: absolute;
-  inset: auto calc(var(--cartaz-margem) + 12px) calc(100% + 23px);
+  position: relative;
+  z-index: 1;
   display: grid;
   justify-items: start;
   gap: 8px;
+  min-width: 0;
+  padding: 0 12px 18px;
   pointer-events: none;
 }
 
 .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-type {
   max-width: 100%;
   padding: 5px 8px;
-  overflow: hidden;
+  overflow-wrap: anywhere;
   color: #252b1a;
   background: var(--cartaz-selo-categoria);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   transform: rotate(-3deg);
 }
 
@@ -323,13 +380,12 @@
 }
 
 .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-title {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
   color: var(--cartaz-tinta);
   font:
-    900 clamp(25px, 4.4vw, 53px) / 0.95 "Space Grotesk",
+    900 clamp(23px, 8cqi, 42px) / 1 "Space Grotesk",
     sans-serif;
   letter-spacing: -0.055em;
   text-shadow: 2px 3px #18140d;
@@ -404,7 +460,7 @@
   .dc-event-card[data-event-theme="cartaz-de-rua"]
   :is(.dc-event-meta, .dc-event-description) {
   color: var(--cartaz-texto);
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: "Space Grotesk", Arial, sans-serif;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.55;
@@ -415,7 +471,7 @@
 }
 
 .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-action {
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: "Space Grotesk", Arial, sans-serif;
   font-size: 13px;
   letter-spacing: 0.025em;
   min-height: 44px;
@@ -433,20 +489,17 @@
 @media (max-width: 720px) {
   .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] {
     --cartaz-margem: 7px;
-    --cartaz-altura: clamp(122px, 38vw, 165px);
-    padding-top: calc(var(--cartaz-altura) + var(--cartaz-margem));
   }
 
   .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-heading {
-    inset-inline: calc(var(--cartaz-margem) + 5px);
-    bottom: calc(100% + 17px);
     gap: 5px;
+    padding: 0 8px 12px;
   }
 
   .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-type {
-    max-width: calc(100% - 52px);
+    max-width: 100%;
     padding: 3px 5px;
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .dc-event-card[data-event-theme="cartaz-de-rua"]
@@ -456,7 +509,7 @@
   }
 
   .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-title {
-    font-size: clamp(19px, 6vw, 26px);
+    font-size: clamp(20px, 8cqi, 30px);
   }
 
   .dc-shell .dc-event-card[data-event-theme="cartaz-de-rua"] .dc-event-date {
@@ -556,3 +609,4 @@
   }
 }
 /* Cartaz enviado pelo responsável, compartilhado pela agenda e pela prévia. */
+

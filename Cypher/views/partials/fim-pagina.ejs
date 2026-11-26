@@ -1,3 +1,13 @@
+<link rel="stylesheet" href="/css/confirmacao-cypher.css">
+<dialog class="cy-confirm" id="cy-confirm" aria-labelledby="cy-confirm-title" aria-describedby="cy-confirm-message">
+  <form method="dialog">
+    <p class="cy-confirm-kicker" aria-hidden="true">CYPHER / CONFIRMAÇÃO</p>
+    <h2 id="cy-confirm-title">Confirmar ação</h2>
+    <p id="cy-confirm-message"></p>
+    <div class="cy-confirm-actions"><button value="cancelar" autofocus>Cancelar</button><button value="confirmar" class="cy-confirm-submit">Confirmar</button></div>
+  </form>
+</dialog>
+<script src="/js/confirmacao-cypher.js" defer></script>
 <button class="mobile-overlay" type="button" data-sidebar-close aria-label="Fechar menu de navegação" hidden>
 </button>
 <script src="/js/interacoes.js" defer>

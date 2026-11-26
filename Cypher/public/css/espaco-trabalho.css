@@ -18,10 +18,13 @@
 .et-page h1,
 .et-page h2,
 .et-page h3 {
-  font-family: "Space Grotesk", "DM Sans", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   color: var(--et-ink);
   line-height: 1.12;
   overflow-wrap: anywhere;
+}
+.et-page h1 {
+  font-family: "Oswald", sans-serif;
 }
 .et-page h1 {
   font-size: clamp(30px, 3.2vw, 52px);
@@ -466,3 +469,11 @@
   }
 }
 .et-workspace-links{display:flex;flex-wrap:wrap;gap:16px 24px;margin:22px 0}
+html:not(.dark) body:has(.et-sheet) :is(.sidebar .nav-label, .reputation-mini .mini-heading, .reputation-mini > p, .user-mini > div > span, .breadcrumbs > span:first-child, .et-sheet .ci-button) {
+  color: #46553e;
+}
+
+html:not(.dark) .et-sheet .ci-button {
+  color: #263222;
+  background: #eee9d7;
+}

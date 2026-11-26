@@ -53,9 +53,9 @@
 .pf-editor-intro h2 {
   margin: 14px 0 12px;
   font:
-    700 clamp(32px, 4.5vw, 58px)/1.08 "Space Grotesk",
+    700 clamp(32px, 4.5vw, 58px)/1.08 "Oswald",
     sans-serif;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .pf-handle {
@@ -90,7 +90,7 @@
   background: var(--dc-surface);
   color: var(--dc-ink);
   font:
-    700 13px/1.4 "DM Sans",
+    700 13px/1.4 "Space Grotesk",
     sans-serif !important;
   cursor: pointer;
   text-align: center;
@@ -834,9 +834,9 @@
 .pf-detail h1 {
   margin: 14px 0 20px;
   font:
-    700 clamp(28px, 4vw, 46px)/1.15 "Space Grotesk",
+    700 clamp(28px, 4vw, 46px)/1.15 "Oswald",
     sans-serif;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .pf-detail > p {

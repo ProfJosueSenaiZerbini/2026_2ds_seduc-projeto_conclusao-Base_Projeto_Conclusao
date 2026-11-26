@@ -672,3 +672,20 @@
     width: 100%;
   }
 }
+.dark .work-form .form-step,
+.dark .work-form .button-lime {
+  background: #b6e86f;
+  color: #172013;
+}
+
+html:not(.dark) .work-form :is(.optional-mark, .form-section-heading p, .profile-credit-form p, .ghost-credit-form p),
+html:not(.dark) body:has(.work-form) :is(.back-link, .page-header .eyebrow, .page-header p) {
+  color: #263222;
+}
+
+.work-form [data-vinculos-musicais] {
+  min-width: 0;
+  margin: 1rem 0 0;
+  padding: .75rem;
+  border: 1px solid var(--line);
+}

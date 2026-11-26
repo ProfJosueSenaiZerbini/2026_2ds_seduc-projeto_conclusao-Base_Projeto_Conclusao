@@ -1,10 +1,10 @@
     <div class="notification-center" data-notification-center>
-      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações<%= (quantidadeNaoLidas ?? 0) > 0 ? ', ' + quantidadeNaoLidas + ' não lida(s)' : '' %>" aria-expanded="false" aria-controls="painel-notificacoes">
         <span class="lucide-icon" aria-hidden="true">
           <%- icones.bell %>
         </span>
         <% if ((quantidadeNaoLidas ?? 0) > 0) { %>
-          <span class="notification-count" aria-label="<%= quantidadeNaoLidas %> não lida(s)">
+          <span class="notification-count" aria-hidden="true">
             <%= quantidadeNaoLidas %>
           </span>
         <% } %>
@@ -48,6 +48,6 @@
         <% } %>
       </section>
     </div>
-    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de <%= usuario.name %>" title="Perfil de <%= usuario.name %>">
+    <a class="topbar-avatar" href="/profile" aria-label="<%= usuario.initials %> · Perfil de <%= usuario.name %>" title="Perfil de <%= usuario.name %>">
       <%- include('avatar-usuario') %>
     </a>

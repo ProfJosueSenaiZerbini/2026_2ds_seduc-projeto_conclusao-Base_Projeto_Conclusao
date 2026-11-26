@@ -5,6 +5,11 @@
       <meta name="cypher-theme" content="light">
       <script>
         (() => {
+          const acessoAdmin = false;
+          if (acessoAdmin) {
+            document.documentElement.classList.add("dark");
+            return;
+          }
           localStorage.setItem("cypher-tema","dark"); const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
           let tema = temaConta === "light" ? "light" : "dark";
           try {
@@ -41,11 +46,12 @@
       </title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/css/estilos.css">
       <link rel="stylesheet" href="/css/tema-cypher-claro.css">
       <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
       
+        
         <link rel="stylesheet" href="/css/chamadas.css">
       
       <link rel="stylesheet" href="/css/tema.css">
@@ -93,9 +99,7 @@
             <span>
             </span>
           </span>
-          <span class="logo-word">
-            CYPHER
-          </span>
+          <span class="logo-word">CYPHER</span>
         </a>
         <div class="sidebar-theme">
           <nav class="entry-theme" aria-label="Aparência da página">
@@ -377,6 +381,32 @@
         </a>
       
         
+        <a class="side-link" aria-label="Mensagens" href="/messages" >
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Mensagens
+          </span>
+          
+        </a>
+      
+        
         <a class="side-link" aria-label="Colaborações" href="/colaboracoes" >
           <span class="side-icon lucide-icon" aria-hidden="true">
             
@@ -562,7 +592,7 @@
         
       </div>
 
-      <a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
+      <a class="reputation-mini reputation-link" href="/colaboracoes">
         <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true">
 <svg
   class="lucide lucide-circle"
@@ -582,8 +612,8 @@
         <div class="rep-number">—</div><p>Ainda sem avaliações</p>
       </a>
       <div class="sidebar-account-row">
-      <a class="user-mini" href="/profile" aria-label="Abrir perfil deautor">
-        <div class="avatar avatar-yellow">
+      <a class="user-mini" href="/profile" aria-label="AA · @autor · Rapper">
+        <div class="avatar avatar-yellow" aria-hidden="true">
           
 
   AA
@@ -592,7 +622,7 @@
         </div>
         <div>
           <strong>
-            autor
+            @autor
           </strong>
           <span>
             Rapper
@@ -638,27 +668,10 @@
   <div class="dc-title"><h1 id="op-titulo">Oportunidades</h1><p>Encontros profissionais que fazem a cena acontecer.</p></div>
   <div class="dc-account">
     <form class="global-search dc-search" action="/search" method="get" role="search" aria-label="Busca global" data-global-search>
-  <button class="global-search-toggle" type="button" aria-label="Abrir busca" aria-expanded="false" aria-controls="cypher-search-field" hidden>
-<svg
-  class="lucide lucide-search"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m21 21-4.34-4.34" />
-  <circle cx="11" cy="11" r="8" />
-</svg>
-</button>
-  <div class="global-search-field" id="cypher-search-field">
+  <div class="global-search-field">
     <label class="sr-only" for="cypher-global-search">Buscar na Cypher</label>
     <input id="cypher-global-search" name="q" type="search" value="" maxlength="100" placeholder="Buscar na Cypher" autocomplete="off" spellcheck="false" aria-controls="cypher-search-suggestions" aria-expanded="false">
-    <button type="submit" aria-label="Pesquisar na Cypher">
+    <button class="global-search-button" type="submit" aria-label="Pesquisar na Cypher">
 <svg
   class="lucide lucide-search"
   xmlns="http://www.w3.org/2000/svg"
@@ -684,7 +697,7 @@
 </form>
 
         <div class="notification-center" data-notification-center>
-      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+      <button class="notification-trigger" type="button" data-notification-open aria-label="Abrir notificações, 23 não lida(s)" aria-expanded="false" aria-controls="painel-notificacoes">
         <span class="lucide-icon" aria-hidden="true">
           
 <svg
@@ -705,7 +718,7 @@
 
         </span>
         
-          <span class="notification-count" aria-label="23 não lida(s)">
+          <span class="notification-count" aria-hidden="true">
             23
           </span>
         
@@ -723,64 +736,7 @@
           <div class="notification-list">
             
               <article class="notification-item notification-item-unread">
-                <a href="/messages/72b7c18b-c688-4a50-af04-6d29660dbd6a">
-                  <strong>
-                    Nova mensagem
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/ce415700-c967-48b7-80cb-7fc0589e85f4/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
-                  <strong>
-                    Proposta recebida · versão 2
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/c7b2fecd-ed77-47cd-8e90-faf97e01e763/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/8e2422e2-265e-4212-b3fd-f70f740b824c">
-                  <strong>
-                    Situação da oportunidade: cancelada
-                  </strong>
-                  <span>
-                    
-                  </span>
-                </a>
-                
-                  <form method="post" action="/notificacoes/c79c78b3-74c7-4238-abf5-a1937aa1c478/lida">
-                    <button type="submit" aria-label="Marcar como lida">
-                      Lida
-                    </button>
-                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-</form>
-                
-              </article>
-            
-              <article class="notification-item notification-item-unread">
-                <a href="/opportunities/applications/71216b67-4893-4a84-92d4-83e57886045f">
+                <a href="/opportunities/applications/1a2cb7b1-09fe-4712-a552-ff27cf222d95">
                   <strong>
                     Acordo confirmado pelas duas partes
                   </strong>
@@ -789,7 +745,7 @@
                   </span>
                 </a>
                 
-                  <form method="post" action="/notificacoes/c2f33663-0f80-488c-b0bb-e9829db69a15/lida">
+                  <form method="post" action="/notificacoes/f1db3d69-d6a6-47c9-a551-09cc37e9cfe6/lida">
                     <button type="submit" aria-label="Marcar como lida">
                       Lida
                     </button>
@@ -799,7 +755,45 @@
               </article>
             
               <article class="notification-item notification-item-unread">
-                <a href="/opportunities/1bcd08c2-ab8a-491f-a5ae-6170ff1e1916">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Situação da oportunidade: aberta
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/da7de524-e45b-4a3f-99a3-47ad97234c99/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Condições da oportunidade atualizadas
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/c932e97b-795f-419e-9789-d0961f150941/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
                   <strong>
                     Nova candidatura recebida
                   </strong>
@@ -808,7 +802,26 @@
                   </span>
                 </a>
                 
-                  <form method="post" action="/notificacoes/a95a8dbc-e1ee-40c8-8579-eecc5a884345/lida">
+                  <form method="post" action="/notificacoes/bb8d774e-4cb6-4de4-b81c-179d7289eee8/lida">
+                    <button type="submit" aria-label="Marcar como lida">
+                      Lida
+                    </button>
+                  <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+</form>
+                
+              </article>
+            
+              <article class="notification-item notification-item-unread">
+                <a href="/opportunities/6b49b8fb-5378-4bd2-8173-b026faf713ae">
+                  <strong>
+                    Situação da oportunidade: pausada
+                  </strong>
+                  <span>
+                    
+                  </span>
+                </a>
+                
+                  <form method="post" action="/notificacoes/af94857d-1d7f-4c49-893e-c7272d16a160/lida">
                     <button type="submit" aria-label="Marcar como lida">
                       Lida
                     </button>
@@ -821,7 +834,7 @@
         
       </section>
     </div>
-    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de autor" title="Perfil de autor">
+    <a class="topbar-avatar" href="/profile" aria-label="AA · Perfil de @autor" title="Perfil de @autor">
       
 
   AA
@@ -843,12 +856,12 @@
  
  
  <a class="op-text-link" href="/opportunities">Voltar às oportunidades</a>
-<header class="op-detail-heading"><div><span class="op-eyebrow">Prestação de serviço</span><h2>Produção de um lançamento</h2><p>Por <strong>autor</strong> · Rapper</p><a class="op-text-link" href="/p/autor">Ver perfil e portfólio público</a></div><span class="op-state" data-state="aberta">Aberta</span></header>
+<header class="op-detail-heading"><div><span class="op-eyebrow">Prestação de serviço</span><h2>Produção de um lançamento</h2><p>Por <strong>@autor</strong> · Rapper</p><a class="op-text-link" href="/p/autor">Ver perfil e portfólio público</a></div><span class="op-state" data-state="aberta">Aberta</span></header>
 
 
-  <div class="ci-actions" aria-label="Interações com Produção de um lançamento">
+  <div class="ci-actions" role="group" aria-label="Interações com Produção de um lançamento">
     
-      <form method="post" action="/interacoes/oportunidade/52312ac7-c7da-41fc-b204-8ae744d160d6/curtir" data-ci-action="curtir" data-ci-name="Produção de um lançamento">
+      <form method="post" action="/interacoes/oportunidade/e3b60059-a722-4196-91a3-d5d16ebd16be/curtir" data-ci-action="curtir" data-ci-name="Produção de um lançamento">
         <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
         <input type="hidden" name="ativo" value="sim">
         <button class="ci-button ci-crown" type="submit" aria-pressed="false" aria-label="Curtir Produção de um lançamento, 0 curtidas">
@@ -863,7 +876,7 @@
     
     
     
-      <form method="post" action="/interacoes/oportunidade/52312ac7-c7da-41fc-b204-8ae744d160d6/salvar" data-ci-action="salvar">
+      <form method="post" action="/interacoes/oportunidade/e3b60059-a722-4196-91a3-d5d16ebd16be/salvar" data-ci-action="salvar">
         <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
         <input type="hidden" name="ativo" value="sim">
         
@@ -880,19 +893,19 @@
       </form>
     
     
-      <button class="ci-button ci-comment-trigger" type="button" data-ci-open="/interacoes/oportunidade/52312ac7-c7da-41fc-b204-8ae744d160d6" data-ci-name="Produção de um lançamento" aria-label="Comentários em Produção de um lançamento" aria-haspopup="dialog" title="Comentários"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></button>
+      <button class="ci-button ci-comment-trigger" type="button" data-ci-open="/interacoes/oportunidade/e3b60059-a722-4196-91a3-d5d16ebd16be" data-ci-name="Produção de um lançamento" aria-label="Comentários em Produção de um lançamento" aria-haspopup="dialog" title="Comentários"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></button>
     
   </div>
 
-<a class="op-text-link" href="/suporte/new?objeto_tipo=oportunidade&amp;objeto_id=52312ac7-c7da-41fc-b204-8ae744d160d6">Denunciar esta chamada</a>
+<a class="op-text-link" href="/suporte/new?objeto_tipo=oportunidade&amp;objeto_id=e3b60059-a722-4196-91a3-d5d16ebd16be">Denunciar esta chamada</a>
 <div class="op-detail-grid"><div class="op-stack"><section class="op-panel"><h3>Sobre a chamada</h3><p class="op-prose">Procuro profissional para um projeto autoral.</p><h4>Contexto</h4><p class="op-prose">Projeto real da equipe</p></section>
 <section class="op-panel"><h3>Funções e vagas</h3><div class="op-function"><div class="op-results-heading"><h4>Rapper</h4><span class="op-count">2 de 2 vagas livres</span></div><h5>Responsabilidades</h5><p class="op-prose">Gravar versos</p><h5>Requisitos obrigatórios</h5><p class="op-prose">Gravação própria</p><h5>Desejáveis</h5><p class="op-prose">Experiência em estúdio</p></div></section>
 <section class="op-panel"><h3>Condições adicionais</h3><p class="op-prose">Entrega em duas etapas</p></section>
-<section class="op-panel"><h3>Candidaturas recebidas <span class="op-count">1</span></h3><div class="op-rows"><a href="/opportunities/applications/561a4b46-4872-4416-a377-cf7331a6d9a7"><div><strong>candidato</strong><small>Rapper</small></div><span>Retirada</span></a></div></section>
-<details class="op-panel"><summary>Histórico da oportunidade</summary><ol class="op-history"><li>criacao · 24/11/2026</li><li>candidatura · 24/11/2026</li><li>decisao candidatura · 24/11/2026</li></ol></details>
-</div><aside class="op-stack"><section class="op-panel op-conditions"><h3>Condições da chamada</h3><dl class="op-facts"><div><dt>Modalidade</dt><dd>Remoto</dd></div><div><dt>Remuneração</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>0 ocupadas / 2 totais</dd></div><div><dt>Prazo de candidatura</dt><dd>Sem prazo definido</dd></div><div><dt>Publicação</dt><dd>24/11/2026</dd></div></dl>
+<section class="op-panel"><h3>Candidaturas recebidas <span class="op-count">1</span></h3><div class="op-rows"><a href="/opportunities/applications/2db8ff8e-3046-48ba-afbb-440910fb3501"><div><strong>@candidato</strong><small>Rapper</small></div><span>Retirada</span></a></div></section>
+<details class="op-panel"><summary>Histórico da oportunidade</summary><ol class="op-history"><li>criacao · 26/11/2026</li><li>candidatura · 26/11/2026</li><li>decisao candidatura · 26/11/2026</li></ol></details>
+</div><aside class="op-stack"><section class="op-panel op-conditions"><h3>Condições da chamada</h3><dl class="op-facts"><div><dt>Modalidade</dt><dd>Remoto</dd></div><div><dt>Remuneração</dt><dd>R$ 1.500,00 / projeto</dd></div><div><dt>Vagas</dt><dd>0 ocupadas / 2 totais</dd></div><div><dt>Prazo de candidatura</dt><dd>Sem prazo definido</dd></div><div><dt>Publicação</dt><dd>26/11/2026</dd></div></dl>
 </section>
-<section class="op-panel"><h3>Gerenciar chamada</h3><a class="op-button" href="/opportunities/52312ac7-c7da-41fc-b204-8ae744d160d6/edit">Editar informações</a><form method="post" action="/opportunities/52312ac7-c7da-41fc-b204-8ae744d160d6/state" data-confirm="Confirmar a alteração de situação? Candidaturas e acordos anteriores serão preservados."><input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><label>Alterar situação<select name="estado"><option value="pausada">Pausada</option><option value="encerrada">Encerrada</option><option value="cancelada">Cancelada</option></select></label><button class="op-button">Confirmar mudança</button></form></section>
+<section class="op-panel"><h3>Gerenciar chamada</h3><a class="op-button" href="/opportunities/e3b60059-a722-4196-91a3-d5d16ebd16be/edit">Editar informações</a><form method="post" action="/opportunities/e3b60059-a722-4196-91a3-d5d16ebd16be/state" data-confirm="Confirmar a alteração de situação? Candidaturas e acordos anteriores serão preservados."><input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><label>Alterar situação<select name="estado"><option value="pausada">Pausada</option><option value="encerrada">Encerrada</option><option value="cancelada">Cancelada</option></select></label><button class="op-button">Confirmar mudança</button></form></section>
 
 </aside></div>
 
@@ -1023,6 +1036,16 @@
 
 </div>
 <script src="/js/chamadas.js" defer></script>
+<link rel="stylesheet" href="/css/confirmacao-cypher.css">
+<dialog class="cy-confirm" id="cy-confirm" aria-labelledby="cy-confirm-title" aria-describedby="cy-confirm-message">
+  <form method="dialog">
+    <p class="cy-confirm-kicker" aria-hidden="true">CYPHER / CONFIRMAÇÃO</p>
+    <h2 id="cy-confirm-title">Confirmar ação</h2>
+    <p id="cy-confirm-message"></p>
+    <div class="cy-confirm-actions"><button value="cancelar" autofocus>Cancelar</button><button value="confirmar" class="cy-confirm-submit">Confirmar</button></div>
+  </form>
+</dialog>
+<script src="/js/confirmacao-cypher.js" defer></script>
 <button class="mobile-overlay" type="button" data-sidebar-close aria-label="Fechar menu de navegação" hidden>
 </button>
 <script src="/js/interacoes.js" defer>

@@ -1,0 +1,18 @@
+<%- include('../partials/inicio-trabalhos', { breadcrumb: title }) %>
+<header class="sp-heading"><div><span class="sp-eyebrow">CADASTRO E CURADORIA</span><h1><%= title %></h1><p>Confira se a publicação contém as gravações listadas e se a data corresponde à disponibilização.</p></div></header>
+<p class="admin-queue-count"><%= itens.length %> <%= itens.length === 1 ? "evidência na fila" : "evidências na fila" %></p>
+<% if (!itens.length) { %><p class="admin-empty-work">Nenhuma evidência aguarda análise.</p><% } %>
+<% for (const item of itens) { %>
+  <article class="sp-panel">
+    <h2><%= item.titulo %></h2>
+    <p><%= item.formato %> · <%= item.nome %> · <%= item.data_factual.split('-').reverse().join('/') %></p>
+    <ol><% for (const faixa of item.faixas) { %><li><%= faixa.titulo %></li><% } %></ol>
+    <p><a href="<%= item.url %>" rel="noopener noreferrer" target="_blank">Conferir publicação em <%= new URL(item.url).hostname %> (nova aba)</a></p>
+    <form class="admin-decision-actions" method="post" action="/admin/lancamentos/<%= encodeURIComponent(item.id) %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="sp-button sp-primary" name="decisao" value="confirmada">Confirmar evidência</button>
+      <button class="sp-button" name="decisao" value="recusada">Recusar evidência</button>
+    </form>
+  </article>
+<% } %>
+<%- include('../partials/fim-trabalhos') %>

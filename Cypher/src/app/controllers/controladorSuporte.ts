@@ -74,7 +74,7 @@ export const recorrer: Acao = (req, res) =>
     "/suporte/" + m.recorrerSolicitacao(uid(res), req.params.id!, req.body)
   );
 export const fila: Acao = (req, res) =>
-  render(req, res, "fila", { itens: m.filaModeracao(uid(res), req.query) });
+  render(req, res, "fila", { itens: m.filaModeracao(uid(res), req.query), filtroEstado: typeof req.query.estado === "string" ? req.query.estado : "" });
 export const caso: Acao = (req, res) =>
   render(req, res, "caso", {
     c: m.casoModeracao(uid(res), req.params.id!),

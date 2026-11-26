@@ -1,31 +1,46 @@
-<section class="profile-edit-panel profile-edit-workspace card-surface" id="editar-perfil" aria-labelledby="profile-edit-title" data-profile-editor data-default-section="<%= secaoEdicao %>">
+<section class="profile-edit-panel profile-edit-workspace" id="editar-perfil" aria-labelledby="profile-edit-title" data-profile-editor data-default-section="<%= secaoEdicao %>">
   <header class="profile-edit-heading">
     <div>
-      <div class="eyebrow">ESPAÇO PROFISSIONAL · CYPHER</div>
+      <div class="eyebrow">SEU ESPAÇO NA CENA</div>
       <h2 id="profile-edit-title">Editar perfil</h2>
-      <p>Organize sua presença na cena. Cada área salva separadamente e mantém os dados das demais.</p>
+      <p>Sua identidade, seu trabalho, suas conexões. Deixe seu perfil com a sua assinatura.</p>
     </div>
-    <a class="button button-outline profile-edit-cancel" href="/profile">Voltar ao perfil</a>
+    <a class="button button-outline profile-edit-cancel" href="/profile"><span aria-hidden="true"><%- icones.user %></span>Voltar ao perfil</a>
   </header>
 
-  <nav class="profile-edit-navigation" aria-label="Áreas de edição do perfil" role="tablist" data-profile-edit-nav>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-pessoal" aria-controls="edit-panel-pessoal" data-profile-edit-tab="pessoal">Informações pessoais</button>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-identidade" aria-controls="edit-panel-identidade" data-profile-edit-tab="identidade">Identidade pública</button>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-profissional" aria-controls="edit-panel-profissional" data-profile-edit-tab="profissional">Atuação profissional</button>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-portfolio" aria-controls="edit-panel-portfolio" data-profile-edit-tab="portfolio">Portfólio e experiência</button>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-privacidade" aria-controls="edit-panel-privacidade" data-profile-edit-tab="privacidade">Privacidade e contato</button>
-    <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-conta" aria-controls="edit-panel-conta" data-profile-edit-tab="conta">Conta e segurança</button>
-  </nav>
-  <p class="profile-edit-draft-status" data-profile-draft-status role="status" hidden></p>
-
-  <div class="profile-edit-panels">
-    <section class="profile-edit-section" id="edit-panel-pessoal" role="tabpanel" aria-labelledby="edit-tab-pessoal" data-profile-edit-panel="pessoal"<%= secaoEdicao === 'pessoal' ? '' : ' hidden' %>>
+  <div class="profile-edit-layout">
+    <aside class="profile-edit-sidebar">
+      <p class="profile-edit-nav-label">PERSONALIZE SEU PERFIL</p>
+      <nav class="profile-edit-navigation" aria-label="Áreas de edição do perfil" role="tablist" aria-orientation="vertical" data-profile-edit-nav>
+        <% const areasEdicao = [
+          ['pessoal', 'Informações pessoais', 'Bio, localização e imagens', 'user'],
+          ['identidade', 'Identidade pública', 'Nome, vulgo e selo', 'badgeCheck'],
+          ['profissional', 'Atuação profissional', 'Categorias e habilidades', 'briefcase'],
+          ['portfolio', 'Portfólio e experiência', 'Trabalhos e participações', 'disc'],
+          ['privacidade', 'Privacidade e contato', 'Escolha o que compartilhar', 'eye'],
+          ['conta', 'Conta e segurança', 'Acesso e configurações', 'shieldCheck']
+        ]; areasEdicao.forEach(([id, tituloArea, descricaoArea, iconeArea]) => { %>
+          <button type="button" class="profile-edit-tab" role="tab" id="edit-tab-<%= id %>" aria-controls="edit-panel-<%= id %>" aria-selected="<%= secaoEdicao === id %>" tabindex="<%= secaoEdicao === id ? 0 : -1 %>" data-profile-edit-tab="<%= id %>">
+            <span class="profile-edit-tab-icon" aria-hidden="true"><%- icones[iconeArea] %></span>
+            <span class="profile-edit-tab-copy"><strong data-profile-tab-label><%= tituloArea %></strong><small><%= descricaoArea %></small></span>
+          </button>
+        <% }) %>
+      </nav>
+      <p class="profile-edit-save-tip"><span aria-hidden="true"><%- icones.shieldCheck %></span><span>No seu ritmo.<small>Alterne entre as áreas sem perder o que digitou. Salve cada formulário antes de sair.</small></span></p>
+    </aside>
+    <div class="profile-edit-panels">
+      <p class="profile-edit-draft-status" data-profile-draft-status role="status" hidden></p>
+    <section class="profile-edit-section" id="edit-panel-pessoal" role="tabpanel" tabindex="0" aria-labelledby="edit-tab-pessoal" data-profile-edit-panel="pessoal"<%= secaoEdicao === 'pessoal' ? '' : ' hidden' %>>
       <div class="profile-edit-section-heading">
         <div class="eyebrow">IDENTIDADE E APRESENTAÇÃO</div>
         <h3>Informações pessoais</h3>
         <p>Atualize a biografia e a localização do seu perfil.</p>
       </div>
-      <a class="text-link" href="/publicacoes/perfil/<%= encodeURIComponent(usuario.id) %>/midias">Gerenciar foto e capa</a>
+      <a class="profile-edit-media" href="/publicacoes/perfil/<%= encodeURIComponent(usuario.id) %>/midias">
+        <span class="profile-edit-avatar" aria-hidden="true"><%= usuario.initials.slice(0, 2) %></span>
+        <span><strong>Sua imagem na Cypher</strong><small>Personalize a foto e a capa do seu perfil.</small><span class="profile-edit-media-link">Gerenciar foto e capa</span></span>
+        <span class="profile-edit-media-icon" aria-hidden="true"><%- icones.camera %></span>
+      </a>
       <form method="post" action="/profile/secoes/pessoal" class="profile-edit-form" data-profile-section-form data-profile-section="pessoal">
           <label>
             Cidade e estado
@@ -34,7 +49,8 @@
           </label>
         <label>
           Biografia
-          <textarea name="biografia" maxlength="500" rows="5" placeholder="Conte um pouco sobre sua trajetória e seu trabalho"><%= valores.biografia %></textarea>
+          <textarea name="biografia" maxlength="500" rows="5" aria-describedby="profile-bio-help profile-bio-count" placeholder="Conte um pouco sobre sua trajetória, suas referências e o que você cria." data-profile-bio><%= valores.biografia %></textarea>
+          <span class="profile-edit-field-foot"><small id="profile-bio-help">Apresente sua trajetória para quem chega ao seu perfil.</small><small id="profile-bio-count" data-profile-bio-count><%= (valores.biografia || '').length %>/500</small></span>
         </label>
         <div class="profile-edit-actions">
           <button class="button button-lime" type="submit">Salvar informações pessoais</button>
@@ -44,10 +60,10 @@
     </section>
 
     <section class="profile-edit-section" id="edit-panel-identidade" role="tabpanel" aria-labelledby="edit-tab-identidade" data-profile-edit-panel="identidade"<%= secaoEdicao === 'identidade' ? '' : ' hidden' %>>
-      <h3>Identidade pública</h3><p>Gerencie seu nome completo, vulgo e identificador @.</p>
+      <div class="profile-edit-section-heading"><div class="eyebrow">SUA ASSINATURA</div><h3>Identidade pública</h3><p>Defina como você é reconhecido na cena: nome, vulgo e selo profissional.</p></div>
       <%- include('formulario-identidade',{usuario, retornoPerfil:true}) %>
       <%- include('perfil-editor-selo') %>
-      <p><a href="/settings#identidade">Gerenciar identificador @ e histórico</a></p>
+      <a class="text-link" href="/settings#identidade">Gerenciar identificador @ e histórico</a>
     </section>
     <section class="profile-edit-section" id="edit-panel-profissional" role="tabpanel" aria-labelledby="edit-tab-profissional" data-profile-edit-panel="profissional"<%= secaoEdicao === 'profissional' ? '' : ' hidden' %>>
       <div class="profile-edit-section-heading">
@@ -73,7 +89,7 @@
             <% }) %>
           </div>
           <div class="professional-category-browser" data-category-browser hidden>
-            <button type="button" class="professional-category-back" data-category-back-to-areas>← Escolher outra área</button>
+            <button type="button" class="professional-category-back" data-category-back-to-areas>Escolher outra área</button>
             <div class="professional-catalog-groups profile-category-grid">
             <% gruposProfissionais.forEach(grupo => { %>
               <section class="professional-catalog-group" data-professional-group="<%= grupo.id %>" data-category-area-panel="<%= grupo.id %>" hidden>
@@ -322,7 +338,7 @@
 </form>
       <div class="profile-privacy-card">
         <h4>Preferências de visibilidade</h4>
-        <p>Estas preferências são aplicadas pelo servidor na página pública. A visibilidade de cada resposta profissional é configurada separadamente em Atuação profissional.</p>
+        <p>Escolha o que aparece no seu perfil público. Para controlar as respostas de cada categoria, acesse Atuação profissional.</p>
         <%- include('preferencias-privacidade-perfil', { usuario, retornoPerfil: true }) %>
       </div>
       <a class="text-link" href="/settings#privacidade">Abrir todas as configurações</a>
@@ -343,5 +359,6 @@
         <a class="settings-link-row" href="/settings#conta-seguranca"><span><strong>Encerramento de conta</strong><small>Exclusão exige senha atual e confirmação explícita.</small></span><span aria-hidden="true">↗</span></a>
       </div>
     </section>
+  </div>
   </div>
 </section>

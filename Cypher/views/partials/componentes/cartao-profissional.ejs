@@ -1,16 +1,29 @@
-<% const foto = imagemPerfilDemo(perfil.handle); %>
-<a class="cy-profile-card" href="<%= perfil.url %>">
-  <span class="cy-profile-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-  <span class="cy-profile-portrait" aria-hidden="true">
-    <% if (foto) { %><img src="/img/<%= foto %>" alt="" loading="lazy" decoding="async">
-    <% } else { %><%= perfil.iniciais %><% } %>
-  </span>
-  <strong class="cy-profile-name"><%= perfil.nome %></strong>
-  <span class="cy-profile-role"><%= perfil.funcao %></span>
-  <% if (perfil.local || perfil.status || perfil.detalhes.length) { %>
-    <span class="cy-profile-info">
-      <span><%= [perfil.local, foto ? '' : perfil.status, ...perfil.detalhes.slice(0, 2)].filter(Boolean).join(' · ') %></span>
-    </span>
+<%
+  const fotoDemonstrativa = imagemPerfilDemo(perfil.handle);
+  const fotoEnviada = typeof capaUsuario === 'function' ? capaUsuario('perfil', perfil.id) : '';
+  const foto = fotoEnviada || (fotoDemonstrativa ? '/img/' + fotoDemonstrativa : '');
+  const profissoes = perfil.profissoes ?? [];
+  const mostrarHandle = perfil.handle && perfil.handle !== perfil.nome;
+  const detalhes = [perfil.local, ...perfil.detalhes.slice(0, 2)].filter(Boolean);
+%>
+<article class="cy-profile-card">
+  <% if (foto) { %>
+    <span class="cy-profile-backdrop" aria-hidden="true"><img src="<%= foto %>" alt="" loading="lazy" decoding="async"></span>
   <% } %>
-  <span class="cy-profile-action">Ver perfil <span aria-hidden="true"><%- icones.arrowUpRight %></span></span>
-</a>
+  <a class="cy-profile-link" href="<%= perfil.url %>">
+    <span class="cy-profile-portrait" aria-hidden="true">
+      <% if (foto) { %><img src="<%= foto %>" alt="" loading="lazy" decoding="async">
+      <% } else { %><%= perfil.iniciais %><% } %>
+    </span>
+    <strong class="cy-profile-name"><%= perfil.nome %></strong>
+  </a>
+  <% if (profissoes.length) { %>
+    <span class="cy-profile-role"><%= profissoes.slice(0, 2).join(', ') %><% if (profissoes.length > 2) { %>, <a class="cy-profile-more" href="<%= perfil.url %>?aba=atuacao#conteudo-perfil" aria-label="Ver todas as atuações de <%= perfil.nome %>">...</a><% } %></span>
+  <% } %>
+  <% if (mostrarHandle || detalhes.length) { %><div class="cy-profile-info">
+    <div class="cy-profile-info-content">
+      <% if (mostrarHandle) { %><span class="cy-profile-handle"><%= perfil.handle %></span><% } %>
+      <% if (detalhes.length) { %><span><%= detalhes.join(' · ') %></span><% } %>
+    </div>
+  </div><% } %>
+</article>

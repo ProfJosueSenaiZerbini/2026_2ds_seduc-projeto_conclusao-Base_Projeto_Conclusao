@@ -1,148 +1,117 @@
 <% if (usuario.tipoConta === 'administrativo') { %>
-<%- include('navegacao-administrativa',{path,usuario}) %>
-<% } else { %>
-<aside class="sidebar" id="navegacao-principal">
+  <%- include('navegacao-administrativa', { path, usuario }) %>
+<% } else {
+  const profissionalSidebar = usuario.tipoConta === 'profissional' && !usuario.demonstracao;
+  const criacoesSidebar = profissionalSidebar ? acoesCriacaoSidebar(usuario) : [];
+  const principal = [
+    { href: '/dashboard', label: 'Descoberta', icon: 'house' },
+    { href: '/search', label: 'Busca', icon: 'search' },
+    { href: '/messages', label: 'Mensagens', icon: 'messageCircle' },
+    { href: '/notificacoes', label: 'Notificações', icon: 'bell', count: typeof quantidadeNaoLidas !== 'undefined' ? quantidadeNaoLidas : 0 },
+    { href: '/profile', label: 'Meu perfil', icon: 'user', avatar: true },
+  ];
+  const explorar = [
+    { href: '/works', label: 'Obras', icon: 'music' },
+    { href: '/beats', label: 'Banco de Beats', icon: 'headphones' },
+    { href: '/work-projects', label: 'Trabalhos e galerias', icon: 'brush' },
+    { href: '/events', label: 'Eventos', icon: 'calendarDays' },
+    { href: '/opportunities', label: 'Oportunidades', icon: 'briefcase' },
+  ];
+  const gruposMais = [
+    { nome: 'Seu acervo', links: [
+      ...(typeof interacao === 'function' ? [{ href: '/colecoes', label: 'Minha coleção', icon: 'listChecks' }] : []),
+      { href: '/purchases', label: 'Minhas compras', icon: 'headphones' },
+    ] },
+    { nome: 'Na Cypher', links: [
+      { href: '/central', label: 'Cypher Central', icon: 'lightbulb' },
+      { href: '/suporte', label: 'Falar com a Cypher', icon: 'circleHelp' },
+      ...(usuario.ehAdministrador ? [{ href: '/admin/revisao', label: 'Administrador', icon: 'shieldCheck' }] : []),
+    ] },
+    { nome: 'Sua conta', links: [{ href: '/settings', label: 'Configurações', icon: 'settings' }] },
+  ];
+  const rotaSidebar = (typeof caminhoNavegacao === 'string' ? caminhoNavegacao : path).split('?')[0];
+  const linkAtivoSidebar = href => rotaSidebar === href ||
+    (href === '/dashboard' && rotaSidebar === '/') ||
+    (rotaSidebar.startsWith(href + '/') && !criacoesSidebar.some(acao => rotaSidebar === acao.base + '/new')) ||
+    (href === '/opportunities' && ['/my-opportunities', '/my-applications'].includes(rotaSidebar));
+  const maisAtivo = gruposMais.some(grupo => grupo.links.some(link => linkAtivoSidebar(link.href)));
+%>
+<aside class="sidebar sidebar-organized" id="navegacao-principal">
   <div class="sidebar-scroll">
     <div class="sidebar-top">
       <div class="sidebar-brand-row">
         <a class="logo logo-compact" href="/dashboard" aria-label="Cypher — início">
           <span class="discovery-rail-mark" hidden aria-hidden="true"><%- icones.crown %></span>
-          <span class="logo-mark" aria-hidden="true">
-            <span>
-            </span>
-            <span>
-            </span>
-            <span>
-            </span>
-          </span>
-          <span class="logo-word">
-            CYPHER
-          </span>
+          <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="logo-word">CYPHER</span>
         </a>
-        <div class="sidebar-theme">
-          <%- include('componentes/tema-entrada') %>
-        </div>
         <button class="icon-button mobile-close" type="button" data-sidebar-close aria-label="Fechar menu">
-          <span class="lucide-icon" aria-hidden="true">
-            <%- icones.x %>
-          </span>
+          <span class="lucide-icon" aria-hidden="true"><%- icones.x %></span>
         </button>
       </div>
     </div>
     <nav class="side-nav" aria-label="Navegação principal">
-      <div class="nav-label">
-        WORKSPACE
+      <div class="sidebar-nav-group" role="group" aria-label="Seu dia a dia">
+        <% principal.forEach(link => { %>
+          <%- include('componentes/link-sidebar', { link, ativo: linkAtivoSidebar(link.href) }) %>
+        <% }) %>
       </div>
-      <% const links = [
-        { href: '/dashboard', label: 'Descoberta', icon: icones.house },
-        ...(usuario.tipoConta === 'profissional' && !usuario.demonstracao ? [{ href: '/espaco-de-trabalho', label: 'Espaço de Trabalho', icon: icones.briefcase }] : []),
-        { href: '/works', label: 'Obras', icon: icones.music },
-        { href: '/work-projects', label: 'Trabalhos e galerias', icon: icones.brush },
-        { href: '/beats', label: 'Banco de Beats', icon: icones.headphones },
-        { href: '/events', label: 'Eventos', icon: icones.calendarDays },
-        { href: '/opportunities', label: 'Oportunidades', icon: icones.briefcase },
-        ...(usuario.tipoConta === 'profissional' && !usuario.demonstracao ? [{href:'/colaboracoes',label:'Colaborações',icon:icones.users}] : []),
-      ]; %>
-      <% links.forEach(link => { %>
-        <% const ativo = path === link.href || (link.href === '/dashboard' && path === '/') || (link.href === '/works' && path.startsWith('/works/')) || (link.href === '/work-projects' && path.startsWith('/work-projects/')) || (link.href === '/colaboracoes' && path.startsWith('/colaboracoes/')); %>
-        <a class="side-link<%= ativo ? ' active' : '' %>" aria-label="<%= link.label %>" href="<%= link.href %>" <%- ativo ? 'aria-current="page"' : '' %>>
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- link.icon %>
-          </span>
-          <span class="side-link-label">
-            <%= link.label %>
-          </span>
-          <% if (link.count) { %>
-            <b>
-              <%= link.count %>
-            </b>
+      <div class="sidebar-nav-group" role="group" aria-labelledby="sidebar-explorar">
+        <h2 class="nav-label" id="sidebar-explorar">Explorar a cena</h2>
+        <% explorar.forEach(link => { %>
+          <%- include('componentes/link-sidebar', { link, ativo: linkAtivoSidebar(link.href) }) %>
+        <% }) %>
+      </div>
+      <% if (profissionalSidebar) { %>
+        <div class="sidebar-nav-group" role="group" aria-labelledby="sidebar-trabalho">
+          <h2 class="nav-label" id="sidebar-trabalho">Seu trabalho</h2>
+          <% [
+            { href: '/espaco-de-trabalho', label: 'Espaço de Trabalho', icon: 'briefcase' },
+            { href: '/colaboracoes', label: 'Colaborações', icon: 'users' },
+          ].forEach(link => { %>
+            <%- include('componentes/link-sidebar', { link, ativo: linkAtivoSidebar(link.href) }) %>
+          <% }) %>
+          <% if (criacoesSidebar.length) { %>
+            <details class="sidebar-create" <%= criacoesSidebar.some(acao => rotaSidebar === acao.base + '/new') ? 'open' : '' %>>
+              <summary class="side-link" aria-label="Criar novo">
+                <span class="side-icon lucide-icon" aria-hidden="true"><%- icones.plus %></span>
+                <span class="side-link-label">Criar novo</span>
+                <span class="sidebar-chevron lucide-icon" aria-hidden="true"><%- icones.chevronDown %></span>
+              </summary>
+              <div class="sidebar-create-links">
+                <% criacoesSidebar.forEach(acao => { %>
+                  <%- include('componentes/link-sidebar', { link: { href: acao.base + '/new', label: acao.nome, icon: acao.icone }, ativo: rotaSidebar === acao.base + '/new' }) %>
+                <% }) %>
+              </div>
+            </details>
           <% } %>
-        </a>
-      <% }) %>
+        </div>
+      <% } %>
     </nav>
     <div class="sidebar-bottom">
-      <div class="resource-links" id="recursos-menu" popover="manual" aria-label="Opções da conta" hidden>
-        <a class="side-link<%= path === '/profile' ? ' active' : '' %>" href="/profile">
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- icones.user %>
-          </span>
-          <span class="side-link-label">
-            Meu perfil
-          </span>
-        </a>
-        <a class="side-link<%= path === '/settings' ? ' active' : '' %>" href="/settings">
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- icones.settings %>
-          </span>
-          <span class="side-link-label">
-            Configurações
-          </span>
-        </a>
-<a class="side-link" href="/suporte"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.circleHelp %></span><span class="side-link-label">Falar com a Cypher</span></a>
-        <a class="side-link<%= path === '/purchases' ? ' active' : '' %>" href="/purchases"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.headphones %></span><span class="side-link-label">Minhas Compras</span></a>
-        <a class="side-link<%= path === '/central' ? ' active' : '' %>" href="/central">
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- icones.lightbulb %>
-          </span>
-          <span class="side-link-label">
-            Cypher Central
-          </span>
-        </a>
-        <% if (typeof interacao === 'function') { %>
-          <a class="side-link<%= path === '/colecoes' ? ' active' : '' %>" href="/colecoes">
-            <span class="side-icon lucide-icon" aria-hidden="true"><%- icones.listChecks %></span>
-            <span class="side-link-label">Minha coleção</span>
-          </a>
-        <% } %>
-        <a class="side-link<%= path === '/notificacoes' ? ' active' : '' %>" href="/notificacoes">
-          <span class="side-icon lucide-icon" aria-hidden="true">
-            <%- icones.bell %>
-          </span>
-          <span class="side-link-label">
-            Notificações
-          </span>
-        </a>
-        <% if (usuario.ehAdministrador) { %>
-          <a class="side-link<%= path.startsWith('/admin/revisao') ? ' active' : '' %>" href="/admin/revisao">
-            <span class="side-icon lucide-icon" aria-hidden="true">
-              <%- icones.shieldCheck %>
-            </span>
-            <span class="side-link-label">
-              Administrador
-            </span>
-          </a>
-        <% } %>
-      </div>
-
-      <% if (usuario.tipoConta === 'profissional') { const rep = typeof resumoReputacao==='function'?resumoReputacao(usuario.id):{media:null,estado:'Ainda sem avaliações'}; %><a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
-        <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true"><%- icones.badgeCheck %></span></div>
-        <div class="rep-number"><%= rep.media===null?'—':rep.media.toFixed(1).replace('.',',') %><% if(rep.media!==null){ %><span>/ 5</span><% } %></div><p><%= rep.estado %></p>
-      </a>
-      <% } %><div class="sidebar-account-row">
-      <a class="user-mini" href="/profile" aria-label="Abrir perfil de<%= usuario.name %>">
-        <div class="avatar avatar-yellow">
-          <%- include('componentes/avatar-usuario') %>
-        </div>
-        <div>
-          <strong>
-            <%= usuario.name %>
-          </strong>
-          <span>
-            <%= usuario.role %>
-          </span>
-        </div>
-      </a>
-      <div class="sidebar-options">
-        <input type="checkbox" id="sidebar-options-checkbox" class="sidebar-options-checkbox" aria-label="Opções da conta" aria-controls="recursos-menu" aria-expanded="false">
-        <label for="sidebar-options-checkbox" class="sidebar-options-toggle" title="Opções da conta">
-          <span class="sidebar-options-bar" aria-hidden="true"></span>
-          <span class="sidebar-options-bar" aria-hidden="true"></span>
-          <span class="sidebar-options-bar" aria-hidden="true"></span>
-        </label>
-      </div>
+      <button class="side-link sidebar-more<%= maisAtivo ? ' active' : '' %>" type="button" data-sidebar-more aria-label="Mais opções" aria-controls="recursos-menu" aria-expanded="false">
+        <span class="side-icon lucide-icon" aria-hidden="true"><%- icones.menu %></span>
+        <span class="side-link-label">Mais</span>
+      </button>
+      <div class="resource-links" id="recursos-menu" popover="manual" aria-label="Mais opções da Cypher" hidden>
+        <% gruposMais.forEach(grupo => { %>
+          <section class="sidebar-resource-group" aria-label="<%= grupo.nome %>">
+            <h2 class="sidebar-resource-title"><%= grupo.nome %></h2>
+            <% grupo.links.forEach(link => { %>
+              <%- include('componentes/link-sidebar', { link, ativo: linkAtivoSidebar(link.href) }) %>
+            <% }) %>
+            <% if (grupo.nome === 'Sua conta') { %>
+              <div class="sidebar-appearance"><span>Aparência</span><%- include('componentes/tema-entrada') %></div>
+            <% } %>
+          </section>
+        <% }) %>
+        <form class="sidebar-logout" method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="side-link" type="submit"><span class="side-icon lucide-icon" aria-hidden="true"><%- icones.arrowLeft %></span><span class="side-link-label">Sair da conta</span></button>
+        </form>
       </div>
     </div>
   </div>
 </aside>
-
 <% } %>
+

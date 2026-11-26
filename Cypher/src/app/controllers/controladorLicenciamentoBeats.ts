@@ -208,7 +208,9 @@ export const licenca: Acao = (req, res) => {
       `Modalidade: ${s.modalidade === "free" ? "Free Use" : "Premium não exclusiva"}`,
       `Versão dos termos: ${s.numero}`,
       `Aceite: ${data(s.aceite_em)}`,
-      `Valor: ${preco(s.valor_centavos)}`,
+      p.checkoutCatalogo
+        ? "Cobrança: nenhuma."
+        : `Valor da oferta: ${preco(s.valor_centavos)}`,
       ...Object.entries(s.oferta).map(([k, v]) => `${k}: ${v}`),
       "Arquivos: " + s.arquivos.map((a: any) => a.nome).join(", "),
       "Esta autorização contempla somente as permissões expressas. Não concede autoria, revenda, sublicenciamento ou exclusividade por presunção.",

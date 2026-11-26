@@ -34,7 +34,7 @@
   border-radius: 22px;
   background: var(--dc-field);
   color: var(--dc-ink);
-  font: 700 14px "DM Sans", sans-serif;
+  font: 700 14px "Space Grotesk", sans-serif;
   text-decoration: none;
 }
 .obra-acoes .obra-ouvir {
@@ -133,7 +133,7 @@
   color: var(--dc-ink, var(--foreground));
   background: var(--dc-field, var(--surface));
   font:
-    600 13px "DM Sans",
+    600 13px "Space Grotesk",
     sans-serif;
   text-decoration: none;
   cursor: pointer;
@@ -228,7 +228,7 @@ body:has(.ci-dialog[open]) {
   box-shadow: 0 16px 54px #0006;
   overflow: hidden;
   font:
-    14px/1.5 "DM Sans",
+    14px/1.5 "Space Grotesk",
     sans-serif;
 }
 .ci-dialog[open] {
@@ -379,7 +379,7 @@ body:has(.ci-dialog[open]) {
   border: 0;
   padding: 4px 12px 4px 0;
   font:
-    600 11px "DM Sans",
+    600 11px "Space Grotesk",
     sans-serif;
   color: var(--dc-muted);
   background: transparent;
@@ -467,7 +467,7 @@ body:has(.ci-dialog[open]) {
   color: var(--dc-ink);
   background: transparent;
   font:
-    14px/1.6 "DM Sans",
+    14px/1.6 "Space Grotesk",
     sans-serif;
 }
 .ci-compose-field textarea::placeholder {

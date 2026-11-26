@@ -848,6 +848,9 @@ export function listar(
 ) {
   conta(ator);
   expirar();
+  return db().transaction(() => consultarOportunidades(ator, f, contexto))();
+}
+function consultarOportunidades(ator: string, f: Record<string, string>, contexto: string) {
   const where: string[] = ["o.estado<>'rascunho'"],
     args: any[] = [];
   if (contexto === "minhas") {

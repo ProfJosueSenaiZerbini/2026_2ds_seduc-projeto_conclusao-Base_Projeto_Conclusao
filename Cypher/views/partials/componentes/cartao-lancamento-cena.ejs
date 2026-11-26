@@ -1,0 +1,97 @@
+<%
+  const { formato, faixas, audio, duracao, bpm, tom, quantidade, destaque, data, producao, participacao, plataforma, artistaUrl, ficha } = lancamento;
+  const base = 'lancamento-' + item.grupo + '-' + item.id;
+  const imagemDemo = imagemPublicacaoDemo(item.id);
+  const capaEnviada = typeof capaUsuario === 'function' ? capaUsuario(item.grupo === 'beats' ? 'beat' : 'obra', item.id) : '';
+  const capa = capaEnviada || (imagemDemo ? '/img/' + imagemDemo : '');
+  const comPlayer = audio || faixas.some(faixa => faixa.audio);
+  const metadados = [
+    ['Gênero', item.genero],
+    ['Lançamento', data],
+    ['Duração', duracao],
+    ['Andamento', bpm],
+    ['Tom', tom],
+    ['Produção musical', producao],
+    ['Participação', participacao],
+  ].filter(([, valor]) => valor);
+%>
+<article class="dc-release" data-release-format="<%= formato.estilo %>">
+  <a class="dc-release-open" href="<%= item.url %>" data-release-open aria-label="<%= formato.acao %> <%= item.titulo %>" aria-describedby="<%= base %>-artista <%= base %>-meta">
+    <div class="dc-release-artwork">
+      <% if (capa) { %><img src="<%= capa %>" alt="" loading="lazy" decoding="async">
+      <% } else { %><span class="dc-release-fallback" aria-hidden="true"><%- icones[formato.icone] %></span><% } %>
+      <span class="dc-release-tag"><span aria-hidden="true"><%- icones[formato.icone] %></span><%= formato.rotulo %></span>
+    </div>
+    <div class="dc-release-body">
+      <div class="dc-release-meta" id="<%= base %>-meta"><%= [item.genero, destaque].filter(Boolean).join(' · ') %></div>
+      <h3 id="<%= base %>-titulo"><%= item.titulo %></h3>
+      <p class="dc-release-artist" id="<%= base %>-artista"><%= item.autor %></p>
+    </div>
+  </a>
+
+  <dialog id="<%= base %>" class="dc-release-dialog" aria-labelledby="<%= base %>-ficha-titulo" data-release-dialog>
+    <div class="dc-release-sheet">
+      <header class="dc-release-header">
+        <div class="dc-release-jacket" aria-hidden="true">
+          <% if (capa) { %><img src="<%= capa %>" alt="" loading="lazy" decoding="async"><% } else { %><%- icones[formato.icone] %><% } %>
+        </div>
+        <div class="dc-release-header-copy">
+          <span class="dc-release-tag"><span aria-hidden="true"><%- icones[formato.icone] %></span><%= formato.rotulo %></span>
+          <h2 id="<%= base %>-ficha-titulo"><%= item.titulo %></h2>
+          <p><a href="<%= artistaUrl %>"><%= item.autor %></a></p>
+        </div>
+        <form method="dialog" class="dc-release-close">
+          <button type="submit" aria-label="Fechar detalhes" autofocus><span aria-hidden="true"><%- icones.x %></span></button>
+        </form>
+      </header>
+
+      <% if (metadados.length) { %>
+        <dl class="dc-release-details">
+          <% metadados.forEach(([rotulo, valor]) => { %>
+            <div><dt><%= rotulo %></dt><dd><% if (rotulo === 'Lançamento') { %><time datetime="<%= item.data %>"><%= valor %></time><% } else { %><%= valor %><% } %></dd></div>
+          <% }) %>
+        </dl>
+      <% } %>
+
+      <% if (faixas.length) { %>
+        <section class="dc-release-repertoire" aria-labelledby="<%= base %>-faixas">
+          <div class="dc-release-track-heading"><h3 id="<%= base %>-faixas">Faixas</h3><span><%= quantidade %></span></div>
+          <ol class="dc-release-tracks" aria-label="Lista de faixas de <%= item.titulo %>" tabindex="0" role="list">
+            <% faixas.forEach(faixa => { %>
+              <li>
+                <% if (faixa.audio) { %>
+                  <button type="button" data-release-track="<%= faixa.audio %>" data-track-title="<%= faixa.titulo %>" aria-pressed="false" aria-label="Reproduzir <%= faixa.titulo %>">
+                <% } else { %>
+                  <a href="<%= faixa.url %>" aria-label="Ver ficha de <%= faixa.titulo %>">
+                <% } %>
+                  <span class="dc-release-track-number" aria-hidden="true"><%= faixa.numero %></span>
+                  <strong><%= faixa.titulo %></strong>
+                  <span class="dc-release-track-time"><%= faixa.duracao %></span>
+                  <span class="dc-release-track-icon" aria-hidden="true">
+                    <% if (faixa.audio) { %>
+                      <span class="dc-release-play"><%- include('icone-beat', { tipo: 'play' }) %></span>
+                      <span class="dc-release-pause"><%- include('icone-beat', { tipo: 'pause' }) %></span>
+                    <% } else { %><%- icones.arrowUpRight %><% } %>
+                  </span>
+                <% if (faixa.audio) { %></button><% } else { %></a><% } %>
+              </li>
+            <% }) %>
+          </ol>
+        </section>
+      <% } %>
+
+      <% if (comPlayer) { %>
+        <div class="dc-release-player">
+          <div class="dc-release-player-title" role="status"><strong data-release-now><%= audio ? (item.grupo === 'beats' ? 'Prévia do beat' : 'Ouvir faixa') : 'Selecione uma faixa para ouvir' %></strong></div>
+          <audio controls preload="none" data-release-audio aria-label="<%= audio ? 'Reprodutor de ' + item.titulo : 'Reprodutor de áudio' %>"<% if (audio) { %> src="<%= audio %>"<% } else { %> hidden<% } %>></audio>
+          <p class="dc-release-player-status" data-release-status role="status"></p>
+        </div>
+      <% } %>
+
+      <footer class="dc-release-footer">
+        <a class="dc-release-full" href="<%= item.url %>"><%= ficha %><span aria-hidden="true"><%- icones.arrowUpRight %></span></a>
+        <%- include('ouvir-obra', { titulo: item.titulo, plataforma }) %>
+      </footer>
+    </div>
+  </dialog>
+</article>

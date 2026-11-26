@@ -2,7 +2,7 @@
 .tag-shell {max-width:620px;margin:auto}
 .tag-brand {display:inline-block;font:italic 900 28px/1 "Space Grotesk",sans-serif;letter-spacing:-.08em;color:#b6df65;text-decoration:none;margin-bottom:32px}
 .tag-intro {text-align:center;margin:clamp(20px,7vh,80px) 0 30px}
-.tag-intro h1,.tag-panel h1,.tag-panel h2 {font:700 clamp(32px,7vw,58px)/1.02 "Space Grotesk",sans-serif;letter-spacing:-.055em;margin:0 0 10px}
+.tag-intro h1,.tag-panel h1,.tag-panel h2 {font:700 clamp(32px,7vw,58px)/1.02 "Oswald",sans-serif;letter-spacing:-.02em;margin:0 0 10px}
 .tag-intro p,.tag-login {color:#e5e9df}
 .tag-stack {position:relative;height:clamp(154px,31vw,190px);max-width:480px;margin:auto;isolation:isolate}
 .tag-sticker {
@@ -40,7 +40,7 @@
 }
 .tag-sticker small {
   padding: 4px 2px; border-block: 2px solid #34372a;
-  font: 700 clamp(11px,2vw,14px)/1.25 "DM Sans",sans-serif;
+  font: 700 clamp(11px,2vw,14px)/1.25 "Space Grotesk",sans-serif;
 }
 .sticker-paper::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -307,7 +307,7 @@
   border-radius: 2px 5px 1px 4px;
   isolation: isolate;
   box-shadow: 2px 3px 0 #080e0ab8;
-  font-family: "DM Sans", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 1.35;
@@ -734,13 +734,9 @@
 }
 @keyframes theme-fade-out { to { opacity: 0; } }
 @keyframes theme-fade-in { from { opacity: 0; } }
-/* Estrutura estável entre as etapas, com espaço livre para o conteúdo crescer. */
-.tag-page .tag-panel { box-sizing: border-box; min-height: 540px; }
+/* O painel acompanha o conteúdo de cada etapa. */
+.tag-page .tag-panel { box-sizing: border-box; }
 .tag-page .tag-shell { max-width: 740px; }
-.tag-panel-content { min-width: 0; display: flow-root; }
-@media(max-width:600px) {
-  .tag-page .tag-panel { min-height: 0; }
-}
 /* Profissões como navegação; tempo como régua cronológica. */
 .registration-page .tag-panel .trajectory-professions { display:flex; gap:10px; overflow-x:auto; padding:8px 2px 14px; margin:0 0 20px; scrollbar-width:thin; }
 .registration-page .tag-panel .trajectory-profession { flex:0 0 auto; min-height:40px; padding:8px 12px; border:1px solid #82916b50; border-radius:2px 5px 1px 3px; background:#17201855; color:#aab59f; font:600 14px 'Space Grotesk',sans-serif; cursor:pointer; }
@@ -982,3 +978,7 @@
 :root .entrada-cypher .questionnaire-progress__track > span {
   background: var(--dc-olive);
 }
+
+/* Atalhos do login convencional: próximo ao campo e à criação de conta. */
+.tag-panel .login-recuperacao { margin: 0; text-align: end; }
+.tag-panel .login-confirmacao { margin: 10px 0 0; text-align: center; }

@@ -28,7 +28,7 @@ try {
   let r = bootstrap();
   assert.equal(r.status, 0, r.stderr);
   db = new Database(arquivo);
-  assert.equal(db.pragma("user_version", { simple: true }), 37);
+  assert.equal(db.pragma("user_version", { simple: true }), 39);
   assert.deepEqual(db.pragma("integrity_check"), [{ integrity_check: "ok" }]);
   assert.deepEqual(db.pragma("foreign_key_check"), []);
   const tabelas = db
@@ -36,7 +36,7 @@ try {
       "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
     )
     .all();
-  for (const nome of ["profissionais_seguidos", "interacoes_conteudo", "comentarios_conteudo", "midias_publicacoes", "representacoes_profissionais", "historico_representacao", "selos_perfil"])
+  for (const nome of ["profissionais_seguidos", "interacoes_conteudo", "comentarios_conteudo", "midias_publicacoes", "representacoes_profissionais", "historico_representacao", "selos_perfil", "conversas_ocultas", "mensagens_leituras", "creditos_publicacoes", "historico_creditos", "pedidos_selo_externo"])
     assert.ok(tabelas.some(t => t.name === nome), `Tabela de interações ausente: ${nome}`);
   for (const nome of ["detalhes_projetos", "midias_trabalho", "itens_projeto", "historico_projetos", "portfolio_config", "portfolio_itens", "colaboracoes", "avaliacoes_colaboracao", "casos_colaboracao", "manifestacoes_colaboracao", "historico_colaboracao"])
     assert.ok(tabelas.some(t => t.name === nome), `Tabela do acervo ausente: ${nome}`);
@@ -112,7 +112,7 @@ try {
   r = bootstrap();
   assert.equal(r.status,0,r.stderr);
   db = new Database(arquivo);
-  assert.equal(db.pragma("user_version", { simple: true }),37);
+  assert.equal(db.pragma("user_version", { simple: true }),39);
   assert.deepEqual(
     db.prepare("SELECT nome,nome_informado,vulgo,nome_publico,competencias_json,competencias_publicas FROM perfis WHERE usuario_id='legado'").get(),
     {nome:"Nome Legado",nome_informado:"Nome Legado",vulgo:"Vulgo Legado",nome_publico:1,competencias_json:"[]",competencias_publicas:0}
@@ -140,7 +140,7 @@ try {
   r = bootstrap();
   assert.equal(r.status, 0, r.stderr);
   db = new Database(arquivo);
-  assert.equal(db.pragma("user_version", { simple: true }), 37);
+  assert.equal(db.pragma("user_version", { simple: true }), 39);
   assert.ok(db.pragma("table_info(notificacoes)").some(coluna => coluna.name === "removida_em"));
   assert.equal(db.prepare("SELECT posicao FROM midias_publicacoes WHERE id='foto-anterior'").get().posicao, "principal");
   assert.ok(db.pragma("table_info(preferencias_usuario)").some(coluna => coluna.name === "avisos_desativados_json"));
@@ -164,7 +164,7 @@ try {
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /mais recente/);
   console.log(
-    "OK: schema 37, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis."
+    "OK: schema 39, base sem demonstrações, identidades, integridade, unicidade, idempotência e recusa sem mutação de bases incompatíveis."
   );
 } finally {
   if (db?.open) db.close();

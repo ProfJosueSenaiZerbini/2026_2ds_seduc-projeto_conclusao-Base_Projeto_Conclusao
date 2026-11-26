@@ -32,13 +32,15 @@ export function validarIdentificador(valor: string): string | null {
   return null;
 }
 
+const formatoDataCadastro = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Sao_Paulo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 export function dataAtualCadastro(): string {
-  const partes = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
+  const partes = formatoDataCadastro.formatToParts(new Date());
   const valor = (tipo: string) =>
     partes.find(parte => parte.type === tipo)?.value;
   return `${valor("year")}-${valor("month")}-${valor("day")}`;

@@ -168,8 +168,10 @@ function renderizarFormularioBeat(
 
 export function bancoBeats(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
-  const catalogo = CypherModel.beats(usuario?.id).map(beat => {
-    const r=conexaoInternaCypher().prepare("SELECT dados_json FROM catalogo_cena WHERE tipo='beat' AND id=?").get(beat.id);
+  const db = conexaoInternaCypher();
+  const dadosCena = db.prepare("SELECT dados_json FROM catalogo_cena WHERE tipo='beat' AND id=?");
+  const catalogo = db.transaction(() => CypherModel.beats(usuario?.id).map(beat => {
+    const r=dadosCena.get(beat.id);
     const cena=r?JSON.parse(r.dados_json):null;
     return {
     ...beat,
@@ -178,14 +180,25 @@ export function bancoBeats(req: Request, res: Response) {
     valorExclusivo: cena?.preco||null,
     disponibilidade: cena?.vendidoPara ? "vendido" : !beat.disponivel ? "pausado" : beat.ofertas.some(o => o.modalidade === "free" || o.modalidade === "premium") ? "disponivel" : "sem_oferta",
     previewUrl: beat.demonstracao ? audioCatalogoLocal[beat.id] || "" : beat.previaId ? `/beats/${beat.id}/preview` : "",
-  };});
+  };}))();
   const opcoes = (campo: "genre" | "license" | "key") =>
     [...new Set(catalogo.map(beat => beat[campo]).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b, "pt-BR")
     );
   const filtros = lerFiltrosBeats(req.query);
   const filtrado = Object.values(filtros).some(Boolean);
-  const beats = filtrarCatalogoBeats(catalogo, filtros);
+  const selecionados = filtrarCatalogoBeats(catalogo, filtros);
+  const ordem = ["price", "bpm", "title"].includes(req.query.ordem) ? req.query.ordem : "original";
+  const precoMinimo = beat => Math.min(...beat.ofertas.filter(o => o.ativa !== false && Number.isFinite(o.precoCentavos) && o.precoCentavos >= 0).map(o => o.precoCentavos));
+  if (ordem === "title") selecionados.sort((a, b) => a.title.localeCompare(b.title, "pt-BR"));
+  if (ordem === "price") selecionados.sort((a, b) => precoMinimo(a) - precoMinimo(b));
+  if (ordem === "bpm") selecionados.sort((a, b) => (Number(a.bpm) || Infinity) - (Number(b.bpm) || Infinity));
+  const porPagina = 24;
+  const paginas = Math.max(1, Math.ceil(selecionados.length / porPagina));
+  const indiceBeat = selecionados.findIndex(beat => beat.id === req.query.beat);
+  const pedida = typeof req.query.pagina === "string" ? Number.parseInt(req.query.pagina, 10) || 1 : 1;
+  const pagina = indiceBeat >= 0 ? Math.floor(indiceBeat / porPagina) + 1 : Math.min(paginas, Math.max(1, pedida));
+  const inicioPagina = (pagina - 1) * porPagina;
   const destaque = filtrado
     ? undefined
     : catalogo.find(beat => beat.id === "demo-beat-visao-de-rua") ??
@@ -196,7 +209,12 @@ export function bancoBeats(req: Request, res: Response) {
     path: "/beats",
     stylesheet: "banco-beats",
     authenticated: Boolean(usuario),
-    beats,
+    beats: selecionados.slice(inicioPagina, inicioPagina + porPagina),
+    total: selecionados.length,
+    pagina,
+    paginas,
+    inicioPagina,
+    ordem,
     destaque,
     filtrado,
     q: filtros.q,

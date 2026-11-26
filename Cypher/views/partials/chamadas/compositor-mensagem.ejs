@@ -1,0 +1,20 @@
+<form class="msg-compose" method="post" action="<%= action %>">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="chave" value="<%= nonce %>">
+  <div class="msg-compose-bar">
+    <div class="msg-attach-group">
+      <button class="msg-attach-toggle" type="button" aria-label="Adicionar anexo" aria-expanded="false" title="Adicionar anexo">+</button>
+      <div class="msg-attach-options" hidden>
+        <button type="button" data-attachment="image" aria-label="Anexar imagem" title="Imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4-4a2 2 0 0 0-3 0L5 21"/></svg></button>
+        <button type="button" data-attachment="video" aria-label="Anexar vídeo" title="Vídeo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-3v10l-4-3"/></svg></button>
+        <button type="button" data-attachment="file" aria-label="Anexar arquivo ou áudio" title="Arquivo ou áudio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6l2 3h8v13H4z"/><path d="M4 7h8"/></svg></button>
+      </div>
+    </div>
+    <input class="msg-file-input" type="file" accept=".png,.jpg,.jpeg,.mp3,.wav,.ogg,.webm,.weba,.mp4,.txt,.md,.pdf,.docx" hidden>
+    <textarea name="texto" maxlength="4000" rows="1" required aria-label="Escrever mensagem" placeholder="Mensagem"></textarea>
+    <button class="msg-record-button" type="button" aria-label="Gravar áudio" title="Gravar áudio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg></button>
+    <button class="msg-send-button" type="submit" aria-label="Enviar mensagem" title="Enviar mensagem" hidden><%- icones.send %></button>
+  </div>
+  <div class="msg-file-selected" hidden><div class="msg-file-preview"></div><div class="msg-file-meta"><strong></strong><small></small></div><button type="button" aria-label="Remover anexo">×</button></div>
+  <p class="msg-upload-status" role="status" hidden></p>
+</form>

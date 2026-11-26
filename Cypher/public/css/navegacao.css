@@ -1,0 +1,149 @@
+/* Hierarquia compartilhada: cotidiano, descoberta, criação e conta. */
+.sidebar.sidebar-organized {
+  padding: 0;
+  overflow: hidden;
+}
+.sidebar.sidebar-organized .sidebar-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 18px 12px 12px;
+  overflow: hidden;
+}
+.sidebar.sidebar-organized .sidebar-top {
+  flex: none;
+  margin-bottom: 14px;
+}
+.sidebar.sidebar-organized .side-nav {
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+  overflow: hidden auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dc-line, #52644a) transparent;
+}
+.sidebar-organized .sidebar-nav-group {
+  display: grid;
+  gap: 2px;
+  padding-block: 4px 10px;
+}
+.sidebar-organized .sidebar-nav-group + .sidebar-nav-group {
+  border-top: 1px solid var(--dc-line, #52644a);
+  padding-top: 10px;
+}
+.sidebar.sidebar-organized .sidebar-nav-group .nav-label {
+  display: block;
+  margin: 0;
+  padding: 2px 11px 7px;
+  color: var(--dc-nav-label-ink, #aebda2);
+  font: 600 .75rem/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sidebar.sidebar-organized .side-nav .side-link,
+.sidebar.sidebar-organized .sidebar-bottom .side-link {
+  min-height: 44px;
+  flex-shrink: 0;
+  gap: 12px;
+  padding: 8px 11px;
+  font-size: .875rem;
+  line-height: 1.35;
+}
+.sidebar-organized .side-icon { position: relative; flex: none; }
+.sidebar-organized .side-link-label { white-space: normal; }
+.sidebar-organized .side-link:focus-visible {
+  outline: 2px solid var(--dc-accent, #c8f22b);
+  outline-offset: -2px;
+}
+.sidebar-organized .sidebar-avatar {
+  background: var(--dc-button, #c8f22b);
+  color: var(--dc-button-ink, #10140f);
+  font-size: .65rem;
+  outline: 1px solid var(--dc-line, #52644a);
+}
+.sidebar-unread-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dc-accent, #c8f22b);
+}
+.sidebar-organized .side-link.active .sidebar-unread-dot { background: currentColor; }
+.sidebar-organized .sidebar-chevron { margin-left: auto; }
+.sidebar-chevron svg { width: 14px; height: 14px; }
+.sidebar-create summary { cursor: pointer; list-style: none; }
+.sidebar-create summary::-webkit-details-marker { display: none; }
+.sidebar-create[open] .sidebar-chevron { transform: rotate(180deg); }
+.sidebar-organized .sidebar-create-links {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 4px 22px;
+  border-left: 1px solid var(--dc-line, #52644a);
+}
+.sidebar-organized .sidebar-create-links .side-link { padding-left: 9px; }
+.sidebar.sidebar-organized .sidebar-bottom {
+  flex: none;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--dc-line, #52644a);
+}
+.sidebar-organized :is(.sidebar-more, .sidebar-logout button) {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sidebar.sidebar-organized .sidebar-more[aria-expanded="true"] {
+  color: var(--dc-ink, #f1f2e9);
+  background: var(--dc-hover, #1e281b);
+  border-color: var(--dc-line, #52644a);
+}
+.sidebar.sidebar-organized .resource-links {
+  width: 276px;
+  gap: 0;
+  padding: 6px;
+  overscroll-behavior: contain;
+}
+.sidebar-resource-group { padding: 6px 0; }
+.sidebar-resource-group + .sidebar-resource-group,
+.sidebar-logout { border-top: 1px solid var(--dc-line, #52644a); }
+.sidebar.sidebar-organized .sidebar-resource-title {
+  margin: 0;
+  padding: 4px 11px;
+  font: 600 .75rem/1.5 "Space Grotesk", sans-serif;
+  color: var(--dc-nav-label-ink, #aebda2);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.sidebar-appearance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 11px;
+  font-size: .875rem;
+}
+.sidebar-appearance .entry-theme { margin: 0; }
+.sidebar-logout { margin: 0; padding-top: 6px; }
+@media (min-width: 901px) {
+  :root:not(.sidebar-em-transicao) .dc-shell
+    .sidebar-organized:not(:hover):not(:has(:focus-visible)):not(:has([data-sidebar-more][aria-expanded="true"])):not(:has(.sidebar-create[open]))
+    :is(.nav-label, .sidebar-chevron, .sidebar-unread-count) {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  /* A camada de fechamento é irmã do shell; o menu deve ficar acima dela. */
+  .sidebar-visible .dc-shell:has(.sidebar-organized) { isolation: auto; }
+  .sidebar.sidebar-organized { min-height: 0; height: 100dvh; max-height: 100dvh; }
+  .sidebar.sidebar-organized .side-icon { width: 24px; height: 24px; }
+  .sidebar.sidebar-organized .side-icon svg { width: 22px; height: 22px; }
+  .sidebar.sidebar-organized .sidebar-scroll { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}

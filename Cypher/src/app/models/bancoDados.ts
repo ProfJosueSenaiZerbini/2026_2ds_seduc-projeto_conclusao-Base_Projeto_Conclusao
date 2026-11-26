@@ -12,8 +12,10 @@ import { esquemaEventos } from "./esquemaEventos.js";
 import { esquemaCena } from "./esquemaCena.js";
 import { esquemaInteracoes } from "./esquemaInteracoes.js";
 import { esquemaMidiasRepresentacao } from "./esquemaMidiasRepresentacao.js";
+import { consultaPreparada } from "./consultaPreparada.js";
+import { esquemaAcervoMusical, migrarAcervoMusical, guardarAcervo, impedirExclusaoVinculada, type EdicaoAcervo } from "./acervoMusical.js";
 import { interesseEventoLegado, cancelarInteresseEventoLegado, statusInteresseEventoLegado } from "./eventos.js";
-import { contaEncerrada, menorProtegido, preferenciasPrivacidadePermitidas } from "./protecoesConta.js";
+import { contaEncerrada, contatoEtarioPermitido, menorProtegido, preferenciasPrivacidadePermitidas } from "./protecoesConta.js";
 import { objetoDisponivel, objetoSobMedida, situacaoContaModeracao } from "./politicasModeracao.js";
 import Database from "better-sqlite3";
 import { rotuloProfissional } from "./tratamentoProfissional.js";
@@ -389,6 +391,8 @@ export type ObraPersistida = {
   published: boolean;
 };
 export type DadosObraCypher = {
+  acervo?: EdicaoAcervo;
+  propostaGenero?: string;
   published?: boolean;
   atuacoes?: string[];
   title: string;
@@ -418,7 +422,7 @@ export type ObraContaPersistida = ObraPersistida & {
 };
 
 let banco;
-export const versaoEsquema = 37;
+export const versaoEsquema = 39;
 function iniciaisPublicas(nome) {
   const partes = nome
     .normalize("NFD")
@@ -1503,6 +1507,13 @@ export function inicializarBancoCypher() {
       conexao.exec(esquemaCena);
       conexao.exec(esquemaInteracoes);
       conexao.exec(esquemaMidiasRepresentacao);
+      if (versao < 39) conexao.exec(`
+        DELETE FROM profissionais_seguidos AS s WHERE EXISTS (
+          SELECT 1 FROM bloqueios_usuarios b
+          WHERE (b.autor_id=s.seguidor_id AND b.alvo_id=s.profissional_id)
+             OR (b.alvo_id=s.seguidor_id AND b.autor_id=s.profissional_id)
+        )
+      `);
       if (!conexao.pragma("table_info(midias_publicacoes)").some(c => c.name === "posicao")) {
         conexao.exec("ALTER TABLE midias_publicacoes ADD COLUMN posicao TEXT NOT NULL DEFAULT 'principal' CHECK(posicao IN ('principal','capa'))");
         conexao.exec("DROP INDEX IF EXISTS midia_publicacao_ativa");
@@ -1516,6 +1527,9 @@ export function inicializarBancoCypher() {
       conexao.exec(esquemaPreferenciasNotificacoes);
       if (!conexao.prepare("PRAGMA table_info(avaliacoes_colaboracao)").all().some(c => c.name === "estado_antes_vinculo"))
         conexao.exec("ALTER TABLE avaliacoes_colaboracao ADD COLUMN estado_antes_vinculo TEXT CHECK(estado_antes_vinculo IN('ativa','oculta'))");
+      const migrarAcervo = !conexao.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='lancamentos'").get();
+      conexao.exec(esquemaAcervoMusical);
+      if (migrarAcervo) migrarAcervoMusical(conexao);
       if (conexao.pragma("foreign_key_check").length) throw new Error("Integridade referencial inválida.");
       conexao.pragma(`user_version = ${versaoEsquema}`);
     })();
@@ -1524,6 +1538,9 @@ export function inicializarBancoCypher() {
   } catch (erro) { conexao.close(); throw erro; }
 }
 export function listarEventosCypher(filtros, usuarioId) {
+  return bancoAtivo().transaction(() => consultarEventos(filtros, usuarioId))();
+}
+function consultarEventos(filtros, usuarioId) {
   const filtrosSql = [];
   const parametros = { usuarioId };
   if (filtros.categoria) {
@@ -1797,6 +1814,9 @@ export function atualizarEventoCypher(id, proprietarioId, dados) {
 export function excluirEventoCypher(id, proprietarioId) { return false; /* Cancelamento versionado e justificado em eventos.ts preserva o histórico. */ }
 
 export function listarBeatsCypher(usuarioId) {
+  return bancoAtivo().transaction(() => consultarBeats(usuarioId))();
+}
+function consultarBeats(usuarioId) {
   const linhas = bancoAtivo()
     .prepare(
       `
@@ -3193,8 +3213,7 @@ function historicoSolicitacao(db, solicitacaoId) {
     .all(solicitacaoId);
 }
 export function listarAtuacoesUsuarioCypher(usuarioId) {
-  return bancoAtivo()
-    .prepare(
+  return consultaPreparada(bancoAtivo(),
       `SELECT categoria, respostas_json AS respostasJson,
               visibilidades_json AS visibilidadesJson
        FROM respostas_atuacao_categoria WHERE usuario_id = ?
@@ -3212,8 +3231,7 @@ export function listarAtuacoesUsuarioCypher(usuarioId) {
 }
 function ehColaboradorDaConta(db, titularId, visitanteId) {
   return Boolean(
-    db
-      .prepare(
+    consultaPreparada(db,
         `SELECT EXISTS (
              SELECT 1 FROM obras o
              JOIN creditos c ON c.obra_id = o.id
@@ -3234,14 +3252,11 @@ function atuacoesVisiveis(
 ) {
   const titular = visitanteId === titularId;
   if (!titular && !perfilPublico) return [];
-  const colaborador = Boolean(
-    visitanteId &&
-    visitanteId !== titularId &&
-    ehColaboradorDaConta(db, titularId, visitanteId)
-  );
-  const registros = new Map(
-    listarAtuacoesUsuarioCypher(titularId).map(item => [item.categoria, item])
-  );
+  const dados = listarAtuacoesUsuarioCypher(titularId);
+  const colaborador = Boolean(!titular && visitanteId &&
+    dados.some(item => Object.values(item.visibilidades).includes("colaboradores")) &&
+    ehColaboradorDaConta(db, titularId, visitanteId));
+  const registros = new Map(dados.map(item => [item.categoria, item]));
   return categorias.flatMap(categoria => {
     const registro = registros.get(categoria);
     const visibilidades = registro?.visibilidades ?? {};
@@ -3336,6 +3351,9 @@ function opcoesUnicasBusca(valores) {
 }
 export function buscarPerfisPublicosCypher(filtrosRecebidos, usuarioId): ResultadoBuscaPerfisPublicos {
   const db = bancoAtivo();
+  return db.transaction(() => consultarPerfisPublicos(db, filtrosRecebidos, usuarioId))();
+}
+function consultarPerfisPublicos(db, filtrosRecebidos, usuarioId): ResultadoBuscaPerfisPublicos {
   const populares = filtrosRecebidos.ordem === "populares";
   const pontuacao = populares ? `
     (SELECT COUNT(*) FROM atividade_perfis ap
@@ -3729,6 +3747,59 @@ function salvarAtuacoesObra(db, obraId, usuarioId, atuacoes) {
   }
 }
 
+function obraAceitaCredito(db, obraId: string, proprietarioId: string, pessoaId: string) {
+  return contatoEtarioPermitido(db, proprietarioId, pessoaId)
+    && objetoDisponivel(db, "obra", obraId, pessoaId)
+    && !situacaoContaModeracao(db, proprietarioId).contatoRestrito
+    && !situacaoContaModeracao(db, pessoaId).contatoRestrito;
+}
+
+export function conviteCreditoObra(creditoId: string, pessoaId: string) {
+  const db = bancoAtivo();
+  const convite = db.prepare(`
+    SELECT c.obra_id AS obraId, c.funcao AS funcao, c.participacao,
+      c.verificado, o.titulo, o.proprietario_id AS proprietarioId, p.nome AS autor
+    FROM creditos c
+    JOIN obras o ON o.id = c.obra_id
+    JOIN perfis p ON p.usuario_id = o.proprietario_id
+    JOIN usuarios u ON u.id = c.usuario_creditado_id
+    WHERE c.id = ? AND u.id = ? AND u.id <> o.proprietario_id
+      AND u.tipo_conta = 'profissional' AND u.email_confirmado_em IS NOT NULL
+      AND u.demonstracao = 0 AND o.demonstracao = 0 AND c.demonstracao = 0
+      AND o.publicada = 1 AND o.situacao IN ('', 'Lançado')
+  `).get(creditoId, pessoaId) as {
+    obraId: string; funcao: string; participacao: string; verificado: number;
+    titulo: string; proprietarioId: string; autor: string;
+  } | undefined;
+  if (!convite || !obraAceitaCredito(db, convite.obraId, convite.proprietarioId, pessoaId))
+    return null;
+  return convite;
+}
+
+export function confirmarCreditoObra(creditoId: string, pessoaId: string) {
+  const db = bancoAtivo();
+  return db.transaction(() => {
+    const convite = conviteCreditoObra(creditoId, pessoaId);
+    if (!convite) return null;
+    const { changes } = db.prepare(
+      "UPDATE creditos SET verificado=1 WHERE id=? AND usuario_creditado_id=? AND verificado=0"
+    ).run(creditoId, pessoaId);
+    if (changes) {
+      criarNotificacaoCypher({
+        usuarioDestinoId: convite.proprietarioId,
+        tipo: "credito_confirmado",
+        titulo: "Crédito confirmado",
+        mensagem: "Uma participação foi confirmada na ficha da sua obra.",
+        url: "/espaco-de-trabalho/obra/" + encodeURIComponent(convite.obraId),
+        entidadeTipo: "obra",
+        entidadeId: convite.obraId,
+        chaveOrigem: "credito-confirmado:" + creditoId,
+      });
+    }
+    return convite.obraId;
+  }).immediate();
+}
+
 function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
   const anteriores = db.prepare("SELECT id, usuario_creditado_id, nome_creditado, funcao, participacao FROM creditos WHERE obra_id=? AND demonstracao=0").all(obraId);
   const preservados = new Set();
@@ -3784,7 +3855,35 @@ function salvarCreditosObra(db, obraId, proprietarioId, creditos) {
     );
   }
   const remover = db.prepare("DELETE FROM creditos WHERE id=? AND obra_id=?");
-  for (const c of anteriores) if (!preservados.has(c.id)) remover.run(c.id, obraId);
+  for (const c of anteriores) if (!preservados.has(c.id)) {
+    const estado = db.prepare(
+      "SELECT estado FROM historico_creditos WHERE tipo='obra' AND credito_id=? ORDER BY id DESC LIMIT 1"
+    ).get(c.id)?.estado;
+    if (estado === "contestado") throw new Error("CREDITO_EM_ANALISE");
+    remover.run(c.id, obraId);
+  }
+
+  const pendentes = db.prepare(`
+    SELECT c.id, c.usuario_creditado_id AS pessoa
+    FROM creditos c JOIN obras o ON o.id = c.obra_id
+    WHERE c.obra_id=? AND c.usuario_creditado_id IS NOT NULL
+      AND c.verificado=0 AND c.demonstracao=0
+      AND NOT EXISTS (SELECT 1 FROM historico_creditos h WHERE h.tipo='obra' AND h.credito_id=c.id)
+      AND o.publicada=1 AND o.situacao IN ('', 'Lançado')
+  `).all(obraId) as { id: string; pessoa: string }[];
+  for (const credito of pendentes) {
+    if (!obraAceitaCredito(db, obraId, proprietarioId, credito.pessoa)) continue;
+    criarNotificacaoCypher({
+      usuarioDestinoId: credito.pessoa,
+      tipo: "credito_pendente",
+      titulo: "Confira um crédito em uma obra",
+      mensagem: "Você foi indicado como colaborador. Confira a função antes de confirmar.",
+      url: "/espaco-de-trabalho/creditos/" + encodeURIComponent(credito.id),
+      entidadeTipo: "credito",
+      entidadeId: credito.id,
+      chaveOrigem: "credito-pendente:" + credito.id,
+    });
+  }
 }
 export function criarObraCypher(proprietarioId, dados, creditos) {
   exigirPublicacao(proprietarioId, "obra", dados.type);
@@ -3820,7 +3919,7 @@ export function criarObraCypher(proprietarioId, dados, creditos) {
       genre: dados.genre,
       genreDetail: dados.genreDetail,
       lyrics: dados.lyrics,
-      bpm: dados.bpm,
+      bpm: dados.bpm ?? "",
       isrc: dados.isrc,
       iswc: dados.iswc,
       releaseDate: dados.releaseDate,
@@ -3829,6 +3928,7 @@ export function criarObraCypher(proprietarioId, dados, creditos) {
     });
     salvarAtuacoesObra(db, id, proprietarioId, dados.atuacoes);
     salvarCreditosObra(db, id, proprietarioId, creditos);
+    guardarAcervo(db, id, dados.acervo);
     if (dados.propostaGenero?.trim()) {
       db.prepare(
         `INSERT INTO propostas_generos (id, usuario_id, genero)
@@ -3847,6 +3947,7 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
   if (anterior.type !== dados.type) exigirPublicacao(proprietarioId,"obra",dados.type);
   const db = bancoAtivo();
   const salvar = db.transaction(() => {
+    const origem = db.prepare("SELECT * FROM obras WHERE id=?").get(id);
     const resultado = db
       .prepare(
         `
@@ -3882,7 +3983,10 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
         type: dados.type,
         typeDetail: dados.typeDetail,
         status: dados.status,
-        meta: metadadosObra(dados),
+        meta: origem.metadados.trimStart().startsWith("{") ? JSON.stringify({
+          ...jsonObjeto(origem.metadados),
+          resumo: metadadosObra(dados),
+        }) : metadadosObra(dados),
         role: dados.role,
         roleDetail: dados.roleDetail,
         credits: creditos.length,
@@ -3890,7 +3994,7 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
         genre: dados.genre,
         genreDetail: dados.genreDetail,
         lyrics: dados.lyrics,
-        bpm: dados.bpm,
+        bpm: dados.bpm ?? "",
         isrc: dados.isrc,
         iswc: dados.iswc,
         releaseDate: dados.releaseDate,
@@ -3900,6 +4004,7 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
     if (resultado.changes !== 1) return false;
     salvarAtuacoesObra(db, id, proprietarioId, dados.atuacoes);
     salvarCreditosObra(db, id, proprietarioId, creditos);
+    guardarAcervo(db, id, dados.acervo, origem);
     if (dados.propostaGenero?.trim()) {
       db.prepare(
         `INSERT INTO propostas_generos (id, usuario_id, genero)
@@ -3913,15 +4018,19 @@ export function atualizarObraCypher(id, proprietarioId, dados, creditos) {
 export function excluirObraCypher(id, proprietarioId) {
   if(!objetoDisponivel(bancoAtivo(),"obra",id,proprietarioId))return false;
   exigirProfissional(proprietarioId);
-  const resultado = bancoAtivo()
-    .prepare(
-      `
-      DELETE FROM obras
-      WHERE id = ? AND proprietario_id = ? AND demonstracao = 0
-      `
-    )
-    .run(id, proprietarioId);
-  return resultado.changes === 1;
+  const db = bancoAtivo();
+  return db.transaction(() => {
+    if (!db.prepare("SELECT 1 FROM obras WHERE id=? AND proprietario_id=? AND demonstracao=0").get(id, proprietarioId)) return false;
+    if (db.prepare(`
+      SELECT 1 FROM creditos c WHERE c.obra_id=? AND (
+        SELECT estado FROM historico_creditos WHERE tipo='obra' AND credito_id=c.id ORDER BY id DESC LIMIT 1
+      )='contestado'
+    `).get(id)) return false;
+    if (impedirExclusaoVinculada(db, id)) return false;
+    db.prepare("DELETE FROM faixas_lancamento WHERE lancamento_id=?").run(id);
+    db.prepare("DELETE FROM fonogramas_composicoes WHERE fonograma_id IN (SELECT id FROM fonogramas WHERE obra_id=?)").run(id);
+    return db.prepare("DELETE FROM obras WHERE id=?").run(id).changes === 1;
+  })();
 }
 export function estatisticasObrasUsuarioCypher(proprietarioId) {
   return bancoAtivo()

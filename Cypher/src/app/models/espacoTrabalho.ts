@@ -102,7 +102,7 @@ const registros = `
       o.descricao, o.link_escuta AS link, o.proprietario_id=@usuario AS proprio,
       CASE WHEN o.proprietario_id=@usuario THEN json_array(json_object('papel',o.funcao_principal,'detalhe',o.funcao_detalhe)) ELSE c.papeis END AS papeis,
       CASE WHEN o.proprietario_id=@usuario THEN (SELECT json_group_array(profissao_id) FROM atuacoes_obra WHERE obra_id=o.id) ELSE '[]' END AS atuacoes,
-      json_object('Lançamento',o.data_lancamento,'BPM',o.bpm,'ISRC',o.isrc,'ISWC',o.iswc,'Letra',CASE WHEN o.proprietario_id=@usuario THEN o.letra END) AS ficha, o.criado_em
+      json_object('Data informada no acervo anterior',o.data_lancamento,'BPM',o.bpm,'Letra',CASE WHEN o.proprietario_id=@usuario THEN o.letra END) AS ficha, o.criado_em
     FROM obras o JOIN perfis p ON p.usuario_id=o.proprietario_id LEFT JOIN meus_creditos c ON c.obra_id=o.id
     WHERE o.demonstracao=0 AND p.demonstracao=0 AND (o.proprietario_id=@usuario OR c.obra_id IS NOT NULL)
     UNION ALL

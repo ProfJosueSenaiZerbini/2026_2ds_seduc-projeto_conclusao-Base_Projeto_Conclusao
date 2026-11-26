@@ -721,7 +721,7 @@ export function prepararCentralInicial(autor: string) {
       if (conteudo.titulo !== "Antes de escolher um beat" || !conteudo.passos?.some((p: Linha) => p.conteudo === antigo)) continue;
       const guia = guiasIniciais.find(g => g.titulo === conteudo.titulo)!;
       salvarArtigo(autor, { ...guia, passos: JSON.stringify(guia.passos), versao: a.versao }, a.id);
-      for (const acao of ["revisar", "publicar"]) transicionarArtigo(autor, a.id, { acao, versao: registro(a.id).versao, motivo: "Atualização do guia inicial após a entrega do licenciamento demonstrativo de beats." });
+      for (const acao of ["revisar", "publicar"]) transicionarArtigo(autor, a.id, { acao, versao: registro(a.id).versao, motivo: "Atualização do guia inicial sobre as condições e entregas de licenças de beats." });
     }
     if (um("SELECT 1 FROM central_parametros WHERE chave='guias_iniciais_v1'"))
       return;

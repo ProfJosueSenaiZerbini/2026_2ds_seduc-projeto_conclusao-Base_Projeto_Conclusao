@@ -5,6 +5,11 @@
       <meta name="cypher-theme" content="light">
       <script>
         (() => {
+          const acessoAdmin = false;
+          if (acessoAdmin) {
+            document.documentElement.classList.add("dark");
+            return;
+          }
           localStorage.setItem("cypher-tema","dark"); const temaConta = document.querySelector('meta[name="cypher-theme"]').content;
           let tema = temaConta === "light" ? "light" : "dark";
           try {
@@ -37,15 +42,16 @@
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#10140f" />
       <title>
-        CYPHER —Oportunidades
+        CYPHER —Mensagens
       </title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/css/estilos.css">
       <link rel="stylesheet" href="/css/tema-cypher-claro.css">
       <link rel="stylesheet" href="/css/tema-cypher-escuro.css">
       
+        
         <link rel="stylesheet" href="/css/chamadas.css">
       
       <link rel="stylesheet" href="/css/tema.css">
@@ -60,7 +66,7 @@
     <body>
 
 
-<div class="dc-shell op-shell">
+<div class="dc-shell op-shell msg-page">
  <a class="dc-skip" href="#op-conteudo">Pular para o conteúdo</a>
  
 <aside class="sidebar" id="navegacao-principal">
@@ -93,9 +99,7 @@
             <span>
             </span>
           </span>
-          <span class="logo-word">
-            CYPHER
-          </span>
+          <span class="logo-word">CYPHER</span>
         </a>
         <div class="sidebar-theme">
           <nav class="entry-theme" aria-label="Aparência da página">
@@ -348,7 +352,7 @@
         </a>
       
         
-        <a class="side-link active" aria-label="Oportunidades" href="/opportunities" aria-current="page">
+        <a class="side-link" aria-label="Oportunidades" href="/opportunities" >
           <span class="side-icon lucide-icon" aria-hidden="true">
             
 <svg
@@ -372,6 +376,32 @@
           </span>
           <span class="side-link-label">
             Oportunidades
+          </span>
+          
+        </a>
+      
+        
+        <a class="side-link active" aria-label="Mensagens" href="/messages" aria-current="page">
+          <span class="side-icon lucide-icon" aria-hidden="true">
+            
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+
+          </span>
+          <span class="side-link-label">
+            Mensagens
           </span>
           
         </a>
@@ -562,7 +592,7 @@
         
       </div>
 
-      <a class="reputation-mini reputation-link" href="/colaboracoes" aria-label="Consultar reputação profissional">
+      <a class="reputation-mini reputation-link" href="/colaboracoes">
         <div class="mini-heading"><span>REPUTAÇÃO</span><span class="lucide-icon" aria-hidden="true">
 <svg
   class="lucide lucide-circle"
@@ -582,8 +612,8 @@
         <div class="rep-number">—</div><p>Ainda sem avaliações</p>
       </a>
       <div class="sidebar-account-row">
-      <a class="user-mini" href="/profile" aria-label="Abrir perfil demenor-a">
-        <div class="avatar avatar-yellow">
+      <a class="user-mini" href="/profile" aria-label="MM · @menor-a · Rapper">
+        <div class="avatar avatar-yellow" aria-hidden="true">
           
 
   MM
@@ -592,7 +622,7 @@
         </div>
         <div>
           <strong>
-            menor-a
+            @menor-a
           </strong>
           <span>
             Rapper
@@ -635,30 +665,13 @@
 </svg>
 </button>
   <a class="dc-brand" href="/dashboard" aria-label="Cypher — início">CYPHER</a>
-  <div class="dc-title"><h1 id="op-titulo">Oportunidades</h1><p>Encontros profissionais que fazem a cena acontecer.</p></div>
+  <div class="dc-title"><h1 id="op-titulo">Mensagens</h1><p></p></div>
   <div class="dc-account">
     <form class="global-search dc-search" action="/search" method="get" role="search" aria-label="Busca global" data-global-search>
-  <button class="global-search-toggle" type="button" aria-label="Abrir busca" aria-expanded="false" aria-controls="cypher-search-field" hidden>
-<svg
-  class="lucide lucide-search"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m21 21-4.34-4.34" />
-  <circle cx="11" cy="11" r="8" />
-</svg>
-</button>
-  <div class="global-search-field" id="cypher-search-field">
+  <div class="global-search-field">
     <label class="sr-only" for="cypher-global-search">Buscar na Cypher</label>
     <input id="cypher-global-search" name="q" type="search" value="" maxlength="100" placeholder="Buscar na Cypher" autocomplete="off" spellcheck="false" aria-controls="cypher-search-suggestions" aria-expanded="false">
-    <button type="submit" aria-label="Pesquisar na Cypher">
+    <button class="global-search-button" type="submit" aria-label="Pesquisar na Cypher">
 <svg
   class="lucide lucide-search"
   xmlns="http://www.w3.org/2000/svg"
@@ -722,7 +735,7 @@
         
       </section>
     </div>
-    <a class="topbar-avatar" href="/profile" aria-label="Abrir perfil de menor-a" title="Perfil de menor-a">
+    <a class="topbar-avatar" href="/profile" aria-label="MM · Perfil de @menor-a" title="Perfil de @menor-a">
       
 
   MM
@@ -735,18 +748,152 @@
 
 
  <div class="dc-content op-content" id="op-conteudo" tabindex="-1">
- <nav class="op-tabs" aria-label="Navegação de oportunidades">
- 
- <a href="/opportunities" >Explorar</a>
- <a href="/my-applications" >Minhas candidaturas</a><a href="/my-opportunities" >Minhas oportunidades</a>
- <a href="/messages">Mensagens</a>
- </nav>
  
  
- <header class="op-section-heading"><span class="op-eyebrow">Contato e negociação</span><h2>Contato de teste</h2><p>Mensagens privadas, propostas e encontros profissionais.</p></header>
-<section class="op-panel"><h3>Conversa · Contato de teste</h3><div class="op-chat" aria-label="Histórico de mensagens"><p class="op-note">Este é o começo da conversa. Combine os detalhes e registre as condições na proposta.</p></div>
-<p class="op-feedback" role="status">Este contato não está disponível pelas proteções etárias da conta. O histórico autorizado permanece disponível.</p>
-<form method="post" action="/messages/block" data-confirm="Bloquear novos contatos desta pessoa? O histórico da conversa será preservado."><input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><input type="hidden" name="alvo_id" value="autor"><button class="op-text-link" name="acao" value="bloquear">Bloquear contato</button></form></section>
+ 
+ 
+  <section class="msg-layout has-conversation" aria-label="Mensagens privadas">
+    <aside class="msg-sidebar" aria-label="Pessoas e conversas">
+      <div class="msg-sidebar-head">
+        <h2>Conversas</h2>
+        <form class="msg-search" role="search" action="/messages" method="get" data-message-search>
+          <label class="sr-only" for="msg-person-search">Buscar pessoas</label>
+          <div class="msg-search-field"><input id="msg-person-search" name="q" type="search" value="" maxlength="100" placeholder="Nome ou @" autocomplete="off"><button type="submit" aria-label="Buscar pessoas">
+<svg
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+</button></div>
+        </form>
+        <details class="msg-settings">
+          <summary title="Preferências de mensagens" aria-label="Preferências de mensagens">
+<svg
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+</summary>
+          <div class="msg-settings-panel">
+            <h3>Preferências de mensagens</h3>
+            <form class="msg-settings-form" action="/messages/preferences" method="post">
+              <input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+              <fieldset class="msg-settings-group"><legend>Receber de</legend>
+                <label class="msg-settings-option"><span>Profissionais</span><input type="checkbox" name="profissionais" value="sim" checked></label>
+                <label class="msg-settings-option"><span>Consumidores</span><input type="checkbox" name="consumidores" value="sim" ></label>
+              </fieldset>
+              <button class="op-button op-primary msg-settings-save" type="submit">Salvar</button>
+            </form>
+            
+          </div>
+        </details>
+      </div>
+      
+
+      <div class="msg-sidebar-scroll">
+        
+          <section class="msg-list-section" aria-labelledby="msg-conversations-title">
+            <h3 id="msg-conversations-title">Conversas <span>2</span></h3>
+            
+              <div class="msg-person msg-conversation-item is-active">
+                <a class="msg-conversation-hit" href="/messages/conversa-etaria-adulto" aria-label="Abrir conversa com @autor" aria-current="page"></a>
+                <a class="msg-avatar msg-avatar-link" href="/p/autor" aria-label="Ver perfil de @autor">
+                  AA
+                </a>
+                <span class="msg-person-info"><span class="msg-person-top"><a class="msg-person-name" href="/p/autor">@autor</a></span><span class="msg-person-bottom"><span>Contato de teste</span></span></span>
+              </div>
+            
+              <div class="msg-person msg-conversation-item">
+                <a class="msg-conversation-hit" href="/messages/conversa-etaria-pares" aria-label="Abrir conversa com @menor-b"></a>
+                <a class="msg-avatar msg-avatar-link" href="/p/menor-b" aria-label="Ver perfil de @menor-b">
+                  MM
+                </a>
+                <span class="msg-person-info"><span class="msg-person-top"><a class="msg-person-name" href="/p/menor-b">@menor-b</a><time title="26/11/2026">agora</time></span><span class="msg-person-bottom"><span>Conversa entre pares</span></span></span>
+              </div>
+            
+          </section>
+        
+
+        <section class="msg-list-section" aria-labelledby="msg-new-title">
+          <h3 id="msg-new-title">Novos contatos <span>0</span></h3>
+          
+            <p class="msg-empty-list">Nenhum novo contato disponível agora.</p>
+          
+        </section>
+      </div>
+    </aside>
+
+    <div class="msg-main msg-main-active">
+      
+        <header class="msg-chat-head">
+          <a class="msg-mobile-back" href="/messages" aria-label="Voltar às conversas">
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+</a>
+          <a class="msg-avatar msg-avatar-large msg-avatar-link" href="/p/autor" aria-label="Ver perfil de @autor">
+            @A
+          </a>
+          <div class="msg-chat-person"><h2><a href="/p/autor">@autor</a></h2><span>Contato de teste</span></div>
+          <details class="msg-chat-actions"><summary title="Opções da conversa" aria-label="Opções da conversa">•••</summary><div>
+            <form method="post" action="/messages/conversa-etaria-adulto/hide"><input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><button type="submit">Ocultar da minha caixa</button></form>
+            <form method="post" action="/messages/block" data-confirm="Bloquear novos contatos desta pessoa? O histórico da conversa será preservado."><input type="hidden" name="_csrf" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><input type="hidden" name="alvo_id" value="autor"><button type="submit" name="acao" value="bloquear">Bloquear contato</button></form>
+          </div></details>
+        </header>
+        <div class="msg-history" aria-label="Histórico de mensagens">
+          <div class="msg-first-message"><span aria-hidden="true">
+<svg
+  class="lucide lucide-circle"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+</svg>
+</span><h3>Comece a conversa</h3><p>Escreva uma mensagem para @autor.</p></div>
+          
+        </div>
+        <p class="msg-send-disabled" role="status">Este contato não está disponível pelas proteções etárias da conta. O histórico permanece disponível.</p>
+      
+    </div>
+  </section>
 
 
  </div>
@@ -876,6 +1023,16 @@
 
 </div>
 <script src="/js/chamadas.js" defer></script>
+<link rel="stylesheet" href="/css/confirmacao-cypher.css">
+<dialog class="cy-confirm" id="cy-confirm" aria-labelledby="cy-confirm-title" aria-describedby="cy-confirm-message">
+  <form method="dialog">
+    <p class="cy-confirm-kicker" aria-hidden="true">CYPHER / CONFIRMAÇÃO</p>
+    <h2 id="cy-confirm-title">Confirmar ação</h2>
+    <p id="cy-confirm-message"></p>
+    <div class="cy-confirm-actions"><button value="cancelar" autofocus>Cancelar</button><button value="confirmar" class="cy-confirm-submit">Confirmar</button></div>
+  </form>
+</dialog>
+<script src="/js/confirmacao-cypher.js" defer></script>
 <button class="mobile-overlay" type="button" data-sidebar-close aria-label="Fechar menu de navegação" hidden>
 </button>
 <script src="/js/interacoes.js" defer>

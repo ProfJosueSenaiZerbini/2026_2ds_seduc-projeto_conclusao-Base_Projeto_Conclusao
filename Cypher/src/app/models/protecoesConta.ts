@@ -1,4 +1,5 @@
 import type Database from "better-sqlite3";
+import { consultaPreparada } from "./consultaPreparada.js";
 import {
   dataAtualCadastro,
   idadeNaData,
@@ -8,7 +9,7 @@ type Banco = Database.Database;
 
 export function contaEncerrada(db: Banco, id: string): boolean {
   return Boolean(
-    db.prepare("SELECT 1 FROM encerramentos_conta WHERE usuario_id=?").get(id)
+    consultaPreparada(db, "SELECT 1 FROM encerramentos_conta WHERE usuario_id=?").get(id)
   );
 }
 
@@ -17,8 +18,7 @@ export function menorProtegido(
   id: string,
   hoje = dataAtualCadastro()
 ): boolean {
-  const perfil = db
-    .prepare("SELECT nascimento FROM perfis WHERE usuario_id=?")
+  const perfil = consultaPreparada(db, "SELECT nascimento FROM perfis WHERE usuario_id=?")
     .get(id) as { nascimento: string } | undefined;
   return Boolean(
     perfil?.nascimento &&

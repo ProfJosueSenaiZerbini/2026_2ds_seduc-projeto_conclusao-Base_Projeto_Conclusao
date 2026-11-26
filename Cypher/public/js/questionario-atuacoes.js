@@ -782,7 +782,8 @@
     for (const link of page.querySelectorAll("[data-sticker]")) {
       const active = link.dataset.sticker === next;
       const name = link.querySelector("strong").textContent;
-      link.setAttribute("aria-label", active ? name + " selecionado. Trocar tipo de conta" : "Selecionar " + name + ". " + link.querySelector("small").textContent);
+      const descricao = link.querySelector("small").textContent;
+      link.setAttribute("aria-label", name + ". " + descricao + (active ? " Conta selecionada. Trocar tipo de conta." : ""));
       link.href = active ? "/register" : "/register?tipo=" + link.dataset.sticker;
     }
     const after = sticker.getBoundingClientRect();

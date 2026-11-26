@@ -243,7 +243,7 @@ try {
       /href="\/search/
     );
     if (tipo === "pessoas") {
-      assert.equal((html.match(/class="search-person"/g) || []).length, 1);
+      assert.equal((html.match(/class="cy-profile-card"/g) || []).length, 1);
       assert.match(html, /Rapper/);
       assert.match(html, /Beatmaker/);
       assert.doesNotMatch(
@@ -296,7 +296,7 @@ try {
   const paginada = await (
     await get("/search?q=Profissional&tipo=pessoas&pagina=2")
   ).text();
-  assert.equal((paginada.match(/class="search-person"/g) || []).length, 1);
+  assert.equal((paginada.match(/class="cy-profile-card"/g) || []).length, 1);
   assert.match(paginada, /Página 2 de 2/);
   assert.match(paginada, /q=Profissional&amp;tipo=pessoas&amp;pagina=1/);
   const escaped = await (

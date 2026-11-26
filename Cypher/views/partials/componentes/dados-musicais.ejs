@@ -1,0 +1,23 @@
+<% if (musical.isrc || musical.iswc) { %>
+  <dl class="et-facts">
+    <% if (musical.isrc) { %><div><dt>ISRC do fonograma</dt><dd><%= musical.isrc %></dd></div><% } %>
+    <% if (musical.iswc) { %><div><dt>ISWC da composição</dt><dd><%= musical.iswc %></dd></div><% } %>
+  </dl>
+<% } %>
+<% if (musical.composicoes.length) { %>
+  <details><summary>Composições da gravação</summary><ul>
+    <% for (const composicao of musical.composicoes) { %><li><a href="<%= base + encodeURIComponent(composicao.id) %>"><%= composicao.titulo %></a></li><% } %>
+  </ul></details>
+<% } %>
+<% if (musical.lancamento) { %>
+  <% if (musical.faixas.length) { %>
+    <details><summary>Faixas em ordem</summary><ol>
+    <% for (const faixa of musical.faixas) { %><li>
+      <% if (faixa.propriaFicha) { %><%= faixa.titulo %><% } else { %><a href="<%= base + encodeURIComponent(faixa.obraId) %>"><%= faixa.titulo %></a><% } %>
+    </li><% } %>
+    </ol></details>
+  <% } %>
+  <% const evidencia = { pendente: 'Evidência aguardando revisão', recusada: 'Evidência recusada', indisponivel: 'Áudio usado na comprovação indisponível' }; %>
+  <% if (musical.data) { %><p>Lançamento comprovado em <time datetime="<%= musical.data %>"><%= musical.data.split('-').reverse().join('/') %></time> <% if (musical.url) { %><a href="<%= musical.url %>" target="_blank" rel="noopener noreferrer">Ver publicação externa (nova aba)</a><% } %></p>
+  <% } else { %><p><%= evidencia[musical.estado] || 'Aguardando comprovação de lançamento' %></p><% } %>
+<% } %>

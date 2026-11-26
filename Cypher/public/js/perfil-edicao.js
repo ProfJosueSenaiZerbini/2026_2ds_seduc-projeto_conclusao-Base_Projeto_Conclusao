@@ -6,35 +6,53 @@
 
   const tabs = [...editor.querySelectorAll("[data-profile-edit-tab]")];
   const panels = [...editor.querySelectorAll("[data-profile-edit-panel]")];
-  const forms = [...editor.querySelectorAll("form[data-profile-section-form]")];
+  const forms = [...editor.querySelectorAll("form")];
+  forms.forEach(form => {
+    form.dataset.profileSection = form.closest("[data-profile-edit-panel]")?.dataset.profileEditPanel;
+  });
+  const navigation = editor.querySelector("[data-profile-edit-nav]");
+  const compactNavigation = window.matchMedia("(max-width: 800px)");
+  const updateOrientation = () => navigation?.setAttribute("aria-orientation", compactNavigation.matches ? "horizontal" : "vertical");
+  compactNavigation.addEventListener("change", updateOrientation);
+  updateOrientation();
   const draftStatus = editor.querySelector("[data-profile-draft-status]");
   const markers = new Map();
   const snapshots = new Map();
   const dirtyForms = new Set();
+  const pendingForms = new Set();
   let submitting = false;
 
   const sectionExists = name =>
     panels.some(panel => panel.dataset.profileEditPanel === name);
 
-  function setSection(name, updateAddress = true) {
+  function setSection(name, updateAddress = true, focusTab = true) {
     const section = sectionExists(name)
       ? name
       : editor.dataset.defaultSection || "pessoal";
     panels.forEach(panel => {
       panel.hidden = panel.dataset.profileEditPanel !== section;
+      panel.tabIndex = 0;
     });
-    tabs.forEach((tab, index) => {
+    tabs.forEach(tab => {
       const active = tab.dataset.profileEditTab === section;
       tab.setAttribute("aria-selected", String(active));
       tab.tabIndex = active ? 0 : -1;
       tab.classList.toggle("is-active", active);
-      if (active) tab.focus({ preventScroll: true });
+      if (active && focusTab) tab.focus({ preventScroll: true });
+      if (active && compactNavigation.matches && navigation) {
+        // Move only the tab strip; preserve the page's vertical position.
+        const navBox = navigation.getBoundingClientRect();
+        const tabBox = tab.getBoundingClientRect();
+        const shift = tabBox.left < navBox.left ? tabBox.left - navBox.left - 4
+          : tabBox.right > navBox.right ? tabBox.right - navBox.right + 4 : 0;
+        if (shift) navigation.scrollBy({ left: shift, behavior: focusTab && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "instant" });
+      }
     });
 
     if (updateAddress) {
       const url = new URL(window.location.href);
       url.searchParams.set("secao", section);
-      window.history.replaceState(window.history.state, "", url);
+      if (url.href !== window.location.href) window.history.pushState(window.history.state, "", url);
     }
   }
 
@@ -62,7 +80,7 @@
     return (
       tabs
         .find(tab => tab.dataset.profileEditTab === section)
-        ?.textContent.trim() || "esta seção"
+        ?.querySelector("[data-profile-tab-label]")?.textContent.trim() || "esta seção"
     );
   }
 
@@ -102,7 +120,9 @@
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setSection(tab.dataset.profileEditTab));
     tab.addEventListener("keydown", event => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+      const previousKey = compactNavigation.matches ? "ArrowLeft" : "ArrowUp";
+      const nextKey = compactNavigation.matches ? "ArrowRight" : "ArrowDown";
+      if (![previousKey, nextKey, "Home", "End"].includes(event.key))
         return;
       event.preventDefault();
       const nextIndex =
@@ -110,7 +130,7 @@
           ? 0
           : event.key === "End"
             ? tabs.length - 1
-            : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) %
+            : (index + (event.key === nextKey ? 1 : -1) + tabs.length) %
               tabs.length;
       tabs[nextIndex]?.click();
     });
@@ -120,17 +140,51 @@
     snapshots.set(form, fingerprint(form));
     form.addEventListener("input", () => checkForm(form));
     form.addEventListener("change", () => checkForm(form));
-    form.addEventListener("submit", () => {
-      submitting = true;
-      const button = form.querySelector('button[type="submit"]');
-      if (button) {
-        button.disabled = true;
-        button.setAttribute("aria-busy", "true");
-        button.dataset.originalText = button.textContent.trim();
-        button.textContent = "Salvando…";
-      }
+    form.addEventListener("submit", event => {
+      if (pendingForms.has(form)) { event.preventDefault(); return; }
+      // Wait for the category validators before showing a saving state.
+      queueMicrotask(() => {
+        if (event.defaultPrevented) return;
+        pendingForms.add(form);
+        submitting = ![...dirtyForms].some(dirty => dirty !== form);
+        const button = event.submitter || form.querySelector('button[type="submit"]');
+        if (button) {
+          // Keep named submitters enabled so actions such as removing a seal
+          // are included in the submitted form data.
+          button.setAttribute("aria-busy", "true");
+          button.setAttribute("aria-disabled", "true");
+          button.dataset.originalText = button.textContent.trim();
+          button.textContent = "Salvando…";
+        }
+      });
     });
   });
+
+  function resetSubmission() {
+    pendingForms.clear();
+    submitting = false;
+    editor.querySelectorAll("button[data-original-text]").forEach(button => {
+      button.textContent = button.dataset.originalText;
+      button.removeAttribute("aria-busy");
+      button.removeAttribute("aria-disabled");
+      delete button.dataset.originalText;
+    });
+  }
+  window.addEventListener("pageshow", resetSubmission);
+  // Shared form helpers finish enabling/disabling conditional fields on load.
+  document.addEventListener("DOMContentLoaded", () => {
+    forms.forEach(form => snapshots.set(form, fingerprint(form)));
+  }, { once: true });
+  window.addEventListener("popstate", () => {
+    setSection(new URL(window.location.href).searchParams.get("secao"), false, false);
+  });
+  const biography = editor.querySelector("[data-profile-bio]");
+  const biographyCount = editor.querySelector("[data-profile-bio-count]");
+  const updateBiographyCount = () => {
+    if (biography && biographyCount) biographyCount.textContent = `${biography.value.length}/${biography.maxLength}`;
+  };
+  biography?.addEventListener("input", updateBiographyCount);
+  updateBiographyCount();
 
   const otherCategoryInputs = [
     ...editor.querySelectorAll("[data-category-other]"),
@@ -193,6 +247,8 @@
     if (dirtyForms.size === 0 || submitting) return;
     event.preventDefault();
     event.returnValue = "";
+    // Restore buttons if the person cancels leaving with other drafts open.
+    window.setTimeout(resetSubmission, 0);
   });
 
   const requested = new URL(window.location.href).searchParams.get("secao");
@@ -200,6 +256,7 @@
     sectionExists(requested)
       ? requested
       : editor.dataset.defaultSection || "pessoal",
+    false,
     false
   );
 })();

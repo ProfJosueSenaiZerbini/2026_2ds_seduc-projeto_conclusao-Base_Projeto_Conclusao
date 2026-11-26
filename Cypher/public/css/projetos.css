@@ -16,9 +16,9 @@
 }
 .pt-heading h2 {
   font:
-    700 clamp(28px, 4vw, 46px)/1.12 "Space Grotesk",
+    700 clamp(28px, 4vw, 46px)/1.12 "Oswald",
     sans-serif;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   margin: 12px 0;
 }
 .pt-heading p,
@@ -40,7 +40,7 @@
   color: var(--dc-ink);
   border-radius: 3px;
   font:
-    700 13px "DM Sans",
+    700 13px "Space Grotesk",
     sans-serif;
   cursor: pointer;
   white-space: normal;
@@ -107,7 +107,7 @@
   color: var(--dc-ink);
   border-radius: 3px;
   font:
-    400 14px/1.5 "DM Sans",
+    400 14px/1.5 "Space Grotesk",
     sans-serif;
 }
 .pt-form textarea {

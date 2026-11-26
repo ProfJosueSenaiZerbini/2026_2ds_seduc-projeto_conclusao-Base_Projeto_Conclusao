@@ -1,0 +1,8 @@
+<%- include('../partials/inicio-trabalhos', { breadcrumb: title }) %>
+<a class="et-back" href="<%= ficha %>">Voltar ao lançamento</a>
+<section class="et-sheet">
+  <h2 class="cy-work-heading">Revise os dados da comprovação</h2>
+  <p role="alert"><%= erro %></p>
+  <%- include('../partials/componentes/evidencia-lancamento', { id: decodeURIComponent(ficha.split('/').at(-1)), valores }) %>
+</section>
+<%- include('../partials/fim-trabalhos') %>

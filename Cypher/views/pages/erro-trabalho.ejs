@@ -1,4 +1,4 @@
-<%- include('../partials/inicio-trabalhos',{breadcrumb:'Trabalhos e galerias'}) %>
-<a class="et-back" href="/work-projects">Voltar aos trabalhos</a>
-<div class="pt-feedback" role="alert"><h1>Não foi possível continuar</h1><p><%= erro %></p><p>Se você estava preenchendo um formulário, volte pelo navegador para revisar os dados.</p></div>
+<%- include('../partials/inicio-trabalhos',{breadcrumb:typeof voltar === 'string' ? 'Espaço de Trabalho' : 'Trabalhos e galerias'}) %>
+<a class="et-back" href="<%= typeof voltar === 'string' ? voltar : '/work-projects' %>"><%= typeof voltar === 'string' ? 'Voltar à obra' : 'Voltar aos trabalhos' %></a>
+<div class="pt-feedback" role="alert"><h2 class="cy-work-heading">Não foi possível continuar</h2><p><%= erro %></p><p>Se você estava preenchendo um formulário, volte pelo navegador para revisar os dados.</p></div>
 <%- include('../partials/fim-trabalhos') %>

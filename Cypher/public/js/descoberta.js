@@ -3,6 +3,82 @@ const contagemSempreVisivel = window.matchMedia(
   "(max-width: 900px) and (hover: none)"
 );
 
+document.querySelectorAll("[data-release-open]").forEach(abrir => {
+  const dialogo = abrir.nextElementSibling;
+  if (!dialogo?.matches("[data-release-dialog]") || !dialogo.showModal) return;
+
+  const audio = dialogo.querySelector("[data-release-audio]");
+  const tituloAtual = dialogo.querySelector("[data-release-now]");
+  const status = dialogo.querySelector("[data-release-status]");
+  let faixaAtual;
+  let cliqueNoFundo = false;
+
+  abrir.setAttribute("aria-haspopup", "dialog");
+  abrir.addEventListener("click", evento => {
+    if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey)
+      return;
+    dialogo.showModal();
+    evento.preventDefault();
+  });
+  dialogo.addEventListener("pointerdown", evento => {
+    cliqueNoFundo = evento.target === dialogo;
+  });
+  dialogo.addEventListener("click", evento => {
+    if (cliqueNoFundo && evento.target === dialogo) dialogo.close();
+    cliqueNoFundo = false;
+  });
+  dialogo.addEventListener("close", () => {
+    audio?.pause();
+    abrir.focus({ preventScroll: true });
+  });
+
+  if (!audio) return;
+  const falha = "Não foi possível reproduzir este áudio.";
+  const atualizarReproducao = () =>
+    faixaAtual?.setAttribute(
+      "aria-pressed",
+      String(!audio.paused && !audio.ended)
+    );
+
+  audio.addEventListener("play", () => {
+    status.textContent = "";
+    atualizarReproducao();
+  });
+  audio.addEventListener("pause", atualizarReproducao);
+  audio.addEventListener("ended", atualizarReproducao);
+  audio.addEventListener("error", () => {
+    atualizarReproducao();
+    status.textContent = falha;
+  });
+
+  dialogo.querySelectorAll("[data-release-track]").forEach(faixa => {
+    faixa.addEventListener("click", () => {
+      if (faixaAtual === faixa && !audio.paused) {
+        audio.pause();
+        return;
+      }
+      if (faixaAtual !== faixa) {
+        faixaAtual?.removeAttribute("aria-current");
+        faixaAtual?.setAttribute("aria-pressed", "false");
+        faixaAtual = faixa;
+        faixa.setAttribute("aria-current", "true");
+        audio.src = faixa.dataset.releaseTrack;
+        audio.hidden = false;
+        audio.setAttribute(
+          "aria-label",
+          "Reprodutor de " + faixa.dataset.trackTitle
+        );
+        tituloAtual.textContent = faixa.dataset.trackTitle;
+      }
+      status.textContent = "";
+      audio.play().catch(erro => {
+        if (faixaAtual === faixa && erro.name !== "AbortError")
+          status.textContent = falha;
+      });
+    });
+  });
+});
+
 document.querySelectorAll("time.dc-event-date").forEach((data, indice) => {
   const aviso = data.querySelector(".dc-event-countdown");
   const card = data.closest(".dc-event-card");
@@ -44,10 +120,9 @@ const conteudoDestaques = document.querySelector(".dc-feature-content");
 const navegacao = document.querySelector(".dc-feature-nav");
 if (conteudoDestaques && navegacao) {
   const slides = conteudoDestaques.querySelectorAll(".dc-slide");
-  const indicadores = Array.from(
-    navegacao.querySelectorAll(".dc-feature-choice")
+  const radios = Array.from(
+    navegacao.querySelectorAll(".dc-feature-choice input")
   );
-  const radios = indicadores.map(indicador => indicador.querySelector("input"));
   const anterior = navegacao.querySelector(".dc-feature-prev");
   const proximo = navegacao.querySelector(".dc-feature-next");
   const status = navegacao.querySelector(".dc-feature-status");
@@ -59,7 +134,6 @@ if (conteudoDestaques && navegacao) {
   ) {
     navegacao.hidden = false;
     let atual = 0;
-    const trilha = navegacao.querySelector(".dc-feature-choices");
     const contador = navegacao.querySelector(".dc-feature-counter");
     let transicao;
 
@@ -75,20 +149,6 @@ if (conteudoDestaques && navegacao) {
         status.textContent = radios[indice].getAttribute("aria-label");
       if (contador)
         contador.textContent = `${String(indice + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
-      const escolha = indicadores[indice];
-      if (trilha) {
-        const esquerda =
-          escolha.getBoundingClientRect().left -
-          trilha.getBoundingClientRect().left +
-          trilha.scrollLeft;
-        trilha.scrollTo({
-          left: Math.max(
-            0,
-            esquerda - (trilha.clientWidth - escolha.clientWidth) / 2
-          ),
-          behavior: movimentoReduzido.matches ? "auto" : "smooth",
-        });
-      }
       transicao?.cancel();
       if (antigo !== indice && !movimentoReduzido.matches)
         transicao = slides[indice].animate(

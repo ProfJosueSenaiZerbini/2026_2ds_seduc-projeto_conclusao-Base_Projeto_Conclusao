@@ -18,6 +18,7 @@
         Senha
         <input type="password" name="password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
       </label>
+      <p class="auth-switch login-recuperacao"><a href="/recuperar-senha">Esqueci minha senha</a></p>
       <button class="button button-lime full" type="submit">
         Entrar
         <span class="lucide-icon" aria-hidden="true">
@@ -26,7 +27,8 @@
       </button>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
-    <p class="auth-switch"><a href="/recuperar-senha">Esqueci minha senha</a></p>
-    <p class="auth-switch"><a href="/email/pendente">Ainda não confirmou seu e-mail?</a></p>
+
+
     <p class="join-cypher">Chega junto. <a href="/register">Crie sua conta <span aria-hidden="true"><%- icones.arrowUpRight %></span></a></p>
+    <p class="auth-switch login-confirmacao"><a href="/email/pendente">Confirmar e-mail</a></p>
   </section></div></div></main><%- include('../partials/fim-pagina') %>

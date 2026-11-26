@@ -1,0 +1,16 @@
+<%- include('../partials/inicio-trabalhos', { breadcrumb: 'Espaço de Trabalho' }) %>
+<a class="et-back" href="/notificacoes"><%- icones.arrowLeft %> Voltar às notificações</a>
+<article class="et-sheet">
+  <header class="et-heading">
+    <h2 class="cy-work-heading">Confirmar crédito</h2>
+    <p><%= convite.autor %> indicou sua participação em “<%= convite.titulo %>”.</p>
+  </header>
+  <p class="et-role"><%= [convite.funcao, convite.participacao].filter(Boolean).join(' · ') %></p>
+  <p class="et-description">Ao confirmar, a participação passa a constar na ficha da obra e fica disponível para seu portfólio.</p>
+  <form class="et-sheet-actions" method="post" action="/espaco-de-trabalho/creditos/<%= encodeURIComponent(creditoId) %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="et-action" type="submit">Confirmar participação</button>
+  </form>
+  <a class="et-more" href="/creditos/obra/<%= encodeURIComponent(creditoId) %>">Consultar ou recusar crédito</a>
+</article>
+<%- include('../partials/fim-trabalhos') %>

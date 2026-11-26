@@ -6,6 +6,7 @@ export const audioCatalogoLocal: Record<string, string> = {
   "demo-beat-visao-de-rua": "/audio/beats/__Vis%C3%A3o_de_Rua___Boom_Bap_Type_Beat_Cassol_x__Drizzy_x_Pecaos_Type_Beat_Boom_Bap_Rap_Sujo_%5BVENDIDO%5D_MP3_256kbps.mp3",
   "demo-beat-parece-sorte": "/audio/beats/__Parece_Sorte___Boom_Bap_Type_Beat_Cassol_x__Drizzy_x_Pecaos_Type_Beat_Boom_Bap_Rap_Sujo_MP3_256kbps.mp3",
   "demo-beat-desde-ontem": "/audio/beats/_Desde_Ontem__Base_de_Rap_Pecaos_x_Cassol_Beat_Boom_Bap_x_Drizzy_Type_Beat_Boombap_Sujo_MP3_320kbps.mp3",
+  "demo-beat-spider-man": "/audio/beats/%5BFREE%5D_021_Richard_x_Putodiparis_x_Acuk47_Type_Beat_Detroit__Spider-Man__MP3_320kbps.mp3",
   "demo-beat-caos": "/audio/beats/%5BFREE%5D_Alee_x_Js_da_torre_x_Tokiodk_Hoodtrap_Type_Beat__CAOS__MP3_256kbps.mp3",
   "demo-album-profetiza-faixa-1": "/audio/Profetiza/1._LEZIN_-_INTRO_(Papatunes)_MP3_256kbps.mp3",
   "demo-album-profetiza-faixa-2": "/audio/Profetiza/2._LEZIN_-_OVELHA_NEGRA_(Prod._Yvri)_MP3_256kbps.mp3",

@@ -1,5 +1,6 @@
 <%- include('../partials/cabecalho', { title, stylesheet }) %>
-<div class="dc-shell pf-shell">
+<% if (typeof editando !== 'undefined' && editando) { %><link rel="stylesheet" href="/css/perfil-edicao.css"><% } %>
+<div class="dc-shell pf-shell<%= typeof editando !== 'undefined' && editando ? ' pf-edit-shell' : '' %>">
   <a class="dc-skip" href="#perfil">Pular para o perfil</a>
   <%- include('../partials/barra-lateral', {path}) %>
   <div class="dc-page">

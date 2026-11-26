@@ -185,7 +185,7 @@ const roteiro = `
   assert.ok(propostaCategoria);
   assert.equal(revisarPropostaCategoriaCypher(propostaCategoria.id, admin.id, admin.email, true, "Proposta fora do catálogo canônico."), false);
   assert.equal(listarCategoriasProfissionaisCypher().includes("Engenheiro de palco"), false);
-  assert.equal(podeCriarObra(["Letrista"]), false);
+  assert.equal(podeCriarObra(["Letrista"]), true);
   assert.equal(podeCriarObra(["MC"]), false);
   assert.equal(podeCriarObra(["Compositor(a)"]), true);
   assert.equal(solicitarCategoriaProfissionalCypher(usuario.id, "Diretor de palco"), "criada");

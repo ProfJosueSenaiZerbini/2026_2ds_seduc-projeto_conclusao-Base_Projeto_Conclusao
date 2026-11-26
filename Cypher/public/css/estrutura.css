@@ -98,11 +98,11 @@
 
 .logo-word {
   line-height: 1;
+  font-family: "Archivo Black", "Arial Black", Arial, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: -0.055em;
 }
-
-
-
-
 
 .side-nav {
   display: flex;
@@ -752,72 +752,6 @@ a.topbar-avatar:hover {
 
 /* Opções da conta no rodapé da navegação. */
 .sidebar-bottom { position: relative; }
-.sidebar-account-row { display: flex; align-items: center; gap: 8px; }
-.sidebar-account-row .user-mini { flex: 1; min-width: 0; }
-.sidebar-options { position: relative; flex: 0 0 40px; }
-.sidebar-options-checkbox {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-.sidebar-options-toggle {
-  position: relative;
-  display: block;
-  box-sizing: border-box;
-  width: 40px;
-  height: 40px;
-  border: 1px solid transparent;
-  border-radius: 2px 5px 1px 4px;
-  color: var(--dc-accent, #9aaf58);
-  background: transparent;
-  cursor: pointer;
-  transition: color .2s ease;
-}
-.sidebar-options-toggle:hover,
-.sidebar-options-checkbox:checked + .sidebar-options-toggle {
-  color: var(--dc-olive, #82984b);
-}
-.sidebar-options-checkbox:focus-visible + .sidebar-options-toggle {
-  outline: 2px solid var(--dc-olive, #82984b);
-  outline-offset: 4px;
-}
-.sidebar-options-bar {
-  position: absolute;
-  left: 7px;
-  top: 18px;
-  width: 24px;
-  height: 2px;
-  border-radius: 1px;
-  background: currentColor;
-  transform-origin: center;
-  transition:
-    transform .35s cubic-bezier(.4, 0, .2, 1),
-    width .35s ease,
-    opacity .2s ease;
-}
-.sidebar-options-bar:first-child {
-  width: 17px;
-  transform: translateY(-7px);
-}
-.sidebar-options-bar:last-child {
-  left: auto;
-  right: 7px;
-  width: 17px;
-  transform: translateY(7px);
-}
-.sidebar-options-checkbox:checked + .sidebar-options-toggle .sidebar-options-bar:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-.sidebar-options-checkbox:checked + .sidebar-options-toggle .sidebar-options-bar:first-child {
-  width: 24px;
-  transform: rotate(225deg);
-}
-.sidebar-options-checkbox:checked + .sidebar-options-toggle .sidebar-options-bar:last-child {
-  width: 24px;
-  transform: rotate(135deg);
-}
 .sidebar-bottom > .resource-links {
   position: fixed;
   inset: auto;
@@ -848,6 +782,4 @@ a.topbar-avatar:hover {
   color: #eef5ea;
   box-shadow: 8px 0 28px #0005;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sidebar-options-toggle, .sidebar-options-bar { transition-duration: 0s !important; }
-}
+

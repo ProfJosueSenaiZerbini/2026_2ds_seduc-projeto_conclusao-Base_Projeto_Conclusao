@@ -41,7 +41,7 @@ body {
   isolation: isolate;
   min-height: 100svh;
   color: var(--ink);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
@@ -136,7 +136,7 @@ textarea {
 .rep-number span {
   margin-left: 3px;
   color: #73806f;
-  font-family: "DM Sans", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0;
@@ -200,10 +200,10 @@ textarea {
 .page-header h1 {
   margin: 9px 0 8px;
   color: var(--ink);
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Oswald", sans-serif;
   font-size: clamp(35px, 4vw, 58px);
   line-height: 0.98;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 

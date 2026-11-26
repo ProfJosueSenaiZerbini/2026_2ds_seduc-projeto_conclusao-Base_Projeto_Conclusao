@@ -1,0 +1,11 @@
+<div class="msg-person msg-new-person<%= conversa && conversa.id === p.conversa_id ? ' is-active' : '' %>">
+  <a class="msg-avatar msg-avatar-link" href="/p/<%= encodeURIComponent(p.identificador.replace(/^@/, '')) %>" aria-label="Ver perfil de <%= p.nome %>">
+    <% if (p.foto) { %><img src="<%= p.foto %>" alt="" loading="lazy"><% } else { %><%= p.iniciais || p.nome.slice(0, 2).toUpperCase() %><% } %>
+  </a>
+  <span class="msg-person-info"><span class="msg-person-top"><a class="msg-person-name" href="/p/<%= encodeURIComponent(p.identificador.replace(/^@/, '')) %>"><%= p.nome %></a><% if (p.novo) { %><span class="msg-new-badge" title="Vocês ainda não trocaram mensagens">Novo</span><% } %></span><span class="msg-person-bottom">@<%= p.identificador.replace(/^@/, '') %></span></span>
+  <% if (p.conversa_id) { %>
+    <a class="msg-contact-action" href="/messages/<%= encodeURIComponent(p.conversa_id) %>" aria-label="Conversar com <%= p.nome %>"><%- icones.arrowRight %></a>
+  <% } else { %>
+    <form method="post" action="/messages/start"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="alvo_id" value="<%= p.usuario_id %>"><button class="msg-contact-action" type="submit" aria-label="Iniciar conversa com <%= p.nome %>"><%- icones.arrowRight %></button></form>
+  <% } %>
+</div>

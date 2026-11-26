@@ -1,7 +1,7 @@
 <% const e = typeof interacao === 'function' ? interacao(tipo, id) : null;
    const lista = typeof colecaoAtual === 'string' ? colecaoAtual : ''; %>
 <% if (e) { const endereco = '/interacoes/' + encodeURIComponent(tipo) + '/' + encodeURIComponent(id); %>
-  <div class="ci-actions" aria-label="Interações com <%= e.alvo.titulo %>">
+  <div class="ci-actions" role="group" aria-label="Interações com <%= e.alvo.titulo %>">
     <% if (!lista && (typeof ocultarCurtida === 'undefined' || !ocultarCurtida)) { %>
       <form method="post" action="<%= endereco %>/curtir" data-ci-action="curtir" data-ci-name="<%= e.alvo.titulo %>">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">

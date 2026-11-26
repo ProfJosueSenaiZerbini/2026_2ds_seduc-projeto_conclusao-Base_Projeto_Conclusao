@@ -82,6 +82,7 @@ import {
   validarSenhaExclusao,
 } from "../validators/validarConta.js";
 import { validarBpm, validarLinkEscuta } from "../validators/validarObra.js";
+import { ErroAcervo, impedirExclusaoVinculada, opcoesAcervo, tipoAcervo, valoresAcervo } from "../models/acervoMusical.js";
 import { listaDeLinhas, validarApresentacaoPerfil, validarPerfil } from "../validators/validarPerfil.js";
 
 const nomeCookieSessao = "cypher_session";
@@ -114,14 +115,14 @@ const caminhosProtegidos = new Set([
 function caminhoProtegido(caminho: string): boolean {
   caminho = caminho.toLowerCase().replace(/\/+$/, "") || "/";
   return (
-    /^\/(interacoes|colecoes|publicacoes|publication-media|representacoes)(\/|$)/.test(caminho) ||
+    /^\/(interacoes|colecoes|publicacoes|publication-media|representacoes|creditos|selos)(\/|$)/.test(caminho) ||
     /^\/(opportunities|my-opportunities|my-applications|service-requests|service-mediation|messages|work-projects|work-media|portfolio|colaboracoes|reputacao|central|suporte|p|beats|purchases|events)(\/|$)/.test(caminho) ||
     caminhosProtegidos.has(caminho) || caminho.startsWith("/espaco-de-trabalho/") || caminho.startsWith("/profile/") || caminho.startsWith("/settings/") || caminho.startsWith("/admin/") || caminho === "/admin" ||
     /^\/(?:works|events|beats)\/[^/]+\/(?:edit|delete)$/.test(caminho) ||
     /^\/events\/[^/]+\/(?:interest|interest\/cancel|interests\/[^/]+\/status)$/.test(
       caminho
     ) ||
-    /^\/works\/[^/]+\/like$/.test(caminho) ||
+    /^\/works\/[^/]+\/(?:like|evidencia)$/.test(caminho) ||
     caminho.startsWith("/notificacoes/") ||
     /^\/admin\/revisao\/(?:generos|categorias-profissionais|excecoes-categorias|solicitacoes-excecao)\/[^/]+$/.test(
       caminho
@@ -523,6 +524,8 @@ export const oportunidades = renderizarPagina(
   () => ({ eventos: CypherModel.eventos() })
 );
 type ValoresFormularioObra = {
+  composicoes?: string[];
+  faixas?: string[];
   visibilidade?: string;
   atuacoes?: string[];
   titulo: string;
@@ -575,6 +578,8 @@ const formularioObraVazio: ValoresFormularioObra = {
 
 function formularioObraRecebido(req: Request): ValoresFormularioObra {
   return {
+    composicoes: camposRepetidos(req, "composicaoId").filter(Boolean),
+    faixas: camposRepetidos(req, "fonogramaId").filter(Boolean),
     atuacoes: req.body.selecionarAtuacoes === "1" || req.body.atuacao !== undefined ? camposRepetidos(req, "atuacao").filter(Boolean) : undefined,
     titulo: String(req.body.titulo ?? "").trim(),
     tipo: String(req.body.tipo ?? "").trim(),
@@ -694,6 +699,7 @@ function renderizarFormularioObra(
   } = {}
 ) {
   const editando = opcoes.editando ?? false;
+  const valores = opcoes.valores ?? formularioObraVazio;
   return res.status(opcoes.status ?? 200).render("pages/cadastro-obra", {
     title: editando ? "Editar obra" : "Cadastrar obra",
     path: "/espaco-de-trabalho",
@@ -704,7 +710,9 @@ function renderizarFormularioObra(
     erro: opcoes.erro ?? null,
     editando,
     obraId: opcoes.obraId ?? "",
-    valores: opcoes.valores ?? formularioObraVazio,
+    valores,
+    classeAcervo: tipoAcervo(valores.tipo),
+    opcoesMusicais: opcoesAcervo(conexaoInternaCypher(), usuario.id),
     tipoOutroLegadoVazio: opcoes.tipoOutroLegadoVazio ?? false,
     generoOutroLegadoVazio: opcoes.generoOutroLegadoVazio ?? false,
     papelOutroLegadoVazio: opcoes.papelOutroLegadoVazio ?? false,
@@ -801,7 +809,8 @@ function validarCreditosObra(
   if (
     creditosPerfil.some(
       credito =>
-        !/^@[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(credito.handle) ||
+        (!/^@[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(credito.handle) &&
+          (!credito.handle.startsWith("@") || validarIdentificador(credito.handle))) ||
         credito.papel.length < 2 ||
         credito.papel.length > 80 ||
         credito.participacao.length > 30
@@ -922,7 +931,7 @@ export const novaObra = (req: Request, res: Response) => {
   }
   if (!podePublicar(usuario,"obra",tipo)) return res.sendStatus(403);
   return renderizarFormularioObra(res, usuario, {
-    valores: { ...formularioObraVazio, tipo },
+    valores: { ...formularioObraVazio, tipo, papel: tipoAcervo(tipo) === "composicao" ? "Composição" : tipo === "Letra" ? "Letra" : formularioObraVazio.papel },
   });
 };
 
@@ -938,7 +947,7 @@ export const editarObra = (req: Request, res: Response) => {
   return renderizarFormularioObra(res, usuario, {
     editando: true,
     obraId: obra.id,
-    valores: preencherFormularioObra(obra),
+    valores: { ...preencherFormularioObra(obra), ...valoresAcervo(conexaoInternaCypher(), obra.id) },
     tipoOutroLegadoVazio: obra.type === "Outro" && !obra.typeDetail,
     generoOutroLegadoVazio: obra.genre === "Outro",
     papelOutroLegadoVazio: obra.role === "Outro crédito" && !obra.roleDetail,
@@ -955,6 +964,8 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
   }
 
   const valores = formularioObraRecebido(req);
+  const classe = tipoAcervo(valores.tipo);
+  const modeloMusical = req.body.acervo === "1" || (classe && valores.visibilidade !== undefined);
   if (valores.atuacoes?.some(id => !listarProfissoesCatalogo().some(p => p.id === id && usuario.categories.includes(p.rotulo)))) return res.sendStatus(400);
   if (!editar && !podePublicar(usuario,"obra",valores.tipo)) return res.sendStatus(403);
   if (valores.tipo === "Beat") {
@@ -977,7 +988,13 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
   const papelOutroLegadoVazio = Boolean(
     obraExistente?.role === "Outro crédito" && !obraExistente.roleDetail
   );
+  const erroCodigo = modeloMusical && (
+    (valores.isrc && (classe !== "fonograma" || !/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/i.test(valores.isrc.replaceAll("-", "")))) ? "Informe um ISRC válido na ficha do fonograma." :
+    (valores.iswc && (classe !== "composicao" || !/^T\d{10}$/i.test(valores.iswc.replace(/[.\-]/g, "")))) ? "Informe um ISWC válido na ficha da composição." : null
+  );
   const erro =
+    erroCodigo ||
+    (
     validarFormularioObra(valores, {
       tipoOutroLegadoVazio,
       generoOutroLegadoVazio,
@@ -988,7 +1005,7 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
       creditos.mencoesFantasma,
       creditos.perfisAlinhados,
       creditos.mencoesAlinhadas
-    );
+    ));
   if (erro) {
     return renderizarFormularioObra(res, usuario, {
       status: 400,
@@ -1006,6 +1023,15 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
 
   try {
     const dados = dadosPersistidosObra(valores);
+    if (modeloMusical) {
+      const enviouVinculos = req.body.acervo === "1" || req.body.composicaoId !== undefined || req.body.fonogramaId !== undefined;
+      dados.acervo = editar && !enviouVinculos ? valoresAcervo(conexaoInternaCypher(), obraId) :
+        { composicoes: valores.composicoes ?? [], faixas: valores.faixas ?? [] };
+      dados.isrc = classe === "fonograma" ? dados.isrc.replaceAll("-", "") : obraExistente?.isrc ?? "";
+      dados.iswc = classe === "composicao" ? dados.iswc.replace(/[.\-]/g, "") : obraExistente?.iswc ?? "";
+      dados.releaseDate = obraExistente?.releaseDate ?? "";
+      if (classe !== "letra" && classe !== "composicao") dados.lyrics = obraExistente?.lyrics ?? "";
+    }
     dados.atuacoes = valores.atuacoes;
     if (valores.genero === "Outro" && valores.generoOutro) {
       const detalheNormalizado = valores.generoOutro.toLocaleLowerCase("pt-BR");
@@ -1066,7 +1092,7 @@ function processarFormularioObra(req: Request, res: Response, editar: boolean) {
     if (dados.propostaGenero) parametros.set("genero", "analise");
     return res.redirect(303, `/espaco-de-trabalho?${parametros.toString()}`);
   } catch (erroGravacao) {
-    const mensagemCredito = mensagemErroCredito(erroGravacao);
+    const mensagemCredito = erroGravacao instanceof ErroAcervo ? erroGravacao.message : mensagemErroCredito(erroGravacao);
     if (!mensagemCredito) {
       console.error("Falha ao salvar obra Cypher:", erroGravacao);
     }
@@ -1099,8 +1125,17 @@ export const excluirObra = (req: Request, res: Response) => {
   if (usuario.demonstracao || usuario.tipoConta !== "profissional") {
     return res.redirect(303, "/works?erro=permissao");
   }
-  const excluida = CypherModel.excluirObra(req.params.id ?? "", usuario.id);
-  if (!excluida) return res.sendStatus(404);
+  const id = req.params.id ?? "";
+  const excluida = CypherModel.excluirObra(id, usuario.id);
+  if (!excluida) {
+    if (CypherModel.obraDoUsuario(id, usuario.id) && impedirExclusaoVinculada(conexaoInternaCypher(), id))
+      return res.status(409).render("pages/erro-trabalho", {
+        title: "Obra vinculada", path: "/espaco-de-trabalho", stylesheet: "espaco-trabalho",
+        voltar: "/espaco-de-trabalho/obra/" + encodeURIComponent(id),
+        erro: "Este registro faz parte de outro trabalho. Retire o vínculo na ficha de edição antes de excluí-lo.",
+      });
+    return res.sendStatus(404);
+  }
   return res.redirect(303, "/espaco-de-trabalho?resultado=excluida");
 };
 export const bancoBeats = renderizarPagina(

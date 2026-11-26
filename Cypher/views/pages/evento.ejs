@@ -21,7 +21,8 @@
     <div class="ev-metrics"><% for(const [nome,total] of [['Interessados',f.totais.interessados],['Inscrições',f.totais.inscritos],['Confirmados',f.totais.confirmados],['Presentes',f.totais.presentes]]){ %><div><strong><%= total %></strong><span><%= nome %></span></div><% } %></div>
     <div class="ev-columns">
      <%- include('../partials/componentes/midias-publicacao',{tipo:'evento',id:e.id}) %>
-<% if(f.dono){ %><a class="ci-button" href="/publicacoes/evento/<%= e.id %>/midias">Enviar cartaz</a><% } %>
+<%- include('../partials/componentes/creditos-ficha',{tipo:'evento',id:e.id}) %>
+<% if(f.dono){ %><a class="ci-button" href="/publicacoes/evento/<%= e.id %>/midias">Enviar cartaz</a><a class="ci-button" href="/creditos/gerir/evento/<%= encodeURIComponent(e.id) %>">Gerenciar créditos</a><% } %>
 <section class="ev-panel" id="participacao"><header class="dc-heading"><h2>Sua participação</h2></header>
       <% if(f.dono){ %><p>Você é responsável pela organização deste evento.</p><a class="dc-primary" href="#gestao">Gerenciar inscrições</a>
       <% }else{ %>
