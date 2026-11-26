@@ -1,0 +1,181 @@
+/* Caixa de conversas (contratante e trabalhador). Reaproveita os tokens do chat.css e das telas de cada perfil. */
+:root {
+  --conversas-bg: var(--trabalhador-creme-claro);
+  --conversas-card: var(--cor-branco);
+  --conversas-borda: var(--trabalhador-borda);
+  --conversas-texto: var(--contratante-musgo);
+  --conversas-mudo: var(--contratante-texto-mudo);
+  --conversas-destaque: var(--contratante-musgo);
+}
+
+body.conversas--contratante {
+  --conversas-bg: var(--contratante-fundo);
+  --conversas-borda: var(--cor-borda);
+  --conversas-texto: var(--cor-texto);
+  --conversas-mudo: var(--cor-texto-mudo);
+  --conversas-destaque: var(--contratante-verde);
+}
+
+body {
+  margin: 0;
+  background: var(--conversas-bg);
+  color: var(--conversas-texto);
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+}
+
+.conversas {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 38px 24px 48px;
+}
+
+.conversas__etiqueta {
+  margin: 0;
+  color: var(--conversas-destaque);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.conversas__titulo {
+  margin: 0.2rem 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.conversas__subtitulo {
+  margin: 0 0 1.75rem;
+  color: var(--conversas-mudo);
+  font-size: 0.95rem;
+}
+
+.conversas__lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversa {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--conversas-borda);
+  border-radius: 14px;
+  background: var(--conversas-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.conversa:hover {
+  border-color: var(--conversas-destaque);
+  box-shadow: 0 4px 14px var(--conversas-borda);
+}
+
+.conversa:focus-visible {
+  outline: 3px solid var(--conversas-destaque);
+  outline-offset: 2px;
+}
+
+.conversa__avatar {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.conversa__avatar.avatar-iniciais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--conversas-destaque);
+  color: var(--cor-branco);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.conversa__corpo {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.conversa__linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conversa__nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversa__horario {
+  flex: 0 0 auto;
+  color: var(--conversas-mudo);
+  font-size: 0.75rem;
+}
+
+.conversa__bico {
+  overflow: hidden;
+  color: var(--conversas-destaque);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversa__previa {
+  overflow: hidden;
+  color: var(--conversas-mudo);
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversa__previa--vazia {
+  font-style: italic;
+}
+
+.conversa__seta {
+  color: var(--conversas-mudo);
+}
+
+.conversas__vazio {
+  padding: 40px 20px;
+  border: 1px dashed var(--conversas-borda);
+  border-radius: 14px;
+  background: var(--conversas-card);
+  text-align: center;
+}
+
+.conversas__vazio h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.conversas__vazio p {
+  margin: 0;
+  color: var(--conversas-mudo);
+}
+
+@media (max-width: 600px) {
+  .conversas {
+    padding: 24px 14px 32px;
+  }
+
+  .conversas__titulo {
+    font-size: 1.6rem;
+  }
+}

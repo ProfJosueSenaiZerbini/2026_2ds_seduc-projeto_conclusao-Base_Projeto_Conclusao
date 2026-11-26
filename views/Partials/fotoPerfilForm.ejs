@@ -1,0 +1,23 @@
+<%#
+  Botões da foto de perfil, nos perfis privados (contratante e trabalhador). Passe { temFoto }.
+  O arquivo é enviado ao ser escolhido (public/js/fotoPerfil.js); o servidor confere tipo e tamanho.
+%>
+<div class="foto-perfil-acoes">
+  <form action="/perfil/foto" method="POST" enctype="multipart/form-data" class="foto-perfil-form" data-foto-perfil>
+    <label class="foto-perfil-botao">
+      <i class="ph ph-camera" aria-hidden="true"></i>
+      <span><%= temFoto ? 'Trocar foto' : 'Adicionar foto' %></span>
+      <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="foto-perfil-arquivo" id="fotoPerfilArquivo">
+    </label>
+    <noscript><button type="submit" class="foto-perfil-botao">Enviar foto</button></noscript>
+  </form>
+  <% if (temFoto) { %>
+  <form action="/perfil/foto/remover" method="POST" class="foto-perfil-form">
+    <button type="submit" class="foto-perfil-botao foto-perfil-botao--secundario">
+      <i class="ph ph-trash" aria-hidden="true"></i>
+      <span>Remover foto</span>
+    </button>
+  </form>
+  <% } %>
+  <p class="foto-perfil-dica">JPG, PNG ou WebP, até 2 MB.</p>
+</div>

@@ -1,0 +1,48 @@
+<header class="navbar">
+  <div class="navbar__inner">
+    <a href="/hometrabalhador" class="navbar__logo"><img src="/img/logo-ibico-negativo.svg" alt="iBico" width="94" height="34"></a>
+    <nav class="navbar__links">
+      <!-- A classe ativa acompanha a pagina atual. -->
+      <a href="/hometrabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/hometrabalhador' || rotaAtual === '/homeTrabalhador')) ? 'nav-link--active' : '' %>">Início</a>
+      <a href="/historico" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/historico' || rotaAtual === '/historicoTrabalhador')) ? 'nav-link--active' : '' %>">Histórico</a>
+      <a href="/conversas" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual))) ? 'nav-link--active' : '' %>">Conversas</a>
+      <a href="/carteira/trabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/carteira/trabalhador') ? 'nav-link--active' : '' %>">Carteira</a>
+    </nav>
+    
+    <div class="navbar__actions" style="display: flex; align-items: center; gap: 12px;">
+      <!-- Botão para acessar o Perfil -->
+      <a href="/perfil" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/perfil') ? 'nav-link--active' : '' %>" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+        <i class="ph ph-user-circle" aria-hidden="true" style="font-size: 1.2rem;"></i>
+        <span>Meu Perfil</span>
+      </a>
+
+      <!-- Notificações: aceite e recusas das candidaturas (public/js/notificacoes.js). -->
+      <div class="notificacoes" data-notificacoes data-usuario="<%= typeof usuario !== 'undefined' && usuario ? usuario.id : '' %>">
+        <button type="button" class="notificacoes__sino" id="notificacoesBotao" aria-expanded="false" aria-controls="notificacoesPainel" aria-label="Notificações" title="Notificações">
+          <i class="ph ph-bell" aria-hidden="true"></i>
+          <span class="notificacoes__contador" id="notificacoesContador" hidden></span>
+        </button>
+        <div class="notificacoes__painel" id="notificacoesPainel" role="region" aria-labelledby="notificacoesTitulo" hidden>
+          <div class="notificacoes__topo">
+            <strong id="notificacoesTitulo">Notificações</strong>
+            <button type="button" class="notificacoes__som" id="notificacoesSom" aria-pressed="true" title="Som do aviso">
+              <i class="ph ph-speaker-high" aria-hidden="true"></i>
+              <span>Som ligado</span>
+            </button>
+          </div>
+          <ul class="notificacoes__lista" id="notificacoesLista"></ul>
+          <p class="notificacoes__vazio" id="notificacoesVazio">Nenhuma notificação por enquanto.</p>
+        </div>
+      </div>
+
+      <!-- Permite encerrar a sessao sem depender de JavaScript. -->
+      <form action="/logout" method="POST" style="margin: 0;">
+        <button type="submit" class="logout-btn">Sair</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<!-- Avisos que aparecem quando chega uma notificação nova (lidos por leitores de tela). -->
+<div class="notificacoes-avisos" id="notificacoesAvisos" aria-live="polite"></div>
+<script src="/js/notificacoes.js" defer></script>

@@ -1,0 +1,5 @@
+# Commits só de formatação, ignorados pelo git blame (e pelo blame do GitHub).
+# Configuração local, uma vez por clone: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: formatação inicial com Prettier
+ef9cf4c50b4a95b929ce92399581e2f0d41cec87

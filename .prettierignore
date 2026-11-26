@@ -1,0 +1,8 @@
+node_modules
+playwright-report
+test-results
+Docs
+*.sql
+*.ejs
+package-lock.json
+public/img
