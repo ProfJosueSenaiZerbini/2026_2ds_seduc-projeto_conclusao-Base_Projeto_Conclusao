@@ -339,10 +339,22 @@ input:focus {
   box-shadow: 0 0 0 3px var(--profile-glow);
 }
 
+/* Envolve o campo e o botão do olho, para centralizar o botão na altura do campo */
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Esconde o olho nativo do Edge/IE, que duplicaria o botão do iBico */
+.password-input input::-ms-reveal,
+.password-input input::-ms-clear {
+  display: none;
+}
+
 .eye {
   position: absolute;
-  right: 12px;
-  top: 39px;
+  right: 8px;
   width: 32px;
   height: 32px;
   display: grid;
