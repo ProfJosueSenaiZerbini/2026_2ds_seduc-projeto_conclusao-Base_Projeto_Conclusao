@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('Partials/cabecaInstitucional', { titulo: 'Termos de Uso' }) %>
+</head>
+
+<body class="institucional">
+  <%- include('Partials/topoInstitucional') %>
+
+  <main class="institucional-conteudo">
+    <article class="institucional-cartao">
+      <h1 class="institucional-titulo">Termos de Uso</h1>
+      <%- include('Partials/avisoAcademico') %>
+
+      <section class="institucional-secao">
+        <h2>1. O que é o iBico</h2>
+        <p>Plataforma que conecta contratantes que precisam de serviços rápidos e presenciais (bicos) a trabalhadores que buscam renda extra.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>2. Quem pode usar</h2>
+        <p>Maiores de 18 anos (idade entre 18 e 90 anos), que informem dados verdadeiros no cadastro e escolham um perfil: contratante ou trabalhador.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>3. Saldo simulado</h2>
+        <p>Todos os valores da carteira são fictícios. Nenhum dinheiro real é cobrado, transferido ou recebido, e não há integração com bancos, PIX ou meios de pagamento.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>4. Como funciona a contratação</h2>
+        <ol>
+          <li>O contratante publica o bico.</li>
+          <li>O trabalhador se candidata.</li>
+          <li>Ao aceitar um candidato, o valor fica reservado no saldo do contratante.</li>
+          <li>Ao finalizar, o valor é creditado ao trabalhador.</li>
+          <li>Se o bico for cancelado depois do aceite, o valor volta ao contratante.</li>
+        </ol>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>5. Responsabilidades</h2>
+        <p>Contratante e trabalhador combinam os detalhes do serviço pelo chat e são responsáveis pelo que combinam. O iBico não executa os serviços nem garante sua qualidade.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>6. Avaliações</h2>
+        <p>Depois de um bico finalizado, cada participante pode avaliar o outro (nota de 1 a 5 e comentário opcional) em até 7 dias. As avaliações aparecem no perfil público. Não publique ofensas nem dados pessoais nos comentários.</p>
+      </section>
+
+      <a href="/" class="institucional-botao">
+        <i class="ph ph-house" aria-hidden="true"></i> Voltar ao início
+      </a>
+    </article>
+  </main>
+
+  <%- include('Partials/footer') %>
+</body>
+
+</html>
