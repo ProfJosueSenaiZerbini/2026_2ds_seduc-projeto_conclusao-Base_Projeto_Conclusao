@@ -434,7 +434,7 @@ const COLA = [
         ]
     },
     {
-        conta: 'Trabalhador novo, sem avaliações (Juliana Lima)',
+        conta: 'Trabalhadora iniciante (Juliana Lima)',
         email: USUARIOS.juliana.email,
         testes: [
             {
