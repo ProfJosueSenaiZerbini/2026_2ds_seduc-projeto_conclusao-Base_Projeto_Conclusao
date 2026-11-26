@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -59,14 +60,14 @@ try {
   ok(() =>
     assert.equal(
       b.listarEventosCypher({ ordem: "recentes" }, "visitante").length,
-      12
+      eventosLegados.length
     )
   );
   ok(() =>
     assert.equal(
       descoberta.publicacoesDescoberta("eventos", "", false, "visitante")
         .length,
-      12
+      eventosLegados.length
     )
   );
   ok(() =>
@@ -171,14 +172,14 @@ try {
     assert.ok(
       m
         .conexoesCena("visitante", pap)
-        .destaques.some(v => v.url.startsWith("/work-projects/"))
+        .destaques.some(v => v.url.startsWith("/p/"))
     )
   );
   for (const pessoa of conteudo.pessoasCena) {
     const redePessoa = m.conexoesCena("visitante", m.idPessoaCena(pessoa.slug));
     ok(() =>
       assert.ok(
-        redePessoa.conexoes.length > 0 && redePessoa.destaques.length > 0,
+        redePessoa.totalTrabalhos === 0 || redePessoa.destaques.length > 0,
         pessoa.slug
       )
     );
@@ -190,7 +191,9 @@ try {
           "SELECT count(*) n FROM comentarios_conteudo WHERE id LIKE 'cena-%'"
         )
         .get().n,
-      16
+      conteudo.encontrosCena.reduce(
+        (total, obra) => total + (conteudo.conversasCena[obra.id]?.length || 0), 0
+      )
     )
   );
   ok(() =>
@@ -302,6 +305,7 @@ try {
     )
   );
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   const icons = await import("lucide-static");
@@ -376,16 +380,18 @@ try {
     ["eventos", "/events?localizacao="],
     ["conversa", "/interacoes/obra/cena-obra-sem-atalho"],
     ["projetos", "/work-projects"],
-    ["projeto", "/work-projects/cena-projeto-corpo"],
     ["oportunidades", "/opportunities"],
     ["portfolio", "/portfolio/lezin"],
     ["pedido", "/purchases/" + novoPedido],
     ["checkout", "/purchases/" + novoPedido + "/checkout"],
   ];
+  ok(() => assert.equal(conteudo.projetosCena.length, 0));
+  const projetoRetirado = await req("/work-projects/cena-projeto-corpo");
+  ok(() => assert.equal(projetoRetirado.status, 404));
   for (const [nome, url] of pages) {
     const response = await req(url),
       html = await response.text();
-    ok(() => assert.equal(response.status, 200, html));
+    ok(() => assert.equal(response.status, 200, url + ": " + html.slice(0, 300)));
     const visivel = html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<[^>]*>/g, " ");
@@ -412,7 +418,7 @@ try {
       ok(() => assert.match(principal, /Créditos confirmados/));
     }
     if (nome === "perfil-album") {
-      ok(() => assert.match(principal, /href="\/p\/lezin\?obra=demo-album-profetiza-faixa-1#obra-demo-album-profetiza-faixa-1">Intro<\/a>/));
+      ok(() => assert.match(principal, /href="\/p\/lezin\?obra=demo-album-profetiza-faixa-1">Intro<\/a>/));
     }
     if (nome === "conversa")
       ok(() => assert.match(visivel, /Essa começou com uma guia de voz/));

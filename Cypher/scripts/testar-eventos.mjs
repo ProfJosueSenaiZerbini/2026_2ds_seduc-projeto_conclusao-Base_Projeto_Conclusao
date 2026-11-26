@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -496,6 +497,7 @@ try {
   ok(() => assert.equal(b.excluirEventoCypher(leg, "organizador"), false));
   // HTTP com sessões e proteção CSRF reais.
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   app.locals.icones = new Proxy({}, { get: () => "<svg></svg>" });

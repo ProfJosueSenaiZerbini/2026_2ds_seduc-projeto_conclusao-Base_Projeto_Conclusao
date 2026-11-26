@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -453,10 +454,12 @@ try {
   const { protegerEscrita } =
     await import("../dist/src/app/middlewares/seguranca.js");
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.use("/css", express.static("public/css"));
   app.use("/js", express.static("public/js"));
   app.use("/img", express.static("public/img"));
-  app.use("/qa", express.static("artifacts/opportunities-qa"));
+  const pastaQa = path.join(pasta, "opportunities-qa");
+  app.use("/qa", express.static(pastaQa));
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   app.locals.icones = new Proxy(
@@ -596,9 +599,9 @@ try {
       "/messages/conversa-etaria-adulto": "mensagem-bloqueada",
     }[url];
     if (qa) {
-      fs.mkdirSync("artifacts/opportunities-qa", { recursive: true });
+      fs.mkdirSync(pastaQa, { recursive: true });
       fs.writeFileSync(
-        "artifacts/opportunities-qa/" + qa + ".html",
+        path.join(pastaQa, qa + ".html"),
         html.replace(
           "const temaConta =",
           'localStorage.setItem("cypher-tema","dark"); const temaConta ='
@@ -647,10 +650,10 @@ try {
   });
   ok(() => assert.equal(invalid.status, 400));
   assert.ok((await invalid.text()).includes("Procuro profissional"));
-  const msgBloqueada = fs.readFileSync("artifacts/opportunities-qa/mensagem-bloqueada.html", "utf8");
+  const msgBloqueada = fs.readFileSync(path.join(pastaQa, "mensagem-bloqueada.html"), "utf8");
   ok(() => assert.match(msgBloqueada, /proteções etárias/));
   ok(() => assert.ok(!msgBloqueada.includes('name="texto"')));
-  const htmlForm=fs.readFileSync('artifacts/opportunities-qa/formulario.html','utf8');
+  const htmlForm=fs.readFileSync(path.join(pastaQa, 'formulario.html'),'utf8');
   ok(()=>assert.match(htmlForm, /name="descricao"[^>]*aria-invalid="false">/));
   ok(()=>assert.match(htmlForm, /name="contexto"[^>]*aria-invalid="false">/));
   ok(()=>assert.match(htmlForm, /name="condicoes"[^>]*aria-invalid="false">/));
@@ -664,7 +667,7 @@ try {
   if (process.argv.includes("--preview")) {
     console.log("Prévia isolada: " + host + "/qa/lista.html");
     fs.writeFileSync(
-      "artifacts/opportunities-qa/mobile.html",
+      path.join(pastaQa, "mobile.html"),
       '<!doctype html><title>Revisão mobile</title><body style="margin:0;background:#333;display:grid;place-items:center"><iframe title="Cypher mobile" src="/qa/lista.html" style="width:390px;height:844px;border:0"></iframe>'
     );
     await new Promise(resolve => process.once("SIGINT", resolve));

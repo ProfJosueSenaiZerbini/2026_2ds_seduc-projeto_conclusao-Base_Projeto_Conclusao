@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -400,6 +401,7 @@ try {
   verificar(() => assert.ok(!tem("obra:propria")));
   // Servidor isolado com o router real, sessão, CSRF e views reais.
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   app.locals.icones = new Proxy({}, { get: () => "<svg></svg>" });
@@ -687,11 +689,11 @@ try {
   const enviada = await post(conversa, { texto: "Vamos organizar a próxima sessão?", chave: "mensagem-teste-0001" });
   verificar(() => assert.equal(enviada.status, 303));
   const caixaAntesDaLeitura = await ler(conversa, "autor");
-  verificar(() => assert.match(caixaAntesDaLeitura, /· Enviada/));
+  verificar(() => assert.match(caixaAntesDaLeitura, /aria-label="Enviada"/));
   const ladoVisitante = await ler(conversa, "visitante");
   verificar(() => assert.match(ladoVisitante, /próxima sessão/));
   const caixaDepoisDaLeitura = await ler(conversa, "autor");
-  verificar(() => assert.match(caixaDepoisDaLeitura, /· Lida/));
+  verificar(() => assert.match(caixaDepoisDaLeitura, /aria-label="Lida"/));
   const ocultada = await post(conversa + "/hide", {}, "autor");
   verificar(() => assert.equal(ocultada.status, 303));
   const caixaOcultada = await ler("/messages", "autor");

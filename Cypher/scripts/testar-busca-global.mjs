@@ -238,10 +238,9 @@ try {
       html,
       /Cidade Oculta|Segredo Privado|Segredo Pendente|Segredo Rascunho/
     );
-    assert.doesNotMatch(
-      html.match(/<nav class="side-nav"[\s\S]*?<\/nav>/)?.[0] || "",
-      /href="\/search/
-    );
+    const navegacao = html.match(/<nav class="side-nav"[\s\S]*?<\/nav>/)?.[0] || "";
+    assert.match(navegacao, /href="\/search"[^>]*aria-current="page"/);
+    assert.equal((navegacao.match(/href="\/search"/g) || []).length, 1);
     if (tipo === "pessoas") {
       assert.equal((html.match(/class="cy-profile-card"/g) || []).length, 1);
       assert.match(html, /Rapper/);

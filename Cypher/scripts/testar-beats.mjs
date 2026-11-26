@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -537,6 +538,7 @@ try {
   ok(() => assert.equal(m.gestaoBeat("produtor", legado).disponivel, 0));
   // HTTP real: autenticação, CSRF, arquivos privados, EJS e ausência de atalhos de aprovação.
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   app.locals.icones = new Proxy({}, { get: () => "<svg></svg>" });

@@ -1,3 +1,4 @@
+import { configurarNavegacaoTeste } from "./locais-navegacao-teste.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -593,6 +594,7 @@ try {
     assert.equal(db.prepare("SELECT count(*) n FROM colaboracoes").get().n, qtd)
   );
   const app = express();
+  await configurarNavegacaoTeste(app);
   app.set("view engine", "ejs");
   app.set("views", path.resolve("views"));
   app.locals.icones = new Proxy({}, { get: () => "<svg></svg>" });

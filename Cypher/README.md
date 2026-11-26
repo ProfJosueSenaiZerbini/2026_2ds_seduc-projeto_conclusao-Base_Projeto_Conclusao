@@ -34,9 +34,9 @@ npm start
 - `PORT` altera a porta padrão, `3000`.
 - `CYPHER_DB_PATH` altera o caminho do banco, que por padrão é `data/cypher.sqlite`.
 - Na primeira inicialização, o acesso do Administrador Geral é configurado em `.env.local`, com senha aleatória. Consulte esse arquivo para entrar em `/admin/login`; mantenha-o privado. Alterar o arquivo posteriormente não redefine a senha de um administrador já criado.
-- Por padrão, os e-mails são gravados localmente em `data/emails`. Para configurar envio SMTP, consulte [Integração de e-mail](../planoEvolucao/04-implementacao/integracao-email-gmail.md).
+- Por padrão, os e-mails são gravados localmente em `data/emails`. SMTP é opcional.
 
-Para carregar ou atualizar o catálogo de apresentação, execute `npm run seed:catalog`. A carga cria um backup do banco antes da atualização e pode ser repetida. Inclui perfis das 25 profissões, obras, equipes, projetos, oportunidades e beats com diferentes ofertas. Consulte a [curadoria e o funcionamento das aquisições locais](../planoEvolucao/04-implementacao/catalogo-cena-e-apresentacao.md).
+Para carregar ou atualizar o catálogo de apresentação, execute `npm run seed:catalog`. A carga cria um backup do banco antes da atualização e pode ser repetida. Inclui perfis das 25 profissões, obras, equipes, projetos, oportunidades e beats com diferentes ofertas.
 
 ## Estado do projeto
 
@@ -44,33 +44,31 @@ A aplicação possui fluxos de contas e perfis, descoberta e busca, obras, beats
 
 O catálogo segue as **25 profissões** oficiais. O intervalo entre alterações ordinárias posteriores à primeira mudança livre é de **30 dias**.
 
-Ainda há pendências em obras e créditos, Selos Profissionais e interações gerais. O checkout externo de beats aguarda credenciais de teste e homologação no Mercado Pago; sua ausência não libera arquivos Premium.
+Obras, beats e eventos permitem atribuição de créditos. Selos externos passam por revisão. O checkout externo de beats aguarda credenciais de teste e homologação no Mercado Pago; sua ausência não libera arquivos Premium.
 
-Veja o [alinhamento atual e as pendências por requisito](../planoEvolucao/00-planejamento/alinhamento-atual.md).
+O acervo musical separa faixas reutilizáveis de lançamentos e oferece comprovação e revisão administrativa.
 
-O [guia de acervo musical e homologação](../planoEvolucao/04-implementacao/acervo-musical-e-homologacao.md) descreve a comprovação de lançamentos, a migração, a restauração e os testes reproduzíveis.
+Contas incluem recuperação de senha, encerramento e proteção para usuários de 16 e 17 anos.
 
-Contas incluem recuperação de senha, encerramento e proteção para usuários de 16 e 17 anos. Consulte [acesso e proteção](../planoEvolucao/04-implementacao/contas-acesso-e-protecao.md).
+Beats possuem prévias, ofertas versionadas, aceite e entrega privada em `/purchases`.
 
-Beats possuem prévias, ofertas versionadas, aceite e entrega privada em `/purchases`. Consulte [licenciamento e configuração de teste](../planoEvolucao/04-implementacao/modulo-7-beats-e-licenciamento.md).
-
-Eventos possuem inscrições, vagas, presença, avisos, mapa e avaliação elegível. Consulte [participação e limites da entrega](../planoEvolucao/04-implementacao/modulo-8-eventos-e-participacao.md).
+Eventos possuem inscrições, vagas, presença, avisos, mapa e avaliação elegível.
 
 Mensagens privadas aceitam imagens, áudio, vídeo e documentos com acesso restrito aos participantes. Consulte [formatos e limites dos anexos](docs/anexos-mensagens.md).
 
-Projetos e galerias ficam em `/work-projects`, integrados ao Espaço de Trabalho. Consulte [formatos, limites e regras do acervo](../planoEvolucao/04-implementacao/modulo-5-projetos-galerias-e-acervo.md).
+Projetos e galerias ficam em `/work-projects`, integrados ao Espaço de Trabalho.
 
-O portfólio profissional pode ser organizado em `/portfolio/edit`, nos modos Manual e Inteligente. Consulte [modos, moldes e regras de privacidade](../planoEvolucao/04-implementacao/modulo-6-portfolio-profissional.md).
+O portfólio profissional pode ser organizado em `/portfolio/edit`, nos modos Manual e Inteligente.
 
-Usuários enviam suas fotos, capas, cartazes e materiais de trabalhos. Vínculos profissionais ficam em `/representacoes`, com convite, aceite e encerramento. Consulte [mídias próprias e representação](../planoEvolucao/04-implementacao/midias-e-representacao.md).
+Usuários enviam suas fotos, capas, cartazes e materiais de trabalhos. Vínculos profissionais ficam em `/representacoes`, com convite, aceite e encerramento.
 
-Colaborações formais e avaliações ficam em `/colaboracoes`; a revisão administrativa está em `/admin/reputacao`. Consulte [regras e implementação de reputação](../planoEvolucao/04-implementacao/modulo-10-colaboracoes-e-reputacao.md).
+Colaborações formais e avaliações ficam em `/colaboracoes`; a revisão administrativa está em `/admin/reputacao`.
 
-A Central em `/central` reúne guias pesquisáveis e avaliação de utilidade, com edição e indicadores administrativos. Consulte [consulta e ciclo editorial](../planoEvolucao/04-implementacao/modulo-11-central-editorial.md).
+A Central em `/central` reúne guias pesquisáveis e avaliação de utilidade, com edição e indicadores administrativos.
 
-Ajuda, denúncias e recursos ficam em `/suporte`; a análise é feita em `/admin/moderacao`. Consulte [permissões, evidências e medidas](../planoEvolucao/04-implementacao/modulo-12-suporte-e-moderacao.md).
+Ajuda, denúncias e recursos ficam em `/suporte`; a análise é feita em `/admin/moderacao`.
 
-Oportunidades, candidaturas, negociação e pedidos excepcionais possuem [regras de acesso e histórico documentadas](../planoEvolucao/04-implementacao/modulo-9-oportunidades-e-pedidos.md).
+Oportunidades incluem publicação, candidaturas, propostas versionadas, negociação e pedidos excepcionais.
 
 ## Verificação
 
@@ -89,13 +87,19 @@ npm run test:accounts
 npm run test:events
 npm run test:beats
 npm run test:scene
+npm run test:opportunities
+npm run test:search
+node scripts/testar-acervo-musical.mjs
+node scripts/testar-fluxos-sociais.mjs
 ```
 
 Outros testes por domínio estão disponíveis nos scripts do [package.json](package.json). Os testes usam bancos temporários; verificações HTTP precisam de acesso local ao servidor.
 
 ## Documentação
 
-- [Escopo do projeto](../Documentação/01%20-%20Planejamento%20e%20Pesquisa/CYPHER%20-%20Escopo%20do%20Projeto.md)
-- [Requisitos funcionais](../Documentação/02%20-%20Requisitos%20e%20Regras%20de%20Negócios/RF-Cypher.md)
-- [Regras de negócio](../Documentação/02%20-%20Requisitos%20e%20Regras%20de%20Negócios/RN-Cypher.md)
-- [Plano de evolução](../planoEvolucao/README.md)
+- [Escopo do projeto](../Docs/Nova%20Doc/01%20-%20Planejamento%20e%20Pesquisa/CYPHER%20-%20Escopo%20do%20Projeto.md)
+- [Requisitos funcionais](../Docs/Nova%20Doc/02%20-%20Requisitos%20e%20Regras%20de%20Neg%C3%B3cios/RF-Cypher.md)
+- [Regras de negócio](../Docs/Nova%20Doc/02%20-%20Requisitos%20e%20Regras%20de%20Neg%C3%B3cios/RN-Cypher.md)
+- [Requisitos não funcionais](../Docs/Nova%20Doc/02%20-%20Requisitos%20e%20Regras%20de%20Neg%C3%B3cios/RNF-Cypher.md)
+- [Arquitetura](../Docs/Nova%20Doc/04%20-%20Arquitetura%20e%20Tecnologias/ArquiteturaSistema/Arquitetura-do-Sistema-Cypher.md)
+- [Banco, demonstração e diferenças entre versões](docs/entrega-e-validacao.md)

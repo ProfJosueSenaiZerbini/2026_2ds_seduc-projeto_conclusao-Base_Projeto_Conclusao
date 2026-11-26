@@ -506,98 +506,41 @@ export function semearCatalogoCena(
         "demo-workshop-slam-poesia": "Slam da Guilhermina",
         "demo-workshop-beatbox": "Campeonato Nacional de Beatbox",
       };
-      for (const [id, slug] of eventosAnteriores) {
-        const anterior = um(
-          "SELECT * FROM eventos WHERE id=? AND demonstracao=1",
-          id
-        );
-        if (!anterior) continue;
-        const dono = um(
-          "SELECT demonstracao FROM usuarios WHERE id=?",
+      // Bases novas recebem a mesma curadoria, sem depender da presença de eventos legados.
+      for (const [i, [id, slug]] of eventosAnteriores.entries()) {
+        const anterior = um("SELECT * FROM eventos WHERE id=?", id);
+        if (anterior && (!anterior.demonstracao || !um(
+          "SELECT 1 FROM usuarios WHERE id=? AND demonstracao=1",
           anterior.proprietario_id
-        );
-        if (
-          !dono?.demonstracao &&
-          !itemCena("perfil", anterior.proprietario_id)
-        )
-          continue;
-        run(
-          "UPDATE eventos SET proprietario_id=?,demonstracao=0,titulo=? WHERE id=?",
-          idPessoaCena(slug),
-          nomesEventosRap[id],
-          id
-        );
-        const inicio = Date.parse(
-          anterior.data_texto +
-            "T" +
-            (anterior.horario || "19:00").slice(0, 5) +
-            ":00-03:00"
-        );
-        run(
-          "INSERT INTO eventos_configuracoes(evento_id,capacidade,criterios,fuso,inicio_em,fim_em) VALUES(?,80,'Respeite os horários e as orientações da organização.','America/Sao_Paulo',?,?) ON CONFLICT DO NOTHING",
-          id,
-          Number.isFinite(inicio) ? inicio : null,
-          Number.isFinite(inicio) ? inicio + 7200000 : null
-        );
-        registrar("evento", id, "evento:" + id, {
-          organizador: idPessoaCena(slug),
-          migrado: true,
-          localizacao_confirmada: false,
-        });
-      }
-      const eventos: {
-        id: string;
-        autor: string;
-        titulo: string;
-        local: string;
-        descricao: string;
-        dias: number;
-        vagas: number;
-      }[] = [];
-      for (const [i, e] of eventos.entries()) {
-        const data = new Date(agora + e.dias * 86400000)
-            .toISOString()
-            .slice(0, 10),
-          autor = idPessoaCena(e.autor);
-        run(
-          `INSERT INTO eventos(id,proprietario_id,titulo,categoria,data_texto,horario,local,organizador,situacao,cor,descricao,formato,inscricao,tipo_participacao,tema_cartao,demonstracao) VALUES(?,?,?,'Encontro',?,'19:00',?,?,'Inscrições abertas','green',?,'Presencial','Inscrição sujeita à aprovação da organização.','aprovacao','classico',0) ON CONFLICT DO NOTHING`,
-          e.id,
-          autor,
-          e.titulo,
-          data,
-          e.local,
-          pessoasCena.find(p => p.slug === e.autor)!.nome,
-          e.descricao
-        );
-        run(
-          "INSERT INTO eventos_configuracoes(evento_id,capacidade,criterios,fuso,inicio_em,fim_em) VALUES(?,?,?,'America/Sao_Paulo',?,?) ON CONFLICT DO NOTHING",
-          e.id,
-          e.vagas,
-          "Participação mediante inscrição e confirmação da organização. Respeite o horário e os combinados do encontro.",
-          Date.parse(data + "T22:00:00Z"),
-          Date.parse(data + "T00:00:00Z") + 86400000
-        );
-        for (const p of pessoasCena
-          .filter(p => p.slug !== e.autor)
-          .slice(i + 2, i + 5)) {
-          const uid = idPessoaCena(p.slug);
+        ) && !itemCena("perfil", anterior.proprietario_id))) continue;
+
+        const autor = idPessoaCena(slug);
+        const data = anterior?.data_texto ||
+          new Date(agora + (i + 2) * 7 * 86400000).toISOString().slice(0, 10);
+        const titulo = nomesEventosRap[id];
+        if (anterior) {
           run(
-            "INSERT INTO eventos_acompanhamentos(evento_id,usuario_id,interessado,salvo,criada_em) VALUES(?,?,1,1,?) ON CONFLICT DO NOTHING",
-            e.id,
-            uid,
-            agora
+            "UPDATE eventos SET proprietario_id=?,demonstracao=0,titulo=? WHERE id=?",
+            autor, titulo, id
           );
+        } else {
           run(
-            "INSERT INTO eventos_inscricoes(id,evento_id,usuario_id,estado,justificativa,criada_em,atualizada_em) VALUES(?,?,?,'pendente','Gostaria de participar da conversa e conhecer o processo da equipe.',?,?) ON CONFLICT DO NOTHING",
-            e.id + "-" + p.slug,
-            e.id,
-            uid,
-            agora,
-            agora
+            `INSERT INTO eventos(id,proprietario_id,titulo,categoria,data_texto,horario,
+                local,organizador,situacao,descricao,formato,tipo_participacao)
+              VALUES(?,?,?,?,?,'19:00','Local a confirmar',?,'Inscrições abertas',?,'Presencial','aprovacao')`,
+            id, autor, titulo, id.startsWith("demo-workshop-") ? "Workshop" : "Encontro",
+            data, "Catálogo de demonstração",
+            "Evento fictício para testar navegação e inscrições. Data e local não são oficiais."
           );
         }
-        registrar("evento", e.id, "evento:" + e.id, {
-          equipe: e.autor,
+        const inicio = Date.parse(data + "T" + (anterior?.horario || "19:00").slice(0, 5) + ":00-03:00");
+        run(
+          "INSERT INTO eventos_configuracoes(evento_id,capacidade,criterios,fuso,inicio_em,fim_em) VALUES(?,80,'Respeite os horários e as orientações da organização.','America/Sao_Paulo',?,?) ON CONFLICT DO NOTHING",
+          id, Number.isFinite(inicio) ? inicio : null, Number.isFinite(inicio) ? inicio + 7200000 : null
+        );
+        registrar("evento", id, "evento:" + id, {
+          organizador: autor,
+          migrado: Boolean(anterior),
           localizacao_confirmada: false,
         });
       }

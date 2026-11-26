@@ -81,10 +81,10 @@ try {
   const mensagem = { texto: "CONTEUDO_PRIVADO_DO_ENSAIO", chave: "fixture-mensagem-0001" };
   await pedir(rota, "autora", 303, mensagem);
   await pedir(rota, "autora", 303, mensagem);
-  assert.match((await pedir(rota, "autora", 200)).html, /· Enviada/);
+  assert.match((await pedir(rota, "autora", 200)).html, /aria-label="Enviada"/);
   const caixaDestino = await pedir(rota, "parceira", 200);
-  assert.equal(caixaDestino.html.split(mensagem.texto).length - 1, 1);
-  assert.match((await pedir(rota, "autora", 200)).html, /· Lida/);
+  assert.equal(caixaDestino.html.split("<p>" + mensagem.texto + "</p>").length - 1, 1);
+  assert.match((await pedir(rota, "autora", 200)).html, /aria-label="Lida"/);
   await pedir(rota + "/hide", "terceiro", 403, {});
   await pedir(rota + "/hide", "autora", 303, {});
   assert.ok(!(await pedir("/messages", "autora", 200)).html.includes(rota));
