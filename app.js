@@ -13,9 +13,10 @@ import perfilRoutes from './routes/perfilRoutes.js';
 import cepRoutes from './routes/cepRoutes.js';
 import notificacaoRoutes from './routes/notificacaoRoutes.js';
 import conversaRoutes from './routes/conversaRoutes.js';
+import paginasRoutes from './routes/paginasRoutes.js';
 import { modoCepFalso } from './services/cepService.js';
 import { carregarDadosDaSessao } from './middleware/sessaoMiddleware.js';
-import { tratarErro } from './middleware/erroMiddleware.js';
+import { paginaNaoEncontrada, tratarErro } from './middleware/erroMiddleware.js';
 import { iniciaisDoNome } from './services/iniciais.js';
 dotenv.config();
 
@@ -85,6 +86,7 @@ app.use('/perfil', perfilRoutes);
 app.use('/api/cep', cepRoutes);
 app.use('/notificacoes', notificacaoRoutes);
 app.use('/conversas', conversaRoutes);
+app.use('/', paginasRoutes);
 
 // Página inicial do iBico
 app.get('/', (req, res) => {
@@ -102,6 +104,9 @@ app.get('/', (req, res) => {
 
     return res.render('landing');
 });
+
+// Nenhuma rota respondeu: página 404 do iBico (ou JSON, para fetch e /api/).
+app.use(paginaNaoEncontrada);
 
 // Depois de todas as rotas: erros não tratados viram uma resposta genérica.
 app.use(tratarErro);

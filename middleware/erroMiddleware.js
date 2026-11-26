@@ -6,6 +6,20 @@ const MENSAGENS = {
     500: 'Erro interno do servidor.'
 };
 
+// A requisição espera JSON (fetch das telas): responde JSON em vez de texto ou página.
+const pedeJson = (req) =>
+    String(req.headers.accept || '').includes('application/json') ||
+    String(req.headers['content-type'] || '').includes('application/json');
+
+// Depois de todas as rotas e antes de tratarErro: endereço que não existe vira 404 (página do iBico ou JSON).
+export const paginaNaoEncontrada = (req, res) => {
+    if (pedeJson(req) || req.path.startsWith('/api/')) {
+        return res.status(404).json({ sucesso: false, erro: 'Página não encontrada.' });
+    }
+
+    return res.status(404).render('404');
+};
+
 export const tratarErro = (erro, req, res, next) => {
     const informado = Number(erro?.status || erro?.statusCode);
     const status = informado >= 400 && informado < 500 ? informado : 500;
@@ -23,11 +37,7 @@ export const tratarErro = (erro, req, res, next) => {
     }
 
     const mensagem = MENSAGENS[status] || MENSAGENS[400];
-    const querJson =
-        String(req.headers.accept || '').includes('application/json') ||
-        String(req.headers['content-type'] || '').includes('application/json');
-
-    if (querJson) {
+    if (pedeJson(req)) {
         return res.status(status).json({ sucesso: false, erro: mensagem });
     }
 

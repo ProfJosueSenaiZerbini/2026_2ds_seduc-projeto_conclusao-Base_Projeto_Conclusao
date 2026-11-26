@@ -1,0 +1,298 @@
+/* =========================================================
+   IBICO — Páginas institucionais (Termos, Privacidade, Ajuda) e 404
+   Públicas: abrem com ou sem login. Usam só as cores da paleta.css.
+   ========================================================= */
+.institucional {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: var(--contratante-fundo);
+}
+
+.institucional .footer {
+  margin-top: 0;
+}
+
+/* ---------- topo ---------- */
+.institucional-topo {
+  background: var(--cor-branco);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.institucional-topo__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+
+.institucional-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--contratante-verde);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.institucional-voltar:hover {
+  color: var(--contratante-verde-hover);
+  text-decoration: underline;
+}
+
+/* ---------- conteúdo ---------- */
+.institucional-conteudo {
+  flex: 1;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+}
+
+.institucional-cartao {
+  background: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px var(--sombra-cor-leve);
+  padding: 40px 44px;
+}
+
+.institucional-titulo {
+  margin: 0 0 16px;
+  color: var(--contratante-musgo);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.institucional-intro {
+  margin: 0 0 24px;
+  color: var(--cor-texto-suave);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.institucional-aviso {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 0 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--aviso-borda);
+  border-radius: 12px;
+  background: var(--aviso-fundo);
+  color: var(--aviso-escuro);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.institucional-aviso .ph {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 20px;
+}
+
+.institucional-secao + .institucional-secao {
+  margin-top: 24px;
+}
+
+.institucional-secao h2 {
+  margin: 0 0 8px;
+  color: var(--contratante-verde);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.institucional-secao p,
+.institucional-secao li {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.institucional-secao ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.institucional-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 36px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  background: var(--contratante-verde);
+  color: var(--cor-branco);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.institucional-botao:hover {
+  background: var(--contratante-verde-hover);
+}
+
+.institucional-voltar:focus-visible,
+.institucional-botao:focus-visible,
+.faq-item summary:focus-visible {
+  outline: 2px solid var(--contratante-verde);
+  outline-offset: 3px;
+}
+
+/* ---------- central de ajuda ---------- */
+.faq-grupo + .faq-grupo {
+  margin-top: 32px;
+}
+
+.faq-grupo__cabeca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.faq-grupo__cabeca h2 {
+  margin: 0;
+  color: var(--contratante-musgo);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.faq-grupo--trabalhador .faq-grupo__cabeca h2 {
+  color: var(--trabalhador-vermelho);
+}
+
+.faq-grupo .faq-grupo__mascote {
+  width: 64px;
+}
+
+.faq-grupo__icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--contratante-verde-suave);
+  color: var(--contratante-verde);
+  font-size: 24px;
+}
+
+.faq-item {
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-fundo);
+}
+
+.faq-item + .faq-item {
+  margin-top: 10px;
+}
+
+.faq-grupo--trabalhador .faq-item {
+  border-color: var(--trabalhador-borda);
+  background: var(--trabalhador-creme-claro);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: var(--cor-texto);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  flex-shrink: 0;
+  color: var(--contratante-verde);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.faq-grupo--trabalhador .faq-item summary::after {
+  color: var(--trabalhador-vermelho);
+}
+
+.faq-item[open] summary::after {
+  content: '−';
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 16px 16px;
+  color: var(--cor-texto-suave);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ---------- 404 ---------- */
+.nao-encontrada {
+  text-align: center;
+}
+
+.nao-encontrada .mascote {
+  margin: 0 auto 20px;
+}
+
+.nao-encontrada__codigo {
+  margin: 0 0 4px;
+  color: var(--contratante-verde-claro);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.nao-encontrada__texto {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.nao-encontrada .institucional-botao {
+  margin-top: 28px;
+}
+
+/* ---------- telas pequenas ---------- */
+@media (max-width: 600px) {
+  .institucional-topo__inner {
+    padding: 12px 16px;
+  }
+
+  .institucional-conteudo {
+    padding: 20px 12px 40px;
+  }
+
+  .institucional-cartao {
+    padding: 24px 18px;
+    border-radius: 12px;
+  }
+
+  .institucional-titulo {
+    font-size: 26px;
+  }
+
+  .institucional-botao {
+    justify-content: center;
+    width: 100%;
+  }
+}

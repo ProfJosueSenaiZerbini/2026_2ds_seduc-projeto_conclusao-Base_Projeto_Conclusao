@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('Partials/cabecaInstitucional', { titulo: 'Política de Privacidade' }) %>
+</head>
+
+<body class="institucional">
+  <%- include('Partials/topoInstitucional') %>
+
+  <main class="institucional-conteudo">
+    <article class="institucional-cartao">
+      <h1 class="institucional-titulo">Política de Privacidade</h1>
+      <%- include('Partials/avisoAcademico') %>
+
+      <section class="institucional-secao">
+        <h2>1. Dados coletados</h2>
+        <p>Nome, e-mail, CPF, idade, perfil escolhido, foto de perfil (opcional), bicos publicados, candidaturas, mensagens do chat, avaliações e movimentações do saldo simulado.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>2. Para que usamos</h2>
+        <p>Identificar o usuário, permitir o login, mostrar os bicos e candidaturas, permitir a conversa entre as partes e calcular a reputação.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>3. O que fica público</h2>
+        <p>No perfil público aparecem nome, tipo de perfil, foto, data de cadastro, nota média, bicos concluídos e avaliações recebidas. <strong>Não</strong> aparecem e-mail, CPF, idade nem saldo.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>4. Segurança</h2>
+        <p>A senha é guardada com hash bcrypt, nunca em texto puro; o acesso às páginas exige login e o perfil correto; as tentativas de login são limitadas.</p>
+      </section>
+
+      <section class="institucional-secao">
+        <h2>5. LGPD</h2>
+        <p>O tratamento dos dados observa a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), em contexto acadêmico. Para dúvidas, procure a equipe do projeto.</p>
+      </section>
+
+      <a href="/" class="institucional-botao">
+        <i class="ph ph-house" aria-hidden="true"></i> Voltar ao início
+      </a>
+    </article>
+  </main>
+
+  <%- include('Partials/footer') %>
+</body>
+
+</html>

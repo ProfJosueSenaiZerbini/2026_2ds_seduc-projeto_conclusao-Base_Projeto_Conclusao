@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('Partials/cabecaInstitucional', { titulo: 'Página não encontrada' }) %>
+</head>
+
+<body class="institucional">
+  <%- include('Partials/topoInstitucional') %>
+
+  <main class="institucional-conteudo">
+    <section class="institucional-cartao nao-encontrada">
+      <%- include('Partials/mascote', { ave: 'araponga', tamanho: 150 }) %>
+      <p class="nao-encontrada__codigo" aria-hidden="true">404</p>
+      <h1 class="institucional-titulo">Página não encontrada</h1>
+      <p class="nao-encontrada__texto">Esse endereço não existe ou foi removido.</p>
+      <a href="/" class="institucional-botao">
+        <i class="ph ph-house" aria-hidden="true"></i> Voltar ao início
+      </a>
+    </section>
+  </main>
+
+  <%- include('Partials/footer') %>
+</body>
+
+</html>
