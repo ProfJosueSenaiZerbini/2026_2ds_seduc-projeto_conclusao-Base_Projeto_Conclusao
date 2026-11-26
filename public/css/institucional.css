@@ -1,5 +1,5 @@
 /* =========================================================
-   IBICO — Páginas institucionais (Termos, Privacidade, Ajuda)
+   IBICO — Páginas institucionais (Termos, Privacidade, Ajuda) e 404
    Públicas: abrem com ou sem login. Usam só as cores da paleta.css.
    ========================================================= */
 .institucional {
@@ -242,6 +242,34 @@
   color: var(--cor-texto-suave);
   font-size: 15px;
   line-height: 1.6;
+}
+
+/* ---------- 404 ---------- */
+.nao-encontrada {
+  text-align: center;
+}
+
+.nao-encontrada .mascote {
+  margin: 0 auto 20px;
+}
+
+.nao-encontrada__codigo {
+  margin: 0 0 4px;
+  color: var(--contratante-verde-claro);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.nao-encontrada__texto {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.nao-encontrada .institucional-botao {
+  margin-top: 28px;
 }
 
 /* ---------- telas pequenas ---------- */

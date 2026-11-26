@@ -64,3 +64,34 @@ test.describe('Páginas institucionais', () => {
         await ctx.close();
     });
 });
+
+test.describe('Página 404', () => {
+    test('endereço inexistente responde 404 com a página do iBico', async ({ page }) => {
+        const resposta = await page.goto(`${BASE}/pagina-que-nao-existe`);
+
+        expect(resposta.status()).toBe(404);
+        await expect(page.getByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeVisible();
+        await expect(page.getByText('Esse endereço não existe ou foi removido.')).toBeVisible();
+
+        await page.locator('main').getByRole('link', { name: 'Voltar ao início' }).click();
+        await expect(page).toHaveURL(`${BASE}/`);
+    });
+
+    test('/api/ inexistente responde 404 em JSON', async ({ request }) => {
+        const resposta = await request.get(`${BASE}/api/qualquer-coisa`, { failOnStatusCode: false });
+
+        expect(resposta.status()).toBe(404);
+        expect(resposta.headers()['content-type']).toContain('application/json');
+        expect(await resposta.json()).toEqual({ sucesso: false, erro: 'Página não encontrada.' });
+    });
+
+    test('pedido em JSON para endereço inexistente também recebe JSON', async ({ request }) => {
+        const resposta = await request.get(`${BASE}/nao-existe`, {
+            headers: { accept: 'application/json' },
+            failOnStatusCode: false
+        });
+
+        expect(resposta.status()).toBe(404);
+        expect(await resposta.json()).toEqual({ sucesso: false, erro: 'Página não encontrada.' });
+    });
+});
