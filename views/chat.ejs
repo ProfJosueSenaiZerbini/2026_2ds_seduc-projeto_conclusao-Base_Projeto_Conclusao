@@ -13,9 +13,10 @@
 
 <% const ehContratante = usuario.tipo_perfil && usuario.tipo_perfil.toLowerCase() === 'contratante'; %>
 <body<%- ehContratante ? ' class="chat--contratante"' : '' %>>
-  <% const rotaVolta = ehContratante
-    ? `/bicos/${bico.id}/gerenciar`
-    : '/historico'; %>
+  <% const veioDeConversas = (typeof voltarParaConversas !== 'undefined') && voltarParaConversas; %>
+  <% const rotaVolta = veioDeConversas
+    ? '/conversas'
+    : (ehContratante ? `/bicos/${bico.id}/gerenciar` : '/historico'); %>
 
   <main class="chat-screen">
     <header class="chat-header">

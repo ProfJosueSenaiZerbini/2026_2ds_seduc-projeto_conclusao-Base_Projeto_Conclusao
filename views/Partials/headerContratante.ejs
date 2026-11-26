@@ -54,6 +54,16 @@
       <span class="sidebar-nav__label">Bicos</span>
     </a>
     <a
+      href="/conversas"
+      class="sidebar-nav__link <%= rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual) ? 'active' : '' %>"
+      aria-label="Conversas"
+      title="Conversas"
+      <%- rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual) ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-chat-circle" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Conversas</span>
+    </a>
+    <a
       href="/carteira/contratante"
       class="sidebar-nav__link <%= rotaAtual === '/carteira/contratante' ? 'active' : '' %>"
       aria-label="Carteira"

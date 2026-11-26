@@ -5,6 +5,7 @@
       <!-- A classe ativa acompanha a pagina atual. -->
       <a href="/hometrabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/hometrabalhador' || rotaAtual === '/homeTrabalhador')) ? 'nav-link--active' : '' %>">Início</a>
       <a href="/historico" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/historico' || rotaAtual === '/historicoTrabalhador')) ? 'nav-link--active' : '' %>">Histórico</a>
+      <a href="/conversas" class="nav-link <%= (typeof rotaAtual !== 'undefined' && (rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual))) ? 'nav-link--active' : '' %>">Conversas</a>
       <a href="/carteira/trabalhador" class="nav-link <%= (typeof rotaAtual !== 'undefined' && rotaAtual === '/carteira/trabalhador') ? 'nav-link--active' : '' %>">Carteira</a>
     </nav>
     

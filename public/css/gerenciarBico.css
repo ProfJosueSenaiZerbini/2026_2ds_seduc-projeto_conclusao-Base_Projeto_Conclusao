@@ -133,6 +133,13 @@ body {
     transform 0.18s ease;
 }
 
+.manage-job__button:has(.ph) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .manage-job__button:hover:not(:disabled) {
   transform: translateY(-1px);
 }

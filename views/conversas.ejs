@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iBico | Conversas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/paleta.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/conversas.css">
+  <link rel="stylesheet" href="/css/mascotes.css">
+  <%- include('Partials/phosphorIcons') %>
+</head>
+
+<% const ehContratante = perfil === 'contratante'; %>
+<body class="<%= ehContratante ? 'conversas--contratante' : 'conversas--trabalhador' %>">
+
+  <%- include(ehContratante ? 'Partials/headerContratante' : 'Partials/headertrabalhador') %>
+
+  <main class="conversas">
+    <header class="conversas__topo">
+      <p class="conversas__etiqueta">Mensagens</p>
+      <h1 class="conversas__titulo">Conversas</h1>
+      <p class="conversas__subtitulo">
+        <%= ehContratante
+          ? 'Fale com os trabalhadores cujas candidaturas você aceitou.'
+          : 'Fale com os contratantes que aceitaram a sua candidatura.' %>
+      </p>
+    </header>
+
+    <% if (conversas.length === 0) { %>
+      <section class="conversas__vazio" aria-label="Nenhuma conversa">
+        <%- include('Partials/mascoteVazio', { area: perfil }) %>
+        <h2>Nenhuma conversa por enquanto</h2>
+        <p>
+          <%= ehContratante
+            ? 'As conversas aparecem aqui depois que você aceitar um candidato.'
+            : 'As conversas aparecem aqui depois que um contratante aceitar a sua candidatura.' %>
+        </p>
+      </section>
+    <% } else { %>
+      <ul class="conversas__lista" aria-label="Suas conversas">
+        <% conversas.forEach((c) => { %>
+          <li>
+            <a class="conversa" href="/bicos/candidaturas/<%= c.candidaturaId %>/chat?de=conversas">
+              <%- include('Partials/avatar', { nome: c.outroNome, fotoUrl: c.outroFotoUrl, classe: 'conversa__avatar' }) %>
+              <span class="conversa__corpo">
+                <span class="conversa__linha">
+                  <strong class="conversa__nome"><%= c.outroNome %></strong>
+                  <% if (c.temMensagem) { %><time class="conversa__horario"><%= c.ultimaHorario %></time><% } %>
+                </span>
+                <span class="conversa__bico"><i class="ph ph-briefcase" aria-hidden="true"></i> <%= c.titulo %></span>
+                <span class="conversa__previa <%= c.temMensagem ? '' : 'conversa__previa--vazia' %>">
+                  <% if (c.temMensagem) { %><%= c.ultimaPropria ? 'Você: ' : '' %><%= c.ultimaPrevia %><% } else { %>Nenhuma mensagem ainda. Comece a conversa.<% } %>
+                </span>
+              </span>
+              <i class="ph ph-caret-right conversa__seta" aria-hidden="true"></i>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </main>
+
+</body>
+
+</html>

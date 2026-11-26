@@ -91,7 +91,9 @@ export const exibirChatCandidatura = async (req, res) => {
             candidaturaId: req.params.candidatura_id,
             mensagens,
             // Bico cancelado: a conversa continua legível, mas não aceita novas mensagens.
-            conversaBloqueada: candidatura.bico_status === 'Cancelado'
+            conversaBloqueada: candidatura.bico_status === 'Cancelado',
+            // Veio da caixa de conversas (?de=conversas): o botão voltar retorna para lá.
+            voltarParaConversas: req.query?.de === 'conversas'
         });
     } catch (erro) {
         console.error('Erro ao abrir conversa da candidatura:', erro);
