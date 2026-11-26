@@ -33,12 +33,10 @@ body {
   text-decoration: none;
 }
 
-.brand-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--global-ibico-brand);
+.brand__logo {
+  display: block;
+  width: auto;
+  height: 32px;
 }
 
 .avatar {
@@ -114,26 +112,30 @@ body:has(.contractor-sidebar.is-collapsed) {
   min-width: 0;
   gap: 11px;
   color: var(--contractor-sidebar-white);
-  font-family: inherit;
-  font-size: 21px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.04em;
   text-decoration: none;
   white-space: nowrap;
 }
 
-.sidebar-brand__mark {
-  display: grid;
+/* Menu aberto: a logo (versão para fundo escuro). Menu recolhido: só o ícone. */
+.sidebar-brand__logo {
+  display: block;
+  width: auto;
+  height: 34px;
+}
+
+.sidebar-brand__icone {
+  display: none;
   flex: 0 0 40px;
   width: 40px;
   height: 40px;
-  place-items: center;
-  border-radius: 14px 14px 14px 5px;
-  background: var(--contractor-sidebar-accent);
-  color: var(--contractor-sidebar-primary);
-  font-size: 25px;
-  line-height: 1;
+}
+
+.contractor-sidebar.is-collapsed .sidebar-brand__logo {
+  display: none;
+}
+
+.contractor-sidebar.is-collapsed .sidebar-brand__icone {
+  display: block;
 }
 
 .sidebar-collapse-toggle,
@@ -382,7 +384,6 @@ body:has(.contractor-sidebar.is-collapsed) {
   flex-direction: column;
 }
 
-.contractor-sidebar.is-collapsed .sidebar-brand__text,
 .contractor-sidebar.is-collapsed .sidebar-nav__label,
 .contractor-sidebar.is-collapsed .sidebar-balance__details,
 .contractor-sidebar.is-collapsed .sidebar-account__name {
@@ -431,16 +432,6 @@ body:has(.contractor-sidebar.is-collapsed) {
 }
 
 @media (min-width: 1025px) {
-  .contractor-sidebar.is-collapsed .sidebar-brand {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .contractor-sidebar.is-collapsed .sidebar-brand__text {
-    max-width: 64px;
-    opacity: 1;
-  }
-
   .contractor-sidebar.is-collapsed .sidebar-nav,
   .contractor-sidebar.is-collapsed .sidebar-balance,
   .contractor-sidebar.is-collapsed .sidebar-account {
@@ -484,12 +475,14 @@ body:has(.contractor-sidebar.is-collapsed) {
     flex-direction: row;
   }
 
-  .contractor-sidebar.is-collapsed .sidebar-brand {
-    flex-direction: row;
-    gap: 11px;
+  .contractor-sidebar.is-collapsed .sidebar-brand__logo {
+    display: block;
   }
 
-  .contractor-sidebar.is-collapsed .sidebar-brand__text,
+  .contractor-sidebar.is-collapsed .sidebar-brand__icone {
+    display: none;
+  }
+
   .contractor-sidebar.is-collapsed .sidebar-nav__label,
   .contractor-sidebar.is-collapsed .sidebar-balance__details,
   .contractor-sidebar.is-collapsed .sidebar-account__name {
@@ -638,11 +631,14 @@ body:has(.contractor-sidebar.is-collapsed) {
 }
 
 .navbar__logo {
-  font-size: 1.4rem;
-  font-weight: 800;
-  line-height: 1.2;
-  color: var(--worker-header-ink);
-  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navbar__logo img {
+  display: block;
+  width: auto;
+  height: 34px;
 }
 
 .navbar__links {
@@ -789,10 +785,6 @@ body:has(.contractor-sidebar.is-collapsed) {
 .footer--worker .footer-col a.brand,
 .footer--worker .footer-col a.hint-link {
   color: var(--trabalhador-vermelho);
-}
-
-.footer--worker .brand-dot {
-  background-color: var(--trabalhador-vermelho);
 }
 
 .footer--worker .footer__description,

@@ -264,11 +264,10 @@ body {
   text-decoration: none;
 }
 
-.brand-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--brand-500);
+.brand__logo {
+  display: block;
+  width: auto;
+  height: 32px;
 }
 
 .auth-title {

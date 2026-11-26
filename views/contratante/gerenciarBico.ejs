@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/css/gerenciarBico.css">
   <link rel="stylesheet" href="/css/mascotes.css">
   <%- include('../Partials/phosphorIcons') %>
+<link rel="icon" type="image/svg+xml" href="/img/icone-ibico.svg">
 </head>
 
 <body>
@@ -133,7 +134,7 @@
                           </form>
                         </div>
                         <% } else if (c.status_candidatura==='Aceito' ) { %>
-                          <a class="manage-job__button manage-job__button--secondary" href="/bicos/candidaturas/<%= c.candidatura_id %>/chat">Abrir conversa</a>
+                          <a class="manage-job__button manage-job__button--primary" href="/bicos/candidaturas/<%= c.candidatura_id %>/chat"><i class="ph ph-chat-circle" aria-hidden="true"></i> Abrir conversa</a>
                           <% } %>
                     </article>
                     <% }); %>

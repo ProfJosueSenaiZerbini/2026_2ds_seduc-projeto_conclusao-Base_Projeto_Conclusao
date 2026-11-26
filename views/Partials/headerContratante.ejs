@@ -6,8 +6,8 @@
 >
   <div class="contractor-sidebar__top">
     <a href="/homeContratante" class="sidebar-brand" aria-label="iBico — início">
-      <span class="sidebar-brand__mark" aria-hidden="true">i</span>
-      <span class="sidebar-brand__text">iBico</span>
+      <img class="sidebar-brand__icone" src="/img/icone-ibico.svg" alt="iBico" width="40" height="40">
+      <img class="sidebar-brand__logo" src="/img/logo-ibico-negativo.svg" alt="iBico" width="94" height="34">
     </a>
     <button
       class="sidebar-collapse-toggle"
@@ -52,6 +52,16 @@
     >
       <i class="ph ph-briefcase" aria-hidden="true"></i>
       <span class="sidebar-nav__label">Bicos</span>
+    </a>
+    <a
+      href="/conversas"
+      class="sidebar-nav__link <%= rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual) ? 'active' : '' %>"
+      aria-label="Conversas"
+      title="Conversas"
+      <%- rotaAtual === '/conversas' || /^\/bicos\/candidaturas\/\d+\/chat/.test(rotaAtual) ? 'aria-current="page"' : '' %>
+    >
+      <i class="ph ph-chat-circle" aria-hidden="true"></i>
+      <span class="sidebar-nav__label">Conversas</span>
     </a>
     <a
       href="/carteira/contratante"

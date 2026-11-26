@@ -106,26 +106,13 @@ body[data-profile='trabalhador'] {
   display: inline-flex;
   align-items: center;
   justify-self: start;
-  gap: 8px;
-  color: var(--ink);
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.07em;
   text-decoration: none;
 }
 
-.landing-brand__mark {
-  display: grid;
-  width: 29px;
-  height: 29px;
-  place-items: center;
-  border-radius: 50% 50% 50% 12%;
-  background: var(--identity);
-  color: var(--cream);
-  font-size: 20px;
-  font-style: italic;
-  font-weight: 700;
-  transition: background-color 220ms ease;
+.landing-brand__logo {
+  display: block;
+  width: auto;
+  height: 38px;
 }
 
 .landing-nav,
@@ -910,14 +897,8 @@ body[data-profile='trabalhador'] .landing-hero::after {
   gap: 30px;
 }
 
-.landing-footer .landing-brand {
-  font-size: 18px;
-}
-
-.landing-footer .landing-brand__mark {
-  width: 25px;
-  height: 25px;
-  font-size: 17px;
+.landing-footer .landing-brand__logo {
+  height: 32px;
 }
 
 .landing-footer__state {
